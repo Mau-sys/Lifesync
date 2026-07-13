@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS lifesync;
+
 USE lifesync;
 
 CREATE TABLE IF NOT EXISTS usuario(
@@ -87,7 +89,16 @@ id_usuario INT NOT NULL,
 
 id_insignia INT NOT NULL,
 
-fecha_obtenida DATETIME DEFAULT CURRENT_TIMESTAMP);
+fecha_obtenida DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+FOREIGN KEY(id_usuario)
+REFERENCES usuario(id_usuario),
+
+
+FOREIGN KEY(id_insignia)
+REFERENCES insignias(id_insignia)
+
+);
 
 CREATE TABLE IF NOT EXISTS notificaciones(
 id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
@@ -100,7 +111,12 @@ mensaje TEXT NOT NULL,
 
 leida BOOLEAN DEFAULT FALSE,
 
-fecha_notificacion DATETIME DEFAULT CURRENT_TIMESTAMP);
+fecha_notificacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+FOREIGN KEY(id_usuario)
+REFERENCES usuario(id_usuario)
+
+);
 
 CREATE TABLE IF NOT EXISTS configuracionnotificaciones(
 id_configuracion INT AUTO_INCREMENT PRIMARY KEY,
@@ -109,7 +125,12 @@ id_usuario INT NOT NULL UNIQUE,
 
 correo_recordatorios BOOLEAN DEFAULT TRUE,
 
-correo_logros BOOLEAN DEFAULT TRUE);  
+correo_logros BOOLEAN DEFAULT TRUE,
+
+FOREIGN KEY(id_usuario)
+REFERENCES usuario(id_usuario)
+
+);  
 
 CREATE TABLE IF NOT EXISTS registroshabitos(
 id_registro INT AUTO_INCREMENT PRIMARY KEY,
@@ -120,6 +141,11 @@ valor_registrado DECIMAL(10,2) NOT NULL,
 
 fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-observaciones VARCHAR(255));
+observaciones VARCHAR(255),
+
+FOREIGN KEY(id_habito)
+REFERENCES habitos(id_habito)
+
+);
  
  
