@@ -82,7 +82,7 @@ descripcion VARCHAR(255),
 
 imagen VARCHAR(255));
 
-CREATE TABLE IF NOT EXISTS usuariosinsignias(
+CREATE TABLE IF NOT EXISTS usuarios_insignias(
 id_usuario_insignia INT AUTO_INCREMENT PRIMARY KEY,
 
 id_usuario INT NOT NULL,
@@ -118,7 +118,7 @@ REFERENCES usuario(id_usuario)
 
 );
 
-CREATE TABLE IF NOT EXISTS configuracionnotificaciones(
+CREATE TABLE IF NOT EXISTS configuracion_notificaciones(
 id_configuracion INT AUTO_INCREMENT PRIMARY KEY,
 
 id_usuario INT NOT NULL UNIQUE,
@@ -132,7 +132,7 @@ REFERENCES usuario(id_usuario)
 
 );  
 
-CREATE TABLE IF NOT EXISTS registroshabitos(
+CREATE TABLE IF NOT EXISTS registros_habitos(
 id_registro INT AUTO_INCREMENT PRIMARY KEY,
 
 id_habito INT NOT NULL,
