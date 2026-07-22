@@ -1,0 +1,82 @@
+body{
+    background:#000;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+.perfil{
+
+    width:360px;
+    background:#0b0b0b;
+    border-radius:20px;
+    padding:30px;
+    color:white;
+
+}
+
+.avatar{
+
+    width:70px;
+    height:70px;
+    background:#7B2EFF;
+    border-radius:50%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:35px;
+    color:white;
+
+}
+
+.editar{
+
+    color:#7B2EFF;
+    cursor:pointer;
+
+}
+
+.list-group{
+
+    background:none;
+
+}
+
+.opcion{
+
+    background:transparent !important;
+    color:white !important;
+
+    border:none;
+    border-bottom:1px solid #222;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:18px 10px;
+
+    transition:.3s;
+
+}
+
+.opcion:hover{
+
+    background:#181818 !important;
+    border-radius:10px;
+    color:#58CC02 !important;
+
+}
+
+.opcion i{
+
+    color:#7B2EFF;
+    font-size:18px;
+
+}
+
+.text-danger i{
+
+    color:#dc3545;
+
+}
