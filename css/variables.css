@@ -1,0 +1,119 @@
+:root {
+
+    --color-fondo: #000219;
+
+    --color-fondo-secundario: #080B26;
+
+    --color-superficie: #10142F;
+
+    --color-superficie-clara: #181D3D;
+
+
+    --color-morado: #8B5CF6;
+
+    --color-morado-oscuro: #7044D8;
+
+    --color-celeste: #00D4FF;
+
+    --color-rosado: #FF4D9D;
+
+    --color-naranja: #FF9F1C;
+
+    --color-verde: #2CD478;
+
+
+    --color-blanco: #FFFFFF;
+
+    --color-negro: #000000;
+
+
+    --color-texto-principal: #FFFFFF;
+
+    --color-texto-secundario: #B8BDD6;
+
+    --color-texto-suave: #777D9D;
+
+
+    --color-borde: #292E50;
+
+    --color-error: #FF5C7A;
+
+    --color-exito: #2CD478;
+
+
+    --color-hidratacion: #00D4FF;
+
+    --color-alimentacion: #2CD478;
+
+    --color-salud-mental: #8B5CF6;
+
+    --color-actividad-fisica: #FF9F1C;
+
+    --color-registro-academico: #FF4D9D;
+
+    --color-personalizada: #FF9F1C;
+
+
+    --fuente-principal: "Poppins", sans-serif;
+
+    --fuente-titulos: "Sora", sans-serif;
+
+
+    --peso-regular: 400;
+
+    --peso-medium: 500;
+
+    --peso-semibold: 600;
+
+    --peso-bold: 700;
+
+
+    --radio-pequeno: 8px;
+
+    --radio-medio: 14px;
+
+    --radio-grande: 22px;
+
+    --radio-redondo: 50%;
+
+
+    --sombra-suave:
+        0 8px 25px rgba(0, 0, 0, 0.18);
+
+    --sombra-morada:
+        0 8px 25px rgba(139, 92, 246, 0.25);
+
+
+    --transicion: 0.25s ease;
+
+
+    --ancho-maximo: 1200px;
+
+}
+
+
+[data-theme="light"] {
+
+    --color-fondo: #FFFFFF;
+
+    --color-fondo-secundario: #F7F8FC;
+
+    --color-superficie: #FFFFFF;
+
+    --color-superficie-clara: #F1F2F8;
+
+
+    --color-texto-principal: #111111;
+
+    --color-texto-secundario: #555555;
+
+    --color-texto-suave: #777777;
+
+
+    --color-borde: #E4E5EC;
+
+
+    --sombra-suave:
+        0 8px 25px rgba(0, 0, 0, 0.10);
+
+}

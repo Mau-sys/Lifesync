@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Registro de usuario en LifeSync">
+
+    <title>LifeSync | Registrarse</title>
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/general.css">
+    <link rel="stylesheet" href="../css/registro.css">
+
+</head>
+
+<body>
+
+    <main class="register-page">
+
+        <section class="register-card">
+
+            <div class="header-register">
+
+                <h1>
+
+                    Crear cuenta
+
+                </h1>
+
+                <p>
+
+                    Comienza tu mejor versión
+
+                </p>
+
+            </div>
+
+            <form
+                id="registroForm"
+                class="register-form"
+                action=""
+                method="post">
+
+                <div class="input-group">
+
+                    <label for="nombre">
+
+                        Nombre completo
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Ingresa tu nombre completo"
+                        autocomplete="name"
+                        required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="correo">
+
+                        Correo electrónico
+
+                    </label>
+
+                    <input
+                        type="email"
+                        id="correo"
+                        name="correo"
+                        placeholder="Ingresa tu correo electrónico"
+                        autocomplete="email"
+                        required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="password">
+
+                        Contraseña
+
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Crea una contraseña"
+                        autocomplete="new-password"
+                        required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="confirmarPassword">
+
+                        Confirmar contraseña
+
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmarPassword"
+                        name="confirmarPassword"
+                        placeholder="Confirma tu contraseña"
+                        autocomplete="new-password"
+                        required>
+
+                </div>
+
+                <p
+                    id="mensajeError"
+                    class="mensaje-error">
+
+                </p>
+
+                <button
+                    type="submit"
+                    id="btnRegistro"
+                    class="btn-primary">
+
+                    Registrarse
+
+                </button>
+
+            </form>
+
+            <div class="social-register">
+
+                <p>
+
+                    O continúa con
+
+                </p>
+
+                <div class="social-buttons">
+
+                    <button
+                        type="button"
+                        id="googleRegister"
+                        class="social-button">
+
+                        <img
+                            src="Logo-G.png"
+                            alt="Google">
+
+                    </button>
+
+                    <button
+                        type="button"
+                        id="appleRegister"
+                        class="social-button">
+
+                        <img
+                            src="Logo-A.png"
+                            alt="Apple">
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <p class="login-link">
+
+                ¿Ya tienes una cuenta?
+
+                <a
+                    href="../Inicio-Sesion/Inicio-sesion.html">
+
+                    Inicia sesión
+
+                </a>
+
+            </p>
+
+        </section>
+
+    </main>
+
+    <script src="../js/registro.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Configuración general de LifeSync">
+
+    <title>LifeSync | Configuración</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/general.css">
+    <link rel="stylesheet" href="../../css/configuracion.css">
+
+</head>
+
+<body>
+
+    <main class="contenedor-configuracion">
+
+        <header class="encabezado">
+
+            <a
+                href="../Perfil.html"
+                class="volver">
+
+                ← Volver
+
+            </a>
+
+            <h1>
+
+                Configuración
+
+            </h1>
+
+            <p>
+
+                Personaliza el funcionamiento de tu cuenta.
+
+            </p>
+
+        </header>
+
+        <form
+            id="configuracionForm"
+            class="configuracion-form">
+
+            <section class="seccion-configuracion">
+
+                <h2>
+
+                    Apariencia
+
+                </h2>
+
+                <div class="opcion">
+
+                    <div>
+
+                        <h3>
+
+                            Tema oscuro
+
+                        </h3>
+
+                        <p>
+
+                            Activa el tema oscuro de LifeSync.
+
+                        </p>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="modoOscuro"
+                            name="modoOscuro"
+                            checked>
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </section>
+
+            <section class="seccion-configuracion">
+
+                <h2>
+
+                    Idioma
+
+                </h2>
+
+                <div class="campo">
+
+                    <label for="idioma">
+
+                        Selecciona el idioma
+
+                    </label>
+
+                    <select
+                        id="idioma"
+                        name="idioma">
+
+                        <option value="es">
+
+                            Español
+
+                        </option>
+
+                        <option value="en">
+
+                            English
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </section>
+
+            <section class="seccion-configuracion">
+
+                <h2>
+
+                    Notificaciones
+
+                </h2>
+
+                <div class="opcion">
+
+                    <div>
+
+                        <h3>
+
+                            Activar notificaciones
+
+                        </h3>
+
+                        <p>
+
+                            Recibe recordatorios de tus hábitos.
+
+                        </p>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="notificaciones"
+                            name="notificaciones">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </section>
+
+            <section class="seccion-configuracion">
+
+                <h2>
+
+                    Privacidad
+
+                </h2>
+
+                <div class="opcion">
+
+                    <div>
+
+                        <h3>
+
+                            Perfil público
+
+                        </h3>
+
+                        <p>
+
+                            Permite que otros usuarios vean tu perfil.
+
+                        </p>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="perfilPublico"
+                            name="perfilPublico">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </section>
+
+            <section class="acciones">
+
+                <button
+                    type="submit"
+                    id="btnGuardarConfiguracion"
+                    class="btn-principal">
+
+                    Guardar cambios
+
+                </button>
+
+            </section>
+
+        </form>
+
+    </main>
+
+    <script src="../../js/configuracion.js"></script>
+
+</body>
+
+</html>

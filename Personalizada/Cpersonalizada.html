@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Visualiza y administra un hábito personalizado de LifeSync">
+
+    <title>LifeSync | Hábito personalizado</title>
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/general.css">
+    <link rel="stylesheet" href="../css/personalizada.css">
+
+</head>
+
+<body>
+
+    <main class="contenedor-categoria">
+
+        <header class="encabezado">
+
+            <a
+                href="../Categorias/Categorias.html"
+                class="volver">
+
+                ← Volver
+
+            </a>
+
+            <button
+                type="button"
+                id="btnOpciones"
+                class="btn-opciones">
+
+                ⋮
+
+            </button>
+
+        </header>
+
+        <section class="encabezado-categoria">
+
+            <img
+                src="H-Perzona.png"
+                alt="Hábito personalizado"
+                class="icono-categoria">
+
+            <div>
+
+                <h1 id="nombreCategoria"></h1>
+
+                <p id="descripcionCategoria"></p>
+
+            </div>
+
+        </section>
+
+        <section
+            id="progresoCategoria"
+            class="progreso-categoria">
+
+        </section>
+
+        <section
+            id="informacionCategoria"
+            class="informacion-categoria">
+
+        </section>
+
+        <section
+            id="panelCategoria"
+            class="panel-categoria">
+
+        </section>
+
+        <section class="acciones-categoria">
+
+            <button
+                type="button"
+                id="btnRegistrar"
+                class="btn-principal">
+
+            </button>
+
+            <button
+                type="button"
+                id="btnEditar"
+                class="btn-secundario">
+
+            </button>
+
+            <button
+                type="button"
+                id="btnEliminar"
+                class="btn-peligro">
+
+            </button>
+
+        </section>
+
+        <section class="historial">
+
+            <h2>
+
+                Historial
+
+            </h2>
+
+            <div
+                id="historialCategoria"
+                class="lista-historial">
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="../js/personalizada.js"></script>
+
+</body>
+
+</html>

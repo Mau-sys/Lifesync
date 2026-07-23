@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Datos personales del usuario">
+
+    <title>LifeSync | Datos personales</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/general.css">
+    <link rel="stylesheet" href="../../css/datos-personales.css">
+
+</head>
+
+<body>
+
+    <main class="contenedor-datos">
+
+        <header class="encabezado">
+
+            <a
+                href="../Perfil.html"
+                class="volver">
+
+                ← Volver
+
+            </a>
+
+            <h1>
+
+                Datos personales
+
+            </h1>
+
+        </header>
+
+        <section class="foto-perfil">
+
+            <img
+                src="Perfil.png"
+                alt="Foto de perfil"
+                id="fotoPerfil">
+
+            <label
+                for="nuevaFoto"
+                class="btn-cambiar-foto">
+
+                Cambiar foto
+
+            </label>
+
+            <input
+                type="file"
+                id="nuevaFoto"
+                accept="image/*">
+
+        </section>
+
+        <form
+            id="formDatosPersonales"
+            autocomplete="off">
+
+            <div class="campo">
+
+                <label for="usuario">
+
+                    Nombre de usuario
+
+                </label>
+
+                <input
+                    type="text"
+                    id="usuario"
+                    name="usuario">
+
+            </div>
+
+            <div class="campo">
+
+                <label for="nombreCompleto">
+
+                    Nombre completo
+
+                </label>
+
+                <input
+                    type="text"
+                    id="nombreCompleto"
+                    name="nombreCompleto">
+
+            </div>
+
+            <div class="campo">
+
+                <label for="correo">
+
+                    Correo electrónico
+
+                </label>
+
+                <input
+                    type="email"
+                    id="correo"
+                    name="correo">
+
+            </div>
+
+            <div class="campo">
+
+                <label for="fechaNacimiento">
+
+                    Fecha de nacimiento
+
+                </label>
+
+                <input
+                    type="date"
+                    id="fechaNacimiento"
+                    name="fechaNacimiento">
+
+            </div>
+
+            <div class="campo">
+
+                <label for="genero">
+
+                    Género
+
+                </label>
+
+                <select
+                    id="genero"
+                    name="genero">
+
+                    <option value="">Seleccionar</option>
+
+                    <option value="femenino">Femenino</option>
+
+                    <option value="masculino">Masculino</option>
+
+                    <option value="otro">Prefiero no decirlo</option>
+
+                </select>
+
+            </div>
+
+            <hr>
+
+            <h2>
+
+                Seguridad
+
+            </h2>
+
+            <div class="campo">
+
+                <label for="contrasenaActual">
+
+                    Contraseña actual
+
+                </label>
+
+                <input
+                    type="password"
+                    id="contrasenaActual"
+                    name="contrasenaActual">
+
+            </div>
+
+            <div class="campo">
+
+                <label for="nuevaContrasena">
+
+                    Nueva contraseña
+
+                </label>
+
+                <input
+                    type="password"
+                    id="nuevaContrasena"
+                    name="nuevaContrasena">
+
+            </div>
+
+            <div class="campo">
+
+                <label for="confirmarContrasena">
+
+                    Confirmar nueva contraseña
+
+                </label>
+
+                <input
+                    type="password"
+                    id="confirmarContrasena"
+                    name="confirmarContrasena">
+
+            </div>
+
+            <div class="acciones">
+
+                <button
+                    type="submit"
+                    id="btnGuardar">
+
+                    Guardar cambios
+
+                </button>
+
+                <button
+                    type="button"
+                    id="btnCancelar">
+
+                    Cancelar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </main>
+
+    <script src="../../js/datos-personales.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Visualiza tus rachas en LifeSync">
+
+    <title>LifeSync | Rachas</title>
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/general.css">
+    <link rel="stylesheet" href="../css/racha.css">
+
+</head>
+
+<body>
+
+    <main class="contenedor-racha">
+
+        <header class="encabezado">
+
+            <a
+                href="../Pagina-Inicio/inicio.html"
+                class="volver">
+
+                ← Volver
+
+            </a>
+
+            <h1>
+
+                Rachas
+
+            </h1>
+
+            <p>
+
+                Mantén tus hábitos y observa cómo tu constelación se ilumina.
+
+            </p>
+
+        </header>
+
+        <section class="constelacion">
+
+            <h2>
+
+                Tu constelación
+
+            </h2>
+
+            <p>
+
+                Cada día que completes todos tus hábitos iluminará una nueva estrella.
+
+            </p>
+
+            <div
+                id="constelacionUsuario"
+                class="constelacion-grid">
+
+            </div>
+
+        </section>
+
+        <section class="racha-actual">
+
+            <img
+                src="Racha.png"
+                alt="Racha"
+                class="icono-racha">
+
+            <h2>
+
+                Racha actual
+
+            </h2>
+
+            <span id="rachaActual">
+
+                0 días
+
+            </span>
+
+            <p>
+
+                ¡Sigue así! Cada día consecutivo fortalece tu constancia.
+
+            </p>
+
+        </section>
+
+        <section class="resumen">
+
+            <article class="tarjeta-resumen">
+
+                <h3>
+
+                    Mejor racha
+
+                </h3>
+
+                <span id="mejorRacha">
+
+                    0 días
+
+                </span>
+
+            </article>
+
+            <article class="tarjeta-resumen">
+
+                <h3>
+
+                    Hábitos completados
+
+                </h3>
+
+                <span id="habitosCompletados">
+
+                    0
+
+                </span>
+
+            </article>
+
+            <article class="tarjeta-resumen">
+
+                <h3>
+
+                    Días registrados
+
+                </h3>
+
+                <span id="diasRegistrados">
+
+                    0
+
+                </span>
+
+            </article>
+
+        </section>
+
+        <section class="categorias">
+
+            <h2>
+
+                Constancia por categoría
+
+            </h2>
+
+            <div id="listaCategorias">
+
+            </div>
+
+        </section>
+
+        <section class="historial">
+
+            <h2>
+
+                Historial de rachas
+
+            </h2>
+
+            <div
+                id="historialRachas"
+                class="lista-historial">
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="../js/racha.js"></script>
+
+</body>
+
+</html>

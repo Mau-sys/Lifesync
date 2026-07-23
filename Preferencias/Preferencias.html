@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Selecciona las categorías que deseas utilizar en LifeSync">
+
+    <title>LifeSync | Preferencias</title>
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/general.css">
+    <link rel="stylesheet" href="../css/preferencias.css">
+
+</head>
+
+<body>
+
+    <main class="preferences-page">
+
+        <section class="preferences-card">
+
+            <header class="preferences-header">
+
+                <h1>Preferencias</h1>
+
+                <p>
+
+                    Activa o desactiva hábitos.
+
+                </p>
+
+            </header>
+
+            <form
+                id="preferenciasForm"
+                class="preferences-form">
+
+                <div class="categoria">
+
+                    <div class="categoria-info">
+
+                        <img
+                            src="Hidrat.png"
+                            alt="Hidratación">
+
+                        <div>
+
+                            <h3>Hidratación</h3>
+
+                            <p>Controla tu consumo diario de agua.</p>
+
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="hidratacion"
+                            name="hidratacion">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="categoria">
+
+                    <div class="categoria-info">
+
+                        <img
+                            src="Alimen.png"
+                            alt="Alimentación">
+
+                        <div>
+
+                            <h3>Alimentación</h3>
+
+                            <p>Registra tus comidas diarias.</p>
+
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="alimentacion"
+                            name="alimentacion">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="categoria">
+
+                    <div class="categoria-info">
+
+                        <img
+                            src="S-Mental.png"
+                            alt="Salud Mental">
+
+                        <div>
+
+                            <h3>Salud Mental</h3>
+
+                            <p>Haz seguimiento a tus descansos y bienestar.</p>
+
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="saludMental"
+                            name="saludMental">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="categoria">
+
+                    <div class="categoria-info">
+
+                        <img
+                            src="A-Fisica.png"
+                            alt="Actividad Física">
+
+                        <div>
+
+                            <h3>Actividad Física</h3>
+
+                            <p>Registra tus sesiones de ejercicio.</p>
+
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="actividadFisica"
+                            name="actividadFisica">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="categoria">
+
+                    <div class="categoria-info">
+
+                        <img
+                            src="R-Academ.png"
+                            alt="Registro Académico">
+
+                        <div>
+
+                            <h3>Registro Académico</h3>
+
+                            <p>Organiza tus actividades y tareas.</p>
+
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="registroAcademico"
+                            name="registroAcademico">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="categoria">
+
+                    <div class="categoria-info">
+
+                        <img
+                            src="H-Perzona.png"
+                            alt="Hábito Personalizado">
+
+                        <div>
+
+                            <h3>Hábito Personalizado</h3>
+
+                            <p>Crea un hábito completamente personalizado.</p>
+
+                        </div>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="habitoPersonalizado"
+                            name="habitoPersonalizado">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <p
+                    id="mensajePreferencias"
+                    class="mensaje">
+
+                </p>
+
+                <button
+                    type="submit"
+                    id="btnGuardarPreferencias"
+                    class="btn-primary">
+
+                    Guardar
+
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script src="../js/preferencias.js"></script>
+
+</body>
+
+</html>

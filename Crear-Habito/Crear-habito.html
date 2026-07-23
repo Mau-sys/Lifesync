@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Crea un hábito personalizado en LifeSync">
+
+    <title>LifeSync | Crear hábito personalizado</title>
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/general.css">
+    <link rel="stylesheet" href="../css/crear-habito.css">
+
+</head>
+
+<body>
+
+    <main class="habit-page">
+
+        <section class="habit-card">
+
+            <a
+                href="../Preferencias/Preferencias.html"
+                class="btn-back">
+
+                ← Volver
+
+            </a>
+
+            <header class="habit-header">
+
+                <h1>Define tu hábito</h1>
+
+                <p>
+
+                    Personaliza un hábito que se adapte a tus objetivos.
+
+                </p>
+
+            </header>
+
+            <form
+                id="habitoForm"
+                class="habit-form"
+                action=""
+                method="post">
+
+                <div class="input-group">
+
+                    <label for="nombreHabito">
+
+                        Nombre del hábito
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nombreHabito"
+                        name="nombreHabito"
+                        placeholder="Ej. Leer 20 páginas"
+                        required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="objetivo">
+
+                        Objetivo
+
+                    </label>
+
+                    <textarea
+                        id="objetivo"
+                        name="objetivo"
+                        rows="3"
+                        placeholder="Describe el objetivo de tu hábito..."
+                        required></textarea>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="frecuencia">
+
+                        Frecuencia
+
+                    </label>
+
+                    <select
+                        id="frecuencia"
+                        name="frecuencia"
+                        required>
+
+                        <option value="">Selecciona una opción</option>
+
+                        <option value="diario">Diario</option>
+
+                        <option value="semanal">Semanal</option>
+
+                        <option value="mensual">Mensual</option>
+
+                    </select>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="fechaInicio">
+
+                        Fecha de inicio
+
+                    </label>
+
+                    <input
+                        type="date"
+                        id="fechaInicio"
+                        name="fechaInicio"
+                        required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="fechaFin">
+
+                        Fecha de finalización
+
+                    </label>
+
+                    <input
+                        type="date"
+                        id="fechaFin"
+                        name="fechaFin"
+                        required>
+
+                </div>
+
+                <p
+                    id="mensajeHabito"
+                    class="mensaje">
+
+                </p>
+
+                <button
+                    type="submit"
+                    id="guardarHabito"
+                    class="btn-primary">
+
+                    Guardar hábito
+
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script src="../js/crear-habito.js"></script>
+
+</body>
+
+</html>
