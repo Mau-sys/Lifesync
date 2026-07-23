@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salud Mental</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Exclusivo de Salud Mental -->
+    <link rel="stylesheet" href="css/SaludMental.css">
+</head>
+<body class="bg-salud min-vh-100 d-flex align-items-center justify-content-center p-3 p-md-5">
+
+    <div class="card-habito shadow-lg w-100">
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-options p-0" id="btn-options-salud" aria-label="Opciones">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+        </div>
+        
+        <div class="text-center mb-4">
+            <div class="icon-circle bg-purple-soft mx-auto mb-2">
+                <i class="fa-solid fa-brain text-purple"></i>
+            </div>
+            <h4 class="fw-bold text-dark mt-2">Salud Mental</h4>
+        </div>
+
+        <div class="progress-ring ring-purple mx-auto mb-4" id="ring-pausas">
+            <div class="progress-content">
+                <h2 class="fw-bold mb-0 text-dark" id="contador-pausas">1/2</h2>
+                <span class="text-muted small fw-semibold">pausas</span>
+            </div>
+        </div>
+
+        <div class="text-center mb-4">
+            <span class="text-muted d-block small fw-bold text-uppercase tracking-wider">Meta diaria</span>
+            <span class="text-purple fw-bold fs-6" id="meta-pausas">2 pausas conscientes</span>
+        </div>
+
+        <div class="pausas-container mb-4" id="lista-pausas">
+            <span class="fw-bold d-block mb-3 text-dark small text-uppercase tracking-wider">Pausas de hoy</span>
+            <div class="pausa-item d-flex justify-content-between align-items-center mb-2 p-2 px-3 rounded-3">
+                <span class="text-secondary fw-semibold small">8:00 AM</span>
+                <i class="fa-solid fa-circle-check text-purple fs-5"></i>
+            </div>
+            <div class="pausa-item d-flex justify-content-between align-items-center p-2 px-3 rounded-3">
+                <span class="text-secondary fw-semibold small">12:10 PM</span>
+                <i class="fa-solid fa-circle-check text-purple fs-5"></i>
+            </div>
+        </div>
+
+        <button class="btn btn-action-purple w-100 rounded-pill fw-bold py-3" id="btn-add-pausa">+1 pausa</button>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
