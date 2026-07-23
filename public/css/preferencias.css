@@ -1,0 +1,204 @@
+* {
+
+margin: 0;
+
+padding: 0;
+
+box-sizing: border-box;
+
+font-family: Arial, sans-serif;
+
+}
+
+body {
+
+background: #ffcccc;
+
+display: flex;
+
+justify-content: center;
+
+align-items: center;
+
+min-height: 100vh;
+
+}
+
+
+
+.content {
+padding: 50px 25px 30px;
+
+}
+
+h2 {
+
+text-align: center;
+color: #222;
+
+margin-bottom: 5px;
+
+}
+
+.subtitle {
+
+text-align: center;
+
+color: #666;
+
+font-size: 12px;
+
+margin-bottom: 25px;
+
+}
+
+.preference {
+
+display: flex;
+
+align-items: center;
+
+justify-content: space-between;
+
+margin-bottom: 18px;
+
+}
+
+.pref-info {
+
+display: flex;
+
+align-items: center;
+
+gap: 12px;
+
+}
+
+.pref-info i {
+
+font-size: 20px;
+width: 24px;
+
+text-align: center;
+
+}
+
+.pref-name {
+
+font-size: 13px;
+
+color: #333;
+
+}
+
+.water {
+
+color: #3aa7ff;
+
+}
+
+.food {
+
+color: #45c24e;
+
+}
+
+.mental {
+
+color: #9c4dff;
+
+}
+
+.exercise {
+
+color: #f4b000;
+
+}
+
+.academic {
+
+color: #ff4da6;
+
+}
+
+.custom {
+
+color: #ff9933;
+
+}
+
+input[type="checkbox"] {
+
+width: 16px;
+
+height: 16px;
+
+accent-color: #000;
+
+}
+
+.button-container {
+
+margin-top: 35px;
+
+text-align: center;
+
+}
+
+button {
+
+width: 140px;
+
+height: 40px;
+
+border: none;
+
+border-radius: 8px;
+
+background: #0d1220;
+
+color: white;
+
+font-weight: bold;
+
+cursor: pointer;
+
+transition: 0.3s;
+
+}
+
+button:hover {
+
+background: #1c2541;
+
+}
+
+.water {
+    color: #3AA7FF;
+}
+
+.food {
+    color: #49C44A;
+}
+
+.mental {
+    color: #9B59FF;
+}
+
+.exercise {
+    color: #F4B000;
+}
+
+.academic {
+    color: #FF4DA6;
+}
+
+.custom {
+    color: #FF8C42;
+}
+
+.pref-info i {
+    font-size: 22px;
+    width: 30px;
+    text-align: center;
+}
