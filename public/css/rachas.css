@@ -1,0 +1,15 @@
+    body {
+            margin: 0;
+            font-family: poppins;
+            background-color: black;
+        }
+
+        .racha {
+            position: fixed; 
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
