@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Estadísticas del progreso del usuario">
+
+    <title>LifeSync | Estadísticas</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/general.css">
+    <link rel="stylesheet" href="../../css/estadisticas.css">
+
+</head>
+
+<body>
+
+    <main class="contenedor-estadisticas">
+
+        <header class="encabezado">
+
+            <a
+                href="../Perfil.html"
+                class="volver">
+
+                ← Volver
+
+            </a>
+
+            <h1>
+
+                Estadísticas
+
+            </h1>
+
+            <p>
+
+                Consulta tu progreso y analiza el cumplimiento de tus hábitos.
+
+            </p>
+
+        </header>
+
+        <section class="resumen-general">
+
+            <article class="tarjeta-resumen">
+
+                <h2>
+
+                    Progreso general
+
+                </h2>
+
+                <p id="progresoGeneral">
+
+                    0%
+
+                </p>
+
+            </article>
+
+            <article class="tarjeta-resumen">
+
+                <h2>
+
+                    Días en racha
+
+                </h2>
+
+                <p id="diasRacha">
+
+                    0
+
+                </p>
+
+            </article>
+
+            <article class="tarjeta-resumen">
+
+                <h2>
+
+                    Hábitos completados
+
+                </h2>
+
+                <p id="habitosCompletados">
+
+                    0
+
+                </p>
+
+            </article>
+
+        </section>
+
+        <section class="filtro">
+
+            <label for="periodo">
+
+                Mostrar estadísticas de:
+
+            </label>
+
+            <select
+                id="periodo"
+                name="periodo">
+
+                <option value="semana">
+
+                    Esta semana
+
+                </option>
+
+                <option value="mes">
+
+                    Este mes
+
+                </option>
+
+                <option value="anio">
+
+                    Este año
+
+                </option>
+
+            </select>
+
+        </section>
+
+        <section class="grafica-general">
+
+            <h2>
+
+                Progreso general
+
+            </h2>
+
+            <div id="graficaGeneral">
+
+            </div>
+
+        </section>
+
+        <section class="estadisticas-categorias">
+
+            <h2>
+
+                Categorías
+
+            </h2>
+
+            <div id="listaCategorias">
+
+            </div>
+
+        </section>
+
+        <section class="estadisticas-habitos">
+
+            <h2>
+
+                Hábitos personalizados
+
+            </h2>
+
+            <div id="listaHabitos">
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="../../js/estadisticas.js"></script>
+
+</body>
+
+</html>
