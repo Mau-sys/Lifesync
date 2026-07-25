@@ -2,116 +2,131 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil</title>
 
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="description"
+          content="Perfil del usuario - LifeSync">
 
-    
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>LifeSync | Perfil</title>
 
-    <link rel="stylesheet" href="css/pegrfil.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/perfil.css">
+
 </head>
 
-<body class="bg-dark">
+<body>
 
-    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center py-4">
+    <main class="perfil-container">
 
-        <div class="row justify-content-center w-100">
+        <section class="perfil-superior">
 
-            <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4">
+            <div class="perfil-info">
 
-                <div class="card shadow-lg border-0 rounded-4">
+                <img
+                    src="img/Perfil.png"
+                    alt="Foto de perfil"
+                    id="fotoPerfil"
+                    class="foto-perfil">
 
-                    <div class="card-body p-4">
+                <div class="datos-perfil">
 
-                        <h3 class="text-center fw-bold mb-4">
-                            Perfil
-                        </h3>
+                    <h1 id="nombreUsuario"></h1>
 
-                        
-                        <div class="d-flex align-items-center mb-4">
+                    <a
+                        href="Datos-personales/Datos-personales.html"
+                        id="editarPerfil"
+                        class="editar-perfil">
 
-                            <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center me-3"
-                                style="width:90px;height:90px;">
+                        Editar tu perfil
 
-                                <i class="bi bi-person-fill fs-1 text-white"></i>
-
-                            </div>
-
-                            <div class="flex-grow-1">
-
-                                <h4 class="mb-1">Sarah</h4>
-
-                                <a href="#" class="text-decoration-none small">
-                                    Editar tu perfil
-                                </a>
-
-                            </div>
-
-                        </div>
-
-                        
-                        <div class="list-group">
-
-                            <a href="#"
-                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
-                                Datos personales
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-
-                            <a href="#"
-                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
-                                Hábitos anclados
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-
-                            <a href="#"
-                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
-                                Hábito personalizado
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-
-                            <a href="#"
-                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
-                                Recordatorios
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-
-                            <a href="#"
-                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
-                                Estadísticas
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-
-                            <a href="#"
-                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
-                                Configuración
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-
-                            <a href="#"
-                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 text-danger fw-semibold">
-                                Cerrar sesión
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-
-                        </div>
-
-                    </div>
+                    </a>
 
                 </div>
 
             </div>
 
-        </div>
+        </section>
 
-    </div>
+        <nav class="menu-perfil">
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+            <a
+                href="Datos-personales.html"
+                class="opcion-menu"
+                id="btnDatos">
+
+                <span>Datos personales</span>
+
+                <span>›</span>
+
+            </a>
+
+            <a
+                href="HabitoPersonalizado.html"
+                class="opcion-menu"
+                id="btnHabitoPersonalizado">
+
+                <span>Hábitos personalizados</span>
+
+                <span>›</span>
+
+            </a>
+
+            <a
+                href="Recordatorios/Recordatorios.html"
+                class="opcion-menu"
+                id="btnRecordatorios">
+
+                <span>Recordatorios</span>
+
+                <span>›</span>
+
+            </a>
+
+            <a
+                href="Estadisticas/Estadisticas.html"
+                class="opcion-menu"
+                id="btnEstadisticas">
+
+                <span>Estadísticas</span>
+
+                <span>›</span>
+
+            </a>
+
+            <a
+                href="Configuracion/Configuracion.html"
+                class="opcion-menu"
+                id="btnConfiguracion">
+
+                <span>Configuración</span>
+
+                <span>›</span>
+
+            </a>
+
+        </nav>
+
+        <section class="cerrar-sesion">
+
+            <button
+                type="button"
+                id="btnCerrarSesion"
+                class="btn-cerrar">
+
+                Cerrar sesión
+
+            </button>
+
+        </section>
+
+    </main>
+
+    <script src="../js/perfil.js"></script>
 
 </body>
 

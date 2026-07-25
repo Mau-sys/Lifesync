@@ -1,22 +1,455 @@
-    body {
-            margin: 0;
-            font-family: poppins;
-            background-color: black;
-        }
+.contenedor-racha {
 
-        .racha {
-            position: fixed; 
-            top: 10px;
-            left: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-        }
-        
-        .rachaact {
-            font-family: 'Brawler', serif;
-        font-size: 12px;
-        color: #d9d9d9;
-         text-align: center;
-         margin-top: 2px;
-        }
+    width: min(100% - 40px, 1100px);
+
+    margin: 0 auto;
+
+    padding: 40px 0 60px;
+
+}
+
+.constelacion,
+
+.racha-actual,
+
+.resumen,
+
+.categorias,
+
+.historial {
+
+    padding: 28px;
+
+    margin-bottom: 28px;
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-grande);
+
+    box-shadow: var(--sombra-suave);
+
+    transition:
+        background-color var(--transicion),
+        border-color var(--transicion),
+        transform var(--transicion),
+        box-shadow var(--transicion);
+
+}
+
+.constelacion:hover,
+
+.racha-actual:hover,
+
+.resumen:hover,
+
+.categorias:hover,
+
+.historial:hover {
+
+    border-color: var(--color-morado);
+
+    box-shadow: var(--sombra-morada);
+
+    transform: translateY(-2px);
+
+}
+
+.constelacion h2,
+
+.racha-actual h2,
+
+.categorias h2,
+
+.historial h2 {
+
+    margin-bottom: 10px;
+
+}
+
+.constelacion p,
+
+.racha-actual p {
+
+    margin-bottom: 20px;
+
+}
+
+.constelacion-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+
+    gap: 18px;
+
+    justify-items: center;
+
+    align-items: center;
+
+    min-height: 120px;
+
+    padding: 20px;
+
+    border: 1px dashed var(--color-borde);
+
+    border-radius: var(--radio-medio);
+
+    background-color: var(--color-fondo-secundario);
+
+}
+
+.constelacion-grid .estrella {
+
+    font-size: 34px;
+
+    color: #555;
+
+    transition:
+        color var(--transicion),
+        transform var(--transicion);
+
+}
+
+.constelacion-grid .estrella.activa {
+
+    color: var(--color-naranja);
+
+    text-shadow: 0 0 10px rgba(255,159,28,.8);
+
+}
+
+.constelacion-grid .estrella:hover {
+
+    transform: scale(1.2);
+
+}
+
+.racha-actual {
+
+    text-align: center;
+
+}
+
+.icono-racha {
+
+    width: 90px;
+
+    height: 90px;
+
+    margin: 0 auto 20px;
+
+    object-fit: contain;
+
+}
+
+#rachaActual {
+
+    display: block;
+
+    margin: 16px 0;
+
+    font-family: var(--fuente-titulos);
+
+    font-size: 42px;
+
+    font-weight: var(--peso-bold);
+
+    color: var(--color-naranja);
+
+}
+
+.resumen {
+
+    display: grid;
+
+    grid-template-columns: repeat(3,1fr);
+
+    gap: 20px;
+
+}
+
+.tarjeta-resumen {
+
+    padding: 22px;
+
+    text-align: center;
+
+    background-color: var(--color-superficie-clara);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-medio);
+
+    transition:
+        border-color var(--transicion),
+        transform var(--transicion);
+
+}
+
+.tarjeta-resumen:hover {
+
+    border-color: var(--color-morado);
+
+    transform: translateY(-2px);
+
+}
+
+.tarjeta-resumen h3 {
+
+    margin-bottom: 14px;
+
+    font-size: 18px;
+
+}
+
+.tarjeta-resumen span {
+
+    font-size: 32px;
+
+    font-family: var(--fuente-titulos);
+
+    font-weight: var(--peso-bold);
+
+    color: var(--color-morado);
+
+}
+
+#listaCategorias {
+
+    display: grid;
+
+    gap: 18px;
+
+}
+
+.categoria-racha {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    padding: 18px;
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-medio);
+
+    background-color: var(--color-superficie-clara);
+
+    transition:
+        border-color var(--transicion),
+        transform var(--transicion);
+
+}
+
+.categoria-racha:hover {
+
+    border-color: var(--color-morado);
+
+    transform: translateY(-2px);
+
+}
+
+.categoria-racha img {
+
+    width: 55px;
+
+    height: 55px;
+
+    object-fit: contain;
+
+}
+
+.info-categoria {
+
+    flex: 1;
+
+}
+
+.info-categoria h3 {
+
+    margin-bottom: 8px;
+
+    font-size: 18px;
+
+}
+
+.barra {
+
+    width: 100%;
+
+    height: 10px;
+
+    overflow: hidden;
+
+    border-radius: 50px;
+
+    background-color: var(--color-fondo-secundario);
+
+}
+
+.barra span {
+
+    display: block;
+
+    width: 0%;
+
+    height: 100%;
+
+    border-radius: 50px;
+
+    background-color: var(--color-morado);
+
+    transition: width .4s ease;
+
+}
+
+.porcentaje {
+
+    margin-top: 8px;
+
+    text-align: right;
+
+    font-size: 14px;
+
+    color: var(--color-texto-secundario);
+
+}
+
+.lista-historial {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+}
+
+.historial-item {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 18px 20px;
+
+    background-color: var(--color-superficie-clara);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-medio);
+
+    transition:
+        border-color var(--transicion),
+        transform var(--transicion);
+
+}
+
+.historial-item:hover {
+
+    border-color: var(--color-morado);
+
+    transform: translateY(-2px);
+
+}
+
+.historial-item strong {
+
+    color: var(--color-texto-principal);
+
+}
+
+.historial-item span {
+
+    color: var(--color-morado);
+
+    font-weight: var(--peso-semibold);
+
+}
+
+@media (max-width:900px){
+
+    .resumen{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media (max-width:700px){
+
+    .contenedor-racha{
+
+        width:min(100% - 28px,700px);
+
+        padding-top:28px;
+
+    }
+
+    .constelacion,
+
+    .racha-actual,
+
+    .resumen,
+
+    .categorias,
+
+    .historial{
+
+        padding:22px;
+
+    }
+
+    .constelacion-grid{
+
+        grid-template-columns:repeat(auto-fit,minmax(35px,1fr));
+
+    }
+
+}
+
+@media (max-width:480px){
+
+    .contenedor-racha{
+
+        width:calc(100% - 24px);
+
+    }
+
+    .icono-racha{
+
+        width:70px;
+
+        height:70px;
+
+    }
+
+    #rachaActual{
+
+        font-size:34px;
+
+    }
+
+    .tarjeta-resumen span{
+
+        font-size:26px;
+
+    }
+
+    .categoria-racha{
+
+        flex-direction:column;
+
+        text-align:center;
+
+    }
+
+}
