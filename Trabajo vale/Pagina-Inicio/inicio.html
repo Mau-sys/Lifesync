@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Panel principal de LifeSync">
+
+    <title>LifeSync | Inicio</title>
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/general.css">
+    <link rel="stylesheet" href="../css/inicio.css">
+
+</head>
+
+<body>
+
+    <main class="dashboard">
+
+        <header class="header">
+
+            <a
+                href="../Perfil/Perfil.html"
+                class="perfil">
+
+                <img
+                    src="Perfil.png"
+                    alt="Foto de perfil"
+                    id="fotoPerfil"
+                    class="foto-perfil">
+
+                <div>
+
+                    <p class="saludo">
+
+                        ¡Hola,
+
+                        <span id="nombreUsuario">
+
+                            Usuario
+
+                        </span>!
+
+                    </p>
+
+                    <span id="fechaActual"></span>
+
+                </div>
+
+            </a>
+
+            <button
+                type="button"
+                class="btn-notificaciones"
+                id="btnNotificaciones">
+
+                <img
+                    src="Campana.png"
+                    alt="Notificaciones">
+
+            </button>
+
+        </header>
+
+        <a
+            href="../Racha/Racha.html"
+            class="tarjeta-racha"
+            id="tarjetaRacha">
+
+            <div class="info-racha">
+
+                <img
+                    src="Racha.png"
+                    alt="Racha">
+
+                <div>
+
+                    <span id="diasRacha">
+
+                        0
+
+                    </span>
+
+                    <p>
+
+                        días en racha
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <span class="flecha">
+
+                →
+
+            </span>
+
+        </a>
+
+        <section class="progreso">
+
+            <div class="titulo-progreso">
+
+                <span>
+
+                    Progreso del día
+
+                </span>
+
+                <span id="porcentajeGeneral">
+
+                    0%
+
+                </span>
+
+            </div>
+
+            <div class="barra-progreso">
+
+                <div id="barraProgreso"></div>
+
+            </div>
+
+        </section>
+
+        <section class="categorias">
+
+            <h2>
+
+                Hoy
+
+            </h2>
+
+            <div id="contenedorCategorias"></div>
+
+        </section>
+
+        <a
+            href="../Categorias/Categorias.html"
+            class="btnCategorias"
+            id="btnCategorias">
+
+            <span>
+
+                Ver todas las categorías
+
+            </span>
+
+            <span>
+
+                →
+
+            </span>
+
+        </a>
+
+    </main>
+
+    <script src="../js/inicio.js"></script>
+
+</body>
+
+</html>

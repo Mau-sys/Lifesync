@@ -1,0 +1,91 @@
+.contenedor-habitos {
+
+    width: min(100% - 40px, 900px);
+
+    margin: 0 auto;
+
+    padding: 40px 0 60px;
+
+}
+
+
+.sin-habitos {
+
+    padding: 40px 24px;
+
+    margin-bottom: 24px;
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-grande);
+
+    text-align: center;
+
+}
+
+
+.sin-habitos h2 {
+
+    margin-bottom: 8px;
+
+    font-size: 22px;
+
+}
+
+
+.lista-habitos {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+
+    margin-bottom: 24px;
+
+}
+
+
+.nuevo-habito {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+}
+
+
+#btnNuevoHabito {
+
+    min-width: 210px;
+
+}
+
+
+@media (max-width: 600px) {
+
+    .contenedor-habitos {
+
+        width: calc(100% - 28px);
+
+        padding-top: 28px;
+
+    }
+
+
+    .nuevo-habito {
+
+        width: 100%;
+
+    }
+
+
+    #btnNuevoHabito {
+
+        width: 100%;
+
+    }
+
+}

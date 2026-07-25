@@ -1,0 +1,259 @@
+.contenedor-datos {
+
+    width: min(100% - 40px, 850px);
+
+    margin: 0 auto;
+
+    padding: 40px 0 60px;
+
+}
+
+
+.encabezado {
+
+    margin-bottom: 32px;
+
+}
+
+
+.encabezado h1 {
+
+    margin-top: 24px;
+
+}
+
+
+.foto-perfil {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 16px;
+
+    margin-bottom: 36px;
+
+}
+
+
+.foto-perfil img {
+
+    width: 120px;
+
+    height: 120px;
+
+    object-fit: cover;
+
+    border-radius: var(--radio-redondo);
+
+    border: 3px solid var(--color-morado);
+
+}
+
+
+#nuevaFoto {
+
+    display: none;
+
+}
+
+
+.btn-cambiar-foto {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 44px;
+
+    padding: 10px 20px;
+
+    border-radius: var(--radio-medio);
+
+    background-color: var(--color-superficie-clara);
+
+    border: 1px solid var(--color-borde);
+
+    color: var(--color-texto-principal);
+
+    font-weight: var(--peso-medium);
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--transicion),
+        border-color var(--transicion),
+        color var(--transicion);
+
+}
+
+
+.btn-cambiar-foto:hover {
+
+    background-color: var(--color-morado);
+
+    border-color: var(--color-morado);
+
+    color: var(--color-blanco);
+
+}
+
+
+#formDatosPersonales {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+}
+
+
+.campo {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+.campo label {
+
+    color: var(--color-texto-principal);
+
+    font-weight: var(--peso-medium);
+
+}
+
+
+hr {
+
+    width: 100%;
+
+    margin: 16px 0;
+
+    border: none;
+
+    border-top: 1px solid var(--color-borde);
+
+}
+
+
+#formDatosPersonales h2 {
+
+    margin-bottom: 4px;
+
+    font-size: 24px;
+
+}
+
+
+.acciones {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 12px;
+
+}
+
+
+#btnGuardar,
+
+#btnCancelar {
+
+    min-height: 48px;
+
+    padding: 12px 24px;
+
+    border-radius: var(--radio-medio);
+
+    font-weight: var(--peso-semibold);
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--transicion),
+        color var(--transicion),
+        border-color var(--transicion),
+        transform var(--transicion);
+
+}
+
+
+#btnGuardar {
+
+    background-color: var(--color-morado);
+
+    color: var(--color-blanco);
+
+}
+
+
+#btnGuardar:hover {
+
+    background-color: var(--color-morado-oscuro);
+
+    transform: translateY(-2px);
+
+}
+
+
+#btnCancelar {
+
+    background-color: transparent;
+
+    color: var(--color-texto-secundario);
+
+    border: 1px solid var(--color-borde);
+
+}
+
+
+#btnCancelar:hover {
+
+    color: var(--color-morado);
+
+    border-color: var(--color-morado);
+
+}
+
+
+@media (max-width: 600px) {
+
+    .contenedor-datos {
+
+        width: calc(100% - 28px);
+
+        padding-top: 28px;
+
+    }
+
+
+    .acciones {
+
+        flex-direction: column;
+
+    }
+
+
+    #btnGuardar,
+
+    #btnCancelar {
+
+        width: 100%;
+
+    }
+
+}

@@ -1,0 +1,200 @@
+.contenedor-recordatorios {
+
+    width: min(100% - 40px, 900px);
+
+    margin: 0 auto;
+
+    padding: 40px 0 60px;
+
+}
+
+
+.nuevo-recordatorio {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-bottom: 24px;
+
+}
+
+
+#btnNuevoRecordatorio {
+
+    min-width: 210px;
+
+}
+
+
+.formulario-recordatorio {
+
+    padding: 24px;
+
+    margin-bottom: 24px;
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-grande);
+
+    box-shadow: var(--sombra-suave);
+
+}
+
+
+#recordatorioForm {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+}
+
+
+.campo {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+.campo label {
+
+    color: var(--color-texto-principal);
+
+    font-weight: var(--peso-medium);
+
+}
+
+
+.acciones {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 8px;
+
+}
+
+
+#cancelarRecordatorio {
+
+    min-height: 48px;
+
+    padding: 12px 24px;
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-medio);
+
+    background-color: transparent;
+
+    color: var(--color-texto-secundario);
+
+    font-weight: var(--peso-semibold);
+
+    cursor: pointer;
+
+    transition:
+        color var(--transicion),
+        border-color var(--transicion);
+
+}
+
+
+#cancelarRecordatorio:hover {
+
+    color: var(--color-morado);
+
+    border-color: var(--color-morado);
+
+}
+
+
+.lista-recordatorios {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+
+}
+
+
+.sin-recordatorios {
+
+    padding: 40px 24px;
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-grande);
+
+    text-align: center;
+
+}
+
+
+.sin-recordatorios h2 {
+
+    margin-bottom: 8px;
+
+    font-size: 22px;
+
+}
+
+
+@media (max-width: 600px) {
+
+    .contenedor-recordatorios {
+
+        width: calc(100% - 28px);
+
+        padding-top: 28px;
+
+    }
+
+
+    .nuevo-recordatorio {
+
+        width: 100%;
+
+    }
+
+
+    #btnNuevoRecordatorio {
+
+        width: 100%;
+
+    }
+
+
+    .acciones {
+
+        flex-direction: column;
+
+    }
+
+
+    .acciones .btn-principal,
+
+    #cancelarRecordatorio {
+
+        width: 100%;
+
+    }
+
+}

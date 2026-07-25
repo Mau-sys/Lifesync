@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Administra los recordatorios de LifeSync">
+
+    <title>LifeSync | Recordatorios</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/general.css">
+    <link rel="stylesheet" href="../../css/recordatorios.css">
+
+</head>
+
+<body>
+
+    <main class="contenedor-recordatorios">
+
+        <header class="encabezado">
+
+            <a
+                href="../Perfil.html"
+                class="volver">
+
+                ← Volver
+
+            </a>
+
+            <h1>
+
+                Recordatorios
+
+            </h1>
+
+            <p>
+
+                Organiza tus recordatorios para no olvidar ninguno de tus hábitos.
+
+            </p>
+
+        </header>
+
+        <section class="nuevo-recordatorio">
+
+            <button
+                type="button"
+                id="btnNuevoRecordatorio"
+                class="btn-principal">
+
+                Nuevo recordatorio
+
+            </button>
+
+        </section>
+
+        <section
+            id="formularioRecordatorio"
+            class="formulario-recordatorio"
+            hidden>
+
+            <form
+                id="recordatorioForm">
+
+                <div class="campo">
+
+                    <label for="titulo">
+
+                        Nombre del recordatorio
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="titulo"
+                        name="titulo"
+                        placeholder="Ej. Leer 20 páginas, Tomar agua, Meditar">
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="categoria">
+
+                        Categoría
+
+                    </label>
+
+                    <select
+                        id="categoria"
+                        name="categoria">
+
+                        <option value="">Seleccionar</option>
+
+                        <option>Hidratación</option>
+
+                        <option>Alimentación</option>
+
+                        <option>Salud mental</option>
+
+                        <option>Actividad física</option>
+
+                        <option>Registro académico</option>
+
+                        <option>Hábito personalizado</option>
+
+                    </select>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="hora">
+
+                        Hora
+
+                    </label>
+
+                    <input
+                        type="time"
+                        id="hora"
+                        name="hora">
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="repeticion">
+
+                        Repetir
+
+                    </label>
+
+                    <select
+                        id="repeticion"
+                        name="repeticion">
+
+                        <option>Todos los días</option>
+
+                        <option>Lunes a viernes</option>
+
+                        <option>Solo una vez</option>
+
+                        <option>Personalizado</option>
+
+                    </select>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="mensaje">
+
+                        Mensaje
+
+                    </label>
+
+                    <textarea
+                        id="mensaje"
+                        name="mensaje"
+                        rows="3"
+                        placeholder="Agrega una nota o recordatorio (opcional)"></textarea>
+
+                </div>
+
+                <div class="acciones">
+
+                    <button
+                        type="submit"
+                        class="btn-principal">
+
+                        Guardar
+
+                    </button>
+
+                    <button
+                        type="button"
+                        id="cancelarRecordatorio">
+
+                        Cancelar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <section
+            id="listaRecordatorios"
+            class="lista-recordatorios">
+
+        </section>
+
+        <section
+            id="sinRecordatorios"
+            class="sin-recordatorios">
+
+            <h2>
+
+                No tienes recordatorios.
+
+            </h2>
+
+            <p>
+
+                Crea uno para comenzar a recibir notificaciones.
+
+            </p>
+
+        </section>
+
+    </main>
+
+    <script src="../../js/recordatorios.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Académico</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   
+    <link rel="stylesheet" href="css/RegistroAcademico.css">
+</head>
+<body class="bg-academico min-vh-100 d-flex align-items-center justify-content-center p-3 p-md-5">
+
+    <div class="card-habito shadow-lg w-100">
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-options p-0" id="btn-options-academico" aria-label="Opciones">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+        </div>
+        
+        <div class="text-center mb-4">
+            <div class="icon-circle bg-pink-soft mx-auto mb-2">
+                <i class="fa-solid fa-book-open text-pink"></i>
+            </div>
+            <h4 class="fw-bold text-dark mt-2">Registro Académico</h4>
+        </div>
+
+        <div class="progress-ring ring-pink mx-auto mb-4" id="ring-sesiones">
+            <div class="progress-content">
+                <h2 class="fw-bold mb-0 text-dark" id="contador-sesiones">2/5</h2>
+                <span class="text-muted small fw-semibold">sesiones</span>
+            </div>
+        </div>
+
+        <div class="text-center mb-4">
+            <span class="text-muted d-block small fw-bold text-uppercase tracking-wider">Meta diaria</span>
+            <span class="text-pink fw-bold fs-6" id="meta-sesiones">5 sesiones de estudio</span>
+        </div>
+
+        <div class="tiempo-box text-center p-3 rounded-4 mb-4" id="box-tiempo">
+            <span class="text-dark d-block fw-bold small text-uppercase tracking-wider mb-1">Tiempo acumulado</span>
+            <span class="text-pink fw-bold fs-5" id="tiempo-acumulado">80 min / 240 min</span>
+        </div>
+
+        <button class="btn btn-action-pink w-100 rounded-pill fw-bold py-3" id="btn-add-sesion">+1 sesión</button>
+    </div>
+
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
