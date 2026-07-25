@@ -1,0 +1,505 @@
+.dashboard {
+
+    width: min(100% - 48px, 1100px);
+
+    margin: 0 auto;
+
+    padding: 32px 0 48px;
+
+}
+
+
+.header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 28px;
+
+}
+
+
+.perfil {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+}
+
+
+.foto-perfil {
+
+    width: 58px;
+
+    height: 58px;
+
+    object-fit: cover;
+
+    border-radius: var(--radio-redondo);
+
+    border: 2px solid var(--color-morado);
+
+}
+
+
+.saludo {
+
+    color: var(--color-texto-principal);
+
+    font-size: 18px;
+
+    line-height: 1.4;
+
+}
+
+
+.saludo span {
+
+    color: var(--color-morado);
+
+    font-weight: var(--peso-semibold);
+
+}
+
+
+#fechaActual {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--color-texto-suave);
+
+    font-size: 13px;
+
+}
+
+
+.btn-notificaciones {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 46px;
+
+    height: 46px;
+
+    border-radius: var(--radio-redondo);
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    transition:
+
+        background-color var(--transicion),
+
+        border-color var(--transicion),
+
+        transform var(--transicion);
+
+}
+
+
+.btn-notificaciones:hover {
+
+    background-color: var(--color-superficie-clara);
+
+    border-color: var(--color-morado);
+
+    transform: translateY(-2px);
+
+}
+
+
+.btn-notificaciones img {
+
+    width: 23px;
+
+    height: 23px;
+
+    object-fit: contain;
+
+}
+
+
+.tarjeta-racha {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 22px 26px;
+
+    margin-bottom: 28px;
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-grande);
+
+    box-shadow: var(--sombra-suave);
+
+    transition:
+
+        border-color var(--transicion),
+
+        background-color var(--transicion),
+
+        transform var(--transicion),
+
+        box-shadow var(--transicion);
+
+}
+
+
+.tarjeta-racha:hover {
+
+    border-color: var(--color-morado);
+
+    box-shadow: var(--sombra-morada);
+
+    transform: translateY(-2px);
+
+}
+
+
+.info-racha {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+}
+
+
+.info-racha img {
+
+    width: 48px;
+
+    height: 48px;
+
+    object-fit: contain;
+
+}
+
+
+#diasRacha {
+
+    display: block;
+
+    color: var(--color-texto-principal);
+
+    font-family: var(--fuente-titulos);
+
+    font-size: 28px;
+
+    font-weight: var(--peso-bold);
+
+}
+
+
+.info-racha p {
+
+    font-size: 14px;
+
+}
+
+
+.flecha {
+
+    color: var(--color-morado);
+
+    font-size: 26px;
+
+}
+
+
+.progreso {
+
+    padding: 22px 26px;
+
+    margin-bottom: 32px;
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-grande);
+
+}
+
+
+.titulo-progreso {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-bottom: 14px;
+
+    color: var(--color-texto-principal);
+
+    font-weight: var(--peso-semibold);
+
+}
+
+
+#porcentajeGeneral {
+
+    color: var(--color-morado);
+
+}
+
+
+.barra-progreso {
+
+    width: 100%;
+
+    height: 10px;
+
+    overflow: hidden;
+
+    background-color: var(--color-fondo-secundario);
+
+    border-radius: 50px;
+
+}
+
+
+#barraProgreso {
+
+    width: 0%;
+
+    height: 100%;
+
+    background-color: var(--color-morado);
+
+    border-radius: 50px;
+
+    transition: width 0.4s ease;
+
+}
+
+
+.categorias {
+
+    margin-bottom: 28px;
+
+}
+
+
+.categorias h2 {
+
+    margin-bottom: 18px;
+
+    font-size: 24px;
+
+}
+
+
+#contenedorCategorias {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+
+}
+
+
+.categoria {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    min-height: 90px;
+
+    padding: 18px 22px;
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-grande);
+
+    transition:
+
+        border-color var(--transicion),
+
+        background-color var(--transicion),
+
+        transform var(--transicion);
+
+}
+
+
+.categoria:hover {
+
+    border-color: var(--color-morado);
+
+    background-color: var(--color-superficie-clara);
+
+    transform: translateY(-2px);
+
+}
+
+
+.btnCategorias {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    width: 100%;
+
+    min-height: 54px;
+
+    padding: 14px 22px;
+
+    border-radius: var(--radio-medio);
+
+    background-color: var(--color-morado);
+
+    color: var(--color-blanco);
+
+    font-weight: var(--peso-semibold);
+
+    transition:
+
+        background-color var(--transicion),
+
+        transform var(--transicion),
+
+        box-shadow var(--transicion);
+
+}
+
+
+.btnCategorias:hover {
+
+    background-color: var(--color-morado-oscuro);
+
+    box-shadow: var(--sombra-morada);
+
+    transform: translateY(-2px);
+
+}
+
+
+@media (max-width: 768px) {
+
+    .dashboard {
+
+        width: min(100% - 32px, 700px);
+
+        padding-top: 24px;
+
+    }
+
+
+    #contenedorCategorias {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .dashboard {
+
+        width: calc(100% - 24px);
+
+        padding: 18px 0 32px;
+
+    }
+
+
+    .header {
+
+        margin-bottom: 22px;
+
+    }
+
+
+    .foto-perfil {
+
+        width: 50px;
+
+        height: 50px;
+
+    }
+
+
+    .saludo {
+
+        font-size: 16px;
+
+    }
+
+
+    .btn-notificaciones {
+
+        width: 42px;
+
+        height: 42px;
+
+    }
+
+
+    .tarjeta-racha,
+
+    .progreso {
+
+        padding: 18px;
+
+    }
+
+
+    .tarjeta-racha {
+
+        margin-bottom: 20px;
+
+    }
+
+
+    .categorias h2 {
+
+        font-size: 21px;
+
+    }
+
+}
