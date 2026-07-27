@@ -15,7 +15,7 @@ async function cargarInsignias() {
 
     try {
         // Ajusta la ruta del PHP según donde esté guardado (ej. 'php/obtener_insignias.php')
-        const response = await fetch('obtener_insignias.php');
+        const response = await fetch('..//insignias/obtener_insignias.php');
         
         if (!response.ok) {
             throw new Error(`Error en la petición: ${response.statusText}`);

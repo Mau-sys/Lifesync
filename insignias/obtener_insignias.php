@@ -2,29 +2,40 @@
 // Configurar encabezado para respuesta JSON
 header('Content-Type: application/json; charset=utf-8');
 
-// Requerir el archivo de conexión existente
+// Requerir el archivo de conexión
 require_once '../config/conexion.php';
 
 try {
-    // Consulta para obtener las insignias
+    // 1. Instanciar la clase Database
+    $database = new Database();
+    
+    // 2. Obtener la conexión PDO
+    $conexion = $database->getConnection();
+
+    // Validar si la conexión se realizó correctamente
+    if (!$conexion) {
+        throw new Exception("No se pudo establecer la conexión a la base de datos.");
+    }
+
+    // 3. Preparar y ejecutar la consulta
     $sql = "SELECT id_insignia, nombre, descripcion, imagen FROM insignias";
     $stmt = $conexion->prepare($sql);
     $stmt->execute();
-    
-    // Obtener los resultados como array asociativo
+
+    // 4. Obtener todos los resultados
     $insignias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Retornar respuesta exitosa
+    // 5. Retornar los datos en formato JSON
     echo json_encode([
         'status' => 'success',
         'data' => $insignias
     ]);
 
-} catch (PDOException $e) {
-    // Manejo de errores
+} catch (Exception $e) {
+    // Retornar error si algo falla
     echo json_encode([
         'status' => 'error',
-        'message' => 'Error al obtener insignias: ' . $e->getMessage()
+        'message' => 'Error: ' . $e->getMessage()
     ]);
 }
 ?>
