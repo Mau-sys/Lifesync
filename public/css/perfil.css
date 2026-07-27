@@ -8,6 +8,26 @@
 
 }
 
+.contenedor-insignias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.insignia-item {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+}
+
+.insignia-item:hover {
+    transform: scale(1.15);
+    cursor: pointer;
+}
+
 
 .perfil-superior {
 
