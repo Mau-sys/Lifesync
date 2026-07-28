@@ -1,85 +1,100 @@
-body.bg-alimentacion {
-    background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+:root {
+    --ls-bg-dark: #000219;
+    --ls-card-bg: #080b26;
+    --ls-cyan: #00D4FF;
+    --ls-purple: #8B5CF6;
+    --ls-emerald: #2CD478; /* Color principal para Alimentación */
+    --ls-emerald-soft: rgba(44, 212, 120, 0.12);
+    --ls-emerald-glow: rgba(44, 212, 120, 0.35);
+    --ls-text-muted: #94a3b8;
 }
 
-.card-habito {
-    background-color: #ffffff;
-    border-radius: 32px;
-    padding: 30px 25px;
-    max-width: 420px;
-    border: 1px solid rgba(34, 197, 94, 0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.font-sora {
+    font-family: 'Sora', sans-serif !important;
 }
 
-@media (min-width: 992px) {
-    .card-habito {
-        max-width: 460px;
-        padding: 40px 35px;
-    }
-    .card-habito:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 35px rgba(34, 197, 94, 0.18) !important;
-    }
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: var(--ls-bg-dark) !important;
+    font-family: 'Poppins', sans-serif;
+    color: #ffffff;
 }
 
-@media (max-width: 576px) {
-    .card-habito {
-        border-radius: 24px;
-        padding: 24px 18px;
-    }
+.tracking-wider {
+    letter-spacing: 0.08em;
 }
 
-.btn-options {
-    color: #94a3b8;
-    font-size: 1.25rem;
-    border: none;
-    background: transparent;
+.text-subtle {
+    color: var(--ls-text-muted);
 }
-.btn-options:hover {
-    color: #16a34a;
+
+.text-emerald {
+    color: var(--ls-emerald) !important;
 }
+
+
+.card-full-screen {
+    background-color: var(--ls-bg-dark);
+    width: 100vw;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: clamp(1.2rem, 3vh, 3rem) clamp(1.2rem, 5vw, 4rem);
+}
+
 
 .icon-circle {
-    width: 70px;
-    height: 70px;
+    width: clamp(52px, 8vw, 90px);
+    height: clamp(52px, 8vw, 90px);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.bg-green-soft {
-    background-color: #dcfce7;
-}
-.text-green {
-    color: #16a34a !important;
+
+.bg-emerald-soft {
+    background-color: var(--ls-emerald-soft);
+    border: 1px solid rgba(44, 212, 120, 0.25);
 }
 
 .icon-circle i {
-    font-size: 2.2rem;
+    font-size: clamp(1.5rem, 3.5vw, 3rem);
 }
 
 
+.texto-titulo-fluido { font-size: clamp(1.2rem, 2.5vw, 2.2rem); }
+.label-fluido { font-size: clamp(0.7rem, 1.2vw, 1.05rem); }
+.meta-texto-fluido { font-size: clamp(0.95rem, 1.8vw, 1.5rem); }
+.subtexto-fluido { font-size: clamp(0.75rem, 1.3vw, 1.1rem); }
+.boton-fluido { font-size: clamp(1rem, 1.8vw, 1.4rem); }
+
+
 .progress-ring {
-    width: 170px;
-    height: 170px;
+    width: clamp(140px, 28vw, 260px);
+    height: clamp(140px, 28vw, 260px);
+    max-height: 35vh;
+    max-width: 35vh;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    background: conic-gradient(#16a34a 66.6%, #dcfce7 66.6%);
-    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.12);
+    background: conic-gradient(var(--ls-emerald) 66.6%, rgba(44, 212, 120, 0.15) 66.6%);
+    box-shadow: 0 0 30px var(--ls-emerald-glow);
 }
 
 .progress-ring::before {
     content: "";
     position: absolute;
-    top: 12px;
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    background-color: #ffffff;
+    top: clamp(8px, 1.5vw, 16px);
+    left: clamp(8px, 1.5vw, 16px);
+    right: clamp(8px, 1.5vw, 16px);
+    bottom: clamp(8px, 1.5vw, 16px);
+    background-color: var(--ls-bg-dark);
     border-radius: 50%;
 }
 
@@ -89,25 +104,46 @@ body.bg-alimentacion {
     text-align: center;
 }
 
-.comidainfo-container {
-    background-color: #f0fdf4;
-    border: 1px dashed #bbf7d0;
+.contador-fluido {
+    font-size: clamp(2rem, 4.5vw, 3.8rem);
 }
 
-.btn-action-green {
-    background-color: #1e293b;
-    color: #ffffff;
+
+.btn-options {
+    color: var(--ls-text-muted);
+    font-size: clamp(1.1rem, 2vw, 1.8rem);
     border: none;
-    font-size: 1rem;
+    background: transparent;
+    transition: color 0.2s ease;
+}
+.btn-options:hover {
+    color: var(--ls-emerald);
+}
+
+
+.comidainfo-container {
+    background-color: var(--ls-card-bg);
+    border: 1px dashed rgba(44, 212, 120, 0.3);
+}
+
+
+.btn-action-emerald {
+    background-color: var(--ls-emerald);
+    color: #000219;
+    border: none;
+    padding-top: clamp(0.7rem, 1.8vh, 1.2rem);
+    padding-bottom: clamp(0.7rem, 1.8vh, 1.2rem);
     letter-spacing: 0.5px;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px 20px var(--ls-emerald-glow);
+    transition: all 0.2s ease;
 }
 
-.btn-action-green:hover {
-    background-color: #16a34a;
-    color: #ffffff;
+.btn-action-emerald:hover {
+    background-color: #3debb5; 
+    color: #000219;
+    box-shadow: 0 6px 25px rgba(44, 212, 120, 0.5);
 }
 
-.btn-action-green:active {
+.btn-action-emerald:active {
     transform: scale(0.98);
 }
