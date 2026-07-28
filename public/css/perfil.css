@@ -1,3 +1,6 @@
+body{
+    margin-top: 0px;
+}
 .perfil-container {
 
     width: min(100% - 48px, 900px);
@@ -111,6 +114,10 @@
 
 }
 
+.volver{
+   margin-bottom: 2%;
+    margin-top: 5%;
+}
 
 .opcion-menu {
 
