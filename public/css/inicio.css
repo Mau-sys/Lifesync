@@ -503,3 +503,243 @@
     }
 
 }
+
+.categoria-info {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+}
+
+.categoria-info img {
+
+    width: 42px;
+
+    height: 42px;
+
+    object-fit: contain;
+
+}
+
+.categoria-info h3 {
+
+    margin-bottom: 4px;
+
+    font-size: 16px;
+
+    color: var(--color-texto-principal);
+
+}
+
+.categoria-info p {
+
+    font-size: 13px;
+
+    color: var(--color-texto-secundario);
+
+}
+
+.circulo {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 58px;
+
+    height: 58px;
+
+    border-radius: 50%;
+
+    font-size: 12px;
+
+    font-weight: var(--peso-semibold);
+
+    border: 4px solid;
+
+}
+
+.hidratacion {
+
+    border-color: var(--color-hidratacion);
+
+    color: var(--color-hidratacion);
+
+}
+
+.alimentacion {
+
+    border-color: var(--color-alimentacion);
+
+    color: var(--color-alimentacion);
+
+}
+
+.mental {
+
+    border-color: var(--color-salud-mental);
+
+    color: var(--color-salud-mental);
+
+}
+
+.actividad {
+
+    border-color: var(--color-actividad-fisica);
+
+    color: var(--color-actividad-fisica);
+
+}
+
+.academico {
+
+    border-color: var(--color-registro-academico);
+
+    color: var(--color-registro-academico);
+
+}
+
+.categoria-info {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    flex: 1;
+
+}
+
+.categoria-info img {
+
+    width: 48px;
+
+    height: 48px;
+
+    object-fit: contain;
+
+    flex-shrink: 0;
+
+}
+
+.categoria-info h3 {
+
+    margin-bottom: 4px;
+
+    font-size: 17px;
+
+    font-weight: var(--peso-semibold);
+
+    color: var(--color-texto-principal);
+
+}
+
+.categoria-info p {
+
+    margin: 0;
+
+    font-size: 14px;
+
+    color: var(--color-texto-secundario);
+
+}
+
+.circulo {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 64px;
+
+    height: 64px;
+
+    border-radius: 50%;
+
+    border: 4px solid;
+
+    font-size: 13px;
+
+    font-weight: var(--peso-bold);
+
+    flex-shrink: 0;
+
+    background-color: transparent;
+
+}
+
+.hidratacion {
+
+    border-color: var(--color-hidratacion);
+
+    color: var(--color-hidratacion);
+
+}
+
+.alimentacion {
+
+    border-color: var(--color-alimentacion);
+
+    color: var(--color-alimentacion);
+
+}
+
+.mental {
+
+    border-color: var(--color-salud-mental);
+
+    color: var(--color-salud-mental);
+
+}
+
+.actividad {
+
+    border-color: var(--color-actividad-fisica);
+
+    color: var(--color-actividad-fisica);
+
+}
+
+.academico {
+
+    border-color: var(--color-registro-academico);
+
+    color: var(--color-registro-academico);
+
+}
+
+@media (max-width: 768px) {
+
+    .categoria {
+
+        padding: 18px;
+
+    }
+
+    .categoria-info img {
+
+        width: 42px;
+
+        height: 42px;
+
+    }
+
+    .circulo {
+
+        width: 56px;
+
+        height: 56px;
+
+        font-size: 12px;
+
+    }
+
+}
