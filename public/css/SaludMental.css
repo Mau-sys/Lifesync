@@ -184,3 +184,24 @@ html, body {
 .kebab-item.danger:hover {
     background-color: rgba(255, 85, 85, 0.15);
 }
+
+.config-modal-bg {
+    background-color: #080b26;
+    border: 1px solid rgba(168, 85, 247, 0.3) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.config-input {
+    background-color: #12163e !important;
+    border: 1px solid rgba(168, 85, 247, 0.25) !important;
+}
+
+.config-input:focus {
+    border-color: var(--ls-purple) !important;
+    box-shadow: 0 0 12px var(--ls-purple-glow) !important;
+    color: #ffffff !important;
+}
+
+.modal-backdrop.show {
+    opacity: 0.75;
+}
