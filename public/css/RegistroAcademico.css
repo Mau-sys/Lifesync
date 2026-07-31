@@ -79,6 +79,7 @@ html, body {
     position: relative;
     background: conic-gradient(var(--ls-pink) 40%, rgba(236, 72, 153, 0.15) 40%);
     box-shadow: 0 0 30px var(--ls-pink-glow);
+    transition: background 0.3s ease;
 }
 
 .progress-ring::before {
@@ -123,8 +124,6 @@ html, body {
     background-color: var(--ls-pink);
     color: #ffffff;
     border: none;
-    padding-top: clamp(0.7rem, 1.8vh, 1.2rem);
-    padding-bottom: clamp(0.7rem, 1.8vh, 1.2rem);
     letter-spacing: 0.5px;
     box-shadow: 0 4px 20px var(--ls-pink-glow);
     transition: all 0.2s ease;
@@ -184,4 +183,91 @@ html, body {
 
 .kebab-item.danger:hover {
     background-color: rgba(255, 85, 85, 0.15);
+}
+
+.modal-lifesync {
+    background-color: #0d0f2d;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.custom-input {
+    background-color: #07091e;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: #ffffff;
+    padding: 0.75rem 1rem;
+}
+
+.custom-input.input-group-left {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.custom-input:focus {
+    background-color: #07091e;
+    border-color: var(--ls-pink);
+    color: #ffffff;
+    box-shadow: 0 0 10px var(--ls-pink-soft);
+}
+
+.custom-input-suffix {
+    background-color: #0e1238;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-left: none;
+    color: var(--ls-text-muted);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 0.75rem 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.modal-footer {
+    display: block !important;
+}
+
+.footer-buttons-container {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 0.5rem;
+}
+
+.actions-right {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.5rem;
+}
+
+.modal-footer .btn {
+    margin: 0 !important;
+    white-space: nowrap;
+}
+
+.btn-outline-danger-custom {
+    background-color: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-danger-custom:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.btn-secondary-custom {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-custom:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
 }

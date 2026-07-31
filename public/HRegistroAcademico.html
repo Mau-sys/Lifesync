@@ -19,24 +19,24 @@
         
         <div>
             <div class="d-flex justify-content-end align-items-center mb-3">
-                    <div class="position-relative">
-                        <button class="btn btn-options p-0" id="btn-options-academico" aria-label="Opciones">
-                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                        </button>
-                        <div class="kebab-dropdown-menu" id="kebab-menu-academico">
-                            <a href="inicio.html" class="kebab-item" id="btn-regresar">
-                                <i class="fa-solid fa-arrow-left me-2"></i>Regresar
-                            </a>
-                            <a href="#" class="kebab-item" id="btn-editar-meta">
-                                <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
-                            </a>
-                            <div class="dropdown-divider my-1"></div>
-                            <a href="#" class="kebab-item danger" id="btn-deshabilitar-habito">
-                                <i class="fa-solid fa-ban me-2"></i>Deshabilitar hábito
-                            </a>
-                        </div>
+                <div class="position-relative">
+                    <button class="btn btn-options p-0" id="btn-options-academico" aria-label="Opciones">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                    <div class="kebab-dropdown-menu" id="kebab-menu-academico">
+                        <a href="inicio.html" class="kebab-item" id="btn-regresar">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Regresar
+                        </a>
+                        <a href="#" class="kebab-item" id="btn-editar-meta">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
+                        </a>
+                        <div class="dropdown-divider my-1"></div>
+                        <a href="#" class="kebab-item danger" id="btn-deshabilitar-habito">
+                            <i class="fa-solid fa-ban me-2"></i>Deshabilitar hábito
+                        </a>
                     </div>
                 </div>
+            </div>
             
             <div class="text-center mt-2">
                 <div class="icon-circle bg-pink-soft mx-auto mb-2">
@@ -69,6 +69,46 @@
             <button class="btn btn-action-pink w-100 rounded-pill fw-bold font-sora boton-fluido" id="btn-add-sesion">+1 sesión</button>
         </div>
 
+    </div>
+
+    <div class="modal fade" id="modalConfiguracion" tabindex="-1" aria-labelledby="modalConfiguracionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-lifesync p-2">
+                <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title font-sora fw-bold text-white d-flex align-items-center gap-2 mb-0" id="modalConfiguracionLabel">
+                        <i class="fa-solid fa-gear text-pink"></i>Editar Meta Académica
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white m-0" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <form id="form-config-meta">
+                        <div class="mb-4">
+                            <label for="input-num-sesiones" class="form-label text-subtle fw-semibold">Cantidad de sesiones diarias (Máx. 50)</label>
+                            <input type="number" class="form-control custom-input" id="input-num-sesiones" min="1" max="50" value="5" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="input-duracion-sesion" class="form-label text-subtle fw-semibold">Duración por sesión (Máx. 4 horas / 240 min)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control custom-input input-group-left" id="input-duracion-sesion" min="5" max="240" step="5" value="48" required>
+                                <span class="input-group-text custom-input-suffix">minutos</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0 px-3 pb-3">
+                    <div class="footer-buttons-container w-100">
+                        <button type="button" class="btn btn-outline-danger-custom rounded-pill px-3 py-2 fw-semibold" id="btn-reiniciar-meta">
+                            <i class="fa-solid fa-rotate-right me-1"></i>Reiniciar
+                        </button>
+                        
+                        <div class="actions-right">
+                            <button type="button" class="btn btn-secondary-custom rounded-pill px-3 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-action-pink rounded-pill px-3 py-2 fw-bold" id="btn-guardar-meta">Guardar cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
