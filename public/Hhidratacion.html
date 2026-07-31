@@ -19,9 +19,23 @@
         
         <div>
             <div class="d-flex justify-content-end align-items-center mb-3">
-                <button class="btn btn-options p-0" id="btn-options-hidratacion" aria-label="Opciones">
-                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                </button>
+                <div class="position-relative">
+                    <button class="btn btn-options p-0" id="btn-options-academico" aria-label="Opciones">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                    <div class="kebab-dropdown-menu" id="kebab-menu-academico">
+                        <a href="#" class="kebab-item" id="btn-regresar">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Regresar
+                        </a>
+                         <a href="#" class="kebab-item" id="btn-editar-meta">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
+                        </a>
+                        <div class="dropdown-divider my-1"></div>
+                        <a href="#" class="kebab-item danger" id="btn-deshabilitar-habito">
+                            <i class="fa-solid fa-ban me-2"></i>Deshabilitar hábito
+                        </a>
+                    </div>
+                </div>
             </div>
             
             <div class="text-center mt-2">
@@ -67,5 +81,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/HHidratacion.js"></script>
 </body>
 </html>
