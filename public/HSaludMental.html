@@ -19,25 +19,25 @@
         
         <div>
             <div class="d-flex justify-content-end align-items-center mb-3">
-            <div class="position-relative">
-                <button class="btn btn-options p-0" id="btn-options-saludmental" aria-label="Opciones">
-                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                </button>
+                <div class="position-relative">
+                    <button class="btn btn-options p-0" id="btn-options-saludmental" aria-label="Opciones">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
 
-                <div class="kebab-dropdown-menu" id="kebab-menu-saludmental">
-                    <a href="inicio.html" class="kebab-item" id="btn-regresar">
-                        <i class="fa-solid fa-arrow-left me-2"></i>Regresar
-                    </a>
-                    <a href="#" class="kebab-item" id="btn-editar-meta">
-                        <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
-                    </a>
-                    <div class="dropdown-divider my-1"></div>
-                   <a href="#" class="kebab-item danger" id="btn-eliminar-habito">
-    <i class="fa-solid fa-ban me-2"></i>Deshabilitar hábito
-</a>
+                    <div class="kebab-dropdown-menu" id="kebab-menu-saludmental">
+                        <a href="inicio.html" class="kebab-item" id="btn-regresar">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Regresar
+                        </a>
+                        <a href="#" class="kebab-item" id="btn-editar-meta" data-bs-toggle="modal" data-bs-target="#modalEditarSaludMental">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
+                        </a>
+                        <div class="dropdown-divider my-1"></div>
+                        <a href="#" class="kebab-item danger" id="btn-eliminar-habito">
+                            <i class="fa-solid fa-ban me-2"></i>Deshabilitar hábito
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
             
             <div class="text-center mt-2">
                 <div class="icon-circle bg-purple-soft mx-auto mb-2">
@@ -57,26 +57,61 @@
 
             <div class="text-center">
                 <span class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido">Meta diaria</span>
-                <span class="text-purple fw-bold meta-texto-fluido" id="meta-saludmental">2 pausas conscientes</span>
+                <span class="text-purple fw-bold meta-texto-fluido" id="meta-saludmental">2 pausas conscientes (15 min/pausa)</span>
             </div>
         </div>
 
         <div class="w-100">
             <div class="pausas-container p-3 rounded-4 mb-3">
                 <span class="text-subtle d-block fw-semibold mb-2 label-fluido">Pausas de hoy</span>
-                <div class="d-flex justify-content-between align-items-center py-1">
-                    <span class="text-white fw-medium subtexto-fluido">8:00 AM</span>
-                    <i class="fa-solid fa-circle-check text-purple fs-5"></i>
-                </div>
-                <div class="d-flex justify-content-between align-items-center py-1">
-                    <span class="text-white fw-medium subtexto-fluido">12:10 PM</span>
-                    <i class="fa-solid fa-circle-check text-purple fs-5"></i>
+                <div id="lista-pausas">
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <span class="text-white fw-medium subtexto-fluido">8:00 AM</span>
+                        <i class="fa-solid fa-circle-check text-purple fs-5"></i>
+                    </div>
                 </div>
             </div>
 
             <button class="btn btn-action-purple w-100 rounded-pill fw-bold font-sora boton-fluido" id="btn-add-pausa">+1 pausa</button>
         </div>
 
+    </div>
+
+    <div class="modal fade" id="modalEditarSaludMental" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content config-modal-bg text-white border-0 rounded-4">
+                <div class="modal-header border-bottom border-secondary border-opacity-25">
+                    <h5 class="modal-title font-sora fw-bold" id="modalEditarLabel">
+                        <i class="fa-solid fa-gear text-purple me-2"></i>Editar Meta de Salud Mental
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <form id="form-config-saludmental">
+                        <div class="mb-4">
+                            <label for="input-pausas" class="form-label text-subtle fw-semibold">
+                                Cantidad de pausas diarias (Máx. 50)
+                            </label>
+                            <input type="number" class="form-control config-input text-white" id="input-pausas" min="1" max="50" value="2" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="input-duracion" class="form-label text-subtle fw-semibold">
+                                Duración por pausa (Máx. 4 horas / 240 min)
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control config-input text-white" id="input-duracion" min="1" max="240" value="15" required>
+                                <span class="input-group-text config-input text-subtle border-start-0">minutos</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-top border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-action-purple rounded-pill px-4" id="btn-guardar-config">Guardar cambios</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
