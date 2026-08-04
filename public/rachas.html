@@ -51,47 +51,66 @@
 
             <h2>
 
-                Tu constelación
+                Constelación del mes
 
             </h2>
 
             <p>
 
-                Cada día que completes todos tus hábitos iluminará una nueva estrella.
+                Cada estrella representa un día en el que completaste todos tus hábitos durante este mes.
 
             </p>
-
-            <div class="ejemplo-etiqueta">
-
-                Vista previa
-
-            </div>
-
-            <div class="constelacion-grid ejemplo-constelacion">
-
-                <span class="estrella activa">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella">★</span>
-
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella">★</span>
-
-                <span class="estrella">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-
-            </div>
 
             <div
                 id="constelacionUsuario"
                 class="constelacion-grid">
+
+                <span class="estrella activa">★</span>
+                <span class="estrella activa">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella activa">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella activa">★</span>
+
+                <span class="estrella activa">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella activa">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella activa">★</span>
+                <span class="estrella">★</span>
+
+                <span class="estrella">★</span>
+                <span class="estrella activa">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella activa">★</span>
+                <span class="estrella activa">★</span>
+                <span class="estrella">★</span>
+
+                <span class="estrella">★</span>
+                <span class="estrella activa">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella activa">★</span>
+                <span class="estrella">★</span>
+                <span class="estrella">★</span>
+
+                <span class="estrella activa">★</span>
+
+            </div>
+
+            <div class="acciones-constelacion">
+
+                <button
+                    type="button"
+                    id="abrirHistorial"
+                    class="btn-historial">
+
+                    ✨ Explorar constelaciones
+
+                </button>
 
             </div>
 
@@ -183,43 +202,37 @@
 
             </h2>
 
-            <div class="ejemplo-etiqueta">
+            <div id="listaCategorias">
 
-                Vista previa
+                <div class="categoria-racha ejemplo">
 
-            </div>
+                    <img
+                        src="img/Hidrat.png"
+                        alt="Hidratación">
 
-            <div class="categoria-racha ejemplo">
+                    <div class="info-categoria">
 
-                <img
-                    src="img/Hidrat.png"
-                    alt="Categoría">
+                        <h3>
 
-                <div class="info-categoria">
+                            Hidratación
 
-                    <h3>
+                        </h3>
 
-                        Nombre de la categoría
+                        <div class="barra">
 
-                    </h3>
+                            <span style="width:55%;"></span>
 
-                    <div class="barra">
+                        </div>
 
-                        <span style="width: 55%;"></span>
+                        <p class="porcentaje">
+
+                            Ejemplo de progreso por categoría.
+
+                        </p>
 
                     </div>
 
-                    <p class="porcentaje">
-
-                        Aquí aparecerá automáticamente el porcentaje de constancia.
-
-                    </p>
-
                 </div>
-
-            </div>
-
-            <div id="listaCategorias">
 
             </div>
 
@@ -233,47 +246,151 @@
 
             </h2>
 
-            <div class="ejemplo-etiqueta">
-
-                Vista previa
-
-            </div>
-
-            <div class="historial-item ejemplo">
-
-                <div>
-
-                    <strong>
-
-                        Semana de ejemplo
-
-                    </strong>
-
-                    <p>
-
-                        Aquí se mostrará automáticamente el período registrado.
-
-                    </p>
-
-                </div>
-
-                <span>
-
-                    0 días
-
-                </span>
-
-            </div>
-
             <div
                 id="historialRachas"
                 class="lista-historial">
+
+                <div class="historial-item ejemplo">
+
+                    <div>
+
+                        <strong>
+
+                            Última racha registrada
+
+                        </strong>
+
+                        <p>
+
+                            Aquí aparecerán automáticamente las rachas que el usuario vaya completando.
+
+                        </p>
+
+                    </div>
+
+                    <span>
+
+                        0 días
+
+                    </span>
+
+                </div>
 
             </div>
 
         </section>
 
     </main>
+
+    <div
+        id="modalConstelaciones"
+        class="modal-constelaciones">
+
+        <div class="contenido-modal">
+
+            <div class="encabezado-modal">
+
+                <h2>
+
+                    Historial de constelaciones
+
+                </h2>
+
+                <button
+                    type="button"
+                    class="cerrar-modal"
+                    id="cerrarHistorial">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+            <p>
+
+                Aquí podrás consultar las constelaciones obtenidas en los meses anteriores.
+
+            </p>
+
+            <div class="mes-constelacion">
+
+                <h3>
+
+                    Junio 2026
+
+                </h3>
+
+                <div class="constelacion-grid">
+
+                    <span class="estrella activa">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+
+                </div>
+
+            </div>
+
+            <div class="mes-constelacion">
+
+                <h3>
+
+                    Julio 2026
+
+                </h3>
+
+                <div class="constelacion-grid">
+
+                    <span class="estrella activa">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+
+                </div>
+
+            </div>
+
+            <div class="mes-constelacion">
+
+                <h3>
+
+                    Agosto 2026
+
+                </h3>
+
+                <div class="constelacion-grid">
+
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+                    <span class="estrella">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+                    <span class="estrella activa">★</span>
+                    <span class="estrella">★</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
     <script src="../js/racha.js"></script>
 
