@@ -453,3 +453,78 @@
     }
 
 }
+
+
+.ejemplo-etiqueta {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin: 16px 0 18px;
+
+    padding: 6px 14px;
+
+    border-radius: 999px;
+
+    background-color: rgba(139, 92, 246, .15);
+
+    color: var(--color-morado);
+
+    font-size: 13px;
+
+    font-weight: var(--peso-semibold);
+
+}
+
+.ejemplo {
+
+    opacity: .9;
+
+}
+
+.ejemplo-constelacion {
+
+    margin-bottom: 20px;
+
+}
+
+.ejemplo-constelacion .estrella {
+
+    font-size: 34px;
+
+    color: #666;
+
+    transition:
+        transform var(--transicion),
+        color var(--transicion);
+
+}
+
+.ejemplo-constelacion .estrella.activa {
+
+    color: var(--color-naranja);
+
+    text-shadow: 0 0 10px rgba(255,159,28,.8);
+
+}
+
+.ejemplo-constelacion .estrella:hover {
+
+    transform: scale(1.15);
+
+}
+
+.categoria-racha.ejemplo {
+
+    margin-bottom: 20px;
+
+}
+
+.historial-item.ejemplo {
+
+    margin-bottom: 20px;
+
+}
