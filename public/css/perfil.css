@@ -65,15 +65,17 @@ body{
 
     height: 100px;
 
-    padding: 3px;
-
-    border: 3px solid var(--color-morado);
+    padding: 4px;
 
     border-radius: 50%;
 
-    background: var(--color-superficie);
+    background: linear-gradient(
+        135deg,
+        var(--color-morado),
+        var(--color-celeste)
+    );
 
-    overflow: hidden;
+    box-shadow: 0 0 18px rgba(139, 92, 246, .35);
 
     display: flex;
 
@@ -81,9 +83,9 @@ body{
 
     justify-content: center;
 
-    flex-shrink: 0;
+    overflow: hidden;
 
-    box-sizing: border-box;
+    flex-shrink: 0;
 
 }
 
@@ -93,13 +95,15 @@ body{
 
     height: 100%;
 
-    display: block;
-
     border-radius: 50%;
 
     object-fit: cover;
 
     object-position: center;
+
+    border: 3px solid var(--color-superficie);
+
+    display: block;
 
 }
 
@@ -288,13 +292,13 @@ body{
     }
 
 
-    .perfil-info .marco-perfil{
+    .perfil-info .marco-perfil {
 
     width: 76px;
 
     height: 76px;
 
-    box-sizing: border-box;
+    padding: 3px;
 
 }
 

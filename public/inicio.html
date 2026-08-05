@@ -11,7 +11,11 @@
     <meta name="description"
           content="Panel principal de LifeSync">
 
-    <title>LifeSync | Inicio</title>
+    <title>
+
+        LifeSync | Inicio
+
+    </title>
 
     <link rel="stylesheet"
           href="css/variables.css">
@@ -30,17 +34,21 @@
 
         <header class="header">
 
-            <a href="perfil.html" class="perfil">
-            <div class="marco-perfil">
+            <a
+                href="perfil.html"
+                class="perfil">
 
-            <img src="img/Perfil.png"
-             alt="Foto de perfil"
-             id="fotoPerfil"
-             class="foto-perfil">
+                <div class="marco-perfil">
 
-            </div>
+                    <img
+                        src="img/Perfil.png"
+                        alt="Foto de perfil"
+                        id="fotoPerfil"
+                        class="foto-perfil">
 
-    <div>
+                </div>
+
+                <div>
 
                     <p class="saludo">
 
@@ -64,16 +72,85 @@
 
             <button
                 type="button"
+                id="btnNotificaciones"
                 class="btn-notificaciones"
-                id="btnNotificaciones">
+                aria-label="Abrir notificaciones">
 
                 <img
                     src="img/Campana.png"
                     alt="Notificaciones">
 
+                <span
+                    id="contadorNotificaciones"
+                    class="contador-notificaciones">
+
+                    0
+
+                </span>
+
             </button>
 
         </header>
+
+        <div
+            id="overlayNotificaciones"
+            class="overlay-notificaciones oculto">
+
+        </div>
+
+        <aside
+            id="panelNotificaciones"
+            class="panel-notificaciones oculto">
+
+            <div class="panel-header">
+
+                <h2>
+
+                    Notificaciones
+
+                </h2>
+
+                <button
+                    type="button"
+                    id="cerrarPanel"
+                    class="cerrar-panel"
+                    aria-label="Cerrar panel">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+            <div
+                id="listaNotificaciones"
+                class="lista-notificaciones">
+
+                <div class="sin-notificaciones">
+
+                    <img
+                        src="img/Campana.png"
+                        alt="Sin notificaciones">
+
+                    <h3>
+
+                        Todo está al día
+
+                    </h3>
+
+                    <p>
+
+                        Aquí aparecerán automáticamente tus recordatorios,
+                        logros, rachas, hábitos completados y avisos de
+                        LifeSync.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </aside>
 
         <a
             href="rachas.html"
@@ -111,8 +188,7 @@
             </span>
 
         </a>
-
-        <section class="progreso">
+                <section class="progreso">
 
             <div class="titulo-progreso">
 
@@ -150,8 +226,15 @@
 
             <div id="contenedorCategorias">
 
+                <!--
+                    ESTA TARJETA ES SOLO DE EJEMPLO.
+                    Cuando el usuario tenga hábitos creados,
+                    JavaScript la eliminará automáticamente
+                    y mostrará las categorías reales.
+                -->
 
-                <article class="categoria categoria-ejemplo">
+                <article
+                    class="categoria categoria-ejemplo">
 
                     <div class="categoria-info">
 
@@ -169,7 +252,7 @@
 
                             <p class="detalle-categoria">
 
-                                0 / 0
+                                Aquí aparecerá automáticamente el progreso del hábito.
 
                             </p>
 
@@ -188,8 +271,9 @@
             </div>
 
         </section>
-                <a
-            href="Categorias.html"
+
+        <a
+            href="categorias.html"
             class="btnCategorias"
             id="btnCategorias">
 

@@ -11,11 +11,20 @@
     <meta name="description"
           content="Configuración general de LifeSync">
 
-    <title>LifeSync | Configuración</title>
+    <title>
 
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/general.css">
-    <link rel="stylesheet" href="css/configuracion">
+        LifeSync | Configuración
+
+    </title>
+
+    <link rel="stylesheet"
+          href="css/variables.css">
+
+    <link rel="stylesheet"
+          href="css/general.css">
+
+    <link rel="stylesheet"
+          href="css/configuracion.css">
 
 </head>
 
@@ -26,7 +35,7 @@
         <header class="encabezado">
 
             <a
-                href="/public/perfil.html"
+                href="perfil.html"
                 class="volver">
 
                 ← Volver
@@ -41,7 +50,7 @@
 
             <p>
 
-                Personaliza el funcionamiento de tu cuenta.
+                Personaliza el funcionamiento de tu cuenta y de la aplicación.
 
             </p>
 
@@ -51,11 +60,15 @@
             id="configuracionForm"
             class="configuracion-form">
 
+            <!-- ========================= -->
+            <!-- APARIENCIA -->
+            <!-- ========================= -->
+
             <section class="seccion-configuracion">
 
                 <h2>
 
-                    Apariencia
+                    🎨 Apariencia
 
                 </h2>
 
@@ -65,13 +78,13 @@
 
                         <h3>
 
-                            Tema oscuro
+                            Modo oscuro
 
                         </h3>
 
                         <p>
 
-                            Activa el tema oscuro de LifeSync.
+                            Activa el tema oscuro para una experiencia más cómoda durante la noche.
 
                         </p>
 
@@ -82,7 +95,6 @@
                         <input
                             type="checkbox"
                             id="modoOscuro"
-                            name="modoOscuro"
                             checked>
 
                         <span class="slider"></span>
@@ -93,11 +105,122 @@
 
             </section>
 
+            <!-- ========================= -->
+            <!-- NOTIFICACIONES -->
+            <!-- ========================= -->
+
             <section class="seccion-configuracion">
 
                 <h2>
 
-                    Idioma
+                    🔔 Notificaciones
+
+                </h2>
+
+                <div class="opcion">
+
+                    <div>
+
+                        <h3>
+
+                            Recordatorios
+
+                        </h3>
+
+                        <p>
+
+                            Recibe recordatorios para completar tus hábitos diarios.
+
+                        </p>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="notificaciones"
+                            checked>
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="opcion">
+
+                    <div>
+
+                        <h3>
+
+                            Sonidos de la aplicación
+
+                        </h3>
+
+                        <p>
+
+                            Reproduce sonidos al completar hábitos, obtener logros y recibir notificaciones.
+
+                        </p>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="sonidos"
+                            checked>
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="opcion">
+
+                    <div>
+
+                        <h3>
+
+                            Correos electrónicos
+
+                        </h3>
+
+                        <p>
+
+                            Envía recordatorios importantes y resúmenes semanales a tu correo.
+
+                        </p>
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="correo"
+                            checked>
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </section>
+
+            <!-- ========================= -->
+            <!-- IDIOMA -->
+            <!-- ========================= -->
+
+            <section class="seccion-configuracion">
+
+                <h2>
+
+                    🌐 Idioma
 
                 </h2>
 
@@ -130,12 +253,15 @@
                 </div>
 
             </section>
+                        <!-- ========================= -->
+            <!-- SINCRONIZACIÓN -->
+            <!-- ========================= -->
 
             <section class="seccion-configuracion">
 
                 <h2>
 
-                    Notificaciones
+                    ☁️ Sincronización
 
                 </h2>
 
@@ -145,13 +271,13 @@
 
                         <h3>
 
-                            Activar notificaciones
+                            Sincronización automática
 
                         </h3>
 
                         <p>
 
-                            Recibe recordatorios de tus hábitos.
+                            Guarda automáticamente tus hábitos, estadísticas, rachas y configuraciones para mantenerlas disponibles en todos tus dispositivos.
 
                         </p>
 
@@ -161,8 +287,8 @@
 
                         <input
                             type="checkbox"
-                            id="notificaciones"
-                            name="notificaciones">
+                            id="sincronizacion"
+                            checked>
 
                         <span class="slider"></span>
 
@@ -170,13 +296,43 @@
 
                 </div>
 
+                <div class="opcion">
+
+                    <div>
+
+                        <h3>
+
+                            Estado de sincronización
+
+                        </h3>
+
+                        <p>
+
+                            Tu información se encuentra respaldada correctamente.
+
+                        </p>
+
+                    </div>
+
+                    <span class="estado-activo">
+
+                        ● Sincronizada
+
+                    </span>
+
+                </div>
+
             </section>
+
+            <!-- ========================= -->
+            <!-- SEGURIDAD -->
+            <!-- ========================= -->
 
             <section class="seccion-configuracion">
 
                 <h2>
 
-                    Privacidad
+                    🔒 Seguridad
 
                 </h2>
 
@@ -186,32 +342,63 @@
 
                         <h3>
 
-                            Perfil público
+                            Cambiar contraseña
 
                         </h3>
 
                         <p>
 
-                            Permite que otros usuarios vean tu perfil.
+                            Actualiza tu contraseña para proteger tu cuenta.
 
                         </p>
 
                     </div>
 
-                    <label class="switch">
+                    <button
+                        type="button"
+                        id="btnCambiarContrasena"
+                        class="btn-secundario">
 
-                        <input
-                            type="checkbox"
-                            id="perfilPublico"
-                            name="perfilPublico">
+                        Cambiar
 
-                        <span class="slider"></span>
+                    </button>
 
-                    </label>
+                </div>
+
+                <div class="opcion">
+
+                    <div>
+
+                        <h3>
+
+                            Sesiones activas
+
+                        </h3>
+
+                        <p>
+
+                            Consulta y administra los dispositivos donde has iniciado sesión.
+
+                        </p>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        id="btnSesiones"
+                        class="btn-secundario">
+
+                        Administrar
+
+                    </button>
 
                 </div>
 
             </section>
+
+            <!-- ========================= -->
+            <!-- ACCIONES -->
+            <!-- ========================= -->
 
             <section class="acciones">
 
@@ -230,7 +417,131 @@
 
     </main>
 
-    <script src="../../js/configuracion.js"></script>
+    <!-- ========================= -->
+    <!-- MODAL CAMBIAR CONTRASEÑA -->
+    <!-- ========================= -->
+
+    <div
+        id="modalContrasena"
+        class="modal">
+
+        <div class="modal-contenido">
+
+            <h2>
+
+                Cambiar contraseña
+
+            </h2>
+
+            <div class="campo">
+
+                <label for="actual">
+
+                    Contraseña actual
+
+                </label>
+
+                <input
+                    type="password"
+                    id="actual">
+
+            </div>
+
+            <div class="campo">
+
+                <label for="nueva">
+
+                    Nueva contraseña
+
+                </label>
+
+                <input
+                    type="password"
+                    id="nueva">
+
+            </div>
+
+            <div class="campo">
+
+                <label for="confirmar">
+
+                    Confirmar nueva contraseña
+
+                </label>
+
+                <input
+                    type="password"
+                    id="confirmar">
+
+            </div>
+
+            <div class="acciones-modal">
+
+                <button
+                    type="button"
+                    class="btn-secundario">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-principal">
+
+                    Guardar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- MODAL SESIONES ACTIVAS -->
+    <!-- ========================= -->
+
+    <div
+        id="modalSesiones"
+        class="modal">
+
+        <div class="modal-contenido">
+
+            <h2>
+
+                Sesiones activas
+
+            </h2>
+
+            <p>
+
+                Aquí aparecerán todos los dispositivos donde hayas iniciado sesión. También podrás cerrar cualquier sesión de forma segura.
+
+            </p>
+
+            <div id="listaSesiones">
+
+            </div>
+
+            <div class="acciones-modal">
+
+                <button
+                    type="button"
+                    class="btn-secundario">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="../js/configuracion.js"></script>
 
 </body>
 
