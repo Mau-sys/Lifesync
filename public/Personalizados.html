@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Administra tus hábitos personalizados">
+
+    <title>
+
+        LifeSync | Hábitos personalizados
+
+    </title>
+
+    <link rel="stylesheet"
+          href="css/variables.css">
+
+    <link rel="stylesheet"
+          href="css/general.css">
+
+    <link rel="stylesheet"
+          href="css/Personalizados.css">
+
+</head>
+
+<body>
+
+    <main class="personalizados">
+
+        <header class="encabezado">
+
+            <a
+                href="perfil.html"
+                class="volver">
+
+                ← Volver
+
+            </a>
+
+            <h1>
+
+                Hábitos personalizados
+
+            </h1>
+
+            <p>
+
+                Administra todos tus hábitos personalizados desde un solo lugar.
+
+            </p>
+
+        </header>
+
+        <button
+            type="button"
+            id="btnNuevoHabito"
+            class="btn-principal btn-nuevo">
+
+            + Nuevo hábito
+
+        </button>
+
+        <section class="lista-habitos">
+
+            <div id="contenedorHabitos">
+
+                <article
+                    class="tarjeta-habito habito-ejemplo">
+
+                    <button
+                        class="btn-eliminar"
+                        aria-label="Eliminar hábito">
+
+                        🗑
+
+                    </button>
+
+                    <a
+                        href="HHabitoPersonalizado.html"
+                        class="contenido-habito">
+
+                        <div class="habito-info">
+
+                            <img
+                                src="img/H-Perzona.png"
+                                alt="Hábito personalizado">
+
+                            <div>
+
+                                <h3>
+
+                                    Leer 20 páginas
+
+                                </h3>
+
+                                <p>
+
+                                    Diario • 75% completado
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="circulo-progreso">
+
+                            75%
+
+                        </div>
+
+                    </a>
+
+                </article>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <div
+        id="modalNuevoHabito"
+        class="modal oculto">
+
+        <div class="modal-contenido">
+
+            <div class="modal-header">
+
+                <h2>
+
+                    Nuevo hábito
+
+                </h2>
+
+                <button
+                    id="cerrarModal"
+                    class="btn-cerrar">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+            <form
+                id="habitoForm"
+                class="habit-form">
+
+                <div class="input-group">
+
+                    <label for="nombreHabito">
+
+                        Nombre del hábito
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nombreHabito"
+                        placeholder="Ej. Leer 20 páginas">
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="objetivo">
+
+                        Objetivo
+
+                    </label>
+
+                    <textarea
+                        id="objetivo"
+                        rows="3">
+
+                    </textarea>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="frecuencia">
+
+                        Frecuencia
+
+                    </label>
+
+                    <select
+                        id="frecuencia">
+
+                        <option>
+
+                            Selecciona una opción
+
+                        </option>
+
+                        <option>
+
+                            Diario
+
+                        </option>
+
+                        <option>
+
+                            Semanal
+
+                        </option>
+
+                        <option>
+
+                            Mensual
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="fechaInicio">
+
+                        Fecha de inicio
+
+                    </label>
+
+                    <input
+                        type="date"
+                        id="fechaInicio">
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="fechaFin">
+
+                        Fecha de finalización
+
+                    </label>
+
+                    <input
+                        type="date"
+                        id="fechaFin">
+
+                </div>
+
+                <div class="acciones-modal">
+
+                    <button
+                        type="button"
+                        id="cancelarModal"
+                        class="btn-secundario">
+
+                        Cancelar
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn-principal">
+
+                        Guardar hábito
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div
+        id="modalEliminar"
+        class="modal oculto">
+
+        <div class="modal-contenido modal-pequeno">
+
+            <h2>
+
+                ¿Eliminar hábito?
+
+            </h2>
+
+            <p>
+
+                Esta acción no se puede deshacer.
+
+            </p>
+
+            <div class="acciones-modal">
+
+                <button
+                    id="cancelarEliminar"
+                    class="btn-secundario">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    id="confirmarEliminar"
+                    class="btn-peligro">
+
+                    Eliminar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="js/personalizados.js"></script>
+
+</body>
+
+</html>

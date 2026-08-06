@@ -38,20 +38,53 @@
 }
 
 
-.foto-perfil img {
+.foto-perfil .marco-perfil {
 
-    width: 120px;
+    width: 128px;
 
-    height: 120px;
+    height: 128px;
 
-    object-fit: cover;
+    padding: 4px;
 
-    border-radius: var(--radio-redondo);
+    border-radius: 50%;
 
-    border: 3px solid var(--color-morado);
+    background: linear-gradient(
+        135deg,
+        var(--color-morado),
+        var(--color-celeste)
+    );
+
+    box-shadow: 0 0 18px rgba(139, 92, 246, .35);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    flex-shrink: 0;
 
 }
 
+.foto-perfil img {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    object-position: center;
+
+    border-radius: 50%;
+
+    border: 3px solid var(--color-superficie);
+
+}
 
 #nuevaFoto {
 
@@ -240,13 +273,19 @@ hr {
 
     }
 
+    .foto-perfil .marco-perfil {
+
+        width: 95px;
+
+        height: 95px;
+
+    }
 
     .acciones {
 
         flex-direction: column;
 
     }
-
 
     #btnGuardar,
 
