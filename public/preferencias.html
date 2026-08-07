@@ -30,9 +30,7 @@
                 <h1>Preferencias</h1>
 
                 <p>
-
-                    Activa o desactiva hábitos.
-
+                    Activa o desactiva los hábitos que deseas utilizar.
                 </p>
 
             </header>
@@ -53,7 +51,9 @@
 
                             <h3>Hidratación</h3>
 
-                            <p>Controla tu consumo diario de agua.</p>
+                            <p>
+                                Controla tu consumo diario de agua.
+                            </p>
 
                         </div>
 
@@ -64,13 +64,15 @@
                         <input
                             type="checkbox"
                             id="hidratacion"
-                            name="hidratacion">
+                            name="categorias"
+                            value="Hidratación">
 
                         <span class="slider"></span>
 
                     </label>
 
                 </div>
+
 
                 <div class="categoria">
 
@@ -84,7 +86,9 @@
 
                             <h3>Alimentación</h3>
 
-                            <p>Registra tus comidas diarias.</p>
+                            <p>
+                                Registra tus comidas diarias.
+                            </p>
 
                         </div>
 
@@ -95,13 +99,15 @@
                         <input
                             type="checkbox"
                             id="alimentacion"
-                            name="alimentacion">
+                            name="categorias"
+                            value="Alimentación">
 
                         <span class="slider"></span>
 
                     </label>
 
                 </div>
+
 
                 <div class="categoria">
 
@@ -115,7 +121,9 @@
 
                             <h3>Salud Mental</h3>
 
-                            <p>Haz seguimiento a tus descansos y bienestar.</p>
+                            <p>
+                                Haz seguimiento a tus descansos y bienestar.
+                            </p>
 
                         </div>
 
@@ -126,13 +134,15 @@
                         <input
                             type="checkbox"
                             id="saludMental"
-                            name="saludMental">
+                            name="categorias"
+                            value="Salud Mental">
 
                         <span class="slider"></span>
 
                     </label>
 
                 </div>
+
 
                 <div class="categoria">
 
@@ -146,7 +156,9 @@
 
                             <h3>Actividad Física</h3>
 
-                            <p>Registra tus sesiones de ejercicio.</p>
+                            <p>
+                                Registra tus sesiones de ejercicio.
+                            </p>
 
                         </div>
 
@@ -157,13 +169,15 @@
                         <input
                             type="checkbox"
                             id="actividadFisica"
-                            name="actividadFisica">
+                            name="categorias"
+                            value="Actividad Física">
 
                         <span class="slider"></span>
 
                     </label>
 
                 </div>
+
 
                 <div class="categoria">
 
@@ -177,7 +191,9 @@
 
                             <h3>Registro Académico</h3>
 
-                            <p>Organiza tus actividades y tareas.</p>
+                            <p>
+                                Organiza tus actividades y tareas.
+                            </p>
 
                         </div>
 
@@ -188,13 +204,15 @@
                         <input
                             type="checkbox"
                             id="registroAcademico"
-                            name="registroAcademico">
+                            name="categorias"
+                            value="Registro Académico">
 
                         <span class="slider"></span>
 
                     </label>
 
                 </div>
+
 
                 <div class="categoria">
 
@@ -208,7 +226,9 @@
 
                             <h3>Hábito Personalizado</h3>
 
-                            <p>Crea un hábito completamente personalizado.</p>
+                            <p>
+                                Crea un hábito completamente personalizado.
+                            </p>
 
                         </div>
 
@@ -219,7 +239,8 @@
                         <input
                             type="checkbox"
                             id="habitoPersonalizado"
-                            name="habitoPersonalizado">
+                            name="categorias"
+                            value="Hábito Personalizado">
 
                         <span class="slider"></span>
 
@@ -227,21 +248,22 @@
 
                 </div>
 
+
                 <p
                     id="mensajePreferencias"
-                    class="mensaje">
-
+                    class="mensaje"
+                    role="alert">
                 </p>
 
-                <button
-                 type="submit"
-                 id="btnGuardarPreferencias"
-                 class="btn-primary">
 
-                 Guardar
+                <button
+                    type="submit"
+                    id="btnGuardarPreferencias"
+                    class="btn-primary">
+
+                    Guardar
 
                 </button>
-
 
             </form>
 
@@ -249,7 +271,7 @@
 
     </main>
 
-    <script src="../js/preferencias.js"></script>
+    <script src="js/preferencias.js"></script>
 
 </body>
 

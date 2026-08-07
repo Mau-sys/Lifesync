@@ -1,94 +1,190 @@
 <?php
 
-header("Content-Type: application/json");
+header("Content-Type: application/json; charset=UTF-8");
 
 require_once "../config/conexion.php";
 
-$database = new Database();
-$conn = $database->getConnection();
 
-if (!$conn) {
+$datos = json_decode(
+    file_get_contents("php://input"),
+    true
+);
+
+
+if (!is_array($datos)) {
+
+    http_response_code(400);
+
     echo json_encode([
-        "success" => false,
-        "message" => "Error de conexión"
+        "exito" => false,
+        "mensaje" => "Datos inválidos."
     ]);
+
     exit;
 }
 
-$data = json_decode(file_get_contents("php://input"), true);
 
-$nombre = trim($data["nombre"] ?? "");
-$correo = trim($data["correo"] ?? "");
-$password = trim($data["password"] ?? "");
+$nombre = trim($datos["nombre"] ?? "");
+$correo = trim($datos["correo"] ?? "");
+$password = $datos["password"] ?? "";
+
 
 if (
-    empty($nombre) ||
-    empty($correo) ||
-    empty($password)
+    $nombre === "" ||
+    $correo === "" ||
+    $password === ""
 ) {
+
+    http_response_code(400);
+
     echo json_encode([
-        "success" => false,
-        "message" => "Todos los campos son obligatorios"
+        "exito" => false,
+        "mensaje" => "Todos los campos son obligatorios."
     ]);
+
     exit;
 }
+
+
+if (mb_strlen($nombre) > 50) {
+
+    http_response_code(400);
+
+    echo json_encode([
+        "exito" => false,
+        "mensaje" => "El nombre no puede superar los 50 caracteres."
+    ]);
+
+    exit;
+}
+
+
+if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+
+    http_response_code(400);
+
+    echo json_encode([
+        "exito" => false,
+        "mensaje" => "Ingresa un correo electrónico válido."
+    ]);
+
+    exit;
+}
+
+
+if (mb_strlen($password) < 8) {
+
+    http_response_code(400);
+
+    echo json_encode([
+        "exito" => false,
+        "mensaje" => "La contraseña debe tener al menos 8 caracteres."
+    ]);
+
+    exit;
+}
+
 
 try {
 
-    // Verificar correo existente
-    $sql = "SELECT id_usuario
-            FROM usuario
-            WHERE correo = :correo";
+    $database = new Database();
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":correo", $correo);
-    $stmt->execute();
+    $db = $database->getConnection();
 
-    if ($stmt->rowCount() > 0) {
+
+    if ($db === null) {
+
+        http_response_code(500);
 
         echo json_encode([
-            "success" => false,
-            "message" => "El correo ya está registrado"
+            "exito" => false,
+            "mensaje" => "No se pudo conectar con la base de datos."
         ]);
+
         exit;
     }
 
-    // Hash seguro
+
+    $consulta = $db->prepare(
+        "SELECT id_usuario
+         FROM usuario
+         WHERE correo = :correo
+         LIMIT 1"
+    );
+
+
+    $consulta->execute([
+        ":correo" => $correo
+    ]);
+
+
+    if ($consulta->fetch()) {
+
+        http_response_code(409);
+
+        echo json_encode([
+            "exito" => false,
+            "mensaje" => "El correo ya está registrado."
+        ]);
+
+        exit;
+    }
+
+
     $passwordHash = password_hash(
         $password,
         PASSWORD_DEFAULT
     );
 
-    $sql = "INSERT INTO usuario
-            (
-                nombre_usuario,
-                correo,
-                password_hash
-            )
-            VALUES
-            (
-                :nombre,
-                :correo,
-                :password_hash
-            )";
 
-    $stmt = $conn->prepare($sql);
+    $consulta = $db->prepare(
+        "INSERT INTO usuario
+        (
+            nombre_usuario,
+            correo,
+            password_hash
+        )
+        VALUES
+        (
+            :nombre,
+            :correo,
+            :password_hash
+        )"
+    );
 
-    $stmt->bindParam(":nombre", $nombre);
-    $stmt->bindParam(":correo", $correo);
-    $stmt->bindParam(":password_hash", $passwordHash);
 
-    $stmt->execute();
+    $consulta->execute([
 
-    echo json_encode([
-        "success" => true,
-        "message" => "Usuario registrado correctamente"
+        ":nombre" => $nombre,
+
+        ":correo" => $correo,
+
+        ":password_hash" => $passwordHash
+
     ]);
 
-} catch (PDOException $e) {
 
     echo json_encode([
-        "success" => false,
-        "message" => $e->getMessage()
+
+        "exito" => true,
+
+        "mensaje" => "Usuario registrado correctamente."
+
     ]);
+
+
+} catch (PDOException $error) {
+
+    http_response_code(500);
+
+    echo json_encode([
+
+        "exito" => false,
+
+        "mensaje" => "Ocurrió un error al registrar el usuario."
+
+    ]);
+
 }
+
+?>

@@ -19,7 +19,6 @@
 
 </head>
 
-
 <body>
 
     <main class="register-page">
@@ -28,17 +27,9 @@
 
             <div class="header-register">
 
-                <h1>
+                <h1>Crear cuenta</h1>
 
-                    Crear cuenta
-
-                </h1>
-
-                <p>
-
-                    Comienza tu mejor versión
-
-                </p>
+                <p>Comienza tu mejor versión</p>
 
             </div>
 
@@ -51,9 +42,7 @@
                 <div class="input-group">
 
                     <label for="nombre">
-
                         Nombre completo
-
                     </label>
 
                     <input
@@ -62,6 +51,7 @@
                         name="nombre"
                         placeholder="Ingresa tu nombre completo"
                         autocomplete="name"
+                        maxlength="50"
                         required>
 
                 </div>
@@ -69,9 +59,7 @@
                 <div class="input-group">
 
                     <label for="correo">
-
                         Correo electrónico
-
                     </label>
 
                     <input
@@ -80,6 +68,7 @@
                         name="correo"
                         placeholder="Ingresa tu correo electrónico"
                         autocomplete="email"
+                        maxlength="150"
                         required>
 
                 </div>
@@ -87,9 +76,7 @@
                 <div class="input-group">
 
                     <label for="password">
-
                         Contraseña
-
                     </label>
 
                     <input
@@ -98,6 +85,7 @@
                         name="password"
                         placeholder="Crea una contraseña"
                         autocomplete="new-password"
+                        minlength="8"
                         required>
 
                 </div>
@@ -105,9 +93,7 @@
                 <div class="input-group">
 
                     <label for="confirmarPassword">
-
                         Confirmar contraseña
-
                     </label>
 
                     <input
@@ -116,22 +102,24 @@
                         name="confirmarPassword"
                         placeholder="Confirma tu contraseña"
                         autocomplete="new-password"
+                        minlength="8"
                         required>
 
                 </div>
 
                 <p
                     id="mensajeError"
-                    class="mensaje-error">
-
+                    class="mensaje-error"
+                    role="alert"
+                    aria-live="polite">
                 </p>
 
                 <button
                     type="submit"
                     id="btnRegistro"
                     class="btn-primary">
+
                     Registrarse
-            
 
                 </button>
 
@@ -139,21 +127,18 @@
 
             <div class="social-register">
 
-                <p>
-
-                    O continúa con
-
-                </p>
+                <p>O continúa con</p>
 
                 <div class="social-buttons">
 
                     <button
                         type="button"
                         id="googleRegister"
-                        class="social-button">
+                        class="social-button"
+                        aria-label="Continuar con Google">
 
                         <img
-                            src="/public/img/Logo-G.png"
+                            src="img/Logo-G.png"
                             alt="Google">
 
                     </button>
@@ -161,10 +146,11 @@
                     <button
                         type="button"
                         id="appleRegister"
-                        class="social-button">
+                        class="social-button"
+                        aria-label="Continuar con Apple">
 
                         <img
-                            src="/public/img/Logo-A.png"
+                            src="img/Logo-A.png"
                             alt="Apple">
 
                     </button>
@@ -177,11 +163,8 @@
 
                 ¿Ya tienes una cuenta?
 
-                <a
-                    href="/public/Inicio-sesion.html">
-
+                <a href="Inicio-sesion.html">
                     Inicia sesión
-
                 </a>
 
             </p>
@@ -189,7 +172,9 @@
         </section>
 
     </main>
+
     <script src="js/registro.js"></script>
+
 </body>
 
 </html>

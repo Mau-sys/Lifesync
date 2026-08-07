@@ -1,59 +1,196 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     const form = document.getElementById("registroForm");
+
+    const nombreInput = document.getElementById("nombre");
+    const correoInput = document.getElementById("correo");
+    const passwordInput = document.getElementById("password");
+    const confirmarPasswordInput = document.getElementById("confirmarPassword");
+
     const mensajeError = document.getElementById("mensajeError");
+    const btnRegistro = document.getElementById("btnRegistro");
 
-    form.addEventListener("submit", async (e) => {
+    const googleRegister = document.getElementById("googleRegister");
+    const appleRegister = document.getElementById("appleRegister");
 
-        e.preventDefault();
 
-        const nombre = document.getElementById("nombre").value.trim();
-        const correo = document.getElementById("correo").value.trim();
-        const password = document.getElementById("password").value;
-        const confirmarPassword = document.getElementById("confirmarPassword").value;
+    function mostrarMensaje(mensaje) {
+
+        mensajeError.textContent = mensaje;
+
+    }
+
+
+    function limpiarMensaje() {
 
         mensajeError.textContent = "";
 
-        if (password !== confirmarPassword) {
-            mensajeError.textContent = "Las contraseñas no coinciden.";
+    }
+
+
+    function cambiarEstadoBoton(cargando) {
+
+        btnRegistro.disabled = cargando;
+
+        btnRegistro.textContent = cargando
+            ? "Registrando..."
+            : "Registrarse";
+
+    }
+
+
+    form.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        limpiarMensaje();
+
+        const nombre = nombreInput.value.trim();
+        const correo = correoInput.value.trim();
+        const password = passwordInput.value;
+        const confirmarPassword = confirmarPasswordInput.value;
+
+
+        if (
+            nombre === "" ||
+            correo === "" ||
+            password === "" ||
+            confirmarPassword === ""
+        ) {
+
+            mostrarMensaje("Completa todos los campos.");
+
             return;
+
         }
+
+
+        if (!correoInput.checkValidity()) {
+
+            mostrarMensaje("Ingresa un correo electrónico válido.");
+
+            return;
+
+        }
+
+
+        if (nombre.length > 50) {
+
+            mostrarMensaje(
+                "El nombre no puede superar los 50 caracteres."
+            );
+
+            return;
+
+        }
+
+
+        if (password.length < 8) {
+
+            mostrarMensaje(
+                "La contraseña debe tener al menos 8 caracteres."
+            );
+
+            return;
+
+        }
+
+
+        if (password !== confirmarPassword) {
+
+            mostrarMensaje("Las contraseñas no coinciden.");
+
+            return;
+
+        }
+
+
+        cambiarEstadoBoton(true);
+
 
         try {
 
             const respuesta = await fetch("../auth/registro.php", {
+
                 method: "POST",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 body: JSON.stringify({
-                    nombre,
-                    correo,
-                    password
+
+                    nombre: nombre,
+                    correo: correo,
+                    password: password
+
                 })
+
             });
+
 
             const datos = await respuesta.json();
 
-            if (datos.success) {
 
-                alert("Registro exitoso");
+            if (!respuesta.ok || !datos.exito) {
 
-                window.location.href = "preferencias.html";
+                mostrarMensaje(
+                    datos.mensaje ||
+                    "No se pudo completar el registro."
+                );
 
-            } else {
+                cambiarEstadoBoton(false);
 
-                mensajeError.textContent = datos.message;
+                return;
+
             }
+
+
+            window.location.href = "Preferencias.html";
+
 
         } catch (error) {
 
-            mensajeError.textContent =
-                "Error al conectar con el servidor.";
+            console.error(
+                "Error al registrar usuario:",
+                error
+            );
+
+            mostrarMensaje(
+                "No se pudo conectar con el servidor. Inténtalo nuevamente."
+            );
+
+            cambiarEstadoBoton(false);
+
         }
 
-        fetch("../auth/registro.php")
+    });
+
+
+    googleRegister.addEventListener("click", () => {
+
+        mostrarMensaje(
+            "El registro con Google estará disponible próximamente."
+        );
 
     });
+
+
+    appleRegister.addEventListener("click", () => {
+
+        mostrarMensaje(
+            "El registro con Apple estará disponible próximamente."
+        );
+
+    });
+
+
+    nombreInput.addEventListener("input", limpiarMensaje);
+
+    correoInput.addEventListener("input", limpiarMensaje);
+
+    passwordInput.addEventListener("input", limpiarMensaje);
+
+    confirmarPasswordInput.addEventListener("input", limpiarMensaje);
 
 });
