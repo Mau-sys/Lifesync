@@ -19,40 +19,42 @@
 
 </head>
 
-
-<body>    
-     
-  
+<body>
 
     <main class="perfil-container">
-       
+
         <a
-        href="inicio.html"
-        class="volver">
+            href="inicio.html"
+            class="volver">
 
-        ← Volver
+            ← Volver
 
-    </a>
+        </a>
+
 
         <section class="perfil-superior">
-            
-
 
             <div class="perfil-info">
 
-            <div class="marco-perfil">
+                <div class="marco-perfil">
 
-            <img
-            src="img/Perfil.png"
-            alt="Foto de perfil"
-            id="fotoPerfil"
-            class="foto-perfil">
+                    <img
+                        src="img/Perfil.png"
+                        alt="Foto de perfil"
+                        id="fotoPerfil"
+                        class="foto-perfil">
 
-            </div>
+                </div>
 
-            <div class="datos-perfil">
 
-                    <h1 id="nombreUsuario"></h1>
+                <div class="datos-perfil">
+
+                    <h1 id="nombreUsuario">
+
+                        Usuario
+
+                    </h1>
+
 
                     <a
                         href="Datos-personales.html"
@@ -63,14 +65,19 @@
 
                     </a>
 
-                  
-                <div id="contenedorInsignias" class="contenedor-insignias"></div>
+
+                    <div
+                        id="contenedorInsignias"
+                        class="contenedor-insignias">
+
+                    </div>
 
                 </div>
 
             </div>
 
         </section>
+
 
         <nav class="menu-perfil">
 
@@ -79,51 +86,75 @@
                 class="opcion-menu"
                 id="btnDatos">
 
-                <span>Datos personales</span>
+                <span>
+
+                    Datos personales
+
+                </span>
 
                 <span>›</span>
 
             </a>
+
 
             <a
                 href="Personalizados.html"
                 class="opcion-menu"
                 id="btnHabitoPersonalizado">
 
-                <span>Hábitos personalizados</span>
+                <span>
+
+                    Hábitos personalizados
+
+                </span>
 
                 <span>›</span>
 
             </a>
 
+
             <a
-                href="Recordatorios.html"
+                href="recordatorios.html"
                 class="opcion-menu"
                 id="btnRecordatorios">
 
-                <span>Recordatorios</span>
+                <span>
+
+                    Recordatorios
+
+                </span>
 
                 <span>›</span>
 
             </a>
+
 
             <a
                 href="Estadisticas.html"
                 class="opcion-menu"
                 id="btnEstadisticas">
 
-                <span>Estadísticas</span>
+                <span>
+
+                    Estadísticas
+
+                </span>
 
                 <span>›</span>
 
             </a>
+
 
             <a
                 href="Configuracion.html"
                 class="opcion-menu"
                 id="btnConfiguracion">
 
-                <span>Configuración</span>
+                <span>
+
+                    Configuración
+
+                </span>
 
                 <span>›</span>
 
@@ -131,22 +162,25 @@
 
         </nav>
 
+
         <section class="cerrar-sesion">
 
-            <a
-                href="Inicio-sesion.html"
+            <button
+                type="button"
                 id="btnCerrarSesion"
                 class="btn-cerrar">
 
                 Cerrar sesión
 
-            </a>
+            </button>
 
         </section>
 
     </main>
 
-    <script src="../js/perfil.js"></script>
+
+    <script src="js/perfil.js"></script>
+
     <script src="js/insignias.js"></script>
 
 </body>

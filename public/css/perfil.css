@@ -1,6 +1,8 @@
-body{
-    margin-top: 0px;
+body {
+    margin-top: 0;
 }
+
+
 .perfil-container {
 
     width: min(100% - 48px, 900px);
@@ -9,26 +11,6 @@ body{
 
     padding: 48px 0;
 
-}
-
-.contenedor-insignias {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-    align-items: center;
-}
-
-.insignia-item {
-    width: 35px;
-    height: 35px;
-    object-fit: contain;
-    transition: transform 0.2s ease;
-}
-
-.insignia-item:hover {
-    transform: scale(1.15);
-    cursor: pointer;
 }
 
 
@@ -59,6 +41,7 @@ body{
 
 }
 
+
 .perfil-info .marco-perfil {
 
     width: 100px;
@@ -88,6 +71,7 @@ body{
     flex-shrink: 0;
 
 }
+
 
 .perfil-info .foto-perfil {
 
@@ -147,10 +131,15 @@ body{
 
 }
 
-.volver{
-   margin-bottom: 2%;
+
+.volver {
+
+    margin-bottom: 2%;
+
     margin-top: 5%;
+
 }
+
 
 .opcion-menu {
 
@@ -294,13 +283,13 @@ body{
 
     .perfil-info .marco-perfil {
 
-    width: 76px;
+        width: 76px;
 
-    height: 76px;
+        height: 76px;
 
-    padding: 3px;
+        padding: 3px;
 
-}
+    }
 
 
     .opcion-menu {
@@ -317,5 +306,52 @@ body{
         width: 100%;
 
     }
+
+}
+
+
+
+.contenedor-insignias {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 10px;
+
+    align-items: center;
+
+}
+
+
+.insignia-item {
+
+    width: 35px;
+
+    height: 35px;
+
+    object-fit: contain;
+
+    transition: transform 0.2s ease;
+
+}
+
+
+.insignia-item:hover {
+
+    transform: scale(1.15);
+
+    cursor: pointer;
+
+}
+
+
+.sin-insignias {
+
+    color: var(--color-texto-secundario);
+
+    font-size: 13px;
 
 }

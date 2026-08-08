@@ -36,15 +36,11 @@
             <header class="habit-header">
 
                 <h1>
-
                     Define tu hábito
-
                 </h1>
 
                 <p>
-
                     Personaliza un hábito que se adapte a tus objetivos.
-
                 </p>
 
             </header>
@@ -52,15 +48,12 @@
             <form
                 id="habitoForm"
                 class="habit-form"
-                action=""
-                method="post">
+                novalidate>
 
                 <div class="input-group">
 
                     <label for="nombreHabito">
-
                         Nombre del hábito
-
                     </label>
 
                     <input
@@ -68,6 +61,8 @@
                         id="nombreHabito"
                         name="nombreHabito"
                         placeholder="Ej. Leer 20 páginas"
+                        maxlength="150"
+                        autocomplete="off"
                         required>
 
                 </div>
@@ -75,15 +70,14 @@
                 <div class="input-group">
 
                     <label for="objetivo">
-
                         Objetivo
-
                     </label>
 
                     <textarea
                         id="objetivo"
                         name="objetivo"
                         rows="3"
+                        maxlength="500"
                         placeholder="Describe el objetivo de tu hábito..."
                         required></textarea>
 
@@ -92,9 +86,7 @@
                 <div class="input-group">
 
                     <label for="frecuencia">
-
                         Frecuencia
-
                     </label>
 
                     <select
@@ -103,27 +95,19 @@
                         required>
 
                         <option value="">
-
                             Selecciona una opción
-
                         </option>
 
-                        <option value="diario">
-
+                        <option value="diaria">
                             Diario
-
                         </option>
 
                         <option value="semanal">
-
                             Semanal
-
                         </option>
 
                         <option value="mensual">
-
                             Mensual
-
                         </option>
 
                     </select>
@@ -133,9 +117,7 @@
                 <div class="input-group">
 
                     <label for="fechaInicio">
-
                         Fecha de inicio
-
                     </label>
 
                     <input
@@ -149,29 +131,31 @@
                 <div class="input-group">
 
                     <label for="fechaFin">
-
                         Fecha de finalización
-
                     </label>
 
                     <input
                         type="date"
                         id="fechaFin"
-                        name="fechaFin"
-                        required>
+                        name="fechaFin">
+
+                    <small class="campo-ayuda">
+                        Puedes dejarla vacía si el hábito no tiene fecha de finalización.
+                    </small>
 
                 </div>
 
                 <p
                     id="mensajeHabito"
-                    class="mensaje">
-
+                    class="mensaje"
+                    role="alert"
+                    aria-live="polite">
                 </p>
 
                 <button
                     type="submit"
                     id="guardarHabito"
-                    class="btn-principal">
+                    class="btn-primary">
 
                     Guardar hábito
 
@@ -183,7 +167,7 @@
 
     </main>
 
-    <script src="../js/crear-habito.js"></script>
+    <script src="js/crear-habito.js"></script>
 
 </body>
 

@@ -1,46 +1,90 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
+
     cargarInsignias();
+
 });
 
-/**
- * Función para solicitar y renderizar las insignias en el perfil
- */
+
 async function cargarInsignias() {
-    const contenedor = document.getElementById('contenedorInsignias');
+
+    const contenedor =
+        document.getElementById("contenedorInsignias");
+
 
     if (!contenedor) {
-        console.error('El contenedor de insignias no existe en el DOM.');
         return;
     }
 
+
     try {
-        // Ajusta la ruta del PHP según donde esté guardado (ej. 'php/obtener_insignias.php')
-        const response = await fetch('..//insignias/obtener_insignias.php');
-        
-        if (!response.ok) {
-            throw new Error(`Error en la petición: ${response.statusText}`);
+
+        const respuesta = await fetch(
+            "../insignias/obtener_insignias.php",
+            {
+                method: "GET",
+                credentials: "include"
+            }
+        );
+
+
+        const datos = await respuesta.json();
+
+
+        if (!respuesta.ok || !datos.exito) {
+
+            contenedor.innerHTML = "";
+
+            return;
+
         }
 
-        const res = await response.json();
 
-        if (res.status === 'success' && res.data.length > 0) {
-            contenedor.innerHTML = ''; // Limpiar el contenedor
+        contenedor.innerHTML = "";
 
-            res.data.forEach(insignia => {
-                // Crear elemento de imagen para la insignia
-                const img = document.createElement('img');
-                img.src = insignia.imagen; // Ruta guardada en la BD (ej: "img/insignias/oro.png")
-                img.alt = insignia.nombre;
-                img.title = `${insignia.nombre}: ${insignia.descripcion}`; // Muestra texto al pasar el cursor
-                img.classList.add('insignia-item');
 
-                contenedor.appendChild(img);
-            });
-        } else if (res.data.length === 0) {
-            contenedor.innerHTML = '<span class="sin-insignias">Sin insignias aún</span>';
+        if (
+            !datos.insignias ||
+            datos.insignias.length === 0
+        ) {
+
+            contenedor.innerHTML =
+                '<span class="sin-insignias">Sin insignias aún</span>';
+
+            return;
+
         }
+
+
+        datos.insignias.forEach((insignia) => {
+
+            const img =
+                document.createElement("img");
+
+
+            img.src = insignia.icono;
+
+            img.alt = insignia.nombre;
+
+            img.title =
+                `${insignia.nombre}: ${insignia.descripcion}`;
+
+            img.classList.add("insignia-item");
+
+
+            contenedor.appendChild(img);
+
+        });
+
 
     } catch (error) {
-        console.error('Error al cargar las insignias:', error);
+
+        console.error(
+            "Error al cargar las insignias:",
+            error
+        );
+
+        contenedor.innerHTML = "";
+
     }
+
 }

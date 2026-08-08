@@ -1,41 +1,91 @@
 <?php
-// Configurar encabezado para respuesta JSON
-header('Content-Type: application/json; charset=utf-8');
 
-// Requerir el archivo de conexión
-require_once '../config/conexion.php';
+session_start();
+
+header("Content-Type: application/json; charset=UTF-8");
+
+require_once "../config/conexion.php";
+
+
+if (!isset($_SESSION["usuario_id"])) {
+
+    http_response_code(401);
+
+    echo json_encode([
+        "exito" => false,
+        "mensaje" => "La sesión ha expirado."
+    ]);
+
+    exit;
+
+}
+
+
+$usuarioId = $_SESSION["usuario_id"];
+
 
 try {
-    // 1. Instanciar la clase Database
-    $database = new Database();
-    
-    // 2. Obtener la conexión PDO
-    $conexion = $database->getConnection();
 
-    // Validar si la conexión se realizó correctamente
-    if (!$conexion) {
-        throw new Exception("No se pudo establecer la conexión a la base de datos.");
+    $database = new Database();
+
+    $db = $database->getConnection();
+
+
+    if ($db === null) {
+
+        http_response_code(500);
+
+        echo json_encode([
+            "exito" => false,
+            "mensaje" => "No se pudo conectar con la base de datos."
+        ]);
+
+        exit;
+
     }
 
-    // 3. Preparar y ejecutar la consulta
-    $sql = "SELECT id_insignia, nombre, descripcion, imagen FROM insignias";
-    $stmt = $conexion->prepare($sql);
-    $stmt->execute();
 
-    // 4. Obtener todos los resultados
-    $insignias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $consulta = $db->prepare(
+        "SELECT
+            l.id_logro,
+            l.nombre_logro AS nombre,
+            l.descripcion,
+            l.icono
+         
+         FROM usuario_logros ul
+         
+         INNER JOIN logros l
+            ON l.id_logro = ul.id_logro
+         
+         WHERE ul.id_usuario = :id_usuario
+         
+         ORDER BY ul.fecha_obtenido DESC"
+    );
 
-    // 5. Retornar los datos en formato JSON
-    echo json_encode([
-        'status' => 'success',
-        'data' => $insignias
+
+    $consulta->execute([
+        ":id_usuario" => $usuarioId
     ]);
 
-} catch (Exception $e) {
-    // Retornar error si algo falla
+
+    $insignias = $consulta->fetchAll(PDO::FETCH_ASSOC);
+
+
     echo json_encode([
-        'status' => 'error',
-        'message' => 'Error: ' . $e->getMessage()
+        "exito" => true,
+        "insignias" => $insignias
     ]);
+
+
+} catch (PDOException $error) {
+
+    http_response_code(500);
+
+    echo json_encode([
+        "exito" => false,
+        "mensaje" => "No se pudieron cargar las insignias."
+    ]);
+
 }
+
 ?>
