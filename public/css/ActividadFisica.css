@@ -39,17 +39,6 @@ html, body {
     color: var(--ls-amber) !important;
 }
 
-.brand-tagline {
-    font-family: 'Sora', sans-serif;
-    font-weight: 700;
-    font-size: clamp(0.8rem, 1.4vw, 1.1rem);
-    letter-spacing: 1px;
-    background: linear-gradient(90deg, var(--ls-cyan), var(--ls-purple));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
 .card-full-screen {
     background-color: var(--ls-bg-dark);
     width: 100vw;
@@ -76,25 +65,12 @@ html, body {
     font-size: clamp(1.5rem, 3.5vw, 3rem);
 }
 
-.texto-titulo-fluido {
-    font-size: clamp(1.2rem, 2.5vw, 2.2rem);
-}
-
-.label-fluido {
-    font-size: clamp(0.7rem, 1.2vw, 1.05rem);
-}
-
-.meta-texto-fluido {
-    font-size: clamp(0.95rem, 1.8vw, 1.5rem);
-}
-
-.tiempo-texto-fluido {
-    font-size: clamp(1.05rem, 2vw, 1.8rem);
-}
-
-.subtexto-fluido {
-    font-size: clamp(0.75rem, 1.3vw, 1.1rem);
-}
+.texto-titulo-fluido { font-size: clamp(1.2rem, 2.5vw, 2.2rem); }
+.label-fluido { font-size: clamp(0.7rem, 1.2vw, 1.05rem); }
+.meta-texto-fluido { font-size: clamp(0.95rem, 1.8vw, 1.5rem); }
+.tiempo-texto-fluido { font-size: clamp(1.05rem, 2vw, 1.8rem); }
+.subtexto-fluido { font-size: clamp(0.75rem, 1.3vw, 1.1rem); }
+.boton-fluido { font-size: clamp(1rem, 1.8vw, 1.4rem); }
 
 .progress-ring {
     width: clamp(140px, 28vw, 260px);
@@ -106,8 +82,9 @@ html, body {
     align-items: center;
     justify-content: center;
     position: relative;
-    background: conic-gradient(var(--ls-amber) 20%, rgba(255, 159, 28, 0.15) 20%);
+    background: conic-gradient(var(--ls-amber) 0%, rgba(255, 159, 28, 0.15) 0%);
     box-shadow: 0 0 30px var(--ls-amber-glow);
+    transition: background 0.4s ease;
 }
 
 .progress-ring::before {
@@ -152,7 +129,6 @@ html, body {
     background-color: var(--ls-amber);
     color: #000219;
     border: none;
-    font-size: clamp(1rem, 1.8vw, 1.4rem);
     padding-top: clamp(0.7rem, 1.8vh, 1.2rem);
     padding-bottom: clamp(0.7rem, 1.8vh, 1.2rem);
     letter-spacing: 0.5px;
@@ -169,13 +145,14 @@ html, body {
 .btn-action-amber:active {
     transform: scale(0.98);
 }
+
 .kebab-dropdown-menu {
     display: none;
     position: absolute;
     top: 100%;
     right: 0;
     margin-top: 0.5rem;
-    min-width: 170px;
+    min-width: 190px;
     background-color: #1e1e2d;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -213,4 +190,126 @@ html, body {
 
 .kebab-item.danger:hover {
     background-color: rgba(255, 85, 85, 0.15);
+}
+
+.modal-custom-card {
+    background-color: #070a21;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+}
+
+.custom-select-dark,
+.custom-input-dark {
+    background-color: #0f1435;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.custom-select-dark:focus,
+.custom-input-dark:focus {
+    background-color: #141b47;
+    border-color: var(--ls-amber);
+    color: #ffffff;
+    box-shadow: 0 0 12px var(--ls-amber-glow);
+}
+
+.custom-input-group .custom-input-dark {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.custom-input-addon {
+    background-color: #161d4a;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: none;
+    color: var(--ls-text-muted);
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 0.75rem 1.1rem;
+    font-size: 0.9rem;
+}
+
+.dias-pill-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.btn-dia-pill {
+    flex: 1;
+    background-color: #12173d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 0.55rem 0;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-dia-pill:hover {
+    border-color: var(--ls-amber);
+}
+
+.btn-dia-pill.selected {
+    background-color: var(--ls-amber);
+    color: #000219;
+    border-color: var(--ls-amber);
+    box-shadow: 0 0 14px var(--ls-amber-glow);
+}
+
+.btn-pill-danger {
+    background: transparent;
+    border: 1px solid #ff3b30;
+    color: #ff453a;
+    border-radius: 30px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+}
+
+.btn-pill-danger:hover {
+    background-color: rgba(255, 59, 48, 0.15);
+    color: #ff6056;
+}
+
+.btn-pill-cancel {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    border-radius: 30px;
+    padding: 0.6rem 1.4rem;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+}
+
+.btn-pill-cancel:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.btn-pill-submit {
+    background-color: var(--ls-amber);
+    border: none;
+    color: #000219;
+    border-radius: 30px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 700;
+    font-size: 0.88rem;
+    box-shadow: 0 4px 15px var(--ls-amber-glow);
+    transition: all 0.2s ease;
+}
+
+.btn-pill-submit:hover {
+    background-color: #ffb143;
+    box-shadow: 0 6px 20px rgba(255, 159, 28, 0.5);
 }
