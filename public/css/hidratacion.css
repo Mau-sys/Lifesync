@@ -81,7 +81,7 @@ html, body {
     align-items: center;
     justify-content: center;
     position: relative;
-    background: conic-gradient(var(--ls-cyan) 50%, rgba(6, 182, 212, 0.15) 50%);
+    background: conic-gradient(var(--ls-cyan) 0%, rgba(6, 182, 212, 0.15) 0%);
     box-shadow: 0 0 30px var(--ls-cyan-glow);
 }
 
@@ -113,6 +113,7 @@ html, body {
     background: transparent;
     transition: color 0.2s ease;
 }
+
 .btn-options:hover {
     color: var(--ls-cyan);
 }
@@ -170,11 +171,19 @@ html, body {
 .kebab-item {
     display: flex;
     align-items: center;
+    width: 100%;
     padding: 0.6rem 1rem;
     color: #ffffff;
     text-decoration: none;
     font-size: 0.875rem;
     transition: background-color 0.2s ease;
+    border: none;
+    background: transparent;
+    text-align: left;
+}
+
+.btn-kebab-action {
+    cursor: pointer;
 }
 
 .kebab-item:hover {
@@ -192,4 +201,21 @@ html, body {
 
 .kebab-item.danger:hover {
     background-color: rgba(255, 85, 85, 0.15);
+}
+
+.config-modal-bg {
+    background-color: #080b26;
+    border: 1px solid rgba(6, 182, 212, 0.3) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.config-input {
+    background-color: #12163e !important;
+    border: 1px solid rgba(6, 182, 212, 0.25) !important;
+}
+
+.config-input:focus {
+    border-color: var(--ls-cyan) !important;
+    box-shadow: 0 0 12px var(--ls-cyan-glow) !important;
+    color: #ffffff !important;
 }

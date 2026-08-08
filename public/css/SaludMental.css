@@ -109,6 +109,7 @@ html, body {
     background: transparent;
     transition: color 0.2s ease;
 }
+
 .btn-options:hover {
     color: var(--ls-purple);
 }
@@ -161,11 +162,19 @@ html, body {
 .kebab-item {
     display: flex;
     align-items: center;
+    width: 100%;
     padding: 0.6rem 1rem;
     color: #ffffff;
     text-decoration: none;
     font-size: 0.875rem;
     transition: background-color 0.2s ease;
+    border: none;
+    background: transparent;
+    text-align: left;
+}
+
+.btn-kebab-action {
+    cursor: pointer;
 }
 
 .kebab-item:hover {
@@ -204,4 +213,27 @@ html, body {
 
 .modal-backdrop.show {
     opacity: 0.75;
+}
+
+.btn-dia {
+    background-color: #12163e;
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    color: var(--ls-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-dia:hover {
+    border-color: var(--ls-purple);
+    color: #ffffff;
+}
+
+.btn-dia.active {
+    background-color: var(--ls-purple);
+    border-color: var(--ls-purple);
+    color: #ffffff;
+    box-shadow: 0 0 10px var(--ls-purple-glow);
 }

@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LifeSync - Registro Académico</title>
 
+    <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 
+    <!-- CSS External -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/RegistroAcademico.css">
@@ -17,6 +19,7 @@
 
     <div class="card-full-screen d-flex flex-column justify-content-between">
         
+        <!-- Header & Menú Opciones -->
         <div>
             <div class="d-flex justify-content-end align-items-center mb-3">
                 <div class="position-relative">
@@ -24,9 +27,9 @@
                         <i class="fa-solid fa-ellipsis-vertical"></i>
                     </button>
                     <div class="kebab-dropdown-menu" id="kebab-menu-academico">
-                        <a href="inicio.html" class="kebab-item" id="btn-regresar">
+                        <button class="kebab-item btn-kebab-action" id="btn-regresar">
                             <i class="fa-solid fa-arrow-left me-2"></i>Regresar
-                        </a>
+                        </button>
                         <a href="#" class="kebab-item" id="btn-editar-meta">
                             <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
                         </a>
@@ -46,31 +49,34 @@
             </div>
         </div>
 
+        <!-- Indicador de Progreso Principal -->
         <div class="my-auto py-2 text-center d-flex flex-column align-items-center justify-content-center">
             <div class="progress-ring ring-pink mx-auto mb-3" id="ring-sesiones">
                 <div class="progress-content">
-                    <h1 class="fw-bold mb-0 text-white font-sora contador-fluido" id="contador-sesiones">2/5</h1>
+                    <h1 class="fw-bold mb-0 text-white font-sora contador-fluido" id="contador-sesiones">0/0</h1>
                     <span class="text-subtle fw-medium subtexto-fluido">sesiones</span>
                 </div>
             </div>
 
             <div class="text-center">
                 <span class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido">Meta diaria</span>
-                <span class="text-pink fw-bold meta-texto-fluido" id="meta-sesiones">5 sesiones de estudio</span>
+                <span class="text-pink fw-bold meta-texto-fluido" id="meta-sesiones">-- sesiones de estudio</span>
             </div>
         </div>
 
+        <!-- Métricas de Tiempo y Acción -->
         <div class="w-100">
             <div class="tiempo-box p-3 rounded-4 mb-3 text-center" id="box-tiempo">
                 <span class="text-subtle d-block fw-semibold label-fluido text-uppercase tracking-wider mb-1">Tiempo acumulado</span>
-                <span class="text-pink fw-bold meta-texto-fluido" id="tiempo-acumulado">80 min / 240 min</span>
+                <span class="text-pink fw-bold meta-texto-fluido" id="tiempo-acumulado">0 min / 0 min</span>
             </div>
 
-            <button class="btn btn-action-pink w-100 rounded-pill fw-bold font-sora boton-fluido" id="btn-add-sesion">+1 sesión</button>
+            <button class="btn btn-action-pink w-100 rounded-pill fw-bold font-sora boton-fluido" id="btn-add-sesion">+1 sesión de estudio</button>
         </div>
 
     </div>
 
+    <!-- Modal de Configuración -->
     <div class="modal fade" id="modalConfiguracion" tabindex="-1" aria-labelledby="modalConfiguracionLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-lifesync p-2">
@@ -82,16 +88,20 @@
                 </div>
                 <div class="modal-body py-4">
                     <form id="form-config-meta">
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label for="input-num-sesiones" class="form-label text-subtle fw-semibold">Cantidad de sesiones diarias (Máx. 50)</label>
                             <input type="number" class="form-control custom-input" id="input-num-sesiones" min="1" max="50" value="5" required>
                         </div>
-                        <div class="mb-2">
-                            <label for="input-duracion-sesion" class="form-label text-subtle fw-semibold">Duración por sesión (Máx. 4 horas / 240 min)</label>
+                        <div class="mb-3">
+                            <label for="input-duracion-sesion" class="form-label text-subtle fw-semibold">Duración por sesión (Máx. 240 min)</label>
                             <div class="input-group">
-                                <input type="number" class="form-control custom-input input-group-left" id="input-duracion-sesion" min="5" max="240" step="5" value="48" required>
+                                <input type="number" class="form-control custom-input input-group-left" id="input-duracion-sesion" min="5" max="240" step="5" value="45" required>
                                 <span class="input-group-text custom-input-suffix">minutos</span>
                             </div>
+                        </div>
+                        <div class="p-3 bg-pink-soft rounded-3 border border-pink border-opacity-25 text-center">
+                            <span class="text-subtle d-block small">Tiempo de estudio meta estimado:</span>
+                            <span class="fw-bold text-pink fs-5" id="preview-meta-total">0 min (0 hrs 0 min)</span>
                         </div>
                     </form>
                 </div>
@@ -111,6 +121,7 @@
         </div>
     </div>
 
+    <!-- JavaScript External -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/HRegistroAcademico.js"></script>
 </body>

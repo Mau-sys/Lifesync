@@ -1,5 +1,6 @@
 const btnOptions = document.getElementById('btn-options-saludmental');
 const kebabMenu = document.getElementById('kebab-menu-saludmental');
+const btnRegresar = document.getElementById('btn-regresar');
 
 if (btnOptions && kebabMenu) {
     btnOptions.addEventListener('click', (e) => {
@@ -14,9 +15,24 @@ if (btnOptions && kebabMenu) {
     });
 }
 
+if (btnRegresar) {
+    btnRegresar.addEventListener('click', () => {
+        const paginaAnterior = document.referrer;
+        const mismoDominio = paginaAnterior && paginaAnterior.includes(window.location.host);
+
+        if (mismoDominio) {
+            window.history.back();
+        } else {
+            window.location.href = 'inicio.html';
+        }
+    });
+}
+
 let pausasCompletadas = 0;
 let pausasTotales = 2;
 let duracionPausa = 15;
+let frecuenciaMeta = 'diaria';
+let diasSeleccionados = [1, 2, 3, 4, 5];
 let historialPausas = [];
 
 const ringElement = document.getElementById('ring-saludmental');
@@ -29,32 +45,58 @@ const btnGuardar = document.getElementById('btn-guardar-config');
 const btnReiniciar = document.getElementById('btn-reiniciar-meta');
 const inputPausas = document.getElementById('input-pausas');
 const inputDuracion = document.getElementById('input-duracion');
+const selectFrecuencia = document.getElementById('select-frecuencia');
+const contenedorDias = document.getElementById('contenedor-dias-semana');
+const labelPausas = document.getElementById('label-pausas');
+const botonesDias = document.querySelectorAll('.btn-dia');
+
+function obtenerSemanaActual() {
+    const ahora = new Date();
+    const inicioAño = new Date(ahora.getFullYear(), 0, 1);
+    const dias = Math.floor((ahora - inicioAño) / (24 * 60 * 60 * 1000));
+    return Math.ceil((dias + inicioAño.getDay() + 1) / 7);
+}
 
 function obtenerFechaHoy() {
     return new Date().toISOString().split('T')[0];
 }
 
-function verificarNuevoDia() {
+function verificarReinicioPeriodo() {
     const hoy = obtenerFechaHoy();
-    const ultimaFecha = localStorage.getItem('ls_saludmental_fecha');
 
-    if (ultimaFecha !== hoy) {
-        pausasCompletadas = 0;
-        historialPausas = [];
-        localStorage.setItem('ls_saludmental_fecha', hoy);
-        guardarDatos();
+    if (frecuenciaMeta === 'semanal') {
+        const semanaActual = `${new Date().getFullYear()}-W${obtenerSemanaActual()}`;
+        const ultimaSemana = localStorage.getItem('ls_saludmental_semana');
+
+        if (ultimaSemana !== semanaActual) {
+            pausasCompletadas = 0;
+            historialPausas = [];
+            localStorage.setItem('ls_saludmental_semana', semanaActual);
+            guardarDatos();
+        }
+    } else {
+        const ultimaFecha = localStorage.getItem('ls_saludmental_fecha');
+
+        if (ultimaFecha !== hoy) {
+            pausasCompletadas = 0;
+            historialPausas = [];
+            localStorage.setItem('ls_saludmental_fecha', hoy);
+            guardarDatos();
+        }
     }
 }
 
 function cargarDatos() {
-    verificarNuevoDia();
-
     const configuracionGuardada = localStorage.getItem('ls_saludmental_config');
     if (configuracionGuardada) {
         const config = JSON.parse(configuracionGuardada);
         pausasTotales = config.pausasTotales || 2;
         duracionPausa = config.duracionPausa || 15;
+        frecuenciaMeta = config.frecuenciaMeta || 'diaria';
+        diasSeleccionados = config.diasSeleccionados || [1, 2, 3, 4, 5];
     }
+
+    verificarReinicioPeriodo();
 
     const pausasGuardadas = localStorage.getItem('ls_saludmental_pausas');
     if (pausasGuardadas) {
@@ -68,6 +110,9 @@ function cargarDatos() {
 
     if (inputPausas) inputPausas.value = pausasTotales;
     if (inputDuracion) inputDuracion.value = duracionPausa;
+    if (selectFrecuencia) selectFrecuencia.value = frecuenciaMeta;
+
+    actualizarVisibilidadDias();
 }
 
 function guardarDatos() {
@@ -75,7 +120,9 @@ function guardarDatos() {
     localStorage.setItem('ls_saludmental_historial', JSON.stringify(historialPausas));
     localStorage.setItem('ls_saludmental_config', JSON.stringify({
         pausasTotales,
-        duracionPausa
+        duracionPausa,
+        frecuenciaMeta,
+        diasSeleccionados
     }));
 }
 
@@ -83,26 +130,38 @@ function renderizarListaPausas() {
     if (!listaPausas) return;
     listaPausas.innerHTML = '';
 
-    historialPausas.forEach(hora => {
+    if (historialPausas.length === 0) {
+        listaPausas.innerHTML = '<span class="text-subtle small d-block text-center py-2">Sin pausas registradas en este periodo</span>';
+        return;
+    }
+
+    historialPausas.forEach(registro => {
         const item = document.createElement('div');
         item.className = 'd-flex justify-content-between align-items-center py-1';
         item.innerHTML = `
-            <span class="text-white fw-medium subtexto-fluido">${hora}</span>
+            <span class="text-white fw-medium subtexto-fluido">${registro}</span>
             <i class="fa-solid fa-circle-check text-purple fs-5"></i>
         `;
         listaPausas.appendChild(item);
     });
 }
 
+function esDiaActivo() {
+    if (frecuenciaMeta !== 'personalizada') return true;
+    const diaHoy = new Date().getDay();
+    return diasSeleccionados.includes(diaHoy);
+}
+
 function actualizarInterfaz() {
-    verificarNuevoDia();
+    verificarReinicioPeriodo();
 
     if (contadorElement) {
         contadorElement.textContent = `${pausasCompletadas}/${pausasTotales}`;
     }
 
     if (metaElement) {
-        metaElement.textContent = `${pausasTotales} pausas conscientes (${duracionPausa} min/pausa)`;
+        const textoPausas = pausasTotales === 1 ? '1 pausa' : `${pausasTotales} pausas`;
+        metaElement.textContent = `${textoPausas} (${duracionPausa} min/pausa)`;
     }
 
     if (ringElement) {
@@ -111,7 +170,13 @@ function actualizarInterfaz() {
     }
 
     if (btnAddPausa) {
-        if (pausasCompletadas >= pausasTotales) {
+        const diaHabilitado = esDiaActivo();
+
+        if (!diaHabilitado) {
+            btnAddPausa.textContent = 'Día de descanso';
+            btnAddPausa.disabled = true;
+            btnAddPausa.classList.add('opacity-75');
+        } else if (pausasCompletadas >= pausasTotales) {
             btnAddPausa.textContent = '¡Meta completada!';
             btnAddPausa.disabled = true;
             btnAddPausa.classList.add('opacity-75');
@@ -125,16 +190,64 @@ function actualizarInterfaz() {
     renderizarListaPausas();
 }
 
+function actualizarVisibilidadDias() {
+    if (!selectFrecuencia) return;
+
+    if (selectFrecuencia.value === 'personalizada') {
+        contenedorDias.classList.remove('d-none');
+        labelPausas.textContent = 'Pausas por día activo (Máx. 50)';
+    } else {
+        contenedorDias.classList.add('d-none');
+        labelPausas.textContent = selectFrecuencia.value === 'semanal' 
+            ? 'Pausas semanales (Máx. 50)' 
+            : 'Pausas diarias (Máx. 50)';
+    }
+
+    botonesDias.forEach(btn => {
+        const valDia = parseInt(btn.dataset.dia);
+        if (diasSeleccionados.includes(valDia)) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
+if (selectFrecuencia) {
+    selectFrecuencia.addEventListener('change', actualizarVisibilidadDias);
+}
+
+botonesDias.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const valDia = parseInt(btn.dataset.dia);
+        if (diasSeleccionados.includes(valDia)) {
+            if (diasSeleccionados.length > 1) {
+                diasSeleccionados = diasSeleccionados.filter(d => d !== valDia);
+                btn.classList.remove('active');
+            } else {
+                alert('Debes mantener al menos 1 día seleccionado.');
+            }
+        } else {
+            diasSeleccionados.push(valDia);
+            btn.classList.add('active');
+        }
+    });
+});
+
 if (btnAddPausa) {
     btnAddPausa.addEventListener('click', () => {
-        verificarNuevoDia();
+        verificarReinicioPeriodo();
 
-        if (pausasCompletadas < pausasTotales) {
+        if (pausasCompletadas < pausasTotales && esDiaActivo()) {
             pausasCompletadas++;
             const ahora = new Date();
             const horaFormateada = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const textoRegistro = frecuenciaMeta === 'semanal' 
+                ? `${ahora.toLocaleDateString([], { weekday: 'short' })} - ${horaFormateada}`
+                : horaFormateada;
 
-            historialPausas.push(horaFormateada);
+            historialPausas.push(textoRegistro);
             guardarDatos();
             actualizarInterfaz();
         }
@@ -143,7 +256,7 @@ if (btnAddPausa) {
 
 if (btnReiniciar) {
     btnReiniciar.addEventListener('click', () => {
-        const confirmar = confirm('¿Estás seguro de que deseas reiniciar el progreso de hoy a 0?');
+        const confirmar = confirm('¿Estás seguro de que deseas reiniciar el progreso de este periodo a 0?');
         if (confirmar) {
             pausasCompletadas = 0;
             historialPausas = [];
@@ -166,6 +279,7 @@ if (btnGuardar) {
     btnGuardar.addEventListener('click', () => {
         const nuevasPausas = parseInt(inputPausas.value);
         const nuevaDuracion = parseInt(inputDuracion.value);
+        const nuevaFrecuencia = selectFrecuencia.value;
 
         if (isNaN(nuevasPausas) || nuevasPausas < 1 || nuevasPausas > 50) {
             alert('Por favor ingresa una cantidad de pausas válida (entre 1 y 50).');
@@ -177,6 +291,17 @@ if (btnGuardar) {
             return;
         }
 
+        if (nuevaFrecuencia === 'personalizada' && diasSeleccionados.length === 0) {
+            alert('Por favor selecciona al menos un día para la meta personalizada.');
+            return;
+        }
+
+        if (frecuenciaMeta !== nuevaFrecuencia) {
+            pausasCompletadas = 0;
+            historialPausas = [];
+        }
+
+        frecuenciaMeta = nuevaFrecuencia;
         pausasTotales = nuevasPausas;
         duracionPausa = nuevaDuracion;
 
