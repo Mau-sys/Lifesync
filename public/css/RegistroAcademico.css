@@ -288,3 +288,25 @@ html, body {
     background-color: rgba(255, 255, 255, 0.1);
     color: #ffffff;
 }
+
+.btn-dia-semana {
+    background-color: #07091e;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--ls-text-muted);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-dia-semana:hover {
+    border-color: var(--ls-pink);
+    color: #ffffff;
+}
+
+.btn-dia-semana.active {
+    background-color: var(--ls-pink);
+    border-color: var(--ls-pink);
+    color: #ffffff;
+    box-shadow: 0 0 10px var(--ls-pink-soft);
+}

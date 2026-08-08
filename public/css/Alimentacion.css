@@ -3,7 +3,7 @@
     --ls-card-bg: #080b26;
     --ls-cyan: #00D4FF;
     --ls-purple: #8B5CF6;
-    --ls-emerald: #2CD478; /* Color principal para Alimentación */
+    --ls-emerald: #2CD478;
     --ls-emerald-soft: rgba(44, 212, 120, 0.12);
     --ls-emerald-glow: rgba(44, 212, 120, 0.35);
     --ls-text-muted: #94a3b8;
@@ -37,7 +37,6 @@ html, body {
     color: var(--ls-emerald) !important;
 }
 
-
 .card-full-screen {
     background-color: var(--ls-bg-dark);
     width: 100vw;
@@ -45,7 +44,6 @@ html, body {
     box-sizing: border-box;
     padding: clamp(1.2rem, 3vh, 3rem) clamp(1.2rem, 5vw, 4rem);
 }
-
 
 .icon-circle {
     width: clamp(52px, 8vw, 90px);
@@ -65,13 +63,11 @@ html, body {
     font-size: clamp(1.5rem, 3.5vw, 3rem);
 }
 
-
 .texto-titulo-fluido { font-size: clamp(1.2rem, 2.5vw, 2.2rem); }
 .label-fluido { font-size: clamp(0.7rem, 1.2vw, 1.05rem); }
 .meta-texto-fluido { font-size: clamp(0.95rem, 1.8vw, 1.5rem); }
 .subtexto-fluido { font-size: clamp(0.75rem, 1.3vw, 1.1rem); }
 .boton-fluido { font-size: clamp(1rem, 1.8vw, 1.4rem); }
-
 
 .progress-ring {
     width: clamp(140px, 28vw, 260px);
@@ -83,8 +79,9 @@ html, body {
     align-items: center;
     justify-content: center;
     position: relative;
-    background: conic-gradient(var(--ls-emerald) 66.6%, rgba(44, 212, 120, 0.15) 66.6%);
+    background: conic-gradient(var(--ls-emerald) 0%, rgba(44, 212, 120, 0.15) 0%);
     box-shadow: 0 0 30px var(--ls-emerald-glow);
+    transition: background 0.4s ease;
 }
 
 .progress-ring::before {
@@ -108,7 +105,6 @@ html, body {
     font-size: clamp(2rem, 4.5vw, 3.8rem);
 }
 
-
 .btn-options {
     color: var(--ls-text-muted);
     font-size: clamp(1.1rem, 2vw, 1.8rem);
@@ -120,12 +116,26 @@ html, body {
     color: var(--ls-emerald);
 }
 
-
 .comidainfo-container {
     background-color: var(--ls-card-bg);
     border: 1px dashed rgba(44, 212, 120, 0.3);
 }
 
+.comida-card {
+    transition: all 0.2s ease;
+}
+.comida-card:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.comida-completada {
+    background-color: rgba(44, 212, 120, 0.08);
+}
+
+.hora-rango-texto {
+    font-size: 0.68rem;
+    margin-top: 2px;
+}
 
 .btn-action-emerald {
     background-color: var(--ls-emerald);
@@ -147,13 +157,20 @@ html, body {
 .btn-action-emerald:active {
     transform: scale(0.98);
 }
+
+.btn-action-emerald.disabled {
+    background-color: #1a3a2a !important;
+    color: #5d8a70 !important;
+    box-shadow: none !important;
+}
+
 .kebab-dropdown-menu {
     display: none;
     position: absolute;
     top: 100%;
     right: 0;
     margin-top: 0.5rem;
-    min-width: 170px;
+    min-width: 210px;
     background-color: #1e1e2d;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -192,48 +209,47 @@ html, body {
 .kebab-item.danger:hover {
     background-color: rgba(255, 85, 85, 0.15);
 }
-.kebab-dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 0.5rem;
-    min-width: 170px;
-    background-color: #1e1e2d;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+
+.bg-dark-card {
+    background-color: #0d1130;
     border-radius: 12px;
-    padding: 0.5rem 0;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    z-index: 1050;
 }
 
-.kebab-dropdown-menu.show {
-    display: block;
+.border-bottom-subtle {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
-.kebab-item {
-    display: flex;
-    align-items: center;
-    padding: 0.6rem 1rem;
+.border-top-subtle {
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.input-dark {
+    background-color: #161b40;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: #ffffff;
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: background-color 0.2s ease;
+    border-radius: 6px;
+    padding: 0.25rem 0.4rem;
+    font-size: 0.8rem;
 }
 
-.kebab-item:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+.input-dark:focus {
+    background-color: #1a204d;
+    border-color: var(--ls-emerald);
     color: #ffffff;
+    box-shadow: 0 0 6px var(--ls-emerald-glow);
 }
 
-.dropdown-divider {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+.form-check-input {
+    width: 2em;
+    height: 1em;
+    cursor: pointer;
 }
 
-.kebab-item.danger {
-    color: #ff5555;
+.form-check-input:checked {
+    background-color: var(--ls-emerald);
+    border-color: var(--ls-emerald);
 }
 
-.kebab-item.danger:hover {
-    background-color: rgba(255, 85, 85, 0.15);
+#modalEditarMeta .modal-dialog {
+    max-width: 480px;
 }
