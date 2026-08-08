@@ -4,19 +4,34 @@ session_start();
 
 header("Content-Type: application/json; charset=UTF-8");
 
-require_once "../config/conexion.php";
+ini_set("display_errors", "0");
+ini_set("log_errors", "1");
+
+require_once __DIR__ . "/../config/conexion.php";
+
+
+function responder($datos, $codigo = 200)
+{
+    http_response_code($codigo);
+
+    echo json_encode(
+        $datos,
+        JSON_UNESCAPED_UNICODE
+    );
+
+    exit;
+}
 
 
 if (!isset($_SESSION["usuario_id"])) {
 
-    http_response_code(401);
-
-    echo json_encode([
-        "exito" => false,
-        "mensaje" => "La sesión ha expirado."
-    ]);
-
-    exit;
+    responder(
+        [
+            "exito" => false,
+            "mensaje" => "La sesión ha expirado."
+        ],
+        401
+    );
 }
 
 
@@ -30,50 +45,114 @@ try {
     $db = $database->getConnection();
 
 
-    if ($db === null) {
+    if (!$db) {
 
-        http_response_code(500);
+        responder(
+            [
+                "exito" => false,
+                "mensaje" => "No se pudo conectar con la base de datos."
+            ],
+            500
+        );
 
-        echo json_encode([
-            "exito" => false,
-            "mensaje" => "No se pudo conectar con la base de datos."
-        ]);
-
-        exit;
     }
+
+
+    $db->setAttribute(
+        PDO::ATTR_ERRMODE,
+        PDO::ERRMODE_EXCEPTION
+    );
+
+
+    /*
+     * USUARIO
+     */
 
     $consultaUsuario = $db->prepare(
         "SELECT
-            u.nombre_usuario,
-            p.foto_perfil
-         FROM usuario u
-         LEFT JOIN perfil_usuario p
-            ON p.id_usuario = u.id_usuario
-         WHERE u.id_usuario = :id_usuario
+            nombre_usuario
+         FROM usuario
+         WHERE id_usuario = :id_usuario
          LIMIT 1"
     );
 
 
-    $consultaUsuario->execute([
-        ":id_usuario" => $usuarioId
-    ]);
+    $consultaUsuario->execute(
+        [
+            ":id_usuario" => $usuarioId
+        ]
+    );
 
 
-    $usuario = $consultaUsuario->fetch(PDO::FETCH_ASSOC);
+    $usuario = $consultaUsuario->fetch(
+        PDO::FETCH_ASSOC
+    );
 
 
     if (!$usuario) {
 
-        http_response_code(404);
+        responder(
+            [
+                "exito" => false,
+                "mensaje" => "Usuario no encontrado."
+            ],
+            404
+        );
 
-        echo json_encode([
-            "exito" => false,
-            "mensaje" => "Usuario no encontrado."
-        ]);
-
-        exit;
     }
 
+
+    /*
+     * FOTO DE PERFIL
+     *
+     * Si la tabla existe y tiene foto,
+     * se obtiene. Si no, se deja vacía.
+     */
+
+    $fotoPerfil = null;
+
+
+    try {
+
+        $consultaFoto = $db->prepare(
+            "SELECT foto_perfil
+             FROM perfil_usuario
+             WHERE id_usuario = :id_usuario
+             LIMIT 1"
+        );
+
+
+        $consultaFoto->execute(
+            [
+                ":id_usuario" => $usuarioId
+            ]
+        );
+
+
+        $perfil = $consultaFoto->fetch(
+            PDO::FETCH_ASSOC
+        );
+
+
+        if (
+            $perfil &&
+            !empty($perfil["foto_perfil"])
+        ) {
+
+            $fotoPerfil = $perfil["foto_perfil"];
+
+        }
+
+    } catch (Throwable $error) {
+
+        $fotoPerfil = null;
+
+    }
+
+
+    /*
+     * HÁBITOS
+     */
 
     $consultaHabitos = $db->prepare(
         "SELECT
@@ -86,8 +165,8 @@ try {
             h.unidad_medida,
             h.frecuencia,
             h.dias_semana,
-            c.nombre_categoria
-                AS categoria,
+
+            c.nombre_categoria AS categoria,
 
             COALESCE(
                 (
@@ -105,15 +184,17 @@ try {
             ON c.id_categoria = h.id_categoria
 
          WHERE h.id_usuario = :id_usuario
-         AND h.activo = TRUE
+         AND h.activo = 1
 
          ORDER BY h.fecha_creacion ASC"
     );
 
 
-    $consultaHabitos->execute([
-        ":id_usuario" => $usuarioId
-    ]);
+    $consultaHabitos->execute(
+        [
+            ":id_usuario" => $usuarioId
+        ]
+    );
 
 
     $habitos = $consultaHabitos->fetchAll(
@@ -124,31 +205,43 @@ try {
     $habitosPendientes = [];
 
     $totalHabitos = 0;
+
     $habitosCompletados = 0;
 
 
-    $diaSemanaActual =
-        (int) date("N");
+    $diaSemanaActual = (int) date("N");
 
 
     foreach ($habitos as $habito) {
 
-        $frecuencia =
-            $habito["frecuencia"];
+        $frecuencia = strtolower(
+            trim(
+                (string) ($habito["frecuencia"] ?? "")
+            )
+        );
+
 
         $debeMostrarHoy = false;
 
 
-        if ($frecuencia === "diaria") {
+        if (
+            $frecuencia === "diaria" ||
+            $frecuencia === "diario"
+        ) {
 
             $debeMostrarHoy = true;
 
-        } elseif ($frecuencia === "semanal") {
+        }
 
-            $dias =
-                trim(
-                    $habito["dias_semana"] ?? ""
-                );
+
+        elseif (
+            $frecuencia === "semanal" ||
+            $frecuencia === "semanalmente"
+        ) {
+
+            $dias = trim(
+                (string) ($habito["dias_semana"] ?? "")
+            );
 
 
             if ($dias === "") {
@@ -157,43 +250,54 @@ try {
 
             } else {
 
-                $listaDias =
-                    array_map(
-                        "intval",
-                        preg_split(
-                            "/[,; ]+/",
-                            $dias,
-                            -1,
-                            PREG_SPLIT_NO_EMPTY
-                        )
-                    );
+                $listaDias = preg_split(
+                    "/[,; ]+/",
+                    $dias,
+                    -1,
+                    PREG_SPLIT_NO_EMPTY
+                );
 
 
-                $debeMostrarHoy =
-                    in_array(
-                        $diaSemanaActual,
-                        $listaDias,
-                        true
-                    );
+                $listaDias = array_map(
+                    "intval",
+                    $listaDias
+                );
+
+
+                $debeMostrarHoy = in_array(
+                    $diaSemanaActual,
+                    $listaDias,
+                    true
+                );
+
             }
+
+        }
+
+
+        elseif ($frecuencia === "") {
+
+            $debeMostrarHoy = true;
+
         }
 
 
         if (!$debeMostrarHoy) {
-
             continue;
-
         }
 
 
         $totalHabitos++;
 
 
-        $objetivo =
-            (float) $habito["objetivo"];
+        $objetivo = (float) (
+            $habito["objetivo"] ?? 0
+        );
 
-        $progreso =
-            (float) $habito["progreso"];
+
+        $progreso = (float) (
+            $habito["progreso"] ?? 0
+        );
 
 
         $porcentaje = 0;
@@ -207,59 +311,86 @@ try {
         }
 
 
-        $porcentaje =
-            max(
-                0,
-                min(
-                    100,
-                    $porcentaje
-                )
-            );
+        $porcentaje = max(
+            0,
+            min(
+                100,
+                $porcentaje
+            )
+        );
 
 
-        $completado =
-            $porcentaje >= 100;
+        $completado = $porcentaje >= 100;
 
 
         if ($completado) {
 
             $habitosCompletados++;
 
-            continue;
+        }
+
+
+        $categoria = trim(
+            (string) (
+                $habito["categoria"] ?? ""
+            )
+        );
+
+
+        if ($categoria === "") {
+
+            $categoria = "Hábito Personalizado";
 
         }
 
 
-        $detalle = "";
+        $unidad = trim(
+            (string) (
+                $habito["unidad_medida"] ?? ""
+            )
+        );
 
 
-        if (
-            $habito["tipo_medicion"] ===
-            "completar"
-        ) {
+        $tipoMedicion = strtolower(
+            trim(
+                (string) (
+                    $habito["tipo_medicion"] ?? ""
+                )
+            )
+        );
 
-            $detalle =
-                $completado
+
+        if ($tipoMedicion === "completar") {
+
+            $detalle = $completado
                 ? "Completado"
                 : "Pendiente";
 
         } else {
 
+            $progresoTexto = number_format(
+                $progreso,
+                0
+            );
+
+
+            $objetivoTexto = number_format(
+                $objetivo,
+                0
+            );
+
+
             $detalle =
-                number_format(
-                    $progreso,
-                    0
-                ) .
+                $progresoTexto .
                 " de " .
-                number_format(
-                    $objetivo,
-                    0
-                ) .
-                (
-                    $habito["unidad_medida"]
-                    ? " " . $habito["unidad_medida"]
-                    : ""
-                );
+                $objetivoTexto;
+
+
+            if ($unidad !== "") {
+
+                $detalle .= " " . $unidad;
+
+            }
 
         }
 
@@ -272,9 +403,11 @@ try {
             "nombre_habito" =>
                 $habito["nombre_habito"],
 
+            "descripcion" =>
+                $habito["descripcion"],
+
             "categoria" =>
-                $habito["categoria"]
-                ?: "Hábito Personalizado",
+                $categoria,
 
             "objetivo" =>
                 $objetivo,
@@ -283,19 +416,30 @@ try {
                 $progreso,
 
             "unidad_medida" =>
-                $habito["unidad_medida"],
+                $unidad,
+
+            "frecuencia" =>
+                $frecuencia,
 
             "porcentaje" =>
-                round($porcentaje, 2),
+                round(
+                    $porcentaje,
+                    2
+                ),
+
+            "completado" =>
+                $completado,
 
             "detalle" =>
                 $detalle
-
         ];
 
     }
 
 
+    /*
+     * PROGRESO GENERAL
+     */
 
     $porcentajeGeneral = 0;
 
@@ -311,237 +455,290 @@ try {
     }
 
 
-   
+    /*
+     * RACHA
+     */
 
-    $consultaRacha = $db->prepare(
-        "SELECT
-            COALESCE(MAX(r.racha_actual), 0)
-                AS racha
-         FROM rachas r
-         INNER JOIN habitos h
-            ON h.id_habito = r.id_habito
-         WHERE h.id_usuario = :id_usuario
-         AND h.activo = TRUE"
-    );
+    $racha = 0;
 
 
-    $consultaRacha->execute([
-        ":id_usuario" => $usuarioId
-    ]);
+    try {
+
+        $consultaRacha = $db->prepare(
+            "SELECT
+                COALESCE(
+                    MAX(r.racha_actual),
+                    0
+                ) AS racha
+
+             FROM rachas r
+
+             INNER JOIN habitos h
+                ON h.id_habito = r.id_habito
+
+             WHERE h.id_usuario = :id_usuario
+             AND h.activo = 1"
+        );
 
 
-    $racha =
-        (int) (
+        $consultaRacha->execute(
+            [
+                ":id_usuario" => $usuarioId
+            ]
+        );
+
+
+        $racha = (int) (
             $consultaRacha->fetchColumn() ?: 0
         );
 
+    } catch (Throwable $error) {
 
-    
-    $consultaNotificaciones = $db->prepare(
-        "SELECT
-            id_notificacion,
-            titulo,
-            mensaje,
-            leida,
-            fecha_notificacion
-         FROM notificaciones
-         WHERE id_usuario = :id_usuario
-         ORDER BY fecha_notificacion DESC
-         LIMIT 50"
-    );
+        $racha = 0;
+
+    }
 
 
-    $consultaNotificaciones->execute([
-        ":id_usuario" => $usuarioId
-    ]);
-
-
-    $notificacionesBD =
-        $consultaNotificaciones->fetchAll(
-            PDO::FETCH_ASSOC
-        );
-
+    /*
+     * NOTIFICACIONES
+     */
 
     $notificaciones = [];
 
+    $notificacionesNoLeidas = 0;
 
-    foreach (
-        $notificacionesBD
-        as $notificacion
-    ) {
 
-        $fecha =
-            new DateTime(
+    try {
+
+        $consultaNotificaciones = $db->prepare(
+            "SELECT
+                id_notificacion,
+                titulo,
+                mensaje,
+                leida,
+                fecha_notificacion
+
+             FROM notificaciones
+
+             WHERE id_usuario = :id_usuario
+
+             ORDER BY fecha_notificacion DESC
+
+             LIMIT 50"
+        );
+
+
+        $consultaNotificaciones->execute(
+            [
+                ":id_usuario" => $usuarioId
+            ]
+        );
+
+
+        $notificacionesBD =
+            $consultaNotificaciones->fetchAll(
+                PDO::FETCH_ASSOC
+            );
+
+
+        foreach (
+            $notificacionesBD
+            as $notificacion
+        ) {
+
+            $fecha = new DateTime(
                 $notificacion["fecha_notificacion"]
             );
 
 
-        $notificaciones[] = [
+            $notificaciones[] = [
 
-            "id_notificacion" =>
-                (int) $notificacion[
-                    "id_notificacion"
-                ],
+                "id_notificacion" =>
+                    (int) $notificacion[
+                        "id_notificacion"
+                    ],
 
-            "titulo" =>
-                $notificacion["titulo"],
+                "titulo" =>
+                    $notificacion["titulo"],
 
-            "mensaje" =>
-                $notificacion["mensaje"],
+                "mensaje" =>
+                    $notificacion["mensaje"],
 
-            "leida" =>
-                (bool) $notificacion["leida"],
+                "leida" =>
+                    (
+                        (int) $notificacion["leida"]
+                    ) === 1,
 
-            "fecha_formateada" =>
-                $fecha->format(
-                    "d/m/Y H:i"
-                )
+                "fecha_formateada" =>
+                    $fecha->format(
+                        "d/m/Y H:i"
+                    )
+            ];
 
-        ];
-
-    }
-
-
-  
-
-    if (count($notificaciones) === 0) {
-
-        $titulo =
-            "Bienvenido a LifeSync";
-
-        $mensaje =
-            "Activa los permisos de notificaciones y recordatorios para recibir avisos importantes de tus hábitos y rachas.";
+        }
 
 
-        $insertarNotificacion =
-            $db->prepare(
-                "INSERT INTO notificaciones
-                (
-                    id_usuario,
-                    titulo,
-                    mensaje
-                )
-                VALUES
-                (
-                    :id_usuario,
-                    :titulo,
-                    :mensaje
-                )"
+        if (count($notificaciones) === 0) {
+
+            $titulo =
+                "Bienvenido a LifeSync";
+
+
+            $mensaje =
+                "Aquí aparecerán tus recordatorios, logros, rachas y avisos de LifeSync.";
+
+
+            $insertarNotificacion =
+                $db->prepare(
+                    "INSERT INTO notificaciones
+                    (
+                        id_usuario,
+                        titulo,
+                        mensaje
+                    )
+                    VALUES
+                    (
+                        :id_usuario,
+                        :titulo,
+                        :mensaje
+                    )"
+                );
+
+
+            $insertarNotificacion->execute(
+                [
+                    ":id_usuario" =>
+                        $usuarioId,
+
+                    ":titulo" =>
+                        $titulo,
+
+                    ":mensaje" =>
+                        $mensaje
+                ]
             );
 
 
-        $insertarNotificacion->execute([
-            ":id_usuario" =>
-                $usuarioId,
+            $notificaciones[] = [
 
-            ":titulo" =>
-                $titulo,
+                "id_notificacion" =>
+                    (int) $db->lastInsertId(),
 
-            ":mensaje" =>
-                $mensaje
-        ]);
+                "titulo" =>
+                    $titulo,
+
+                "mensaje" =>
+                    $mensaje,
+
+                "leida" =>
+                    false,
+
+                "fecha_formateada" =>
+                    date("d/m/Y H:i")
+            ];
+
+        }
 
 
-        $notificaciones = [[
+        $consultaNoLeidas = $db->prepare(
+            "SELECT COUNT(*)
+             FROM notificaciones
+             WHERE id_usuario = :id_usuario
+             AND leida = 0"
+        );
 
-            "id_notificacion" =>
-                (int) $db->lastInsertId(),
 
-            "titulo" =>
-                $titulo,
+        $consultaNoLeidas->execute(
+            [
+                ":id_usuario" => $usuarioId
+            ]
+        );
 
-            "mensaje" =>
-                $mensaje,
 
-            "leida" =>
-                false,
+        $notificacionesNoLeidas =
+            (int) $consultaNoLeidas->fetchColumn();
 
-            "fecha_formateada" =>
-                date("d/m/Y H:i")
+    } catch (Throwable $error) {
 
-        ]];
+        $notificaciones = [];
+
+        $notificacionesNoLeidas = 0;
 
     }
 
 
-  
+    /*
+     * RESPUESTA FINAL
+     */
 
-    $consultaNoLeidas =
-        $db->prepare(
-            "SELECT COUNT(*)
-             FROM notificaciones
-             WHERE id_usuario = :id_usuario
-             AND leida = FALSE"
-        );
+    responder(
+        [
+
+            "exito" =>
+                true,
+
+            "usuario" => [
+
+                "nombre" =>
+                    $usuario["nombre_usuario"],
+
+                "foto" =>
+                    $fotoPerfil
+            ],
+
+            "progreso" => [
+
+                "porcentaje" =>
+                    round(
+                        $porcentajeGeneral,
+                        2
+                    ),
+
+                "total_habitos" =>
+                    $totalHabitos,
+
+                "completados" =>
+                    $habitosCompletados
+            ],
+
+            "racha" =>
+                $racha,
+
+            "habitos_pendientes" =>
+                $habitosPendientes,
+
+            "notificaciones" =>
+                $notificaciones,
+
+            "notificaciones_no_leidas" =>
+                $notificacionesNoLeidas
+        ]
+    );
 
 
-    $consultaNoLeidas->execute([
-        ":id_usuario" => $usuarioId
-    ]);
+} catch (Throwable $error) {
+
+    error_log(
+        "LifeSync auth/inicio.php: " .
+        $error->getMessage()
+    );
 
 
-    $notificacionesNoLeidas =
-        (int) $consultaNoLeidas->fetchColumn();
+    responder(
+        [
 
+            "exito" =>
+                false,
 
-    
-    echo json_encode([
+            "mensaje" =>
+                "No se pudo cargar la información de LifeSync.",
 
-        "exito" => true,
-
-        "usuario" => [
-
-            "nombre" =>
-                $usuario["nombre_usuario"],
-
-            "foto" =>
-                $usuario["foto_perfil"]
-                ?: null
-
+            "error" =>
+                $error->getMessage()
         ],
-
-        "progreso" => [
-
-            "porcentaje" =>
-                round(
-                    $porcentajeGeneral,
-                    2
-                ),
-
-            "total_habitos" =>
-                $totalHabitos,
-
-            "completados" =>
-                $habitosCompletados
-
-        ],
-
-        "racha" =>
-            $racha,
-
-        "habitos_pendientes" =>
-            $habitosPendientes,
-
-        "notificaciones" =>
-            $notificaciones,
-
-        "notificaciones_no_leidas" =>
-            $notificacionesNoLeidas
-
-    ]);
-
-} catch (PDOException $error) {
-
-    http_response_code(500);
-
-    echo json_encode([
-
-        "exito" => false,
-
-        "mensaje" =>
-            "No se pudo cargar la información de LifeSync."
-
-    ]);
+        500
+    );
 
 }
+
 ?>

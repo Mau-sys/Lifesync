@@ -17,6 +17,7 @@ if (!isset($_SESSION["usuario_id"])) {
     ]);
 
     exit;
+
 }
 
 
@@ -40,6 +41,7 @@ try {
         ]);
 
         exit;
+
     }
 
 
@@ -100,6 +102,7 @@ try {
             ]);
 
             exit;
+
         }
 
 
@@ -111,6 +114,7 @@ try {
         ]);
 
         exit;
+
     }
 
 
@@ -118,6 +122,7 @@ try {
 
         $contenido =
             file_get_contents("php://input");
+
 
         $datos =
             json_decode($contenido, true);
@@ -133,6 +138,7 @@ try {
             ]);
 
             exit;
+
         }
 
 
@@ -181,6 +187,7 @@ try {
                 ]);
 
                 exit;
+
             }
 
 
@@ -195,6 +202,7 @@ try {
                 ]);
 
                 exit;
+
             }
 
 
@@ -228,6 +236,7 @@ try {
                 ]);
 
                 exit;
+
             }
 
 
@@ -245,6 +254,7 @@ try {
                 ]);
 
                 exit;
+
             }
 
 
@@ -308,6 +318,7 @@ try {
             ]);
 
             exit;
+
         }
 
 
@@ -330,6 +341,7 @@ try {
                 ]);
 
                 exit;
+
             }
 
 
@@ -359,6 +371,7 @@ try {
             ]);
 
             exit;
+
         }
 
 
@@ -370,6 +383,7 @@ try {
         ]);
 
         exit;
+
     }
 
 

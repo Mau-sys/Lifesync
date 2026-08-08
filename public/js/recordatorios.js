@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const fechaRecordatorio =
         document.getElementById("fechaRecordatorio");
 
+    const titulo =
+        document.getElementById("titulo");
+
 
     function abrirModal() {
 
@@ -39,7 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.body.style.overflow = "hidden";
 
-        document.getElementById("titulo").focus();
+        setTimeout(() => {
+
+            titulo.focus();
+
+        }, 100);
 
     }
 
@@ -207,6 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     },
 
                     body: JSON.stringify(datos)
+
                 }
             );
 
@@ -316,24 +324,37 @@ document.addEventListener("DOMContentLoaded", () => {
             document.createElement("div");
 
         contenido.className =
-            "contenido-recordatorio";
+            "informacion-recordatorio";
 
 
-        const titulo =
+        const tituloTarjeta =
             document.createElement("h3");
 
-        titulo.textContent =
+        tituloTarjeta.textContent =
             recordatorio.titulo;
 
 
         const detalles =
             document.createElement("p");
 
-        detalles.textContent =
+        detalles.className =
+            "detalles-recordatorio";
+
+
+        const detalle =
+            document.createElement("span");
+
+        detalle.className =
+            "detalle-recordatorio";
+
+        detalle.textContent =
             construirDetalle(recordatorio);
 
 
-        contenido.appendChild(titulo);
+        detalles.appendChild(detalle);
+
+
+        contenido.appendChild(tituloTarjeta);
 
         contenido.appendChild(detalles);
 
@@ -343,15 +364,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const mensaje =
                 document.createElement("p");
 
-            mensaje.className =
-                "mensaje-recordatorio";
-
             mensaje.textContent =
                 recordatorio.mensaje;
 
             contenido.appendChild(mensaje);
 
         }
+
+
+        const acciones =
+            document.createElement("div");
+
+        acciones.className =
+            "acciones-recordatorio";
 
 
         const hora =
@@ -392,11 +417,14 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
+        acciones.appendChild(hora);
+
+        acciones.appendChild(eliminar);
+
+
         articulo.appendChild(contenido);
 
-        articulo.appendChild(hora);
-
-        articulo.appendChild(eliminar);
+        articulo.appendChild(acciones);
 
 
         return articulo;

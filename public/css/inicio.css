@@ -188,14 +188,21 @@
     border: 0;
     border-radius: var(--radio-redondo);
     background: transparent;
-    color: var(--color-texto-principal);
-    font-size: 20px;
+    color: var(--color-texto-secundario);
+    font-size: 22px;
     cursor: pointer;
-    transition: background var(--transicion);
+    transition:
+        background-color var(--transicion),
+        color var(--transicion),
+        transform var(--transicion),
+        box-shadow var(--transicion);
 }
 
 .cerrar-panel:hover {
-    background: var(--color-superficie-clara);
+    background-color: var(--color-superficie-clara);
+    color: var(--color-morado);
+    transform: rotate(90deg);
+    box-shadow: 0 0 18px rgba(139, 92, 246, .35);
 }
 
 .lista-notificaciones {
@@ -313,6 +320,9 @@
     border: 1px solid var(--color-borde);
     border-radius: var(--radio-grande);
     box-shadow: var(--sombra-suave);
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
     transition:
         transform var(--transicion),
         border-color var(--transicion),
@@ -323,6 +333,11 @@
     transform: translateY(-4px);
     border-color: var(--color-morado);
     box-shadow: var(--sombra-morada);
+}
+
+.tarjeta-racha:focus-visible {
+    outline: 2px solid var(--color-morado);
+    outline-offset: 4px;
 }
 
 .info-racha {
@@ -353,6 +368,11 @@
 .flecha {
     font-size: 30px;
     color: var(--color-celeste);
+    transition: transform var(--transicion);
+}
+
+.tarjeta-racha:hover .flecha {
+    transform: translateX(6px);
 }
 
 .progreso {
