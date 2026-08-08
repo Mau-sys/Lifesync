@@ -77,7 +77,7 @@ html, body {
     align-items: center;
     justify-content: center;
     position: relative;
-    background: conic-gradient(var(--ls-pink) 40%, rgba(236, 72, 153, 0.15) 40%);
+    background: conic-gradient(var(--ls-pink) 0%, rgba(236, 72, 153, 0.15) 0%);
     box-shadow: 0 0 30px var(--ls-pink-glow);
     transition: background 0.3s ease;
 }
@@ -124,6 +124,8 @@ html, body {
     background-color: var(--ls-pink);
     color: #ffffff;
     border: none;
+    padding-top: clamp(0.7rem, 1.8vh, 1.2rem);
+    padding-bottom: clamp(0.7rem, 1.8vh, 1.2rem);
     letter-spacing: 0.5px;
     box-shadow: 0 4px 20px var(--ls-pink-glow);
     transition: all 0.2s ease;
@@ -137,6 +139,13 @@ html, body {
 
 .btn-action-pink:active {
     transform: scale(0.98);
+}
+
+.btn-action-pink:disabled {
+    background-color: #6b2146 !important;
+    color: #999 !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
 }
 
 .kebab-dropdown-menu {
@@ -161,11 +170,19 @@ html, body {
 .kebab-item {
     display: flex;
     align-items: center;
+    width: 100%;
     padding: 0.6rem 1rem;
     color: #ffffff;
     text-decoration: none;
     font-size: 0.875rem;
     transition: background-color 0.2s ease;
+    border: none;
+    background: transparent;
+    text-align: left;
+}
+
+.btn-kebab-action {
+    cursor: pointer;
 }
 
 .kebab-item:hover {
@@ -187,7 +204,7 @@ html, body {
 
 .modal-lifesync {
     background-color: #0d0f2d;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(236, 72, 153, 0.3);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }

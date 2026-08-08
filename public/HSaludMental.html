@@ -25,9 +25,9 @@
                     </button>
 
                     <div class="kebab-dropdown-menu" id="kebab-menu-saludmental">
-                        <a href="inicio.html" class="kebab-item" id="btn-regresar">
+                        <button class="kebab-item btn-kebab-action" id="btn-regresar">
                             <i class="fa-solid fa-arrow-left me-2"></i>Regresar
-                        </a>
+                        </button>
                         <a href="#" class="kebab-item" id="btn-editar-meta" data-bs-toggle="modal" data-bs-target="#modalEditarSaludMental">
                             <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
                         </a>
@@ -56,14 +56,13 @@
             </div>
 
             <div class="text-center">
-                <span class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido">Meta diaria</span>
-                <span class="text-purple fw-bold meta-texto-fluido" id="meta-saludmental">2 pausas conscientes (15 min/pausa)</span>
+                <span class="text-purple fw-bold meta-texto-fluido" id="meta-saludmental">2 pausas (15 min/pausa)</span>
             </div>
         </div>
 
         <div class="w-100">
             <div class="pausas-container p-3 rounded-4 mb-3">
-                <span class="text-subtle d-block fw-semibold mb-2 label-fluido">Pausas de hoy</span>
+                <span class="text-subtle d-block fw-semibold mb-2 label-fluido">Pausas del periodo</span>
                 <div id="lista-pausas"></div>
             </div>
 
@@ -83,9 +82,33 @@
                 </div>
                 <div class="modal-body py-4">
                     <form id="form-config-saludmental">
+                        <div class="mb-3">
+                            <label for="select-frecuencia" class="form-label text-subtle fw-semibold">
+                                Frecuencia de la meta
+                            </label>
+                            <select class="form-select config-input text-white" id="select-frecuencia">
+                                <option value="diaria" selected>Diaria (Todos los días)</option>
+                                <option value="semanal">Semanal (Meta global para la semana)</option>
+                                <option value="personalizada">Personalizada (Días específicos)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4 d-none" id="contenedor-dias-semana">
+                            <label class="form-label text-subtle fw-semibold d-block">Selecciona los días activos</label>
+                            <div class="d-flex justify-content-between gap-1" id="grupo-dias">
+                                <button type="button" class="btn btn-dia flex-fill" data-dia="1">L</button>
+                                <button type="button" class="btn btn-dia flex-fill" data-dia="2">M</button>
+                                <button type="button" class="btn btn-dia flex-fill" data-dia="3">Mi</button>
+                                <button type="button" class="btn btn-dia flex-fill" data-dia="4">J</button>
+                                <button type="button" class="btn btn-dia flex-fill" data-dia="5">V</button>
+                                <button type="button" class="btn btn-dia flex-fill" data-dia="6">S</button>
+                                <button type="button" class="btn btn-dia flex-fill" data-dia="0">D</button>
+                            </div>
+                        </div>
+
                         <div class="mb-4">
-                            <label for="input-pausas" class="form-label text-subtle fw-semibold">
-                                Cantidad de pausas diarias (Máx. 50)
+                            <label for="input-pausas" class="form-label text-subtle fw-semibold" id="label-pausas">
+                                Cantidad de pausas (Máx. 50)
                             </label>
                             <input type="number" class="form-control config-input text-white" id="input-pausas" min="1" max="50" value="2" required>
                         </div>
