@@ -11,11 +11,7 @@
     <meta name="description"
           content="Administra tus hábitos personalizados">
 
-    <title>
-
-        LifeSync | Hábitos personalizados
-
-    </title>
+    <title>LifeSync | Hábitos personalizados</title>
 
     <link rel="stylesheet"
           href="css/variables.css">
@@ -56,6 +52,7 @@
 
         </header>
 
+
         <button
             type="button"
             id="btnNuevoHabito"
@@ -65,64 +62,17 @@
 
         </button>
 
+
         <section class="lista-habitos">
 
             <div id="contenedorHabitos">
-
-                <article
-                    class="tarjeta-habito habito-ejemplo">
-
-                    <button
-                        class="btn-eliminar"
-                        aria-label="Eliminar hábito">
-
-                        🗑
-
-                    </button>
-
-                    <a
-                        href="HHabitoPersonalizado.html"
-                        class="contenido-habito">
-
-                        <div class="habito-info">
-
-                            <img
-                                src="img/H-Perzona.png"
-                                alt="Hábito personalizado">
-
-                            <div>
-
-                                <h3>
-
-                                    Leer 20 páginas
-
-                                </h3>
-
-                                <p>
-
-                                    Diario • 75% completado
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="circulo-progreso">
-
-                            75%
-
-                        </div>
-
-                    </a>
-
-                </article>
 
             </div>
 
         </section>
 
     </main>
+
 
     <div
         id="modalNuevoHabito"
@@ -139,8 +89,10 @@
                 </h2>
 
                 <button
+                    type="button"
                     id="cerrarModal"
-                    class="btn-cerrar">
+                    class="btn-cerrar"
+                    aria-label="Cerrar">
 
                     ✕
 
@@ -148,9 +100,11 @@
 
             </div>
 
+
             <form
                 id="habitoForm"
                 class="habit-form">
+
 
                 <div class="input-group">
 
@@ -163,9 +117,13 @@
                     <input
                         type="text"
                         id="nombreHabito"
-                        placeholder="Ej. Leer 20 páginas">
+                        name="nombreHabito"
+                        placeholder="Ej. Leer 20 páginas"
+                        maxlength="150"
+                        required>
 
                 </div>
+
 
                 <div class="input-group">
 
@@ -177,11 +135,14 @@
 
                     <textarea
                         id="objetivo"
-                        rows="3">
-
-                    </textarea>
+                        name="objetivo"
+                        rows="3"
+                        placeholder="Describe qué quieres lograr con este hábito."
+                        maxlength="500"
+                        required></textarea>
 
                 </div>
+
 
                 <div class="input-group">
 
@@ -192,27 +153,29 @@
                     </label>
 
                     <select
-                        id="frecuencia">
+                        id="frecuencia"
+                        name="frecuencia"
+                        required>
 
-                        <option>
+                        <option value="">
 
                             Selecciona una opción
 
                         </option>
 
-                        <option>
+                        <option value="diaria">
 
                             Diario
 
                         </option>
 
-                        <option>
+                        <option value="semanal">
 
                             Semanal
 
                         </option>
 
-                        <option>
+                        <option value="mensual">
 
                             Mensual
 
@@ -221,6 +184,7 @@
                     </select>
 
                 </div>
+
 
                 <div class="input-group">
 
@@ -232,9 +196,12 @@
 
                     <input
                         type="date"
-                        id="fechaInicio">
+                        id="fechaInicio"
+                        name="fechaInicio"
+                        required>
 
                 </div>
+
 
                 <div class="input-group">
 
@@ -246,9 +213,11 @@
 
                     <input
                         type="date"
-                        id="fechaFin">
+                        id="fechaFin"
+                        name="fechaFin">
 
                 </div>
+
 
                 <div class="acciones-modal">
 
@@ -260,6 +229,7 @@
                         Cancelar
 
                     </button>
+
 
                     <button
                         type="submit"
@@ -276,6 +246,7 @@
         </div>
 
     </div>
+
 
     <div
         id="modalEliminar"
@@ -295,9 +266,11 @@
 
             </p>
 
+
             <div class="acciones-modal">
 
                 <button
+                    type="button"
                     id="cancelarEliminar"
                     class="btn-secundario">
 
@@ -305,7 +278,9 @@
 
                 </button>
 
+
                 <button
+                    type="button"
                     id="confirmarEliminar"
                     class="btn-peligro">
 
@@ -318,6 +293,7 @@
         </div>
 
     </div>
+
 
     <script src="js/personalizados.js"></script>
 

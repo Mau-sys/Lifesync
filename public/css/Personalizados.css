@@ -8,6 +8,7 @@
 
 }
 
+
 .encabezado {
 
     margin-bottom: 36px;
@@ -32,6 +33,7 @@
 
 }
 
+
 .btn-nuevo {
 
     margin-bottom: 35px;
@@ -39,6 +41,7 @@
     min-width: 220px;
 
 }
+
 
 .lista-habitos {
 
@@ -49,6 +52,7 @@
     gap: 22px;
 
 }
+
 
 .tarjeta-habito {
 
@@ -69,6 +73,8 @@
         border-color var(--transicion),
         box-shadow var(--transicion),
         background-color var(--transicion);
+
+    animation: aparecerTarjeta .35s ease;
 
 }
 
@@ -118,6 +124,15 @@
 
     flex-shrink: 0;
 
+    transition:
+        transform var(--transicion);
+
+}
+
+.tarjeta-habito:hover .habito-info img {
+
+    transform: scale(1.08);
+
 }
 
 .habito-info h3 {
@@ -135,6 +150,8 @@
     color: var(--color-texto-secundario);
 
 }
+
+
 
 .circulo-progreso {
 
@@ -169,7 +186,38 @@
     box-shadow:
         0 0 18px rgba(139,92,246,.35);
 
+    transition:
+        transform var(--transicion),
+        box-shadow var(--transicion);
+
 }
+
+.tarjeta-habito:hover .circulo-progreso {
+
+    transform: scale(1.06);
+
+}
+
+
+.habito-ejemplo {
+
+    border-style: dashed;
+
+}
+
+.habito-ejemplo .habito-info h3 {
+
+    color: var(--color-texto-principal);
+
+}
+
+.habito-ejemplo .habito-info p {
+
+    color: var(--color-texto-secundario);
+
+}
+
+
 
 .btn-eliminar {
 
@@ -220,23 +268,6 @@
 
 }
 
-.habito-ejemplo {
-
-    border-style: dashed;
-
-}
-
-.habito-ejemplo .habito-info h3 {
-
-    color: var(--color-texto-principal);
-
-}
-
-.habito-ejemplo .habito-info p {
-
-    color: var(--color-texto-secundario);
-
-}
 
 .modal {
 
@@ -318,6 +349,8 @@
 
 }
 
+
+
 .btn-cerrar {
 
     width: 42px;
@@ -348,6 +381,9 @@
     transform: rotate(90deg);
 
 }
+
+
+
 
 .habit-form {
 
@@ -391,6 +427,9 @@ input[type="date"] {
 
 }
 
+
+
+
 .acciones-modal {
 
     display: flex;
@@ -400,6 +439,14 @@ input[type="date"] {
     gap: 14px;
 
     margin-top: 12px;
+
+}
+
+.btn-principal,
+.btn-secundario,
+.btn-peligro {
+
+    transition: all var(--transicion);
 
 }
 
@@ -442,6 +489,9 @@ input[type="date"] {
 
 }
 
+
+
+
 .modal-contenido::-webkit-scrollbar {
 
     width: 8px;
@@ -461,6 +511,9 @@ input[type="date"] {
     background-color: var(--color-morado);
 
 }
+
+
+
 
 .modal-pequeno {
 
@@ -527,6 +580,9 @@ input[type="date"] {
 
 }
 
+
+
+
 @keyframes aparecerModal {
 
     from {
@@ -567,11 +623,8 @@ input[type="date"] {
 
 }
 
-.tarjeta-habito {
 
-    animation: aparecerTarjeta .35s ease;
 
-}
 
 @media (max-width: 900px) {
 
@@ -608,6 +661,9 @@ input[type="date"] {
     }
 
 }
+
+
+
 
 @media (max-width: 600px) {
 
@@ -694,9 +750,7 @@ input[type="date"] {
     }
 
     .acciones-modal .btn-principal,
-
     .acciones-modal .btn-secundario,
-
     .acciones-modal .btn-peligro {
 
         width: 100%;
@@ -705,46 +759,7 @@ input[type="date"] {
 
 }
 
-.btn-principal,
 
-.btn-secundario,
-
-.btn-peligro,
-
-.tarjeta-habito,
-
-.btn-eliminar {
-
-    transition: all var(--transicion);
-
-}
-
-.tarjeta-habito:hover .circulo-progreso {
-
-    transform: scale(1.06);
-
-}
-
-.circulo-progreso {
-
-    transition:
-        transform var(--transicion),
-        box-shadow var(--transicion);
-
-}
-
-.habito-info img {
-
-    transition:
-        transform var(--transicion);
-
-}
-
-.tarjeta-habito:hover .habito-info img {
-
-    transform: scale(1.08);
-
-}
 
 [data-theme="light"] .circulo-progreso {
 

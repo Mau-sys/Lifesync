@@ -2,24 +2,42 @@ CREATE DATABASE IF NOT EXISTS lifesync;
 
 USE lifesync;
 
-
 CREATE TABLE IF NOT EXISTS usuario (
-    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_usuario VARCHAR(50) NOT NULL,
-    correo VARCHAR(150) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    fecha_nacimiento DATE NULL,
-    fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
-    estado ENUM('activo', 'suspendido') DEFAULT 'activo'
-);
 
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+
+    nombre_usuario VARCHAR(50) NOT NULL,
+
+    nombre_completo VARCHAR(150) NULL,
+
+    correo VARCHAR(150) NOT NULL UNIQUE,
+
+    password_hash VARCHAR(255) NOT NULL,
+
+    fecha_nacimiento DATE NULL,
+
+    genero ENUM(
+        'femenino',
+        'masculino',
+        'otro'
+    ) NULL,
+
+    fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    estado ENUM(
+        'activo',
+        'suspendido'
+    ) DEFAULT 'activo'
+);
 
 CREATE TABLE IF NOT EXISTS categorias (
+
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+
     nombre_categoria VARCHAR(100) NOT NULL UNIQUE,
+
     descripcion VARCHAR(255) NULL
 );
-
 
 INSERT IGNORE INTO categorias (
     nombre_categoria,
@@ -50,12 +68,16 @@ INSERT IGNORE INTO categorias (
     'Crea un hábito completamente personalizado.'
 );
 
-
 CREATE TABLE IF NOT EXISTS usuario_categorias (
+
     id_usuario INT NOT NULL,
+
     id_categoria INT NOT NULL,
 
-    PRIMARY KEY (id_usuario, id_categoria),
+    PRIMARY KEY (
+        id_usuario,
+        id_categoria
+    ),
 
     FOREIGN KEY (id_usuario)
         REFERENCES usuario(id_usuario)
@@ -66,9 +88,10 @@ CREATE TABLE IF NOT EXISTS usuario_categorias (
         ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS preferencias_usuario (
+
     id_preferencia INT AUTO_INCREMENT PRIMARY KEY,
+
     id_usuario INT NOT NULL UNIQUE,
 
     tema ENUM(
@@ -92,9 +115,10 @@ CREATE TABLE IF NOT EXISTS preferencias_usuario (
         ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS perfil_usuario (
+
     id_perfil INT AUTO_INCREMENT PRIMARY KEY,
+
     id_usuario INT NOT NULL UNIQUE,
 
     foto_perfil VARCHAR(255) NULL,
@@ -110,8 +134,8 @@ CREATE TABLE IF NOT EXISTS perfil_usuario (
         ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS habitos (
+
     id_habito INT AUTO_INCREMENT PRIMARY KEY,
 
     id_usuario INT NOT NULL,
@@ -161,8 +185,44 @@ CREATE TABLE IF NOT EXISTS habitos (
         ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS recordatorios (
+
+    id_recordatorio INT AUTO_INCREMENT PRIMARY KEY,
+
+    id_usuario INT NOT NULL,
+
+    id_categoria INT NULL,
+
+    titulo VARCHAR(150) NOT NULL,
+
+    hora TIME NOT NULL,
+
+    repeticion ENUM(
+        'diario',
+        'lunes_viernes',
+        'una_vez',
+        'personalizado'
+    ) NOT NULL DEFAULT 'diario',
+
+    fecha_recordatorio DATE NULL,
+
+    mensaje VARCHAR(255) NULL,
+
+    activo BOOLEAN DEFAULT TRUE,
+
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id_usuario)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (id_categoria)
+        REFERENCES categorias(id_categoria)
+        ON DELETE SET NULL
+);
 
 CREATE TABLE IF NOT EXISTS notificaciones (
+
     id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
 
     id_usuario INT NOT NULL,
@@ -180,8 +240,8 @@ CREATE TABLE IF NOT EXISTS notificaciones (
         ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS configuracion_notificaciones (
+
     id_configuracion INT AUTO_INCREMENT PRIMARY KEY,
 
     id_usuario INT NOT NULL UNIQUE,
@@ -195,8 +255,8 @@ CREATE TABLE IF NOT EXISTS configuracion_notificaciones (
         ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS registros_habitos (
+
     id_registro INT AUTO_INCREMENT PRIMARY KEY,
 
     id_habito INT NOT NULL,
@@ -212,8 +272,8 @@ CREATE TABLE IF NOT EXISTS registros_habitos (
         ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS rachas (
+
     id_racha INT AUTO_INCREMENT PRIMARY KEY,
 
     id_habito INT NOT NULL UNIQUE,
@@ -233,8 +293,8 @@ CREATE TABLE IF NOT EXISTS rachas (
         ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS estadisticas_habitos (
+
     id_estadistica INT AUTO_INCREMENT PRIMARY KEY,
 
     id_habito INT NOT NULL,
@@ -259,8 +319,8 @@ CREATE TABLE IF NOT EXISTS estadisticas_habitos (
     )
 );
 
-
 CREATE TABLE IF NOT EXISTS logros (
+
     id_logro INT AUTO_INCREMENT PRIMARY KEY,
 
     nombre_logro VARCHAR(150) NOT NULL UNIQUE,
@@ -272,8 +332,8 @@ CREATE TABLE IF NOT EXISTS logros (
     requisito INT DEFAULT 0
 );
 
-
 CREATE TABLE IF NOT EXISTS usuario_logros (
+
     id_usuario INT NOT NULL,
 
     id_logro INT NOT NULL,
@@ -294,8 +354,8 @@ CREATE TABLE IF NOT EXISTS usuario_logros (
         ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS configuracion_usuario (
+
     id_configuracion INT AUTO_INCREMENT PRIMARY KEY,
 
     id_usuario INT NOT NULL UNIQUE,

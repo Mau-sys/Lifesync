@@ -17,7 +17,6 @@ if (!isset($_SESSION["usuario_id"])) {
     ]);
 
     exit;
-
 }
 
 
@@ -41,7 +40,6 @@ try {
         ]);
 
         exit;
-
     }
 
 
@@ -49,8 +47,10 @@ try {
         "SELECT
             u.id_usuario,
             u.nombre_usuario,
+            u.nombre_completo,
             u.correo,
             u.fecha_nacimiento,
+            u.genero,
             p.foto_perfil,
             p.biografia
         FROM usuario u
@@ -79,7 +79,6 @@ try {
         ]);
 
         exit;
-
     }
 
 
@@ -94,14 +93,19 @@ try {
 
 
     echo json_encode([
+
         "exito" => true,
 
         "usuario" => [
+
             "id_usuario" =>
                 $usuario["id_usuario"],
 
             "nombre_usuario" =>
                 $usuario["nombre_usuario"],
+
+            "nombre_completo" =>
+                $usuario["nombre_completo"],
 
             "correo" =>
                 $usuario["correo"],
@@ -109,12 +113,17 @@ try {
             "fecha_nacimiento" =>
                 $usuario["fecha_nacimiento"],
 
+            "genero" =>
+                $usuario["genero"],
+
             "foto_perfil" =>
                 $foto,
 
             "biografia" =>
                 $usuario["biografia"]
+
         ]
+
     ]);
 
 

@@ -5,17 +5,27 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"
-          content="Administra los recordatorios de LifeSync">
+    <meta
+        name="description"
+        content="Administra los recordatorios de LifeSync">
 
     <title>LifeSync | Recordatorios</title>
 
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/general.css">
-    <link rel="stylesheet" href="css/recordatorios.css">
+    <link
+        rel="stylesheet"
+        href="css/variables.css">
+
+    <link
+        rel="stylesheet"
+        href="css/general.css">
+
+    <link
+        rel="stylesheet"
+        href="css/recordatorios.css">
 
 </head>
 
@@ -47,6 +57,7 @@
 
         </header>
 
+
         <section class="nuevo-recordatorio">
 
             <button
@@ -60,144 +71,13 @@
 
         </section>
 
-        <section
-            id="formularioRecordatorio"
-            class="formulario-recordatorio"
-            hidden>
-
-            <form
-                id="recordatorioForm">
-
-                <div class="campo">
-
-                    <label for="titulo">
-
-                        Nombre del recordatorio
-
-                    </label>
-
-                    <input
-                        type="text"
-                        id="titulo"
-                        name="titulo"
-                        placeholder="Ej. Leer 20 páginas, Tomar agua, Meditar">
-
-                </div>
-
-                <div class="campo">
-
-                    <label for="categoria">
-
-                        Categoría
-
-                    </label>
-
-                    <select
-                        id="categoria"
-                        name="categoria">
-
-                        <option value="">Seleccionar</option>
-
-                        <option>Hidratación</option>
-
-                        <option>Alimentación</option>
-
-                        <option>Salud mental</option>
-
-                        <option>Actividad física</option>
-
-                        <option>Registro académico</option>
-
-                        <option>Hábito personalizado</option>
-
-                    </select>
-
-                </div>
-
-                <div class="campo">
-
-                    <label for="hora">
-
-                        Hora
-
-                    </label>
-
-                    <input
-                        type="time"
-                        id="hora"
-                        name="hora">
-
-                </div>
-
-                <div class="campo">
-
-                    <label for="repeticion">
-
-                        Repetir
-
-                    </label>
-
-                    <select
-                        id="repeticion"
-                        name="repeticion">
-
-                        <option>Todos los días</option>
-
-                        <option>Lunes a viernes</option>
-
-                        <option>Solo una vez</option>
-
-                        <option>Personalizado</option>
-
-                    </select>
-
-                </div>
-
-                <div class="campo">
-
-                    <label for="mensaje">
-
-                        Mensaje
-
-                    </label>
-
-                    <textarea
-                        id="mensaje"
-                        name="mensaje"
-                        rows="3"
-                        placeholder="Agrega una nota o recordatorio (opcional)"></textarea>
-
-                </div>
-
-                <div class="acciones">
-
-                    <button
-                        type="submit"
-                        class="btn-principal">
-
-                        Guardar
-
-                    </button>
-
-                    <button
-                        type="button"
-                        id="cancelarRecordatorio">
-
-                        Cancelar
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </section>
 
         <section
             id="listaRecordatorios"
             class="lista-recordatorios">
 
         </section>
+
 
         <section
             id="sinRecordatorios"
@@ -219,7 +99,246 @@
 
     </main>
 
-    <script src="../../js/recordatorios.js"></script>
+
+    <div
+        id="modalRecordatorio"
+        class="modal oculto"
+        aria-hidden="true">
+
+        <div
+            class="modal-contenido"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tituloModalRecordatorio">
+
+            <div class="modal-header">
+
+                <h2 id="tituloModalRecordatorio">
+
+                    Nuevo recordatorio
+
+                </h2>
+
+                <button
+                    type="button"
+                    id="cerrarModal"
+                    class="btn-cerrar"
+                    aria-label="Cerrar">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+
+            <form
+                id="recordatorioForm"
+                autocomplete="off">
+
+                <div class="campo">
+
+                    <label for="titulo">
+
+                        Nombre del recordatorio
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="titulo"
+                        name="titulo"
+                        maxlength="150"
+                        placeholder="Ej. Leer 20 páginas"
+                        required>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="categoria">
+
+                        Categoría
+
+                    </label>
+
+                    <select
+                        id="categoria"
+                        name="categoria">
+
+                        <option value="">
+
+                            Seleccionar
+
+                        </option>
+
+                        <option value="1">
+
+                            Hidratación
+
+                        </option>
+
+                        <option value="2">
+
+                            Alimentación
+
+                        </option>
+
+                        <option value="3">
+
+                            Salud Mental
+
+                        </option>
+
+                        <option value="4">
+
+                            Actividad Física
+
+                        </option>
+
+                        <option value="5">
+
+                            Registro Académico
+
+                        </option>
+
+                        <option value="6">
+
+                            Hábito Personalizado
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="hora">
+
+                        Hora
+
+                    </label>
+
+                    <input
+                        type="time"
+                        id="hora"
+                        name="hora"
+                        required>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="repeticion">
+
+                        Repetir
+
+                    </label>
+
+                    <select
+                        id="repeticion"
+                        name="repeticion"
+                        required>
+
+                        <option value="diario">
+
+                            Todos los días
+
+                        </option>
+
+                        <option value="lunes_viernes">
+
+                            Lunes a viernes
+
+                        </option>
+
+                        <option value="una_vez">
+
+                            Solo una vez
+
+                        </option>
+
+                        <option value="personalizado">
+
+                            Personalizado
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    class="campo"
+                    id="campoFecha"
+                    hidden>
+
+                    <label for="fechaRecordatorio">
+
+                        Fecha
+
+                    </label>
+
+                    <input
+                        type="date"
+                        id="fechaRecordatorio"
+                        name="fechaRecordatorio">
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="mensaje">
+
+                        Mensaje
+
+                    </label>
+
+                    <textarea
+                        id="mensaje"
+                        name="mensaje"
+                        rows="3"
+                        maxlength="255"
+                        placeholder="Agrega una nota o recordatorio (opcional)"></textarea>
+
+                </div>
+
+
+                <div class="acciones">
+
+                    <button
+                        type="button"
+                        id="cancelarRecordatorio"
+                        class="btn-secundario">
+
+                        Cancelar
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn-principal">
+
+                        Guardar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/recordatorios.js"></script>
 
 </body>
 

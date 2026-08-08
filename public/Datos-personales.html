@@ -14,10 +14,13 @@
     <title>LifeSync | Datos personales</title>
 
     <link rel="stylesheet" href="css/variables.css">
+
     <link rel="stylesheet" href="css/general.css">
+
     <link rel="stylesheet" href="css/datos-personales.css">
 
 </head>
+
 
 <body>
 
@@ -33,6 +36,7 @@
 
             </a>
 
+
             <h1>
 
                 Datos personales
@@ -41,35 +45,41 @@
 
         </header>
 
+
         <section class="foto-perfil">
 
-        <div class="marco-perfil">
+            <div class="marco-perfil">
 
-        <img
-            src="img/Perfil.png"
-            alt="Foto de perfil"
-            id="fotoPerfil">
+                <img
+                    src="img/Perfil.png"
+                    alt="Foto de perfil"
+                    id="fotoPerfil">
 
-        </div>
+            </div>
 
-        <label
-        for="nuevaFoto"
-        class="btn-cambiar-foto">
 
-        Cambiar foto
+            <label
+                for="nuevaFoto"
+                class="btn-cambiar-foto">
 
-        </label>
+                Cambiar foto
 
-        <input
-        type="file"
-        id="nuevaFoto"
-        accept="image/*">
+            </label>
+
+
+            <input
+                type="file"
+                id="nuevaFoto"
+                name="nuevaFoto"
+                accept="image/jpeg,image/png,image/webp">
 
         </section>
+
 
         <form
             id="formDatosPersonales"
             autocomplete="off">
+
 
             <div class="campo">
 
@@ -79,12 +89,16 @@
 
                 </label>
 
+
                 <input
                     type="text"
                     id="usuario"
-                    name="usuario">
+                    name="usuario"
+                    maxlength="50"
+                    required>
 
             </div>
+
 
             <div class="campo">
 
@@ -94,12 +108,15 @@
 
                 </label>
 
+
                 <input
                     type="text"
                     id="nombreCompleto"
-                    name="nombreCompleto">
+                    name="nombreCompleto"
+                    maxlength="150">
 
             </div>
+
 
             <div class="campo">
 
@@ -109,12 +126,16 @@
 
                 </label>
 
+
                 <input
                     type="email"
                     id="correo"
-                    name="correo">
+                    name="correo"
+                    maxlength="150"
+                    required>
 
             </div>
+
 
             <div class="campo">
 
@@ -124,12 +145,14 @@
 
                 </label>
 
+
                 <input
                     type="date"
                     id="fechaNacimiento"
                     name="fechaNacimiento">
 
             </div>
+
 
             <div class="campo">
 
@@ -139,29 +162,52 @@
 
                 </label>
 
+
                 <select
                     id="genero"
                     name="genero">
 
-                    <option value="">Seleccionar</option>
+                    <option value="">
 
-                    <option value="femenino">Femenino</option>
+                        Seleccionar
 
-                    <option value="masculino">Masculino</option>
+                    </option>
 
-                    <option value="otro">Prefiero no decirlo</option>
+
+                    <option value="femenino">
+
+                        Femenino
+
+                    </option>
+
+
+                    <option value="masculino">
+
+                        Masculino
+
+                    </option>
+
+
+                    <option value="otro">
+
+                        Prefiero no decirlo
+
+                    </option>
 
                 </select>
 
             </div>
 
+
             <hr>
+
 
             <h2>
 
                 Seguridad
 
             </h2>
+
 
             <div class="campo">
 
@@ -171,12 +217,15 @@
 
                 </label>
 
+
                 <input
                     type="password"
                     id="contrasenaActual"
-                    name="contrasenaActual">
+                    name="contrasenaActual"
+                    autocomplete="current-password">
 
             </div>
+
 
             <div class="campo">
 
@@ -186,12 +235,15 @@
 
                 </label>
 
+
                 <input
                     type="password"
                     id="nuevaContrasena"
-                    name="nuevaContrasena">
+                    name="nuevaContrasena"
+                    autocomplete="new-password">
 
             </div>
+
 
             <div class="campo">
 
@@ -201,12 +253,23 @@
 
                 </label>
 
+
                 <input
                     type="password"
                     id="confirmarContrasena"
-                    name="confirmarContrasena">
+                    name="confirmarContrasena"
+                    autocomplete="new-password">
 
             </div>
+
+
+            <p
+                id="mensajeDatos"
+                class="mensaje-datos"
+                aria-live="polite">
+
+            </p>
+
 
             <div class="acciones">
 
@@ -218,6 +281,7 @@
 
                 </button>
 
+
                 <button
                     type="button"
                     id="btnCancelar">
@@ -228,11 +292,13 @@
 
             </div>
 
+
         </form>
 
     </main>
 
-    <script src="../../js/datos-personales.js"></script>
+
+    <script src="js/datos-personales.js"></script>
 
 </body>
 

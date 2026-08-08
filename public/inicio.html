@@ -5,263 +5,272 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"
-          content="Panel principal de LifeSync">
+    <meta
+        name="description"
+        content="Panel principal de LifeSync">
 
     <title>LifeSync | Inicio</title>
 
-    <link rel="stylesheet"
-          href="css/variables.css">
+    <link
+        rel="stylesheet"
+        href="css/variables.css">
 
-    <link rel="stylesheet"
-          href="css/general.css">
+    <link
+        rel="stylesheet"
+        href="css/general.css">
 
-    <link rel="stylesheet"
-          href="css/inicio.css">
+    <link
+        rel="stylesheet"
+        href="css/inicio.css">
 
 </head>
 
 <body>
 
-<main class="dashboard">
+    <main class="dashboard">
 
-    <header class="header">
+        <header class="header">
 
-        <a
-            href="perfil.html"
-            class="perfil">
+            <a
+                href="perfil.html"
+                class="perfil">
 
-            <div class="marco-perfil">
+                <div class="marco-perfil">
 
-                <img
-                    src="img/Perfil.png"
-                    alt="Foto de perfil"
-                    id="fotoPerfil"
-                    class="foto-perfil">
+                    <img
+                        src="img/Perfil.png"
+                        alt="Foto de perfil"
+                        id="fotoPerfil"
+                        class="foto-perfil">
 
-            </div>
+                </div>
 
-            <div>
+                <div>
 
-                <p class="saludo">
+                    <p class="saludo">
+                        ¡Hola,
+                        <span id="nombreUsuario">
+                            Usuario
+                        </span>!
+                    </p>
 
-                    ¡Hola,
+                    <span id="fechaActual"></span>
 
-                    <span id="nombreUsuario">
-                        Usuario
-                    </span>!
+                </div>
 
-                </p>
+            </a>
 
-                <span id="fechaActual"></span>
-
-            </div>
-
-        </a>
-
-
-        <button
-            type="button"
-            id="btnNotificaciones"
-            class="btn-notificaciones"
-            aria-label="Abrir notificaciones"
-            aria-expanded="false">
-
-            <img
-                src="img/Campana.png"
-                alt="Notificaciones">
-
-            <span
-                id="contadorNotificaciones"
-                class="contador-notificaciones"
-                aria-label="Notificaciones no leídas">
-
-                0
-
-            </span>
-
-        </button>
-
-    </header>
-
-
-    <div
-        id="overlayNotificaciones"
-        class="overlay-notificaciones oculto">
-    </div>
-
-
-    <aside
-        id="panelNotificaciones"
-        class="panel-notificaciones oculto"
-        aria-hidden="true">
-
-        <div class="panel-header">
-
-            <h2>
-                Notificaciones
-            </h2>
 
             <button
                 type="button"
-                id="cerrarPanel"
-                class="cerrar-panel"
-                aria-label="Cerrar panel">
-
-                ✕
-
-            </button>
-
-        </div>
-
-
-        <div
-            id="listaNotificaciones"
-            class="lista-notificaciones">
-
-            <div class="sin-notificaciones">
+                id="btnNotificaciones"
+                class="btn-notificaciones"
+                aria-label="Abrir notificaciones"
+                aria-expanded="false"
+                aria-controls="panelNotificaciones">
 
                 <img
                     src="img/Campana.png"
-                    alt="Sin notificaciones">
+                    alt="Notificaciones">
 
-                <h3>
-                    Todo está al día
-                </h3>
-
-                <p>
-                    Aquí aparecerán tus recordatorios,
-                    logros, rachas, hábitos completados
-                    y avisos de LifeSync.
-                </p>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <a
-        href="rachas.html"
-        class="tarjeta-racha"
-        id="tarjetaRacha">
-
-        <div class="info-racha">
-
-            <img
-                src="img/Racha.png"
-                alt="Racha">
-
-            <div>
-
-                <span id="diasRacha">
+                <span
+                    id="contadorNotificaciones"
+                    class="contador-notificaciones"
+                    aria-label="Notificaciones no leídas">
                     0
                 </span>
 
-                <p>
-                    días en racha
-                </p>
+            </button>
+
+        </header>
+
+
+        <section
+            id="panelNotificaciones"
+            class="panel-notificaciones oculto"
+            aria-hidden="true">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Notificaciones
+                    </h2>
+
+                    <span
+                        class="estado-notificaciones">
+                        Recordatorios, rachas, progreso y logros
+                    </span>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="cerrarPanel"
+                    class="cerrar-panel"
+                    aria-label="Cerrar panel">
+
+                    ✕
+
+                </button>
 
             </div>
 
-        </div>
-
-        <span class="flecha">
-            →
-        </span>
-
-    </a>
-
-
-    <section class="progreso">
-
-        <div class="titulo-progreso">
-
-            <span>
-                Progreso del día
-            </span>
-
-            <span id="porcentajeGeneral">
-                0%
-            </span>
-
-        </div>
-
-        <div class="barra-progreso">
 
             <div
-                id="barraProgreso">
-            </div>
+                id="listaNotificaciones"
+                class="lista-notificaciones">
 
-        </div>
-
-    </section>
-
-
-    <section class="categorias">
-
-        <h2>
-            Hoy
-        </h2>
-
-        <div id="contenedorCategorias">
-
-            <article class="categoria categoria-ejemplo">
-
-                <div class="categoria-info">
+                <div class="sin-notificaciones">
 
                     <img
-                        src="img/Hidrat.png"
-                        alt="Categoría">
+                        src="img/Campana.png"
+                        alt="Sin notificaciones">
 
-                    <div>
+                    <h3>
+                        Todo está al día
+                    </h3>
 
-                        <h3 class="nombre-categoria">
-                            Cargando...
-                        </h3>
+                    <p>
+                        Aquí aparecerán tus recordatorios,
+                        logros, rachas, hábitos completados
+                        y avisos de LifeSync.
+                    </p>
 
-                        <p class="detalle-categoria">
-                            Cargando tus hábitos...
-                        </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div
+            id="overlayNotificaciones"
+            class="overlay-notificaciones oculto">
+        </div>
+
+
+        <section class="tarjeta-racha">
+
+            <div class="info-racha">
+
+                <img
+                    src="img/Racha.png"
+                    alt="Racha">
+
+                <div>
+
+                    <span id="diasRacha">
+                        0
+                    </span>
+
+                    <p>
+                        días en racha
+                    </p>
+
+                </div>
+
+            </div>
+
+            <span
+                class="flecha"
+                aria-hidden="true">
+                →
+            </span>
+
+        </section>
+
+
+        <section class="progreso">
+
+            <div class="titulo-progreso">
+
+                <span>
+                    Progreso del día
+                </span>
+
+                <span id="porcentajeGeneral">
+                    0%
+                </span>
+
+            </div>
+
+            <div class="barra-progreso">
+
+                <div
+                    id="barraProgreso">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="categorias">
+
+            <h2>
+                Hoy
+            </h2>
+
+
+            <div id="contenedorCategorias">
+
+                <article class="categoria categoria-ejemplo">
+
+                    <div class="categoria-info">
+
+                        <img
+                            src="img/Hidrat.png"
+                            alt="Categoría">
+
+                        <div>
+
+                            <h3 class="nombre-categoria">
+                                Cargando...
+                            </h3>
+
+                            <p class="detalle-categoria">
+                                Cargando tus hábitos...
+                            </p>
+
+                        </div>
 
                     </div>
 
-                </div>
+                    <div class="circulo ejemplo">
+                        0%
+                    </div>
 
-                <div class="circulo ejemplo">
-                    0%
-                </div>
+                </article>
 
-            </article>
-
-        </div>
-
-    </section>
+            </div>
 
 
-    <a
-        href="categorias.html"
-        class="btnCategorias"
-        id="btnCategorias">
+            <a
+                href="categorias.html"
+                class="btnCategorias">
 
-        <span>
-            Ver todas las categorías
-        </span>
+                <span>
+                    Ver todas las categorías
+                </span>
 
-        <span>
-            →
-        </span>
+                <span aria-hidden="true">
+                    →
+                </span>
 
-    </a>
+            </a>
 
-</main>
+        </section>
+
+    </main>
 
 
-<script src="js/inicio.js"></script>
+    <script src="js/inicio.js"></script>
 
 </body>
 

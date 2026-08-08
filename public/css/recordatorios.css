@@ -9,6 +9,31 @@
 }
 
 
+.encabezado {
+
+    margin-bottom: 32px;
+
+}
+
+
+.encabezado h1 {
+
+    margin-top: 20px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.encabezado p {
+
+    max-width: 650px;
+
+    color: var(--color-texto-secundario);
+
+}
+
+
 .nuevo-recordatorio {
 
     display: flex;
@@ -108,7 +133,9 @@
 
     transition:
         color var(--transicion),
-        border-color var(--transicion);
+        border-color var(--transicion),
+        background-color var(--transicion),
+        transform var(--transicion);
 
 }
 
@@ -118,6 +145,15 @@
     color: var(--color-morado);
 
     border-color: var(--color-morado);
+
+    background-color: var(--color-superficie-clara);
+
+}
+
+
+#cancelarRecordatorio:active {
+
+    transform: translateY(1px);
 
 }
 
@@ -132,6 +168,193 @@
 
 }
 
+
+/* Tarjetas creadas por JavaScript */
+
+.tarjeta-recordatorio {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 22px 24px;
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-grande);
+
+    box-shadow: var(--sombra-suave);
+
+    transition:
+        transform var(--transicion),
+        border-color var(--transicion),
+        box-shadow var(--transicion),
+        background-color var(--transicion);
+
+}
+
+
+.tarjeta-recordatorio:hover {
+
+    transform: translateY(-3px);
+
+    border-color: var(--color-morado);
+
+    box-shadow: var(--sombra-morada);
+
+}
+
+
+.informacion-recordatorio {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 0;
+
+}
+
+
+.informacion-recordatorio h3 {
+
+    margin: 0;
+
+    font-size: 20px;
+
+    color: var(--color-texto-principal);
+
+}
+
+
+.informacion-recordatorio p {
+
+    margin: 0;
+
+    color: var(--color-texto-secundario);
+
+}
+
+
+.detalles-recordatorio {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 4px;
+
+}
+
+
+.detalle-recordatorio {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 30px;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    background-color: var(--color-superficie-clara);
+
+    border: 1px solid var(--color-borde);
+
+    color: var(--color-texto-secundario);
+
+    font-size: 13px;
+
+}
+
+
+.hora-recordatorio {
+
+    color: var(--color-morado);
+
+    font-weight: var(--peso-semibold);
+
+}
+
+
+.acciones-recordatorio {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+
+}
+
+
+.btn-eliminar-recordatorio {
+
+    width: 42px;
+
+    height: 42px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background-color: transparent;
+
+    color: var(--color-texto-secundario);
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--transicion),
+        color var(--transicion),
+        transform var(--transicion);
+
+}
+
+
+.btn-eliminar-recordatorio:hover {
+
+    background-color: rgba(255, 92, 122, .12);
+
+    color: var(--color-error);
+
+    transform: scale(1.08);
+
+}
+
+
+.btn-eliminar-recordatorio:active {
+
+    transform: scale(.96);
+
+}
+
+
+/* Mensaje cuando no existen recordatorios */
 
 .sin-recordatorios {
 
@@ -153,6 +376,262 @@
     margin-bottom: 8px;
 
     font-size: 22px;
+
+}
+
+
+.sin-recordatorios p {
+
+    color: var(--color-texto-secundario);
+
+}
+
+
+/* Estado de carga */
+
+.cargando-recordatorios {
+
+    padding: 30px 20px;
+
+    text-align: center;
+
+    color: var(--color-texto-secundario);
+
+}
+
+
+/* Mensaje de error */
+
+.error-recordatorios {
+
+    padding: 18px 20px;
+
+    border: 1px solid var(--color-error);
+
+    border-radius: var(--radio-medio);
+
+    background-color: rgba(255, 92, 122, .08);
+
+    color: var(--color-error);
+
+    text-align: center;
+
+}
+
+
+/* Modal de confirmación */
+
+.modal-recordatorio {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 999;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 24px;
+
+    background-color: rgba(0, 0, 0, .70);
+
+    backdrop-filter: blur(6px);
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transition:
+        opacity var(--transicion),
+        visibility var(--transicion);
+
+}
+
+
+.modal-recordatorio.oculto {
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+}
+
+
+.modal-recordatorio-contenido {
+
+    width: min(100%, 430px);
+
+    padding: 30px;
+
+    background-color: var(--color-superficie);
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-grande);
+
+    box-shadow: var(--sombra-suave);
+
+    text-align: center;
+
+}
+
+
+.modal-recordatorio-contenido h2 {
+
+    margin-bottom: 12px;
+
+    font-size: 26px;
+
+}
+
+
+.modal-recordatorio-contenido p {
+
+    margin-bottom: 26px;
+
+    color: var(--color-texto-secundario);
+
+}
+
+
+.acciones-modal-recordatorio {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+
+}
+
+
+.btn-confirmar-eliminar {
+
+    min-height: 48px;
+
+    padding: 12px 24px;
+
+    border: none;
+
+    border-radius: var(--radio-medio);
+
+    background-color: var(--color-error);
+
+    color: var(--color-blanco);
+
+    font-weight: var(--peso-semibold);
+
+    cursor: pointer;
+
+    transition:
+        transform var(--transicion),
+        box-shadow var(--transicion);
+
+}
+
+
+.btn-confirmar-eliminar:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 20px rgba(255, 92, 122, .30);
+
+}
+
+
+.btn-cancelar-eliminar {
+
+    min-height: 48px;
+
+    padding: 12px 24px;
+
+    border: 1px solid var(--color-borde);
+
+    border-radius: var(--radio-medio);
+
+    background-color: transparent;
+
+    color: var(--color-texto-secundario);
+
+    font-weight: var(--peso-semibold);
+
+    cursor: pointer;
+
+    transition:
+        color var(--transicion),
+        border-color var(--transicion),
+        background-color var(--transicion);
+
+}
+
+
+.btn-cancelar-eliminar:hover {
+
+    color: var(--color-morado);
+
+    border-color: var(--color-morado);
+
+    background-color: var(--color-superficie-clara);
+
+}
+
+
+/* Animaciones */
+
+@keyframes aparecerRecordatorio {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(15px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}
+
+
+.tarjeta-recordatorio {
+
+    animation: aparecerRecordatorio .30s ease;
+
+}
+
+
+/* Responsive */
+
+@media (max-width: 700px) {
+
+    .tarjeta-recordatorio {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .acciones-recordatorio {
+
+        width: 100%;
+
+        justify-content: flex-end;
+
+    }
 
 }
 
@@ -182,6 +661,13 @@
     }
 
 
+    .formulario-recordatorio {
+
+        padding: 20px;
+
+    }
+
+
     .acciones {
 
         flex-direction: column;
@@ -192,6 +678,31 @@
     .acciones .btn-principal,
 
     #cancelarRecordatorio {
+
+        width: 100%;
+
+    }
+
+
+    .detalles-recordatorio {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+
+    .acciones-modal-recordatorio {
+
+        flex-direction: column;
+
+    }
+
+
+    .btn-confirmar-eliminar,
+
+    .btn-cancelar-eliminar {
 
         width: 100%;
 
