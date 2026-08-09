@@ -87,10 +87,6 @@ try {
         );
     }
 
-    /*
-     * COMPROBAR USUARIO
-     */
-
     $consultaUsuario = $db->prepare(
         "SELECT id_usuario
          FROM usuario
@@ -111,15 +107,9 @@ try {
         );
     }
 
-    /*
-     * COMENZAR TRANSACCIÓN
-     */
 
     $db->beginTransaction();
 
-    /*
-     * BORRAR CATEGORÍAS ANTERIORES
-     */
 
     $consultaEliminar = $db->prepare(
         "DELETE FROM usuario_categorias
@@ -130,10 +120,6 @@ try {
         ":id_usuario" => $usuarioId
     ]);
 
-    /*
-     * BUSCAR CATEGORÍAS
-     */
-
     $consultaCategoria = $db->prepare(
         "SELECT id_categoria
          FROM categorias
@@ -141,9 +127,6 @@ try {
          LIMIT 1"
     );
 
-    /*
-     * INSERTAR CATEGORÍAS DEL USUARIO
-     */
 
     $consultaInsertar = $db->prepare(
         "INSERT INTO usuario_categorias
@@ -181,10 +164,6 @@ try {
         ]);
     }
 
-    /*
-     * COMPROBAR PREFERENCIAS
-     */
-
     $consultaPreferencia = $db->prepare(
         "SELECT id_preferencia
          FROM preferencias_usuario
@@ -197,10 +176,6 @@ try {
     ]);
 
     $preferencia = $consultaPreferencia->fetch();
-
-    /*
-     * CREAR PREFERENCIA SI NO EXISTE
-     */
 
     if (!$preferencia) {
 
@@ -220,9 +195,6 @@ try {
         ]);
     }
 
-    /*
-     * CONFIRMAR
-     */
 
     $db->commit();
 
