@@ -6,122 +6,154 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require_once "../config/conexion.php";
 
+$db = null;
 
-if (!isset($_SESSION["usuario_id"])) {
+try {
 
-    http_response_code(401);
+    // =========================================================
+    // 1. COMPROBAR SESIÓN
+    // =========================================================
 
-    echo json_encode([
-        "exito" => false,
-        "mensaje" => "La sesión ha expirado. Inicia sesión nuevamente."
-    ]);
+    if (!isset($_SESSION["usuario_id"])) {
 
-    exit;
-}
-
-
-$datos = json_decode(
-    file_get_contents("php://input"),
-    true
-);
-
-
-if (!is_array($datos)) {
-
-    http_response_code(400);
-
-    echo json_encode([
-        "exito" => false,
-        "mensaje" => "Datos inválidos."
-    ]);
-
-    exit;
-}
-
-
-$categorias = $datos["categorias"] ?? [];
-
-
-if (!is_array($categorias) || count($categorias) === 0) {
-
-    http_response_code(400);
-
-    echo json_encode([
-        "exito" => false,
-        "mensaje" => "Selecciona al menos una categoría."
-    ]);
-
-    exit;
-}
-
-
-$categoriasPermitidas = [
-    "Hidratación",
-    "Alimentación",
-    "Salud Mental",
-    "Actividad Física",
-    "Registro Académico",
-    "Hábito Personalizado"
-];
-
-
-$categorias = array_values(
-    array_unique($categorias)
-);
-
-
-foreach ($categorias as $categoria) {
-
-    if (!in_array($categoria, $categoriasPermitidas, true)) {
-
-        http_response_code(400);
+        http_response_code(401);
 
         echo json_encode([
             "exito" => false,
-            "mensaje" => "Se recibió una categoría no válida."
+            "paso" => "SESION",
+            "mensaje" => "No existe usuario_id en la sesión.",
+            "sesion" => $_SESSION
         ]);
 
         exit;
     }
-}
 
 
-$usuarioId = $_SESSION["usuario_id"];
+    $usuarioId = (int) $_SESSION["usuario_id"];
 
 
-try {
+    // =========================================================
+    // 2. COMPROBAR CONEXIÓN
+    // =========================================================
 
     $database = new Database();
 
     $db = $database->getConnection();
 
 
-    if ($db === null) {
+    if (!$db) {
 
-        http_response_code(500);
-
-        echo json_encode([
-            "exito" => false,
-            "mensaje" => "No se pudo conectar con la base de datos."
-        ]);
-
-        exit;
+        throw new Exception(
+            "No se pudo conectar con la base de datos."
+        );
     }
 
 
+    // =========================================================
+    // 3. COMPROBAR QUE EL USUARIO EXISTE
+    // =========================================================
+
+    $consulta = $db->prepare(
+        "SELECT id_usuario, nombre_usuario, correo
+         FROM usuario
+         WHERE id_usuario = :id
+         LIMIT 1"
+    );
+
+    $consulta->execute([
+        ":id" => $usuarioId
+    ]);
+
+    $usuario = $consulta->fetch();
+
+
+    if (!$usuario) {
+
+        throw new Exception(
+            "El usuario de la sesión no existe en la tabla usuario. ID recibido: "
+            . $usuarioId
+        );
+    }
+
+
+    // =========================================================
+    // 4. RECIBIR JSON
+    // =========================================================
+
+    $contenido = file_get_contents("php://input");
+
+    $datos = json_decode($contenido, true);
+
+
+    if (!is_array($datos)) {
+
+        throw new Exception(
+            "El JSON recibido no es válido. Contenido recibido: "
+            . $contenido
+        );
+    }
+
+
+    $categorias = $datos["categorias"] ?? [];
+
+
+    if (!is_array($categorias) || count($categorias) === 0) {
+
+        throw new Exception(
+            "No se recibieron categorías."
+        );
+    }
+
+
+    // =========================================================
+    // 5. COMPROBAR CATEGORÍAS
+    // =========================================================
+
+    $permitidas = [
+        "Hidratación",
+        "Alimentación",
+        "Salud Mental",
+        "Actividad Física",
+        "Registro Académico",
+        "Hábito Personalizado"
+    ];
+
+
+    foreach ($categorias as $categoria) {
+
+        if (!in_array($categoria, $permitidas, true)) {
+
+            throw new Exception(
+                "Categoría no permitida: " . $categoria
+            );
+        }
+    }
+
+
+    // =========================================================
+    // 6. INICIAR TRANSACCIÓN
+    // =========================================================
+
     $db->beginTransaction();
 
+
+    // =========================================================
+    // 7. ELIMINAR PREFERENCIAS ANTERIORES
+    // =========================================================
 
     $consultaEliminar = $db->prepare(
         "DELETE FROM usuario_categorias
          WHERE id_usuario = :id_usuario"
     );
 
-
     $consultaEliminar->execute([
         ":id_usuario" => $usuarioId
     ]);
 
+
+    // =========================================================
+    // 8. BUSCAR CATEGORÍAS
+    // =========================================================
 
     $consultaCategoria = $db->prepare(
         "SELECT id_categoria
@@ -130,6 +162,10 @@ try {
          LIMIT 1"
     );
 
+
+    // =========================================================
+    // 9. INSERTAR CATEGORÍAS
+    // =========================================================
 
     $consultaInsertar = $db->prepare(
         "INSERT INTO usuario_categorias
@@ -152,47 +188,90 @@ try {
         ]);
 
 
-        $categoria = $consultaCategoria->fetch();
+        $categoriaEncontrada =
+            $consultaCategoria->fetch();
 
 
-        if (!$categoria) {
+        if (!$categoriaEncontrada) {
 
-            $db->rollBack();
-
-            http_response_code(500);
-
-            echo json_encode([
-                "exito" => false,
-                "mensaje" =>
-                    "La categoría '" .
-                    $nombreCategoria .
-                    "' no existe en la base de datos."
-            ]);
-
-            exit;
+            throw new Exception(
+                "No existe la categoría en la tabla categorias: "
+                . $nombreCategoria
+            );
         }
 
 
         $consultaInsertar->execute([
             ":id_usuario" => $usuarioId,
-            ":id_categoria" => $categoria["id_categoria"]
+            ":id_categoria" =>
+                (int) $categoriaEncontrada["id_categoria"]
         ]);
     }
 
+
+    // =========================================================
+    // 10. GUARDAR PREFERENCIAS GENERALES
+    // =========================================================
+
+    $consultaPreferencias = $db->prepare(
+        "SELECT id_preferencia
+         FROM preferencias_usuario
+         WHERE id_usuario = :id_usuario
+         LIMIT 1"
+    );
+
+    $consultaPreferencias->execute([
+        ":id_usuario" => $usuarioId
+    ]);
+
+    $preferenciaExistente =
+        $consultaPreferencias->fetch();
+
+
+    if (!$preferenciaExistente) {
+
+        $insertarPreferencia = $db->prepare(
+            "INSERT INTO preferencias_usuario
+            (
+                id_usuario
+            )
+            VALUES
+            (
+                :id_usuario
+            )"
+        );
+
+        $insertarPreferencia->execute([
+            ":id_usuario" => $usuarioId
+        ]);
+    }
+
+
+    // =========================================================
+    // 11. CONFIRMAR
+    // =========================================================
 
     $db->commit();
 
 
     echo json_encode([
         "exito" => true,
+        "paso" => "COMPLETADO",
         "mensaje" => "Preferencias guardadas correctamente.",
+        "usuario_id" => $usuarioId,
         "categorias" => $categorias
     ]);
 
+    exit;
 
-} catch (PDOException $error) {
 
-    if ($db !== null && $db->inTransaction()) {
+} catch (Throwable $error) {
+
+
+    if (
+        $db instanceof PDO &&
+        $db->inTransaction()
+    ) {
 
         $db->rollBack();
     }
@@ -200,11 +279,16 @@ try {
 
     http_response_code(500);
 
+
     echo json_encode([
         "exito" => false,
-        "mensaje" =>
-            "Ocurrió un error al guardar las preferencias."
+        "paso" => "ERROR",
+        "mensaje" => "Ocurrió un error al guardar las preferencias.",
+        "error" => $error->getMessage(),
+        "archivo" => $error->getFile(),
+        "linea" => $error->getLine()
     ]);
-}
 
+    exit;
+}
 ?>

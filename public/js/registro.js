@@ -15,16 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     function mostrarMensaje(mensaje) {
-
         mensajeError.textContent = mensaje;
-
     }
 
 
     function limpiarMensaje() {
-
         mensajeError.textContent = "";
-
     }
 
 
@@ -35,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
         btnRegistro.textContent = cargando
             ? "Registrando..."
             : "Registrarse";
-
     }
 
 
@@ -61,7 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
             mostrarMensaje("Completa todos los campos.");
 
             return;
-
         }
 
 
@@ -70,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
             mostrarMensaje("Ingresa un correo electrónico válido.");
 
             return;
-
         }
 
 
@@ -81,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             return;
-
         }
 
 
@@ -92,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             return;
-
         }
 
 
@@ -101,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
             mostrarMensaje("Las contraseñas no coinciden.");
 
             return;
-
         }
 
 
@@ -110,26 +100,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
 
-            const respuesta = await fetch("../auth/registro.php", {
+            const respuesta = await fetch(
+                "/LifeSync/auth/registro.php",
+                {
+                    method: "POST",
 
-                method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                    credentials: "include",
 
-                body: JSON.stringify({
-
-                    nombre: nombre,
-                    correo: correo,
-                    password: password
-
-                })
-
-            });
+                    body: JSON.stringify({
+                        nombre: nombre,
+                        correo: correo,
+                        password: password
+                    })
+                }
+            );
 
 
-            const datos = await respuesta.json();
+            const texto = await respuesta.text();
+
+            let datos;
+
+            try {
+
+                datos = JSON.parse(texto);
+
+            } catch (error) {
+
+                console.error("Respuesta del servidor:", texto);
+
+                mostrarMensaje(
+                    "El servidor no devolvió una respuesta válida."
+                );
+
+                cambiarEstadoBoton(false);
+
+                return;
+            }
 
 
             if (!respuesta.ok || !datos.exito) {
@@ -142,7 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 cambiarEstadoBoton(false);
 
                 return;
-
             }
 
 
@@ -161,7 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             cambiarEstadoBoton(false);
-
         }
 
     });
@@ -186,11 +194,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     nombreInput.addEventListener("input", limpiarMensaje);
-
     correoInput.addEventListener("input", limpiarMensaje);
-
     passwordInput.addEventListener("input", limpiarMensaje);
-
     confirmarPasswordInput.addEventListener("input", limpiarMensaje);
 
 });

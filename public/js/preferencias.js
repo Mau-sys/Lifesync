@@ -2,9 +2,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const form = document.getElementById("preferenciasForm");
 
-    const mensaje = document.getElementById("mensajePreferencias");
+    const mensaje = document.getElementById(
+        "mensajePreferencias"
+    );
 
-    const boton = document.getElementById("btnGuardarPreferencias");
+    const boton = document.getElementById(
+        "btnGuardarPreferencias"
+    );
 
     const checkboxes = document.querySelectorAll(
         'input[name="categorias"]'
@@ -38,103 +42,165 @@ document.addEventListener("DOMContentLoaded", () => {
 
     checkboxes.forEach((checkbox) => {
 
-        checkbox.addEventListener("change", limpiarMensaje);
+        checkbox.addEventListener(
+            "change",
+            limpiarMensaje
+        );
 
     });
 
 
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener(
+        "submit",
+        async (event) => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        limpiarMensaje();
-
-
-        const seleccionadas = Array.from(checkboxes)
-            .filter((checkbox) => checkbox.checked)
-            .map((checkbox) => checkbox.value);
+            limpiarMensaje();
 
 
-        if (seleccionadas.length === 0) {
-
-            mostrarMensaje(
-                "Selecciona al menos una categoría."
-            );
-
-            return;
-
-        }
+            const seleccionadas = Array.from(checkboxes)
+                .filter((checkbox) => checkbox.checked)
+                .map((checkbox) => checkbox.value);
 
 
-        const tienePersonalizado =
-            document.getElementById("habitoPersonalizado").checked;
-
-
-        cambiarEstadoBoton(true);
-
-
-        try {
-
-            const respuesta = await fetch(
-                "../auth/preferencias.php",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    credentials: "include",
-
-                    body: JSON.stringify({
-                        categorias: seleccionadas
-                    })
-                }
-            );
-
-
-            const datos = await respuesta.json();
-
-
-            if (!respuesta.ok || !datos.exito) {
+            if (seleccionadas.length === 0) {
 
                 mostrarMensaje(
-                    datos.mensaje ||
-                    "No se pudieron guardar tus preferencias."
+                    "Selecciona al menos una categoría."
                 );
+
+                return;
+            }
+
+
+            const tienePersonalizado =
+                document.getElementById(
+                    "habitoPersonalizado"
+                ).checked;
+
+
+            cambiarEstadoBoton(true);
+
+
+            try {
+
+                const respuesta = await fetch(
+                    "../auth/preferencias.php",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        credentials: "include",
+
+                        body: JSON.stringify({
+                            categorias:
+                                seleccionadas
+                        })
+                    }
+                );
+
+
+                const textoRespuesta =
+                    await respuesta.text();
+
+
+                console.log(
+                    "Respuesta de preferencias.php:",
+                    textoRespuesta
+                );
+
+
+                let datos;
+
+
+                try {
+
+                    datos = JSON.parse(
+                        textoRespuesta
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "La respuesta no es JSON válido:",
+                        textoRespuesta
+                    );
+
+                    mostrarMensaje(
+                        "El servidor devolvió una respuesta inesperada."
+                    );
+
+                    cambiarEstadoBoton(false);
+
+                    return;
+                }
+
+
+                if (
+                    !respuesta.ok ||
+                    !datos.exito
+                ) {
+
+                    console.error(
+                        "Error del servidor:",
+                        datos
+                    );
+
+
+                    mostrarMensaje(
+                        datos.detalle ||
+                        datos.mensaje ||
+                        "No se pudieron guardar las preferencias."
+                    );
+
+
+                    cambiarEstadoBoton(false);
+
+                    return;
+                }
+
+
+                console.log(
+                    "Preferencias guardadas:",
+                    datos
+                );
+
+
+                if (tienePersonalizado) {
+
+                    window.location.href =
+                        "Crear-habito.html";
+
+                } else {
+
+                    window.location.href =
+                        "Inicio.html";
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Error de conexión:",
+                    error
+                );
+
+
+                mostrarMensaje(
+                    "No se pudo conectar con el servidor. Inténtalo nuevamente."
+                );
+
 
                 cambiarEstadoBoton(false);
 
-                return;
-
             }
-
-
-            if (tienePersonalizado) {
-
-                window.location.href = "Crear-habito.html";
-
-            } else {
-
-                window.location.href = "Inicio.html";
-
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Error al guardar preferencias:",
-                error
-            );
-
-            mostrarMensaje(
-                "No se pudo conectar con el servidor. Inténtalo nuevamente."
-            );
-
-            cambiarEstadoBoton(false);
 
         }
-
-    });
+    );
 
 });

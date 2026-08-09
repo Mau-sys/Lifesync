@@ -1,15 +1,15 @@
 <?php
 
+session_start();
+
 header("Content-Type: application/json; charset=UTF-8");
 
 require_once "../config/conexion.php";
-
 
 $datos = json_decode(
     file_get_contents("php://input"),
     true
 );
-
 
 if (!is_array($datos)) {
 
@@ -23,11 +23,9 @@ if (!is_array($datos)) {
     exit;
 }
 
-
 $nombre = trim($datos["nombre"] ?? "");
 $correo = trim($datos["correo"] ?? "");
 $password = $datos["password"] ?? "";
-
 
 if (
     $nombre === "" ||
@@ -45,7 +43,6 @@ if (
     exit;
 }
 
-
 if (mb_strlen($nombre) > 50) {
 
     http_response_code(400);
@@ -57,7 +54,6 @@ if (mb_strlen($nombre) > 50) {
 
     exit;
 }
-
 
 if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
 
@@ -71,7 +67,6 @@ if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-
 if (mb_strlen($password) < 8) {
 
     http_response_code(400);
@@ -84,13 +79,11 @@ if (mb_strlen($password) < 8) {
     exit;
 }
 
-
 try {
 
     $database = new Database();
 
     $db = $database->getConnection();
-
 
     if ($db === null) {
 
@@ -104,7 +97,6 @@ try {
         exit;
     }
 
-
     $consulta = $db->prepare(
         "SELECT id_usuario
          FROM usuario
@@ -112,11 +104,9 @@ try {
          LIMIT 1"
     );
 
-
     $consulta->execute([
         ":correo" => $correo
     ]);
-
 
     if ($consulta->fetch()) {
 
@@ -130,12 +120,10 @@ try {
         exit;
     }
 
-
     $passwordHash = password_hash(
         $password,
         PASSWORD_DEFAULT
     );
-
 
     $consulta = $db->prepare(
         "INSERT INTO usuario
@@ -152,7 +140,6 @@ try {
         )"
     );
 
-
     $consulta->execute([
 
         ":nombre" => $nombre,
@@ -163,6 +150,11 @@ try {
 
     ]);
 
+    $usuarioId = $db->lastInsertId();
+
+    $_SESSION["usuario_id"] = $usuarioId;
+    $_SESSION["usuario_nombre"] = $nombre;
+    $_SESSION["usuario_correo"] = $correo;
 
     echo json_encode([
 
@@ -171,7 +163,6 @@ try {
         "mensaje" => "Usuario registrado correctamente."
 
     ]);
-
 
 } catch (PDOException $error) {
 
