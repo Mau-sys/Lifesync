@@ -6,13 +6,7 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require_once "../config/conexion.php";
 
-$db = null;
-
 try {
-
-    // =========================================================
-    // 1. COMPROBAR SESIÓN
-    // =========================================================
 
     if (!isset($_SESSION["usuario_id"])) {
 
@@ -28,86 +22,40 @@ try {
         exit;
     }
 
-
     $usuarioId = (int) $_SESSION["usuario_id"];
-
-
-    // =========================================================
-    // 2. COMPROBAR CONEXIÓN
-    // =========================================================
-
-    $database = new Database();
-
-    $db = $database->getConnection();
-
-
-    if (!$db) {
-
-        throw new Exception(
-            "No se pudo conectar con la base de datos."
-        );
-    }
-
-
-    // =========================================================
-    // 3. COMPROBAR QUE EL USUARIO EXISTE
-    // =========================================================
-
-    $consulta = $db->prepare(
-        "SELECT id_usuario, nombre_usuario, correo
-         FROM usuario
-         WHERE id_usuario = :id
-         LIMIT 1"
-    );
-
-    $consulta->execute([
-        ":id" => $usuarioId
-    ]);
-
-    $usuario = $consulta->fetch();
-
-
-    if (!$usuario) {
-
-        throw new Exception(
-            "El usuario de la sesión no existe en la tabla usuario. ID recibido: "
-            . $usuarioId
-        );
-    }
-
-
-    // =========================================================
-    // 4. RECIBIR JSON
-    // =========================================================
 
     $contenido = file_get_contents("php://input");
 
     $datos = json_decode($contenido, true);
 
-
     if (!is_array($datos)) {
 
-        throw new Exception(
-            "El JSON recibido no es válido. Contenido recibido: "
-            . $contenido
-        );
-    }
+        http_response_code(400);
 
+        echo json_encode([
+            "exito" => false,
+            "paso" => "JSON",
+            "mensaje" => "El JSON recibido no es válido.",
+            "contenido" => $contenido
+        ]);
+
+        exit;
+    }
 
     $categorias = $datos["categorias"] ?? [];
 
-
     if (!is_array($categorias) || count($categorias) === 0) {
 
-        throw new Exception(
-            "No se recibieron categorías."
-        );
+        http_response_code(400);
+
+        echo json_encode([
+            "exito" => false,
+            "paso" => "CATEGORIAS",
+            "mensaje" => "No se recibieron categorías."
+        ]);
+
+        exit;
     }
-
-
-    // =========================================================
-    // 5. COMPROBAR CATEGORÍAS
-    // =========================================================
 
     $permitidas = [
         "Hidratación",
@@ -117,7 +65,6 @@ try {
         "Registro Académico",
         "Hábito Personalizado"
     ];
-
 
     foreach ($categorias as $categoria) {
 
@@ -129,17 +76,50 @@ try {
         }
     }
 
+    $database = new Database();
 
-    // =========================================================
-    // 6. INICIAR TRANSACCIÓN
-    // =========================================================
+    $db = $database->getConnection();
+
+    if (!$db) {
+
+        throw new Exception(
+            "No se pudo obtener la conexión a MySQL."
+        );
+    }
+
+    /*
+     * COMPROBAR USUARIO
+     */
+
+    $consultaUsuario = $db->prepare(
+        "SELECT id_usuario
+         FROM usuario
+         WHERE id_usuario = :id_usuario
+         LIMIT 1"
+    );
+
+    $consultaUsuario->execute([
+        ":id_usuario" => $usuarioId
+    ]);
+
+    $usuario = $consultaUsuario->fetch();
+
+    if (!$usuario) {
+
+        throw new Exception(
+            "El usuario con ID " . $usuarioId . " no existe en la tabla usuario."
+        );
+    }
+
+    /*
+     * COMENZAR TRANSACCIÓN
+     */
 
     $db->beginTransaction();
 
-
-    // =========================================================
-    // 7. ELIMINAR PREFERENCIAS ANTERIORES
-    // =========================================================
+    /*
+     * BORRAR CATEGORÍAS ANTERIORES
+     */
 
     $consultaEliminar = $db->prepare(
         "DELETE FROM usuario_categorias
@@ -150,10 +130,9 @@ try {
         ":id_usuario" => $usuarioId
     ]);
 
-
-    // =========================================================
-    // 8. BUSCAR CATEGORÍAS
-    // =========================================================
+    /*
+     * BUSCAR CATEGORÍAS
+     */
 
     $consultaCategoria = $db->prepare(
         "SELECT id_categoria
@@ -162,10 +141,9 @@ try {
          LIMIT 1"
     );
 
-
-    // =========================================================
-    // 9. INSERTAR CATEGORÍAS
-    // =========================================================
+    /*
+     * INSERTAR CATEGORÍAS DEL USUARIO
+     */
 
     $consultaInsertar = $db->prepare(
         "INSERT INTO usuario_categorias
@@ -180,55 +158,51 @@ try {
         )"
     );
 
-
     foreach ($categorias as $nombreCategoria) {
 
         $consultaCategoria->execute([
             ":nombre" => $nombreCategoria
         ]);
 
+        $categoria = $consultaCategoria->fetch();
 
-        $categoriaEncontrada =
-            $consultaCategoria->fetch();
-
-
-        if (!$categoriaEncontrada) {
+        if (!$categoria) {
 
             throw new Exception(
-                "No existe la categoría en la tabla categorias: "
-                . $nombreCategoria
+                "La categoría '" .
+                $nombreCategoria .
+                "' no existe en la tabla categorias."
             );
         }
 
-
         $consultaInsertar->execute([
             ":id_usuario" => $usuarioId,
-            ":id_categoria" =>
-                (int) $categoriaEncontrada["id_categoria"]
+            ":id_categoria" => (int) $categoria["id_categoria"]
         ]);
     }
 
+    /*
+     * COMPROBAR PREFERENCIAS
+     */
 
-    // =========================================================
-    // 10. GUARDAR PREFERENCIAS GENERALES
-    // =========================================================
-
-    $consultaPreferencias = $db->prepare(
+    $consultaPreferencia = $db->prepare(
         "SELECT id_preferencia
          FROM preferencias_usuario
          WHERE id_usuario = :id_usuario
          LIMIT 1"
     );
 
-    $consultaPreferencias->execute([
+    $consultaPreferencia->execute([
         ":id_usuario" => $usuarioId
     ]);
 
-    $preferenciaExistente =
-        $consultaPreferencias->fetch();
+    $preferencia = $consultaPreferencia->fetch();
 
+    /*
+     * CREAR PREFERENCIA SI NO EXISTE
+     */
 
-    if (!$preferenciaExistente) {
+    if (!$preferencia) {
 
         $insertarPreferencia = $db->prepare(
             "INSERT INTO preferencias_usuario
@@ -246,13 +220,11 @@ try {
         ]);
     }
 
-
-    // =========================================================
-    // 11. CONFIRMAR
-    // =========================================================
+    /*
+     * CONFIRMAR
+     */
 
     $db->commit();
-
 
     echo json_encode([
         "exito" => true,
@@ -264,31 +236,26 @@ try {
 
     exit;
 
-
 } catch (Throwable $error) {
 
-
     if (
+        isset($db) &&
         $db instanceof PDO &&
         $db->inTransaction()
     ) {
-
         $db->rollBack();
     }
 
-
     http_response_code(500);
-
 
     echo json_encode([
         "exito" => false,
         "paso" => "ERROR",
         "mensaje" => "Ocurrió un error al guardar las preferencias.",
-        "error" => $error->getMessage(),
+        "detalle" => $error->getMessage(),
         "archivo" => $error->getFile(),
         "linea" => $error->getLine()
     ]);
 
     exit;
 }
-?>

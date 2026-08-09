@@ -153,11 +153,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     mostrarMensaje(
-                        datos.detalle ||
-                        datos.mensaje ||
-                        "No se pudieron guardar las preferencias."
+                    datos.detalle ||
+                    datos.mensaje ||
+                    "No se pudieron guardar las preferencias."
                     );
 
+console.log("Respuesta completa del servidor:", datos);
 
                     cambiarEstadoBoton(false);
 
