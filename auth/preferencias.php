@@ -15,18 +15,20 @@ try {
         echo json_encode([
             "exito" => false,
             "paso" => "SESION",
-            "mensaje" => "No existe usuario_id en la sesión.",
-            "sesion" => $_SESSION
+            "mensaje" => "La sesión ha expirado. Inicia sesión nuevamente."
         ]);
 
         exit;
     }
 
+
     $usuarioId = (int) $_SESSION["usuario_id"];
+
 
     $contenido = file_get_contents("php://input");
 
     $datos = json_decode($contenido, true);
+
 
     if (!is_array($datos)) {
 
@@ -35,14 +37,15 @@ try {
         echo json_encode([
             "exito" => false,
             "paso" => "JSON",
-            "mensaje" => "El JSON recibido no es válido.",
-            "contenido" => $contenido
+            "mensaje" => "El JSON recibido no es válido."
         ]);
 
         exit;
     }
 
+
     $categorias = $datos["categorias"] ?? [];
+
 
     if (!is_array($categorias) || count($categorias) === 0) {
 
@@ -57,6 +60,7 @@ try {
         exit;
     }
 
+
     $permitidas = [
         "Hidratación",
         "Alimentación",
@@ -66,19 +70,28 @@ try {
         "Hábito Personalizado"
     ];
 
+
     foreach ($categorias as $categoria) {
 
-        if (!in_array($categoria, $permitidas, true)) {
+        if (!is_string($categoria) || !in_array($categoria, $permitidas, true)) {
 
-            throw new Exception(
-                "Categoría no permitida: " . $categoria
-            );
+            http_response_code(400);
+
+            echo json_encode([
+                "exito" => false,
+                "paso" => "CATEGORIA_INVALIDA",
+                "mensaje" => "Se recibió una categoría no válida."
+            ]);
+
+            exit;
         }
     }
+
 
     $database = new Database();
 
     $db = $database->getConnection();
+
 
     if (!$db) {
 
@@ -87,6 +100,7 @@ try {
         );
     }
 
+
     $consultaUsuario = $db->prepare(
         "SELECT id_usuario
          FROM usuario
@@ -94,16 +108,19 @@ try {
          LIMIT 1"
     );
 
+
     $consultaUsuario->execute([
         ":id_usuario" => $usuarioId
     ]);
 
-    $usuario = $consultaUsuario->fetch();
+
+    $usuario = $consultaUsuario->fetch(PDO::FETCH_ASSOC);
+
 
     if (!$usuario) {
 
         throw new Exception(
-            "El usuario con ID " . $usuarioId . " no existe en la tabla usuario."
+            "El usuario no existe."
         );
     }
 
@@ -116,9 +133,11 @@ try {
          WHERE id_usuario = :id_usuario"
     );
 
+
     $consultaEliminar->execute([
         ":id_usuario" => $usuarioId
     ]);
+
 
     $consultaCategoria = $db->prepare(
         "SELECT id_categoria
@@ -141,28 +160,31 @@ try {
         )"
     );
 
+
     foreach ($categorias as $nombreCategoria) {
 
         $consultaCategoria->execute([
             ":nombre" => $nombreCategoria
         ]);
 
-        $categoria = $consultaCategoria->fetch();
+
+        $categoria = $consultaCategoria->fetch(PDO::FETCH_ASSOC);
+
 
         if (!$categoria) {
 
             throw new Exception(
-                "La categoría '" .
-                $nombreCategoria .
-                "' no existe en la tabla categorias."
+                "La categoría seleccionada no existe."
             );
         }
+
 
         $consultaInsertar->execute([
             ":id_usuario" => $usuarioId,
             ":id_categoria" => (int) $categoria["id_categoria"]
         ]);
     }
+
 
     $consultaPreferencia = $db->prepare(
         "SELECT id_preferencia
@@ -171,11 +193,14 @@ try {
          LIMIT 1"
     );
 
+
     $consultaPreferencia->execute([
         ":id_usuario" => $usuarioId
     ]);
 
-    $preferencia = $consultaPreferencia->fetch();
+
+    $preferencia = $consultaPreferencia->fetch(PDO::FETCH_ASSOC);
+
 
     if (!$preferencia) {
 
@@ -190,6 +215,7 @@ try {
             )"
         );
 
+
         $insertarPreferencia->execute([
             ":id_usuario" => $usuarioId
         ]);
@@ -197,6 +223,7 @@ try {
 
 
     $db->commit();
+
 
     echo json_encode([
         "exito" => true,
@@ -208,6 +235,7 @@ try {
 
     exit;
 
+
 } catch (Throwable $error) {
 
     if (
@@ -215,19 +243,20 @@ try {
         $db instanceof PDO &&
         $db->inTransaction()
     ) {
+
         $db->rollBack();
     }
 
+
     http_response_code(500);
+
 
     echo json_encode([
         "exito" => false,
         "paso" => "ERROR",
-        "mensaje" => "Ocurrió un error al guardar las preferencias.",
-        "detalle" => $error->getMessage(),
-        "archivo" => $error->getFile(),
-        "linea" => $error->getLine()
+        "mensaje" => "Ocurrió un error al guardar las preferencias."
     ]);
 
     exit;
 }
+?>

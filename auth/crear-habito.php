@@ -176,11 +176,10 @@ if ($fechaFin !== "") {
 } else {
 
     $fechaFin = null;
-
 }
 
 
-$usuarioId = $_SESSION["usuario_id"];
+$usuarioId = (int) $_SESSION["usuario_id"];
 
 
 try {
@@ -190,13 +189,37 @@ try {
     $db = $database->getConnection();
 
 
-    if ($db === null) {
+    if (!$db) {
 
-        http_response_code(500);
+        throw new Exception(
+            "No se pudo conectar con la base de datos."
+        );
+    }
+
+
+    $consultaUsuario = $db->prepare(
+        "SELECT id_usuario
+         FROM usuario
+         WHERE id_usuario = :id_usuario
+         LIMIT 1"
+    );
+
+
+    $consultaUsuario->execute([
+        ":id_usuario" => $usuarioId
+    ]);
+
+
+    $usuario = $consultaUsuario->fetch(PDO::FETCH_ASSOC);
+
+
+    if (!$usuario) {
+
+        http_response_code(401);
 
         echo json_encode([
             "exito" => false,
-            "mensaje" => "No se pudo conectar con la base de datos."
+            "mensaje" => "El usuario no existe."
         ]);
 
         exit;
@@ -220,8 +243,11 @@ try {
 
 
     $idCategoria = $categoria
-        ? $categoria["id_categoria"]
+        ? (int) $categoria["id_categoria"]
         : null;
+
+
+    $db->beginTransaction();
 
 
     $consulta = $db->prepare(
@@ -297,6 +323,9 @@ try {
     ]);
 
 
+    $db->commit();
+
+
     echo json_encode([
         "exito" => true,
         "mensaje" => "Hábito creado correctamente.",
@@ -309,8 +338,20 @@ try {
         ]
     ]);
 
+    exit;
 
-} catch (PDOException $error) {
+
+} catch (Throwable $error) {
+
+    if (
+        isset($db) &&
+        $db instanceof PDO &&
+        $db->inTransaction()
+    ) {
+
+        $db->rollBack();
+    }
+
 
     http_response_code(500);
 
@@ -319,6 +360,6 @@ try {
         "mensaje" => "Ocurrió un error al crear el hábito."
     ]);
 
+    exit;
 }
-
 ?>
