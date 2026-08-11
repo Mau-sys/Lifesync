@@ -1,9 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
+
     const progresoGeneral = document.getElementById("progresoGeneral");
     const diasRacha = document.getElementById("diasRacha");
     const habitosCompletados = document.getElementById("habitosCompletados");
 
     const periodo = document.getElementById("periodo");
+
     const graficaGeneral = document.getElementById("graficaGeneral");
 
     const listaCategorias = document.getElementById("listaCategorias");
@@ -13,81 +15,73 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("mensajeEstadisticas");
 
 
-    function escaparHTML(valor) {
+    function escaparHTML(texto) {
+
         const elemento = document.createElement("div");
 
-        elemento.textContent = valor ?? "";
+        elemento.textContent = texto ?? "";
 
         return elemento.innerHTML;
     }
 
 
     function limitarPorcentaje(valor) {
-        const numero = Number(valor);
 
-        if (!Number.isFinite(numero)) {
-            return 0;
-        }
+        const numero = Number(valor) || 0;
 
-        return Math.max(0, Math.min(100, numero));
+        return Math.max(
+            0,
+            Math.min(100, numero)
+        );
     }
 
 
-    function mostrarMensaje(texto = "") {
+    function mostrarMensaje(texto = "", tipo = "") {
+
         mensajeEstadisticas.textContent = texto;
+
+        mensajeEstadisticas.className = "mensaje";
+
+        if (tipo) {
+            mensajeEstadisticas.classList.add(tipo);
+        }
     }
 
 
-    function mostrarCargando() {
-        mostrarMensaje("Cargando estadísticas...");
+    function mostrarResumen(resumen = {}) {
 
-        progresoGeneral.textContent = "…";
-        diasRacha.textContent = "…";
-        habitosCompletados.textContent = "…";
-
-        graficaGeneral.innerHTML =
-            '<p class="sin-datos">Cargando progreso...</p>';
-
-        listaCategorias.innerHTML =
-            '<p class="sin-datos">Cargando categorías...</p>';
-
-        listaHabitos.innerHTML =
-            '<p class="sin-datos">Cargando hábitos...</p>';
-    }
-
-
-    function mostrarSinDatos(contenedor, texto) {
-        contenedor.innerHTML = `
-            <p class="sin-datos">
-                ${escaparHTML(texto)}
-            </p>
-        `;
-    }
-
-
-    function pintarResumen(datos) {
         progresoGeneral.textContent =
-            `${Math.round(limitarPorcentaje(datos.progreso_general))}%`;
+            `${Math.round(
+                limitarPorcentaje(
+                    resumen.progreso_general
+                )
+            )}%`;
+
 
         diasRacha.textContent =
-            Number(datos.dias_racha) || 0;
+            Number(resumen.dias_racha) || 0;
+
 
         habitosCompletados.textContent =
-            Number(datos.habitos_completados) || 0;
+            Number(resumen.habitos_completados) || 0;
     }
 
 
-    function pintarGrafica(datos) {
+    function mostrarGrafica(datos) {
+
         graficaGeneral.innerHTML = "";
 
+
         if (
-            !Array.isArray(datos.grafica) ||
-            datos.grafica.length === 0
+            !Array.isArray(datos) ||
+            datos.length === 0
         ) {
-            mostrarSinDatos(
-                graficaGeneral,
-                "No hay datos suficientes para mostrar la gráfica."
-            );
+
+            graficaGeneral.innerHTML = `
+                <p class="sin-datos">
+                    No hay datos suficientes para mostrar la gráfica.
+                </p>
+            `;
 
             return;
         }
@@ -100,9 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
             "grafica-barras";
 
 
-        datos.grafica.forEach((dia) => {
+        datos.forEach((dato) => {
+
             const porcentaje =
-                limitarPorcentaje(dia.porcentaje);
+                limitarPorcentaje(dato.porcentaje);
+
 
             const columna =
                 document.createElement("div");
@@ -111,55 +107,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 "barra-columna";
 
 
-            const valor =
-                document.createElement("span");
+            columna.innerHTML = `
 
-            valor.className =
-                "barra-valor";
+                <span class="barra-valor">
+                    ${Math.round(porcentaje)}%
+                </span>
 
-            valor.textContent =
-                `${Math.round(porcentaje)}%`;
+                <div class="barra">
 
+                    <div
+                        class="barra-relleno"
+                        style="height: ${porcentaje}%;">
+                    </div>
 
-            const barra =
-                document.createElement("div");
+                </div>
 
-            barra.className =
-                "barra";
+                <span class="barra-etiqueta">
+                    ${escaparHTML(dato.etiqueta)}
+                </span>
 
+            `;
 
-            const relleno =
-                document.createElement("div");
-
-            relleno.className =
-                "barra-relleno";
-
-            relleno.style.height =
-                `${porcentaje}%`;
-
-            relleno.setAttribute(
-                "title",
-                `${Math.round(porcentaje)}%`
-            );
-
-
-            const etiqueta =
-                document.createElement("span");
-
-            etiqueta.className =
-                "barra-etiqueta";
-
-            etiqueta.textContent =
-                dia.etiqueta || "";
-
-
-            barra.appendChild(relleno);
-
-            columna.appendChild(valor);
-            columna.appendChild(barra);
-            columna.appendChild(etiqueta);
 
             contenedor.appendChild(columna);
+
         });
 
 
@@ -167,7 +138,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function pintarCategorias(categorias) {
+    function crearTarjetaEstadistica(elemento) {
+
+        const porcentaje =
+            limitarPorcentaje(elemento.porcentaje);
+
+
+        const tarjeta =
+            document.createElement("article");
+
+        tarjeta.className =
+            "tarjeta-estadistica";
+
+
+        tarjeta.innerHTML = `
+
+            <div class="estadistica-info">
+
+                <h3>
+                    ${escaparHTML(
+                        elemento.nombre
+                    )}
+                </h3>
+
+                <p>
+                    ${escaparHTML(
+                        elemento.detalle ||
+                        "Sin información disponible."
+                    )}
+                </p>
+
+            </div>
+
+
+            <div class="estadistica-progreso">
+
+                <span>
+                    ${Math.round(porcentaje)}%
+                </span>
+
+                <div class="barra-progreso">
+
+                    <div
+                        class="barra-progreso-relleno"
+                        style="width: ${porcentaje}%;">
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        return tarjeta;
+    }
+
+
+    function mostrarCategorias(categorias) {
+
         listaCategorias.innerHTML = "";
 
 
@@ -175,65 +204,30 @@ document.addEventListener("DOMContentLoaded", () => {
             !Array.isArray(categorias) ||
             categorias.length === 0
         ) {
-            mostrarSinDatos(
-                listaCategorias,
-                "Todavía no hay estadísticas de categorías."
-            );
+
+            listaCategorias.innerHTML = `
+                <p class="sin-datos">
+                    Todavía no hay datos de categorías.
+                </p>
+            `;
 
             return;
         }
 
 
         categorias.forEach((categoria) => {
-            const porcentaje =
-                limitarPorcentaje(categoria.porcentaje);
 
-            const tarjeta =
-                document.createElement("article");
+            listaCategorias.appendChild(
+                crearTarjetaEstadistica(categoria)
+            );
 
-            tarjeta.className =
-                "tarjeta-estadistica";
-
-
-            tarjeta.innerHTML = `
-                <div class="estadistica-info">
-
-                    <h3>
-                        ${escaparHTML(categoria.nombre)}
-                    </h3>
-
-                    <p>
-                        ${Number(categoria.completados) || 0}
-                        completados
-                    </p>
-
-                </div>
-
-                <div class="estadistica-progreso">
-
-                    <span>
-                        ${Math.round(porcentaje)}%
-                    </span>
-
-                    <div class="barra-progreso">
-
-                        <div
-                            class="barra-progreso-relleno"
-                            style="width: ${porcentaje}%">
-                        </div>
-
-                    </div>
-
-                </div>
-            `;
-
-
-            listaCategorias.appendChild(tarjeta);
         });
+
     }
 
 
-    function pintarHabitos(habitos) {
+    function mostrarHabitos(habitos) {
+
         listaHabitos.innerHTML = "";
 
 
@@ -241,100 +235,56 @@ document.addEventListener("DOMContentLoaded", () => {
             !Array.isArray(habitos) ||
             habitos.length === 0
         ) {
-            mostrarSinDatos(
-                listaHabitos,
-                "Todavía no tienes hábitos personalizados."
-            );
+
+            listaHabitos.innerHTML = `
+                <p class="sin-datos">
+                    Todavía no tienes hábitos personalizados.
+                </p>
+            `;
 
             return;
         }
 
 
         habitos.forEach((habito) => {
-            const porcentaje =
-                limitarPorcentaje(habito.porcentaje);
 
-            const tarjeta =
-                document.createElement("article");
+            listaHabitos.appendChild(
+                crearTarjetaEstadistica(habito)
+            );
 
-            tarjeta.className =
-                "tarjeta-estadistica";
-
-
-            tarjeta.innerHTML = `
-                <div class="estadistica-info">
-
-                    <h3>
-                        ${escaparHTML(habito.nombre)}
-                    </h3>
-
-                    <p>
-                        ${Number(habito.completados) || 0}
-                        completados
-                    </p>
-
-                </div>
-
-                <div class="estadistica-progreso">
-
-                    <span>
-                        ${Math.round(porcentaje)}%
-                    </span>
-
-                    <div class="barra-progreso">
-
-                        <div
-                            class="barra-progreso-relleno"
-                            style="width: ${porcentaje}%">
-                        </div>
-
-                    </div>
-
-                </div>
-            `;
-
-
-            listaHabitos.appendChild(tarjeta);
         });
-    }
 
-
-    function pintarEstadisticas(datos) {
-        pintarResumen(datos);
-        pintarGrafica(datos);
-        pintarCategorias(datos.categorias);
-        pintarHabitos(datos.habitos_personalizados);
-
-        mostrarMensaje("");
     }
 
 
     async function cargarEstadisticas() {
+
         const periodoSeleccionado =
             periodo.value || "semana";
 
 
-        mostrarCargando();
-
-
         try {
+
+            mostrarMensaje("");
+
+
             const respuesta =
                 await fetch(
-                    `../php/estadisticas.php?periodo=${encodeURIComponent(
+                    `../auth/estadisticas.php?periodo=${encodeURIComponent(
                         periodoSeleccionado
                     )}`,
                     {
                         method: "GET",
                         credentials: "same-origin",
+                        cache: "no-store",
                         headers: {
                             "Accept": "application/json"
-                        },
-                        cache: "no-store"
+                        }
                     }
                 );
 
 
-            const texto =
+            const textoRespuesta =
                 await respuesta.text();
 
 
@@ -342,60 +292,82 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             try {
-                datos = JSON.parse(texto);
+
+                datos =
+                    JSON.parse(
+                        textoRespuesta
+                    );
+
             } catch (error) {
+
+                console.error(
+                    "Respuesta recibida del servidor:",
+                    textoRespuesta
+                );
+
                 throw new Error(
                     "El servidor no devolvió una respuesta válida."
                 );
+
             }
 
 
-            if (!respuesta.ok || !datos.exito) {
+            if (!respuesta.ok) {
+
                 throw new Error(
                     datos.mensaje ||
                     "No se pudieron cargar las estadísticas."
                 );
+
             }
 
 
-            pintarEstadisticas(datos);
+            if (!datos.exito) {
+
+                throw new Error(
+                    datos.mensaje ||
+                    "No se pudieron cargar las estadísticas."
+                );
+
+            }
+
+
+            mostrarResumen(
+                datos.resumen
+            );
+
+
+            mostrarGrafica(
+                datos.grafica
+            );
+
+
+            mostrarCategorias(
+                datos.categorias
+            );
+
+
+            mostrarHabitos(
+                datos.habitos
+            );
 
 
         } catch (error) {
+
             console.error(
                 "Error al cargar estadísticas:",
                 error
             );
 
 
-            progresoGeneral.textContent = "0%";
-            diasRacha.textContent = "0";
-            habitosCompletados.textContent = "0";
-
-
-            mostrarSinDatos(
-                graficaGeneral,
-                "No se pudieron cargar los datos."
-            );
-
-
-            mostrarSinDatos(
-                listaCategorias,
-                "No se pudieron cargar las categorías."
-            );
-
-
-            mostrarSinDatos(
-                listaHabitos,
-                "No se pudieron cargar los hábitos personalizados."
-            );
-
-
             mostrarMensaje(
                 error.message ||
-                "Ocurrió un error al cargar las estadísticas."
+                "No se pudieron cargar las estadísticas.",
+                "error"
             );
+
         }
+
     }
 
 
@@ -406,4 +378,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     cargarEstadisticas();
+
 });

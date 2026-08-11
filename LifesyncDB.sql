@@ -376,3 +376,26 @@ CREATE TABLE IF NOT EXISTS configuracion_usuario (
         REFERENCES usuario(id_usuario)
         ON DELETE CASCADE
 );
+ALTER TABLE preferencias_usuario
+ADD COLUMN sincronizacion_automatica BOOLEAN DEFAULT TRUE;
+CREATE TABLE IF NOT EXISTS sesiones_usuario (
+    id_sesion INT AUTO_INCREMENT PRIMARY KEY,
+
+    id_usuario INT NOT NULL,
+
+    token_sesion VARCHAR(255) NOT NULL UNIQUE,
+
+    dispositivo VARCHAR(255) NULL,
+
+    ip VARCHAR(45) NULL,
+
+    fecha_inicio DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    ultimo_acceso DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    activa BOOLEAN DEFAULT TRUE,
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id_usuario)
+        ON DELETE CASCADE
+);

@@ -7,131 +7,211 @@ const btnLogin = document.getElementById("btnLogin");
 const googleLogin = document.getElementById("googleLogin");
 const appleLogin = document.getElementById("appleLogin");
 
+const ENDPOINT_LOGIN = "../auth/login.php";
+
 
 function mostrarMensaje(mensaje) {
 
-    mensajeError.textContent = mensaje;
+    if (!mensajeError) {
+        return;
+    }
 
+    mensajeError.textContent = mensaje;
 }
 
 
 function limpiarMensaje() {
 
-    mensajeError.textContent = "";
+    if (!mensajeError) {
+        return;
+    }
 
+    mensajeError.textContent = "";
 }
 
 
 function cambiarEstadoBoton(cargando) {
 
-    if (cargando) {
-
-        btnLogin.disabled = true;
-        btnLogin.textContent = "Iniciando sesión...";
-
-    } else {
-
-        btnLogin.disabled = false;
-        btnLogin.textContent = "Iniciar sesión";
-
+    if (!btnLogin) {
+        return;
     }
 
+    btnLogin.disabled = cargando;
+
+    btnLogin.textContent = cargando
+        ? "Iniciando sesión..."
+        : "Iniciar sesión";
 }
 
 
-loginForm.addEventListener("submit", async function(event) {
+if (loginForm) {
 
-    event.preventDefault();
+    loginForm.addEventListener(
+        "submit",
+        async function(event) {
 
-    limpiarMensaje();
+            event.preventDefault();
 
-    const correo = correoInput.value.trim();
-    const password = passwordInput.value;
+            limpiarMensaje();
 
-    if (!correo || !password) {
+            const correo =
+                correoInput
+                    ? correoInput.value.trim()
+                    : "";
 
-        mostrarMensaje("Completa todos los campos.");
+            const password =
+                passwordInput
+                    ? passwordInput.value
+                    : "";
 
-        return;
 
-    }
+            if (!correo || !password) {
 
-    if (!correoInput.checkValidity()) {
+                mostrarMensaje(
+                    "Completa todos los campos."
+                );
 
-        mostrarMensaje("Ingresa un correo electrónico válido.");
+                return;
+            }
 
-        return;
 
-    }
+            if (
+                correoInput &&
+                !correoInput.checkValidity()
+            ) {
 
-    cambiarEstadoBoton(true);
+                mostrarMensaje(
+                    "Ingresa un correo electrónico válido."
+                );
 
-    try {
+                return;
+            }
 
-        const respuesta = await fetch("../auth/login.php", {
 
-            method: "POST",
+            cambiarEstadoBoton(true);
 
-            headers: {
-                "Content-Type": "application/json"
-            },
 
-            body: JSON.stringify({
-                correo: correo,
-                password: password
-            })
+            try {
 
-        });
+                const respuesta =
+                    await fetch(
+                        ENDPOINT_LOGIN,
+                        {
+                            method: "POST",
 
-        const datos = await respuesta.json();
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
 
-        if (!respuesta.ok || !datos.exito) {
+                                "Accept":
+                                    "application/json"
+                            },
+
+                            credentials:
+                                "same-origin",
+
+                            body:
+                                JSON.stringify({
+                                    correo: correo,
+                                    password: password
+                                })
+                        }
+                    );
+
+
+                const datos =
+                    await respuesta.json();
+
+
+                if (
+                    !respuesta.ok ||
+                    !datos.exito
+                ) {
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        "El correo o la contraseña son incorrectos."
+                    );
+
+                    cambiarEstadoBoton(false);
+
+                    return;
+                }
+
+
+                if (datos.usuario) {
+
+                    localStorage.setItem(
+                        "lifesync_usuario",
+                        JSON.stringify(
+                            datos.usuario
+                        )
+                    );
+                }
+
+
+                window.location.href =
+                    "inicio.html";
+
+            } catch (error) {
+
+                console.error(
+                    "Error al iniciar sesión:",
+                    error
+                );
+
+                mostrarMensaje(
+                    "No se pudo conectar con el servidor. Inténtalo nuevamente."
+                );
+
+                cambiarEstadoBoton(false);
+            }
+        }
+    );
+}
+
+
+if (googleLogin) {
+
+    googleLogin.addEventListener(
+        "click",
+        function() {
 
             mostrarMensaje(
-                datos.mensaje || "El correo o la contraseña son incorrectos."
+                "El inicio de sesión con Google estará disponible próximamente."
             );
-
-            cambiarEstadoBoton(false);
-
-            return;
-
         }
-
-        window.location.href = "inicio.html";
-
-    } catch (error) {
-
-        console.error("Error al iniciar sesión:", error);
-
-        mostrarMensaje(
-            "No se pudo conectar con el servidor. Inténtalo nuevamente."
-        );
-
-        cambiarEstadoBoton(false);
-
-    }
-
-});
-
-
-googleLogin.addEventListener("click", function() {
-
-    mostrarMensaje(
-        "El inicio de sesión con Google estará disponible próximamente."
     );
+}
 
-});
 
+if (appleLogin) {
 
-appleLogin.addEventListener("click", function() {
+    appleLogin.addEventListener(
+        "click",
+        function() {
 
-    mostrarMensaje(
-        "El inicio de sesión con Apple estará disponible próximamente."
+            mostrarMensaje(
+                "El inicio de sesión con Apple estará disponible próximamente."
+            );
+        }
     );
+}
 
-});
+
+if (correoInput) {
+
+    correoInput.addEventListener(
+        "input",
+        limpiarMensaje
+    );
+}
 
 
-correoInput.addEventListener("input", limpiarMensaje);
+if (passwordInput) {
 
-passwordInput.addEventListener("input", limpiarMensaje);
+    passwordInput.addEventListener(
+        "input",
+        limpiarMensaje
+    );
+}
