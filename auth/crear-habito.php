@@ -6,7 +6,6 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require_once "../config/conexion.php";
 
-
 if (!isset($_SESSION["usuario_id"])) {
 
     http_response_code(401);
@@ -19,12 +18,10 @@ if (!isset($_SESSION["usuario_id"])) {
     exit;
 }
 
-
 $datos = json_decode(
     file_get_contents("php://input"),
     true
 );
-
 
 if (!is_array($datos)) {
 
@@ -38,7 +35,6 @@ if (!is_array($datos)) {
     exit;
 }
 
-
 $nombre = trim($datos["nombre"] ?? "");
 
 $descripcion = trim($datos["descripcion"] ?? "");
@@ -48,7 +44,6 @@ $frecuencia = trim($datos["frecuencia"] ?? "");
 $fechaInicio = trim($datos["fechaInicio"] ?? "");
 
 $fechaFin = trim($datos["fechaFin"] ?? "");
-
 
 if (
     $nombre === "" ||
@@ -67,39 +62,35 @@ if (
     exit;
 }
 
-
-if (strlen($nombre) > 150) {
-
-    http_response_code(400);
-
-    echo json_encode([
-        "exito" => false,
-        "mensaje" => "El nombre del hábito es demasiado largo."
-    ]);
-
-    exit;
-}
-
-
-if (strlen($descripcion) > 500) {
+if (strlen($nombre) < 2 || strlen($nombre) > 150) {
 
     http_response_code(400);
 
     echo json_encode([
         "exito" => false,
-        "mensaje" => "La descripción del hábito es demasiado larga."
+        "mensaje" => "El nombre del hábito debe tener entre 2 y 150 caracteres."
     ]);
 
     exit;
 }
 
+if (strlen($descripcion) < 3 || strlen($descripcion) > 500) {
+
+    http_response_code(400);
+
+    echo json_encode([
+        "exito" => false,
+        "mensaje" => "La descripción del hábito debe tener entre 3 y 500 caracteres."
+    ]);
+
+    exit;
+}
 
 $frecuenciasPermitidas = [
     "diaria",
     "semanal",
     "mensual"
 ];
-
 
 if (!in_array($frecuencia, $frecuenciasPermitidas, true)) {
 
@@ -113,12 +104,10 @@ if (!in_array($frecuencia, $frecuenciasPermitidas, true)) {
     exit;
 }
 
-
 $inicio = DateTime::createFromFormat(
     "Y-m-d",
     $fechaInicio
 );
-
 
 if (
     !$inicio ||
@@ -135,14 +124,12 @@ if (
     exit;
 }
 
-
 if ($fechaFin !== "") {
 
     $fin = DateTime::createFromFormat(
         "Y-m-d",
         $fechaFin
     );
-
 
     if (
         !$fin ||
@@ -159,15 +146,13 @@ if ($fechaFin !== "") {
         exit;
     }
 
-
     if ($fin < $inicio) {
 
         http_response_code(400);
 
         echo json_encode([
             "exito" => false,
-            "mensaje" =>
-                "La fecha de finalización no puede ser anterior a la fecha de inicio."
+            "mensaje" => "La fecha de finalización no puede ser anterior a la fecha de inicio."
         ]);
 
         exit;
@@ -178,16 +163,13 @@ if ($fechaFin !== "") {
     $fechaFin = null;
 }
 
-
 $usuarioId = (int) $_SESSION["usuario_id"];
-
 
 try {
 
     $database = new Database();
 
     $db = $database->getConnection();
-
 
     if (!$db) {
 
@@ -196,36 +178,6 @@ try {
         );
     }
 
-
-    $consultaUsuario = $db->prepare(
-        "SELECT id_usuario
-         FROM usuario
-         WHERE id_usuario = :id_usuario
-         LIMIT 1"
-    );
-
-
-    $consultaUsuario->execute([
-        ":id_usuario" => $usuarioId
-    ]);
-
-
-    $usuario = $consultaUsuario->fetch(PDO::FETCH_ASSOC);
-
-
-    if (!$usuario) {
-
-        http_response_code(401);
-
-        echo json_encode([
-            "exito" => false,
-            "mensaje" => "El usuario no existe."
-        ]);
-
-        exit;
-    }
-
-
     $consultaCategoria = $db->prepare(
         "SELECT id_categoria
          FROM categorias
@@ -233,22 +185,22 @@ try {
          LIMIT 1"
     );
 
-
     $consultaCategoria->execute([
         ":nombre" => "Hábito Personalizado"
     ]);
 
-
     $categoria = $consultaCategoria->fetch(PDO::FETCH_ASSOC);
 
+    if (!$categoria) {
 
-    $idCategoria = $categoria
-        ? (int) $categoria["id_categoria"]
-        : null;
+        throw new Exception(
+            "La categoría 'Hábito Personalizado' no existe en la tabla categorias."
+        );
+    }
 
+    $idCategoria = (int) $categoria["id_categoria"];
 
     $db->beginTransaction();
-
 
     $consulta = $db->prepare(
         "INSERT INTO habitos
@@ -283,7 +235,6 @@ try {
         )"
     );
 
-
     $consulta->execute([
         ":id_usuario" => $usuarioId,
         ":id_categoria" => $idCategoria,
@@ -294,9 +245,7 @@ try {
         ":fecha_fin" => $fechaFin
     ]);
 
-
     $idHabito = $db->lastInsertId();
-
 
     $consultaRacha = $db->prepare(
         "INSERT INTO rachas
@@ -317,14 +266,11 @@ try {
         )"
     );
 
-
     $consultaRacha->execute([
         ":id_habito" => $idHabito
     ]);
 
-
     $db->commit();
-
 
     echo json_encode([
         "exito" => true,
@@ -332,6 +278,7 @@ try {
         "habito" => [
             "id" => $idHabito,
             "nombre" => $nombre,
+            "descripcion" => $descripcion,
             "frecuencia" => $frecuencia,
             "fechaInicio" => $fechaInicio,
             "fechaFin" => $fechaFin
@@ -339,7 +286,6 @@ try {
     ]);
 
     exit;
-
 
 } catch (Throwable $error) {
 
@@ -352,12 +298,12 @@ try {
         $db->rollBack();
     }
 
-
     http_response_code(500);
 
     echo json_encode([
         "exito" => false,
-        "mensaje" => "Ocurrió un error al crear el hábito."
+        "mensaje" => "Ocurrió un error al crear el hábito.",
+        "detalle" => $error->getMessage()
     ]);
 
     exit;

@@ -8,17 +8,20 @@
 
 }
 
+
 .contenedor-estadisticas .encabezado {
 
     margin-bottom: 32px;
 
 }
 
+
 .contenedor-estadisticas .encabezado h1 {
 
     margin-top: 18px;
 
 }
+
 
 .resumen-general {
 
@@ -48,12 +51,10 @@
     text-align: center;
 
     transition:
-
         background-color var(--transicion),
-
         border-color var(--transicion),
-
-        transform var(--transicion);
+        transform var(--transicion),
+        box-shadow var(--transicion);
 
 }
 
@@ -61,6 +62,10 @@
 .tarjeta-resumen:hover {
 
     transform: translateY(-3px);
+
+    border-color: var(--color-morado);
+
+    box-shadow: var(--sombra-morada);
 
 }
 
@@ -85,6 +90,7 @@
     font-weight: var(--peso-bold);
 
 }
+
 
 .filtro {
 
@@ -114,10 +120,9 @@
 
 }
 
+
 .grafica-general,
-
 .estadisticas-categorias,
-
 .estadisticas-habitos {
 
     padding: 28px;
@@ -132,13 +137,30 @@
 
     box-shadow: var(--sombra-suave);
 
+    transition:
+        background-color var(--transicion),
+        border-color var(--transicion),
+        transform var(--transicion),
+        box-shadow var(--transicion);
+
+}
+
+
+.grafica-general:hover,
+.estadisticas-categorias:hover,
+.estadisticas-habitos:hover {
+
+    transform: translateY(-3px);
+
+    border-color: var(--color-morado);
+
+    box-shadow: var(--sombra-morada);
+
 }
 
 
 .grafica-general h2,
-
 .estadisticas-categorias h2,
-
 .estadisticas-habitos h2 {
 
     margin-bottom: 20px;
@@ -147,15 +169,20 @@
 
 }
 
+
 #graficaGeneral {
 
-    min-height: 240px;
+    min-height: 260px;
 
     display: flex;
 
     align-items: center;
 
     justify-content: center;
+
+    padding: 20px;
+
+    overflow-x: auto;
 
     border: 1px dashed var(--color-borde);
 
@@ -165,8 +192,106 @@
 
 }
 
-#listaCategorias,
 
+.grafica-barras {
+
+    width: 100%;
+
+    min-width: 420px;
+
+    height: 220px;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+}
+
+
+.barra-columna {
+
+    height: 100%;
+
+    flex: 1;
+
+    min-width: 28px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 6px;
+
+}
+
+
+.barra-valor {
+
+    font-size: 12px;
+
+    font-weight: var(--peso-medium);
+
+    color: var(--color-texto-secundario);
+
+}
+
+
+.barra {
+
+    width: 100%;
+
+    max-width: 46px;
+
+    height: 150px;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    overflow: hidden;
+
+    background-color: var(--color-superficie-clara);
+
+    border-radius: 8px 8px 4px 4px;
+
+}
+
+
+.barra-relleno {
+
+    width: 100%;
+
+    min-height: 0;
+
+    background-color: var(--color-morado);
+
+    border-radius: 8px 8px 0 0;
+
+    transition: height var(--transicion);
+
+}
+
+
+.barra-etiqueta {
+
+    font-size: 11px;
+
+    color: var(--color-texto-suave);
+
+    white-space: nowrap;
+
+}
+
+
+#listaCategorias,
 #listaHabitos {
 
     display: grid;
@@ -176,9 +301,15 @@
 }
 
 
-#listaCategorias > *,
+.tarjeta-estadistica {
 
-#listaHabitos > * {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 24px;
 
     padding: 16px;
 
@@ -188,7 +319,132 @@
 
     border-radius: var(--radio-medio);
 
+    transition:
+        background-color var(--transicion),
+        border-color var(--transicion),
+        transform var(--transicion),
+        box-shadow var(--transicion);
+
 }
+
+
+.tarjeta-estadistica:hover {
+
+    transform: translateY(-2px);
+
+    border-color: var(--color-morado);
+
+    box-shadow: var(--sombra-morada);
+
+}
+
+
+.estadistica-info {
+
+    min-width: 0;
+
+}
+
+
+.estadistica-info h3 {
+
+    margin-bottom: 6px;
+
+    font-size: 17px;
+
+}
+
+
+.estadistica-info p {
+
+    margin: 0;
+
+    color: var(--color-texto-secundario);
+
+    font-size: 14px;
+
+}
+
+
+.estadistica-progreso {
+
+    width: min(280px, 40%);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+
+.estadistica-progreso > span {
+
+    min-width: 42px;
+
+    color: var(--color-morado);
+
+    font-weight: var(--peso-bold);
+
+    text-align: right;
+
+}
+
+
+.barra-progreso {
+
+    flex: 1;
+
+    height: 9px;
+
+    overflow: hidden;
+
+    background-color: var(--color-borde);
+
+    border-radius: 999px;
+
+}
+
+
+.barra-progreso-relleno {
+
+    height: 100%;
+
+    background-color: var(--color-morado);
+
+    border-radius: inherit;
+
+    transition: width var(--transicion);
+
+}
+
+
+.sin-datos {
+
+    margin: 0;
+
+    padding: 20px;
+
+    color: var(--color-texto-suave);
+
+    text-align: center;
+
+}
+
+
+.mensaje {
+
+    margin-top: 20px;
+
+    color: var(--color-error);
+
+    text-align: center;
+
+    font-weight: var(--peso-medium);
+
+}
+
 
 @media (max-width: 768px) {
 
@@ -223,6 +479,22 @@
 
     }
 
+
+    .tarjeta-estadistica {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .estadistica-progreso {
+
+        width: 100%;
+
+    }
+
 }
 
 
@@ -238,9 +510,7 @@
 
 
     .grafica-general,
-
     .estadisticas-categorias,
-
     .estadisticas-habitos {
 
         padding: 20px;
@@ -261,99 +531,11 @@
 
     }
 
-}
-.tarjeta-resumen {
 
-    padding: 24px;
+    #graficaGeneral {
 
-    background-color: var(--color-superficie);
+        padding: 12px;
 
-    border: 1px solid var(--color-borde);
-
-    border-radius: var(--radio-grande);
-
-    box-shadow: var(--sombra-suave);
-
-    text-align: center;
-
-    transition:
-        background-color var(--transicion),
-        border-color var(--transicion),
-        transform var(--transicion),
-        box-shadow var(--transicion);
-
-}
-
-.tarjeta-resumen:hover {
-
-    transform: translateY(-3px);
-
-    border-color: var(--color-morado);
-
-    box-shadow: var(--sombra-morada);
-
-}
-.grafica-general,
-.estadisticas-categorias,
-.estadisticas-habitos {
-
-    padding: 28px;
-
-    margin-bottom: 24px;
-
-    background-color: var(--color-superficie);
-
-    border: 1px solid var(--color-borde);
-
-    border-radius: var(--radio-grande);
-
-    box-shadow: var(--sombra-suave);
-
-    transition:
-        background-color var(--transicion),
-        border-color var(--transicion),
-        transform var(--transicion),
-        box-shadow var(--transicion);
-
-}
-
-.grafica-general:hover,
-.estadisticas-categorias:hover,
-.estadisticas-habitos:hover {
-
-    transform: translateY(-3px);
-
-    border-color: var(--color-morado);
-
-    box-shadow: var(--sombra-morada);
-
-}
-#listaCategorias > *,
-#listaHabitos > * {
-
-    padding: 16px;
-
-    background-color: var(--color-superficie-clara);
-
-    border: 1px solid var(--color-borde);
-
-    border-radius: var(--radio-medio);
-
-    transition:
-        background-color var(--transicion),
-        border-color var(--transicion),
-        transform var(--transicion),
-        box-shadow var(--transicion);
-
-}
-
-#listaCategorias > *:hover,
-#listaHabitos > *:hover {
-
-    transform: translateY(-2px);
-
-    border-color: var(--color-morado);
-
-    box-shadow: var(--sombra-morada);
+    }
 
 }

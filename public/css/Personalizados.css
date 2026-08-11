@@ -9,6 +9,8 @@
 }
 
 
+/* ENCABEZADO */
+
 .encabezado {
 
     margin-bottom: 36px;
@@ -34,6 +36,8 @@
 }
 
 
+/* BOTÓN NUEVO HÁBITO */
+
 .btn-nuevo {
 
     margin-bottom: 35px;
@@ -42,6 +46,8 @@
 
 }
 
+
+/* LISTA DE HÁBITOS */
 
 .lista-habitos {
 
@@ -53,6 +59,8 @@
 
 }
 
+
+/* TARJETA DEL HÁBITO */
 
 .tarjeta-habito {
 
@@ -152,6 +160,7 @@
 }
 
 
+/* PROGRESO */
 
 .circulo-progreso {
 
@@ -199,6 +208,8 @@
 }
 
 
+/* HÁBITO DE EJEMPLO */
+
 .habito-ejemplo {
 
     border-style: dashed;
@@ -218,6 +229,7 @@
 }
 
 
+/* BOTÓN ELIMINAR */
 
 .btn-eliminar {
 
@@ -268,6 +280,8 @@
 
 }
 
+
+/* MODALES */
 
 .modal {
 
@@ -350,6 +364,7 @@
 }
 
 
+/* BOTÓN CERRAR MODAL */
 
 .btn-cerrar {
 
@@ -383,7 +398,7 @@
 }
 
 
-
+/* FORMULARIO DEL MODAL */
 
 .habit-form {
 
@@ -428,7 +443,7 @@ input[type="date"] {
 }
 
 
-
+/* BOTONES DEL MODAL */
 
 .acciones-modal {
 
@@ -490,7 +505,7 @@ input[type="date"] {
 }
 
 
-
+/* SCROLL DEL MODAL */
 
 .modal-contenido::-webkit-scrollbar {
 
@@ -513,7 +528,7 @@ input[type="date"] {
 }
 
 
-
+/* MODAL DE ELIMINACIÓN */
 
 .modal-pequeno {
 
@@ -581,7 +596,7 @@ input[type="date"] {
 }
 
 
-
+/* ANIMACIONES */
 
 @keyframes aparecerModal {
 
@@ -624,7 +639,7 @@ input[type="date"] {
 }
 
 
-
+/* TABLET */
 
 @media (max-width: 900px) {
 
@@ -663,7 +678,7 @@ input[type="date"] {
 }
 
 
-
+/* MÓVIL */
 
 @media (max-width: 600px) {
 
@@ -760,6 +775,7 @@ input[type="date"] {
 }
 
 
+/* MODO CLARO */
 
 [data-theme="light"] .circulo-progreso {
 

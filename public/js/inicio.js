@@ -98,11 +98,12 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             () => {
 
-                if (
+                const estaOculto =
                     panelNotificaciones.classList.contains(
                         "oculto"
-                    )
-                ) {
+                    );
+
+                if (estaOculto) {
 
                     abrirNotificaciones();
 
@@ -158,643 +159,40 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    function mostrarFechaActual() {
-
-        if (!fechaActual) {
-            return;
-        }
-
-        const ahora = new Date();
-
-        fechaActual.textContent =
-            ahora.toLocaleDateString(
-                "es-ES",
-                {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
-                }
-            );
-
-    }
-
-
-    async function obtenerRespuestaJSON(
-        url
-    ) {
-
-        const respuesta =
-            await fetch(
-                url,
-                {
-                    method: "GET",
-                    cache: "no-store",
-                    credentials: "same-origin"
-                }
-            );
-
-
-        const texto =
-            await respuesta.text();
-
-
-        let resultado = null;
-
-
-        try {
-
-            resultado =
-                JSON.parse(texto);
-
-        } catch (error) {
-
-            console.error(
-                "Respuesta no válida del servidor:",
-                texto
-            );
-
-            throw new Error(
-                "El servidor no devolvió una respuesta válida."
-            );
-
-        }
-
-
-        if (!respuesta.ok) {
-
-            throw new Error(
-                resultado.mensaje ||
-                "El servidor devolvió un error."
-            );
-
-        }
-
-
-        return resultado;
-
-    }
-
-
-    async function cargarDatosUsuario() {
-
-        if (!nombreUsuario) {
-            return;
-        }
-
-
-        try {
-
-            const resultado =
-                await obtenerRespuestaJSON(
-                    "auth/usuario.php"
-                );
-
-
-            if (
-                resultado.exito &&
-                resultado.usuario
-            ) {
-
-                nombreUsuario.textContent =
-                    resultado.usuario.nombre ||
-                    resultado.usuario.nombre_usuario ||
-                    "Usuario";
-
-
-                if (
-                    fotoPerfil &&
-                    resultado.usuario.foto
-                ) {
-
-                    fotoPerfil.src =
-                        resultado.usuario.foto;
-
-                }
-
-            }
-
-        } catch (error) {
-
-            console.error(
-                "No se pudo cargar el usuario:",
-                error
-            );
-
-        }
-
-    }
-
-
-    async function cargarResumenInicio() {
-
-        mostrarCargandoHabitos();
-
-
-        try {
-
-            const resultado =
-                await obtenerRespuestaJSON(
-                    "auth/inicio.php"
-                );
-
-
-            if (!resultado.exito) {
-
-                throw new Error(
-                    resultado.mensaje ||
-                    "No se pudo cargar LifeSync."
-                );
-
-            }
-
-
-            actualizarRacha(
-                resultado.racha
-            );
-
-
-            actualizarProgreso(
-                resultado.progreso
-            );
-
-
-            actualizarCategorias(
-                resultado.habitos_pendientes
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Error al cargar el resumen de Inicio:",
-                error
-            );
-
-            mostrarErrorInicio(
-                error.message
-            );
-
-        }
-
-    }
-
-
-    function mostrarCargandoHabitos() {
-
-        const contenedor =
-            document.getElementById(
-                "contenedorCategorias"
-            );
-
-
-        if (!contenedor) {
-            return;
-        }
-
-
-        contenedor.innerHTML = "";
-
-
-        const mensaje =
-            document.createElement("p");
-
-        mensaje.className =
-            "categoria-cargando";
-
-        mensaje.textContent =
-            "Cargando tus hábitos...";
-
-
-        contenedor.appendChild(
-            mensaje
-        );
-
-    }
-
-
-    function actualizarRacha(racha) {
-
-        const diasRacha =
-            document.getElementById(
-                "diasRacha"
-            );
-
-
-        if (!diasRacha) {
-            return;
-        }
-
-
-        const valor =
-            Number(racha) || 0;
-
-
-        diasRacha.textContent =
-            valor;
-
-    }
-
-
-    function actualizarProgreso(
-        progreso
-    ) {
-
-        const porcentajeGeneral =
-            document.getElementById(
-                "porcentajeGeneral"
-            );
-
-        const barraProgreso =
-            document.getElementById(
-                "barraProgreso"
-            );
-
-
-        let valor = 0;
-
-
-        if (
-            progreso &&
-            typeof progreso === "object"
-        ) {
-
-            valor =
-                Number(
-                    progreso.porcentaje
-                ) || 0;
-
-        } else {
-
-            valor =
-                Number(progreso) || 0;
-
-        }
-
-
-        valor =
-            Math.max(
-                0,
-                Math.min(
-                    100,
-                    valor
-                )
-            );
-
-
-        valor =
-            Math.round(valor);
-
-
-        if (porcentajeGeneral) {
-
-            porcentajeGeneral.textContent =
-                `${valor}%`;
-
-        }
-
-
-        if (barraProgreso) {
-
-            barraProgreso.style.width =
-                `${valor}%`;
-
-        }
-
-    }
-
-
-    function actualizarCategorias(
-        habitos
-    ) {
-
-        const contenedor =
-            document.getElementById(
-                "contenedorCategorias"
-            );
-
-
-        if (!contenedor) {
-            return;
-        }
-
-
-        contenedor.innerHTML = "";
-
-
-        if (
-            !Array.isArray(habitos) ||
-            habitos.length === 0
-        ) {
-
-            const mensaje =
-                document.createElement("p");
-
-            mensaje.className =
-                "categoria-vacia";
-
-            mensaje.textContent =
-                "No tienes hábitos para hoy.";
-
-
-            contenedor.appendChild(
-                mensaje
-            );
-
-            return;
-
-        }
-
-
-        const grupos =
-            agruparHabitosPorCategoria(
-                habitos
-            );
-
-
-        Object.values(grupos).forEach(
-            (grupo) => {
-
-                const articulo =
-                    document.createElement(
-                        "article"
-                    );
-
-                articulo.className =
-                    "categoria";
-
-
-                const info =
-                    document.createElement(
-                        "div"
-                    );
-
-                info.className =
-                    "categoria-info";
-
-
-                const imagen =
-                    document.createElement(
-                        "img"
-                    );
-
-                imagen.src =
-                    obtenerIconoCategoria(
-                        grupo.nombre
-                    );
-
-                imagen.alt =
-                    grupo.nombre;
-
-
-                const texto =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                const titulo =
-                    document.createElement(
-                        "h3"
-                    );
-
-                titulo.className =
-                    "nombre-categoria";
-
-                titulo.textContent =
-                    grupo.nombre;
-
-
-                const detalle =
-                    document.createElement(
-                        "p"
-                    );
-
-                detalle.className =
-                    "detalle-categoria";
-
-
-                detalle.textContent =
-                    `${grupo.completados} de ${grupo.total} hábitos completados`;
-
-
-                texto.appendChild(
-                    titulo
-                );
-
-                texto.appendChild(
-                    detalle
-                );
-
-
-                info.appendChild(
-                    imagen
-                );
-
-                info.appendChild(
-                    texto
-                );
-
-
-                const circulo =
-                    document.createElement(
-                        "div"
-                    );
-
-                circulo.className =
-                    "circulo";
-
-
-                const porcentaje =
-                    grupo.total > 0
-                        ? Math.round(
-                            (
-                                grupo.completados /
-                                grupo.total
-                            ) * 100
-                        )
-                        : 0;
-
-
-                circulo.textContent =
-                    `${porcentaje}%`;
-
-
-                articulo.appendChild(
-                    info
-                );
-
-                articulo.appendChild(
-                    circulo
-                );
-
-
-                contenedor.appendChild(
-                    articulo
-                );
-
-            }
-        );
-
-    }
-
-
-    function mostrarErrorInicio(
-        mensaje
-    ) {
-
-        const contenedor =
-            document.getElementById(
-                "contenedorCategorias"
-            );
-
-
-        if (!contenedor) {
-            return;
-        }
-
-
-        contenedor.innerHTML = "";
-
-
-        const mensajeElemento =
-            document.createElement("p");
-
-        mensajeElemento.className =
-            "categoria-vacia";
-
-
-        mensajeElemento.textContent =
-            mensaje ||
-            "No se pudieron cargar tus hábitos.";
-
-
-        contenedor.appendChild(
-            mensajeElemento
-        );
-
-    }
-
-
-    function agruparHabitosPorCategoria(
-        habitos
-    ) {
-
-        const grupos = {};
-
-
-        habitos.forEach(
-            (habito) => {
-
-                const nombre =
-                    habito.categoria ||
-                    "Hábito Personalizado";
-
-
-                if (!grupos[nombre]) {
-
-                    grupos[nombre] = {
-
-                        nombre: nombre,
-
-                        total: 0,
-
-                        completados: 0
-
-                    };
-
-                }
-
-
-                grupos[nombre].total++;
-
-
-                const progreso =
-                    Number(
-                        habito.progreso
-                    ) || 0;
-
-
-                const objetivo =
-                    Number(
-                        habito.objetivo
-                    ) || 0;
-
-
-                if (
-                    objetivo > 0 &&
-                    progreso >= objetivo
-                ) {
-
-                    grupos[nombre].completados++;
-
-                }
-
-            }
-        );
-
-
-        return grupos;
-
-    }
-
-
-    function obtenerIconoCategoria(
-        nombre
-    ) {
-
-        const iconos = {
-
-            "Hidratación":
-                "img/Hidrat.png",
-
-            "Alimentación":
-                "img/Alimentacion.png",
-
-            "Salud Mental":
-                "img/SaludMental.png",
-
-            "Actividad Física":
-                "img/ActividadFisica.png",
-
-            "Registro Académico":
-                "img/Academico.png",
-
-            "Hábito Personalizado":
-                "img/H-Perzona.png"
-
-        };
-
-
-        return (
-            iconos[nombre] ||
-            "img/H-Perzona.png"
-        );
-
-    }
-
-
     async function cargarNotificaciones() {
 
-        if (!listaNotificaciones) {
-            return;
-        }
-
-
         try {
 
-            const resultado =
-                await obtenerRespuestaJSON(
-                    "auth/inicio.php"
+            const respuesta =
+                await fetch(
+                    "auth/inicio.php",
+                    {
+                        method: "GET",
+                        cache: "no-cache"
+                    }
                 );
+
+
+            if (!respuesta.ok) {
+
+                throw new Error(
+                    "No se pudieron cargar las notificaciones."
+                );
+
+            }
+
+
+            const resultado =
+                await respuesta.json();
 
 
             if (!resultado.exito) {
 
-                throw new Error(
-                    resultado.mensaje ||
-                    "No se pudieron cargar las notificaciones."
+                mostrarErrorNotificaciones(
+                    resultado.mensaje
                 );
+
+                return;
 
             }
 
@@ -821,9 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function actualizarContador(
-        cantidad
-    ) {
+    function actualizarContador(cantidad) {
 
         const numero =
             Number(cantidad) || 0;
@@ -846,7 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 "activo"
             );
 
-
             if (btnNotificaciones) {
 
                 btnNotificaciones.classList.add(
@@ -860,7 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
             contadorNotificaciones.classList.remove(
                 "activo"
             );
-
 
             if (btnNotificaciones) {
 
@@ -902,10 +296,13 @@ document.addEventListener("DOMContentLoaded", () => {
         notificaciones.forEach(
             (notificacion) => {
 
-                listaNotificaciones.appendChild(
+                const tarjeta =
                     crearNotificacion(
                         notificacion
-                    )
+                    );
+
+                listaNotificaciones.appendChild(
+                    tarjeta
                 );
 
             }
@@ -990,14 +387,16 @@ document.addEventListener("DOMContentLoaded", () => {
             document.createElement("p");
 
         mensaje.textContent =
-            notificacion.mensaje || "";
+            notificacion.mensaje ||
+            "";
 
 
         const fecha =
             document.createElement("time");
 
         fecha.textContent =
-            notificacion.fecha_formateada || "";
+            notificacion.fecha_formateada ||
+            "";
 
 
         contenido.appendChild(
@@ -1081,6 +480,56 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    function mostrarErrorNotificaciones(
+        mensaje
+    ) {
+
+        if (!listaNotificaciones) {
+            return;
+        }
+
+
+        listaNotificaciones.innerHTML = "";
+
+
+        const contenedor =
+            document.createElement("div");
+
+        contenedor.className =
+            "sin-notificaciones";
+
+
+        const titulo =
+            document.createElement("h3");
+
+        titulo.textContent =
+            "No se pudieron cargar las notificaciones";
+
+
+        const texto =
+            document.createElement("p");
+
+        texto.textContent =
+            mensaje ||
+            "Intenta nuevamente más tarde.";
+
+
+        contenedor.appendChild(
+            titulo
+        );
+
+        contenedor.appendChild(
+            texto
+        );
+
+
+        listaNotificaciones.appendChild(
+            contenedor
+        );
+
+    }
+
+
     async function marcarNotificacionesLeidas() {
 
         try {
@@ -1093,8 +542,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         headers: {
                             "Content-Type":
                                 "application/json"
-                        },
-                        credentials: "same-origin"
+                        }
                     }
                 );
 
@@ -1104,32 +552,18 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            const texto =
-                await respuesta.text();
+            const resultado =
+                await respuesta.json();
 
 
-            let resultado;
-
-
-            try {
-
-                resultado =
-                    JSON.parse(texto);
-
-            } catch (error) {
+            if (!resultado.exito) {
 
                 console.error(
-                    "Respuesta inválida al marcar notificaciones:",
-                    texto
+                    resultado.mensaje
                 );
 
                 return;
 
-            }
-
-
-            if (!resultado.exito) {
-                return;
             }
 
 
@@ -1154,13 +588,551 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    function mostrarFechaActual() {
+
+        if (!fechaActual) {
+            return;
+        }
+
+
+        const ahora =
+            new Date();
+
+
+        fechaActual.textContent =
+            ahora.toLocaleDateString(
+                "es-ES",
+                {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                }
+            );
+
+    }
+
+
+    async function cargarDatosUsuario() {
+
+        if (!nombreUsuario) {
+            return;
+        }
+
+
+        try {
+
+            const respuesta =
+                await fetch(
+                    "auth/usuario.php",
+                    {
+                        method: "GET",
+                        cache: "no-cache"
+                    }
+                );
+
+
+            if (!respuesta.ok) {
+                return;
+            }
+
+
+            const resultado =
+                await respuesta.json();
+
+
+            if (
+                resultado.exito &&
+                resultado.usuario
+            ) {
+
+                nombreUsuario.textContent =
+                    resultado.usuario.nombre ||
+                    resultado.usuario.nombre_usuario ||
+                    "Usuario";
+
+
+                if (
+                    fotoPerfil &&
+                    resultado.usuario.foto
+                ) {
+
+                    fotoPerfil.src =
+                        resultado.usuario.foto;
+
+                }
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "No se pudo cargar el usuario:",
+                error
+            );
+
+        }
+
+    }
+
+
+    async function cargarResumenInicio() {
+
+        try {
+
+            const respuesta =
+                await fetch(
+                    "auth/inicio.php",
+                    {
+                        method: "GET",
+                        cache: "no-cache"
+                    }
+                );
+
+
+            if (!respuesta.ok) {
+                mostrarErrorInicio();
+                return;
+            }
+
+
+            const resultado =
+                await respuesta.json();
+
+
+            if (!resultado.exito) {
+                mostrarErrorInicio();
+                return;
+            }
+
+
+            actualizarRacha(
+                resultado.racha
+            );
+
+
+            actualizarProgreso(
+                resultado.progreso
+            );
+
+
+            actualizarCategorias(
+                resultado.habitos_pendientes
+            );
+
+        } catch (error) {
+
+            console.error(
+                "No se pudo cargar el resumen de Inicio:",
+                error
+            );
+
+            mostrarErrorInicio();
+
+        }
+
+    }
+
+
+    function actualizarRacha(racha) {
+
+        const diasRacha =
+            document.getElementById(
+                "diasRacha"
+            );
+
+
+        if (!diasRacha) {
+            return;
+        }
+
+
+        const valor =
+            Number(racha) || 0;
+
+
+        diasRacha.textContent =
+            valor;
+
+    }
+
+
+    function actualizarProgreso(
+        progreso
+    ) {
+
+        const porcentajeGeneral =
+            document.getElementById(
+                "porcentajeGeneral"
+            );
+
+        const barraProgreso =
+            document.getElementById(
+                "barraProgreso"
+            );
+
+
+        let valor = 0;
+
+
+        if (
+            progreso &&
+            typeof progreso === "object"
+        ) {
+
+            valor =
+                Number(
+                    progreso.porcentaje
+                ) || 0;
+
+        } else {
+
+            valor =
+                Number(progreso) || 0;
+
+        }
+
+
+        valor =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    valor
+                )
+            );
+
+
+        if (porcentajeGeneral) {
+
+            porcentajeGeneral.textContent =
+                `${valor}%`;
+
+        }
+
+
+        if (barraProgreso) {
+
+            barraProgreso.style.width =
+                `${valor}%`;
+
+        }
+
+    }
+
+
+    function actualizarCategorias(
+        habitos
+    ) {
+
+        const contenedor =
+            document.getElementById(
+                "contenedorCategorias"
+            );
+
+
+        if (!contenedor) {
+            return;
+        }
+
+
+        contenedor.innerHTML = "";
+
+
+        if (
+            !Array.isArray(habitos) ||
+            habitos.length === 0
+        ) {
+
+            const mensaje =
+                document.createElement("p");
+
+            mensaje.className =
+                "categoria-vacia";
+
+            mensaje.textContent =
+                "No tienes hábitos pendientes para hoy.";
+
+            contenedor.appendChild(
+                mensaje
+            );
+
+            return;
+
+        }
+
+
+        const grupos =
+            agruparHabitosPorCategoria(
+                habitos
+            );
+
+
+        Object.values(grupos).forEach(
+            (grupo) => {
+
+                const articulo =
+                    document.createElement(
+                        "article"
+                    );
+
+                articulo.className =
+                    "categoria";
+
+
+                const info =
+                    document.createElement(
+                        "div"
+                    );
+
+                info.className =
+                    "categoria-info";
+
+
+                const imagen =
+                    document.createElement(
+                        "img"
+                    );
+
+                imagen.src =
+                    obtenerIconoCategoria(
+                        grupo.nombre
+                    );
+
+                imagen.alt =
+                    grupo.nombre;
+
+
+                const texto =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                const titulo =
+                    document.createElement(
+                        "h3"
+                    );
+
+                titulo.className =
+                    "nombre-categoria";
+
+                titulo.textContent =
+                    grupo.nombre;
+
+
+                const detalle =
+                    document.createElement(
+                        "p"
+                    );
+
+                detalle.className =
+                    "detalle-categoria";
+
+                detalle.textContent =
+                    `${grupo.completados} de ${grupo.total} hábitos pendientes`;
+
+
+                texto.appendChild(
+                    titulo
+                );
+
+                texto.appendChild(
+                    detalle
+                );
+
+
+                info.appendChild(
+                    imagen
+                );
+
+                info.appendChild(
+                    texto
+                );
+
+
+                const circulo =
+                    document.createElement(
+                        "div"
+                    );
+
+                circulo.className =
+                    "circulo";
+
+
+                const porcentaje =
+                    grupo.total > 0
+                        ? Math.round(
+                            (
+                                grupo.completados /
+                                grupo.total
+                            ) * 100
+                        )
+                        : 0;
+
+
+                circulo.textContent =
+                    `${porcentaje}%`;
+
+
+                articulo.appendChild(
+                    info
+                );
+
+                articulo.appendChild(
+                    circulo
+                );
+
+
+                contenedor.appendChild(
+                    articulo
+                );
+
+            }
+        );
+
+    }
+
+
+    function mostrarErrorInicio() {
+
+        const contenedor =
+            document.getElementById(
+                "contenedorCategorias"
+            );
+
+
+        if (!contenedor) {
+            return;
+        }
+
+
+        contenedor.innerHTML = "";
+
+
+        const mensaje =
+            document.createElement("p");
+
+        mensaje.className =
+            "categoria-vacia";
+
+        mensaje.textContent =
+            "No se pudieron cargar tus hábitos.";
+
+        contenedor.appendChild(
+            mensaje
+        );
+
+    }
+
+
+    function agruparHabitosPorCategoria(
+        habitos
+    ) {
+
+        const grupos = {};
+
+
+        habitos.forEach(
+            (habito) => {
+
+                const nombre =
+                    habito.categoria ||
+                    "Hábito Personalizado";
+
+
+                if (!grupos[nombre]) {
+
+                    grupos[nombre] = {
+                        nombre: nombre,
+                        total: 0,
+                        completados: 0
+                    };
+
+                }
+
+
+                grupos[nombre].total++;
+
+
+                const progreso =
+                    Number(
+                        habito.progreso
+                    ) || 0;
+
+                const objetivo =
+                    Number(
+                        habito.objetivo
+                    ) || 0;
+
+
+                if (
+                    objetivo > 0 &&
+                    progreso >= objetivo
+                ) {
+
+                    grupos[nombre].completados++;
+
+                }
+
+            }
+        );
+
+
+        return grupos;
+
+    }
+
+
+    function obtenerIconoCategoria(
+        nombre
+    ) {
+
+        const iconos = {
+
+            "Hidratación":
+                "img/Hidrat.png",
+
+            "Alimentación":
+                "img/Alimentacion.png",
+
+            "Salud Mental":
+                "img/SaludMental.png",
+
+            "Actividad Física":
+                "img/ActividadFisica.png",
+
+            "Registro Académico":
+                "img/Academico.png",
+
+            "Hábito Personalizado":
+                "img/H-Perzona.png"
+
+        };
+
+
+        return (
+            iconos[nombre] ||
+            "img/H-Perzona.png"
+        );
+
+    }
+
+
+    async function actualizarNotificacionesIniciales() {
+
+        await cargarNotificaciones();
+
+    }
+
+
     mostrarFechaActual();
 
     cargarDatosUsuario();
 
     cargarResumenInicio();
 
-    cargarNotificaciones();
+    actualizarNotificacionesIniciales();
 
 
     setInterval(
@@ -1179,7 +1151,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     !panelNotificaciones.classList.contains(
                         "oculto"
                     );
-
 
                 if (estaAbierto) {
 

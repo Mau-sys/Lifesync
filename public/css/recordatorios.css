@@ -410,6 +410,8 @@
     color: var(--color-morado);
     transform: rotate(90deg);
 }
+
+
 /* Formulario dentro del modal */
 
 #recordatorioForm {

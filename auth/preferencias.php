@@ -15,20 +15,17 @@ try {
         echo json_encode([
             "exito" => false,
             "paso" => "SESION",
-            "mensaje" => "La sesión ha expirado. Inicia sesión nuevamente."
+            "mensaje" => "No existe usuario_id en la sesión."
         ]);
 
         exit;
     }
 
-
     $usuarioId = (int) $_SESSION["usuario_id"];
-
 
     $contenido = file_get_contents("php://input");
 
     $datos = json_decode($contenido, true);
-
 
     if (!is_array($datos)) {
 
@@ -43,9 +40,7 @@ try {
         exit;
     }
 
-
     $categorias = $datos["categorias"] ?? [];
-
 
     if (!is_array($categorias) || count($categorias) === 0) {
 
@@ -60,7 +55,6 @@ try {
         exit;
     }
 
-
     $permitidas = [
         "Hidratación",
         "Alimentación",
@@ -70,28 +64,25 @@ try {
         "Hábito Personalizado"
     ];
 
-
     foreach ($categorias as $categoria) {
 
-        if (!is_string($categoria) || !in_array($categoria, $permitidas, true)) {
+        if (!in_array($categoria, $permitidas, true)) {
 
             http_response_code(400);
 
             echo json_encode([
                 "exito" => false,
-                "paso" => "CATEGORIA_INVALIDA",
-                "mensaje" => "Se recibió una categoría no válida."
+                "paso" => "CATEGORIA",
+                "mensaje" => "Categoría no permitida: " . $categoria
             ]);
 
             exit;
         }
     }
 
-
     $database = new Database();
 
     $db = $database->getConnection();
-
 
     if (!$db) {
 
@@ -100,7 +91,6 @@ try {
         );
     }
 
-
     $consultaUsuario = $db->prepare(
         "SELECT id_usuario
          FROM usuario
@@ -108,36 +98,29 @@ try {
          LIMIT 1"
     );
 
-
     $consultaUsuario->execute([
         ":id_usuario" => $usuarioId
     ]);
 
-
     $usuario = $consultaUsuario->fetch(PDO::FETCH_ASSOC);
-
 
     if (!$usuario) {
 
         throw new Exception(
-            "El usuario no existe."
+            "El usuario con ID " . $usuarioId . " no existe en la tabla usuario."
         );
     }
 
-
     $db->beginTransaction();
-
 
     $consultaEliminar = $db->prepare(
         "DELETE FROM usuario_categorias
          WHERE id_usuario = :id_usuario"
     );
 
-
     $consultaEliminar->execute([
         ":id_usuario" => $usuarioId
     ]);
-
 
     $consultaCategoria = $db->prepare(
         "SELECT id_categoria
@@ -145,7 +128,6 @@ try {
          WHERE nombre_categoria = :nombre
          LIMIT 1"
     );
-
 
     $consultaInsertar = $db->prepare(
         "INSERT INTO usuario_categorias
@@ -160,31 +142,28 @@ try {
         )"
     );
 
-
     foreach ($categorias as $nombreCategoria) {
 
         $consultaCategoria->execute([
             ":nombre" => $nombreCategoria
         ]);
 
-
         $categoria = $consultaCategoria->fetch(PDO::FETCH_ASSOC);
-
 
         if (!$categoria) {
 
             throw new Exception(
-                "La categoría seleccionada no existe."
+                "La categoría '" .
+                $nombreCategoria .
+                "' no existe en la tabla categorias."
             );
         }
-
 
         $consultaInsertar->execute([
             ":id_usuario" => $usuarioId,
             ":id_categoria" => (int) $categoria["id_categoria"]
         ]);
     }
-
 
     $consultaPreferencia = $db->prepare(
         "SELECT id_preferencia
@@ -193,14 +172,11 @@ try {
          LIMIT 1"
     );
 
-
     $consultaPreferencia->execute([
         ":id_usuario" => $usuarioId
     ]);
 
-
     $preferencia = $consultaPreferencia->fetch(PDO::FETCH_ASSOC);
-
 
     if (!$preferencia) {
 
@@ -215,15 +191,12 @@ try {
             )"
         );
 
-
         $insertarPreferencia->execute([
             ":id_usuario" => $usuarioId
         ]);
     }
 
-
     $db->commit();
-
 
     echo json_encode([
         "exito" => true,
@@ -234,7 +207,6 @@ try {
     ]);
 
     exit;
-
 
 } catch (Throwable $error) {
 
@@ -247,14 +219,13 @@ try {
         $db->rollBack();
     }
 
-
     http_response_code(500);
-
 
     echo json_encode([
         "exito" => false,
         "paso" => "ERROR",
-        "mensaje" => "Ocurrió un error al guardar las preferencias."
+        "mensaje" => "Ocurrió un error al guardar las preferencias.",
+        "detalle" => $error->getMessage()
     ]);
 
     exit;

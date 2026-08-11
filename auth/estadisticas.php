@@ -6,204 +6,483 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require_once "../config/conexion.php";
 
+
+function responderJSON(array $datos, int $codigo = 200): void
+{
+    http_response_code($codigo);
+
+    echo json_encode(
+        $datos,
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    );
+
+    exit;
+}
+
+
+function limitarPorcentaje(float $valor): float
+{
+    return round(
+        max(0, min(100, $valor)),
+        2
+    );
+}
+
+
+function fechaActiva(array $habito, DateTime $fecha): bool
+{
+    $fechaInicio = new DateTime(
+        $habito["fecha_inicio"]
+    );
+
+    if ($fecha < $fechaInicio) {
+        return false;
+    }
+
+    if (
+        $habito["fecha_fin"] !== null &&
+        $habito["fecha_fin"] !== "" &&
+        $fecha->format("Y-m-d") > $habito["fecha_fin"]
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
+
+function diaProgramado(array $habito, DateTime $fecha): bool
+{
+    $frecuencia =
+        strtolower(
+            trim(
+                (string)$habito["frecuencia"]
+            )
+        );
+
+
+    if ($frecuencia === "diaria") {
+        return true;
+    }
+
+
+    if ($frecuencia === "semanal") {
+
+        $diasSemana =
+            trim(
+                (string)(
+                    $habito["dias_semana"] ?? ""
+                )
+            );
+
+
+        if ($diasSemana === "") {
+
+            $fechaInicio =
+                new DateTime(
+                    $habito["fecha_inicio"]
+                );
+
+            return
+                $fecha->format("N") ===
+                $fechaInicio->format("N");
+        }
+
+
+        $dias =
+            preg_split(
+                "/[\s,;|]+/",
+                $diasSemana,
+                -1,
+                PREG_SPLIT_NO_EMPTY
+            );
+
+
+        $numeroDia =
+            $fecha->format("N");
+
+
+        $equivalencias = [
+            "lunes" => "1",
+            "martes" => "2",
+            "miercoles" => "3",
+            "miércoles" => "3",
+            "jueves" => "4",
+            "viernes" => "5",
+            "sabado" => "6",
+            "sábado" => "6",
+            "domingo" => "7"
+        ];
+
+
+        foreach ($dias as $dia) {
+
+            $dia =
+                strtolower(
+                    trim($dia)
+                );
+
+
+            if (
+                (string)$dia ===
+                (string)$numeroDia
+            ) {
+                return true;
+            }
+
+
+            if (
+                isset($equivalencias[$dia]) &&
+                $equivalencias[$dia] ===
+                (string)$numeroDia
+            ) {
+                return true;
+            }
+        }
+
+
+        return false;
+    }
+
+
+    if ($frecuencia === "mensual") {
+
+        $fechaInicio =
+            new DateTime(
+                $habito["fecha_inicio"]
+            );
+
+        return
+            $fecha->format("d") ===
+            $fechaInicio->format("d");
+    }
+
+
+    return false;
+}
+
+
+function porcentajeDelDia(
+    array $habito,
+    float $valor
+): float {
+
+    $tipo =
+        strtolower(
+            trim(
+                (string)$habito["tipo_medicion"]
+            )
+        );
+
+
+    if ($tipo === "completar") {
+        return $valor > 0 ? 100 : 0;
+    }
+
+
+    $objetivo =
+        (float)$habito["objetivo"];
+
+
+    if ($objetivo <= 0) {
+        return $valor > 0 ? 100 : 0;
+    }
+
+
+    return limitarPorcentaje(
+        ($valor / $objetivo) * 100
+    );
+}
+
+
+function fechaCompletada(
+    array $habito,
+    float $valor
+): bool {
+
+    return
+        porcentajeDelDia(
+            $habito,
+            $valor
+        ) >= 100;
+}
+
+
 try {
 
     if (!isset($_SESSION["usuario_id"])) {
 
-        http_response_code(401);
-
-        echo json_encode([
-            "exito" => false,
-            "mensaje" => "La sesión ha expirado. Inicia sesión nuevamente."
-        ]);
-
-        exit;
+        responderJSON(
+            [
+                "exito" => false,
+                "mensaje" =>
+                    "La sesión ha expirado. Inicia sesión nuevamente."
+            ],
+            401
+        );
     }
 
 
-    $usuarioId = (int) $_SESSION["usuario_id"];
+    $usuarioId =
+        (int)$_SESSION["usuario_id"];
 
 
-    $periodo = $_GET["periodo"] ?? "semana";
+    $periodo =
+        $_GET["periodo"] ?? "semana";
 
 
-    $periodosPermitidos = [
-        "semana",
-        "mes",
-        "anio"
-    ];
-
-
-    if (!in_array($periodo, $periodosPermitidos, true)) {
-
+    if (
+        !in_array(
+            $periodo,
+            [
+                "semana",
+                "mes",
+                "anio"
+            ],
+            true
+        )
+    ) {
         $periodo = "semana";
-
     }
 
 
-    $hoy = new DateTime();
-
-    $fechaFin = $hoy->format("Y-m-d");
+    $hoy =
+        new DateTime(
+            "today"
+        );
 
 
     if ($periodo === "semana") {
 
-        $fechaInicio = (clone $hoy)
-            ->modify("-6 days")
-            ->format("Y-m-d");
+        $fechaInicioObjeto =
+            (clone $hoy)->modify("-6 days");
 
     } elseif ($periodo === "mes") {
 
-        $fechaInicio = (clone $hoy)
-            ->modify("first day of this month")
-            ->format("Y-m-d");
+        $fechaInicioObjeto =
+            (clone $hoy)->modify(
+                "first day of this month"
+            );
 
     } else {
 
-        $fechaInicio = (clone $hoy)
-            ->modify("first day of January")
-            ->format("Y-m-d");
-
+        $fechaInicioObjeto =
+            (clone $hoy)->modify(
+                "first day of January"
+            );
     }
 
 
-    $database = new Database();
+    $fechaFinObjeto =
+        clone $hoy;
 
-    $db = $database->getConnection();
+
+    $fechaInicio =
+        $fechaInicioObjeto->format("Y-m-d");
 
 
-    if (!$db) {
+    $fechaFin =
+        $fechaFinObjeto->format("Y-m-d");
+
+
+    $database =
+        new Database();
+
+
+    $db =
+        $database->getConnection();
+
+
+    if (!$db instanceof PDO) {
 
         throw new Exception(
-            "No se pudo conectar con la base de datos."
+            "No se pudo establecer la conexión con la base de datos."
         );
-
     }
 
 
-    $consultaHabitos = $db->prepare(
-        "SELECT
-            h.id_habito,
-            h.id_categoria,
-            h.nombre_habito,
-            h.tipo_medicion,
-            h.objetivo,
-            h.frecuencia,
-            h.dias_semana,
-            h.fecha_inicio,
-            h.fecha_fin,
-            c.nombre_categoria
-
-        FROM habitos h
-
-        LEFT JOIN categorias c
-            ON c.id_categoria = h.id_categoria
-
-        WHERE h.id_usuario = :id_usuario
-
-        AND h.activo = 1
-
-        AND h.fecha_inicio <= :fecha_fin
-
-        AND (
-            h.fecha_fin IS NULL
-            OR h.fecha_fin >= :fecha_inicio
-        )
-
-        ORDER BY h.nombre_habito ASC"
+    $db->setAttribute(
+        PDO::ATTR_ERRMODE,
+        PDO::ERRMODE_EXCEPTION
     );
 
 
-    $consultaHabitos->execute([
-        ":id_usuario" => $usuarioId,
-        ":fecha_inicio" => $fechaInicio,
-        ":fecha_fin" => $fechaFin
-    ]);
+    /*
+     * HÁBITOS ACTIVOS DEL USUARIO
+     */
+
+    $consultaHabitos =
+        $db->prepare(
+            "SELECT
+                h.id_habito,
+                h.id_categoria,
+                h.nombre_habito,
+                h.descripcion,
+                h.tipo_medicion,
+                h.objetivo,
+                h.unidad_medida,
+                h.frecuencia,
+                h.dias_semana,
+                h.fecha_inicio,
+                h.fecha_fin,
+                h.activo,
+                c.nombre_categoria
+
+            FROM habitos h
+
+            LEFT JOIN categorias c
+                ON c.id_categoria = h.id_categoria
+
+            WHERE h.id_usuario = :id_usuario
+
+            AND h.activo = 1
+
+            AND h.fecha_inicio <= :fecha_fin
+
+            AND (
+                h.fecha_fin IS NULL
+                OR h.fecha_fin >= :fecha_inicio
+            )
+
+            ORDER BY h.nombre_habito ASC"
+        );
 
 
-    $habitos = $consultaHabitos->fetchAll(PDO::FETCH_ASSOC);
+    $consultaHabitos->execute(
+        [
+            ":id_usuario" =>
+                $usuarioId,
 
+            ":fecha_inicio" =>
+                $fechaInicio,
+
+            ":fecha_fin" =>
+                $fechaFin
+        ]
+    );
+
+
+    $habitos =
+        $consultaHabitos->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+
+
+    /*
+     * SI EL USUARIO TODAVÍA NO TIENE HÁBITOS
+     */
 
     if (!$habitos) {
 
-        echo json_encode([
-            "exito" => true,
-            "periodo" => $periodo,
-            "fecha_inicio" => $fechaInicio,
-            "fecha_fin" => $fechaFin,
-            "progreso_general" => 0,
-            "dias_racha" => 0,
-            "habitos_completados" => 0,
-            "grafica" => [],
-            "categorias" => [],
-            "habitos_personalizados" => []
-        ]);
-
-        exit;
+        responderJSON(
+            [
+                "exito" => true,
+                "periodo" => $periodo,
+                "fecha_inicio" => $fechaInicio,
+                "fecha_fin" => $fechaFin,
+                "progreso_general" => 0,
+                "dias_racha" => 0,
+                "habitos_completados" => 0,
+                "grafica" => [],
+                "categorias" => [],
+                "habitos_personalizados" => []
+            ]
+        );
     }
 
 
-    $consultaRegistros = $db->prepare(
-        "SELECT
-            rh.id_registro,
-            rh.id_habito,
-            rh.valor_registrado,
-            DATE(rh.fecha_registro) AS fecha
+    /*
+     * REGISTROS DEL PERÍODO
+     */
 
-        FROM registros_habitos rh
+    $consultaRegistros =
+        $db->prepare(
+            "SELECT
+                rh.id_habito,
+                rh.valor_registrado,
+                DATE(rh.fecha_registro) AS fecha
 
-        INNER JOIN habitos h
-            ON h.id_habito = rh.id_habito
+            FROM registros_habitos rh
 
-        WHERE h.id_usuario = :id_usuario
+            INNER JOIN habitos h
+                ON h.id_habito = rh.id_habito
 
-        AND DATE(rh.fecha_registro)
-            BETWEEN :fecha_inicio AND :fecha_fin
+            WHERE h.id_usuario = :id_usuario
 
-        ORDER BY rh.fecha_registro ASC"
+            AND DATE(rh.fecha_registro)
+                BETWEEN :fecha_inicio AND :fecha_fin
+
+            ORDER BY rh.fecha_registro ASC"
+        );
+
+
+    $consultaRegistros->execute(
+        [
+            ":id_usuario" =>
+                $usuarioId,
+
+            ":fecha_inicio" =>
+                $fechaInicio,
+
+            ":fecha_fin" =>
+                $fechaFin
+        ]
     );
 
 
-    $consultaRegistros->execute([
-        ":id_usuario" => $usuarioId,
-        ":fecha_inicio" => $fechaInicio,
-        ":fecha_fin" => $fechaFin
-    ]);
+    $registros =
+        $consultaRegistros->fetchAll(
+            PDO::FETCH_ASSOC
+        );
 
 
-    $registros = $consultaRegistros->fetchAll(PDO::FETCH_ASSOC);
-
+    /*
+     * AGRUPAR REGISTROS
+     */
 
     $registrosPorHabito = [];
 
 
     foreach ($registros as $registro) {
 
-        $idHabito = (int) $registro["id_habito"];
-
-        $fecha = $registro["fecha"];
-
-        $valor = (float) $registro["valor_registrado"];
+        $idHabito =
+            (int)$registro["id_habito"];
 
 
-        if (!isset($registrosPorHabito[$idHabito])) {
+        $fecha =
+            $registro["fecha"];
 
+
+        $valor =
+            (float)$registro["valor_registrado"];
+
+
+        if (
+            !isset(
+                $registrosPorHabito[$idHabito]
+            )
+        ) {
             $registrosPorHabito[$idHabito] = [];
-
         }
 
 
-        if (!isset($registrosPorHabito[$idHabito][$fecha])) {
-
+        if (
+            !isset(
+                $registrosPorHabito[$idHabito][$fecha]
+            )
+        ) {
             $registrosPorHabito[$idHabito][$fecha] = 0;
-
         }
 
 
-        $registrosPorHabito[$idHabito][$fecha] += $valor;
-
+        $registrosPorHabito[$idHabito][$fecha]
+            += $valor;
     }
 
+
+    /*
+     * DATOS GENERALES POR HÁBITO
+     */
 
     $datosHabitos = [];
 
@@ -216,216 +495,94 @@ try {
 
     foreach ($habitos as $habito) {
 
-        $idHabito = (int) $habito["id_habito"];
+        $idHabito =
+            (int)$habito["id_habito"];
 
-
-        $objetivo = (float) $habito["objetivo"];
-
-
-        if ($objetivo <= 0) {
-
-            $objetivo = 1;
-
-        }
-
-
-        $tipoMedicion = $habito["tipo_medicion"];
-
-        $frecuencia = $habito["frecuencia"];
-
-
-        $diasConProgreso = 0;
-
-        $diasCompletados = 0;
 
         $porcentajeAcumulado = 0;
 
-        $diasEvaluados = 0;
+        $ocurrenciasEvaluadas = 0;
+
+        $diasCompletados = 0;
 
 
-        $fechaActual = new DateTime($fechaInicio);
-
-        $fechaLimite = new DateTime($fechaFin);
-
-
-        while ($fechaActual <= $fechaLimite) {
-
-            $fecha = $fechaActual->format("Y-m-d");
+        $fechaActual =
+            clone $fechaInicioObjeto;
 
 
-            $fechaHabitoInicio =
-                new DateTime($habito["fecha_inicio"]);
-
-
-            if ($fechaActual < $fechaHabitoInicio) {
-
-                $fechaActual->modify("+1 day");
-
-                continue;
-
-            }
-
+        while ($fechaActual <= $fechaFinObjeto) {
 
             if (
-                $habito["fecha_fin"] !== null
+                fechaActiva(
+                    $habito,
+                    $fechaActual
+                )
                 &&
-                $fecha > $habito["fecha_fin"]
+                diaProgramado(
+                    $habito,
+                    $fechaActual
+                )
             ) {
 
-                $fechaActual->modify("+1 day");
-
-                continue;
-
-            }
+                $fecha =
+                    $fechaActual->format("Y-m-d");
 
 
-            $valor =
-                $registrosPorHabito[$idHabito][$fecha]
-                ?? 0;
+                $valor =
+                    $registrosPorHabito[
+                        $idHabito
+                    ][$fecha] ?? 0;
 
-
-            $porcentajeDia = 0;
-
-
-            if ($tipoMedicion === "completar") {
 
                 $porcentajeDia =
-                    $valor > 0
-                        ? 100
-                        : 0;
-
-            } else {
-
-                $porcentajeDia =
-                    ($valor / $objetivo) * 100;
-
-            }
+                    porcentajeDelDia(
+                        $habito,
+                        (float)$valor
+                    );
 
 
-            $porcentajeDia =
-                max(
-                    0,
-                    min(
-                        100,
-                        $porcentajeDia
+                $porcentajeAcumulado
+                    += $porcentajeDia;
+
+
+                $ocurrenciasEvaluadas++;
+
+
+                if (
+                    fechaCompletada(
+                        $habito,
+                        (float)$valor
                     )
-                );
-
-
-            if ($frecuencia === "diaria") {
-
-                $diasEvaluados++;
-
-                if ($porcentajeDia > 0) {
-
-                    $diasConProgreso++;
-
-                }
-
-                if ($porcentajeDia >= 100) {
-
+                ) {
                     $diasCompletados++;
-
                 }
-
-                $porcentajeAcumulado +=
-                    $porcentajeDia;
-
-            }
-
-
-            elseif ($frecuencia === "semanal") {
-
-                if (
-                    $fechaActual->format("N")
-                    ===
-                    $fechaHabitoInicio->format("N")
-                ) {
-
-                    $diasEvaluados++;
-
-                    if ($porcentajeDia > 0) {
-
-                        $diasConProgreso++;
-
-                    }
-
-                    if ($porcentajeDia >= 100) {
-
-                        $diasCompletados++;
-
-                    }
-
-                    $porcentajeAcumulado +=
-                        $porcentajeDia;
-
-                }
-
-            }
-
-
-            elseif ($frecuencia === "mensual") {
-
-                if (
-                    $fechaActual->format("d")
-                    ===
-                    $fechaHabitoInicio->format("d")
-                ) {
-
-                    $diasEvaluados++;
-
-                    if ($porcentajeDia > 0) {
-
-                        $diasConProgreso++;
-
-                    }
-
-                    if ($porcentajeDia >= 100) {
-
-                        $diasCompletados++;
-
-                    }
-
-                    $porcentajeAcumulado +=
-                        $porcentajeDia;
-
-                }
-
             }
 
 
             $fechaActual->modify("+1 day");
-
         }
 
 
-        if ($diasEvaluados > 0) {
+        $porcentaje = 0;
+
+
+        if ($ocurrenciasEvaluadas > 0) {
 
             $porcentaje =
                 $porcentajeAcumulado /
-                $diasEvaluados;
-
-        } else {
-
-            $porcentaje = 0;
-
+                $ocurrenciasEvaluadas;
         }
 
 
         $porcentaje =
-            round(
-                max(
-                    0,
-                    min(
-                        100,
-                        $porcentaje
-                    )
-                ),
-                2
+            limitarPorcentaje(
+                $porcentaje
             );
 
 
-        $sumaPorcentajes += $porcentaje;
+        $sumaPorcentajes +=
+            $porcentaje;
+
 
         $cantidadHabitos++;
 
@@ -446,83 +603,48 @@ try {
                 $habito["nombre_categoria"]
                 ?? "Sin categoría",
 
-            "frecuencia" =>
-                $frecuencia,
-
             "porcentaje" =>
                 $porcentaje,
 
             "completados" =>
-                $diasCompletados,
-
-            "dias_con_progreso" =>
-                $diasConProgreso
-
+                $diasCompletados
         ];
+    }
 
+
+    /*
+     * PROGRESO GENERAL
+     */
+
+    $progresoGeneral = 0;
+
+
+    if ($cantidadHabitos > 0) {
+
+        $progresoGeneral =
+            $sumaPorcentajes /
+            $cantidadHabitos;
     }
 
 
     $progresoGeneral =
-        $cantidadHabitos > 0
-            ? $sumaPorcentajes /
-              $cantidadHabitos
-            : 0;
-
-
-    $progresoGeneral =
-        round(
-            max(
-                0,
-                min(
-                    100,
-                    $progresoGeneral
-                )
-            ),
-            2
+        limitarPorcentaje(
+            $progresoGeneral
         );
 
 
-    $consultaRachas = $db->prepare(
-        "SELECT
-            MAX(r.racha_actual) AS racha_actual
-
-        FROM rachas r
-
-        INNER JOIN habitos h
-            ON h.id_habito = r.id_habito
-
-        WHERE h.id_usuario = :id_usuario
-
-        AND h.activo = 1"
-    );
-
-
-    $consultaRachas->execute([
-        ":id_usuario" => $usuarioId
-    ]);
-
-
-    $racha = $consultaRachas->fetch(PDO::FETCH_ASSOC);
-
-
-    $diasRacha =
-        (int) (
-            $racha["racha_actual"] ?? 0
-        );
-
+    /*
+     * GRÁFICA DIARIA
+     */
 
     $grafica = [];
 
 
     $fechaActual =
-        new DateTime($fechaInicio);
-
-    $fechaLimite =
-        new DateTime($fechaFin);
+        clone $fechaInicioObjeto;
 
 
-    while ($fechaActual <= $fechaLimite) {
+    while ($fechaActual <= $fechaFinObjeto) {
 
         $fecha =
             $fechaActual->format("Y-m-d");
@@ -535,90 +657,52 @@ try {
 
         foreach ($habitos as $habito) {
 
-            $idHabito =
-                (int) $habito["id_habito"];
-
-
-            $fechaHabitoInicio =
-                new DateTime(
-                    $habito["fecha_inicio"]
-                );
-
-
-            if ($fechaActual < $fechaHabitoInicio) {
-
-                continue;
-
-            }
-
-
             if (
-                $habito["fecha_fin"] !== null
-                &&
-                $fecha > $habito["fecha_fin"]
+                !fechaActiva(
+                    $habito,
+                    $fechaActual
+                )
+                ||
+                !diaProgramado(
+                    $habito,
+                    $fechaActual
+                )
             ) {
-
                 continue;
-
             }
 
 
-            $objetivo =
-                (float) $habito["objetivo"];
-
-
-            if ($objetivo <= 0) {
-
-                $objetivo = 1;
-
-            }
+            $idHabito =
+                (int)$habito["id_habito"];
 
 
             $valor =
-                $registrosPorHabito[$idHabito][$fecha]
-                ?? 0;
-
-
-            if (
-                $habito["tipo_medicion"]
-                === "completar"
-            ) {
-
-                $porcentajeDia =
-                    $valor > 0
-                        ? 100
-                        : 0;
-
-            } else {
-
-                $porcentajeDia =
-                    ($valor / $objetivo) * 100;
-
-            }
-
-
-            $porcentajeDia =
-                max(
-                    0,
-                    min(
-                        100,
-                        $porcentajeDia
-                    )
-                );
+                $registrosPorHabito[
+                    $idHabito
+                ][$fecha] ?? 0;
 
 
             $sumaDia +=
-                $porcentajeDia;
+                porcentajeDelDia(
+                    $habito,
+                    (float)$valor
+                );
+
 
             $cantidadDia++;
-
         }
 
 
-        $porcentajeDiaGeneral =
-            $cantidadDia > 0
-                ? $sumaDia / $cantidadDia
-                : 0;
+        $porcentajeDia =
+            0;
+
+
+        if ($cantidadDia > 0) {
+
+            $porcentajeDia =
+                $sumaDia /
+                $cantidadDia;
+        }
 
 
         $grafica[] = [
@@ -630,18 +714,19 @@ try {
                 $fechaActual->format("d/m"),
 
             "porcentaje" =>
-                round(
-                    $porcentajeDiaGeneral,
-                    2
+                limitarPorcentaje(
+                    $porcentajeDia
                 )
-
         ];
 
 
         $fechaActual->modify("+1 day");
-
     }
 
+
+    /*
+     * CATEGORÍAS
+     */
 
     $categorias = [];
 
@@ -650,7 +735,7 @@ try {
 
         $nombreCategoria =
             $habito["categoria"]
-            ?? "Sin categoría";
+            ?: "Sin categoría";
 
 
         if (
@@ -672,22 +757,25 @@ try {
 
                 "completados" =>
                     0
-
             ];
-
         }
 
 
-        $categorias[$nombreCategoria]["suma"] +=
-            $habito["porcentaje"];
+        $categorias[
+            $nombreCategoria
+        ]["suma"]
+            += $habito["porcentaje"];
 
 
-        $categorias[$nombreCategoria]["cantidad"]++;
+        $categorias[
+            $nombreCategoria
+        ]["cantidad"]++;
 
 
-        $categorias[$nombreCategoria]["completados"] +=
-            $habito["completados"];
-
+        $categorias[
+            $nombreCategoria
+        ]["completados"]
+            += $habito["completados"];
     }
 
 
@@ -696,11 +784,15 @@ try {
 
     foreach ($categorias as $categoria) {
 
-        $porcentaje =
-            $categoria["cantidad"] > 0
-                ? $categoria["suma"] /
-                  $categoria["cantidad"]
-                : 0;
+        $porcentaje = 0;
+
+
+        if ($categoria["cantidad"] > 0) {
+
+            $porcentaje =
+                $categoria["suma"] /
+                $categoria["cantidad"];
+        }
 
 
         $listaCategorias[] = [
@@ -709,114 +801,232 @@ try {
                 $categoria["nombre"],
 
             "porcentaje" =>
-                round(
-                    $porcentaje,
-                    2
+                limitarPorcentaje(
+                    $porcentaje
                 ),
 
             "completados" =>
-                $categoria["completados"]
-
+                (int)$categoria["completados"]
         ];
-
     }
 
+
+    /*
+     * HÁBITOS PERSONALIZADOS
+     */
 
     $habitosPersonalizados = [];
 
 
-    foreach ($datosHabitos as $habito) {
+    foreach ($habitos as $habito) {
+
+        $nombreCategoria =
+            trim(
+                (string)(
+                    $habito["nombre_categoria"]
+                    ?? ""
+                )
+            );
+
 
         if (
-            $habito["categoria"]
-            ===
+            $nombreCategoria !==
             "Hábito Personalizado"
         ) {
-
-            $habitosPersonalizados[] = [
-
-                "id_habito" =>
-                    $habito["id_habito"],
-
-                "nombre" =>
-                    $habito["nombre"],
-
-                "porcentaje" =>
-                    $habito["porcentaje"],
-
-                "completados" =>
-                    $habito["completados"]
-
-            ];
-
+            continue;
         }
 
+
+        $idHabito =
+            (int)$habito["id_habito"];
+
+
+        if (
+            !isset(
+                $datosHabitos[$idHabito]
+            )
+        ) {
+            continue;
+        }
+
+
+        $datos =
+            $datosHabitos[$idHabito];
+
+
+        $habitosPersonalizados[] = [
+
+            "id_habito" =>
+                $idHabito,
+
+            "nombre" =>
+                $datos["nombre"],
+
+            "porcentaje" =>
+                $datos["porcentaje"],
+
+            "completados" =>
+                $datos["completados"]
+        ];
     }
 
 
-    echo json_encode([
+    /*
+     * RACHA ACTUAL
+     *
+     * Se obtiene el máximo de días consecutivos
+     * completados entre los hábitos del usuario.
+     */
 
-        "exito" =>
-            true,
+    $mejorRachaActual = 0;
 
-        "periodo" =>
-            $periodo,
 
-        "fecha_inicio" =>
-            $fechaInicio,
+    foreach ($habitos as $habito) {
 
-        "fecha_fin" =>
-            $fechaFin,
+        $idHabito =
+            (int)$habito["id_habito"];
 
-        "progreso_general" =>
-            round(
+
+        $rachaActual = 0;
+
+
+        $fechaRevision =
+            clone $hoy;
+
+
+        while (true) {
+
+            if (
+                !fechaActiva(
+                    $habito,
+                    $fechaRevision
+                )
+                ||
+                !diaProgramado(
+                    $habito,
+                    $fechaRevision
+                )
+            ) {
+
+                $fechaRevision->modify("-1 day");
+
+                if (
+                    $fechaRevision <
+                    new DateTime(
+                        $habito["fecha_inicio"]
+                    )
+                ) {
+                    break;
+                }
+
+                continue;
+            }
+
+
+            $fecha =
+                $fechaRevision->format("Y-m-d");
+
+
+            $valor =
+                $registrosPorHabito[
+                    $idHabito
+                ][$fecha] ?? 0;
+
+
+            if (
+                fechaCompletada(
+                    $habito,
+                    (float)$valor
+                )
+            ) {
+
+                $rachaActual++;
+
+                $fechaRevision->modify("-1 day");
+
+            } else {
+
+                break;
+            }
+        }
+
+
+        if (
+            $rachaActual >
+            $mejorRachaActual
+        ) {
+            $mejorRachaActual =
+                $rachaActual;
+        }
+    }
+
+
+    /*
+     * RESPUESTA FINAL
+     */
+
+    responderJSON(
+
+        [
+
+            "exito" =>
+                true,
+
+            "periodo" =>
+                $periodo,
+
+            "fecha_inicio" =>
+                $fechaInicio,
+
+            "fecha_fin" =>
+                $fechaFin,
+
+            "progreso_general" =>
                 $progresoGeneral,
-                2
-            ),
 
-        "dias_racha" =>
-            $diasRacha,
+            "dias_racha" =>
+                $mejorRachaActual,
 
-        "habitos_completados" =>
-            $totalCompletados,
+            "habitos_completados" =>
+                $totalCompletados,
 
-        "grafica" =>
-            $grafica,
+            "grafica" =>
+                $grafica,
 
-        "categorias" =>
-            $listaCategorias,
+            "categorias" =>
+                $listaCategorias,
 
-        "habitos_personalizados" =>
-            $habitosPersonalizados
+            "habitos_personalizados" =>
+                $habitosPersonalizados
+        ]
 
-    ]);
-
-    exit;
+    );
 
 
 } catch (Throwable $error) {
 
-    http_response_code(500);
+    error_log(
+        "LifeSync - Error en estadisticas.php: " .
+        $error->getMessage() .
+        " | " .
+        $error->getFile() .
+        ":" .
+        $error->getLine()
+    );
 
-    echo json_encode([
 
-        "exito" =>
-            false,
+    responderJSON(
 
-        "mensaje" =>
-            "No se pudieron cargar las estadísticas.",
+        [
 
-        "detalle" =>
-            $error->getMessage(),
+            "exito" =>
+                false,
 
-        "archivo" =>
-            $error->getFile(),
+            "mensaje" =>
+                "No se pudieron cargar las estadísticas."
+        ],
 
-        "linea" =>
-            $error->getLine()
+        500
 
-    ]);
-
-    exit;
+    );
 }
-?>
