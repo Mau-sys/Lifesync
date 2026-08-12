@@ -1,75 +1,158 @@
 (function () {
 
-    const temaGuardado = localStorage.getItem("lifesync_tema");
+    const CLAVE_TEMA =
+        "lifesync_tema";
 
-    const tema =
-        temaGuardado === "claro"
+
+    function obtenerTemaGuardado() {
+
+        const tema =
+            localStorage.getItem(
+                CLAVE_TEMA
+            );
+
+
+        return tema === "claro"
             ? "claro"
             : "oscuro";
+    }
+
+
+    function actualizarLogos(tema) {
+
+        const logos =
+            document.querySelectorAll(
+                "img[data-logo-lifesync]"
+            );
+
+
+        logos.forEach(
+            function (logo) {
+
+                const logoClaro =
+                    logo.dataset.logoClaro;
+
+
+                const logoOscuro =
+                    logo.dataset.logoOscuro;
+
+
+                if (
+                    tema === "claro" &&
+                    logoClaro
+                ) {
+
+                    logo.src =
+                        logoClaro;
+
+                } else if (
+                    tema === "oscuro" &&
+                    logoOscuro
+                ) {
+
+                    logo.src =
+                        logoOscuro;
+                }
+            }
+        );
+    }
+
+
+    function aplicarTema(tema) {
+
+        const temaValido =
+            tema === "claro"
+                ? "claro"
+                : "oscuro";
+
+
+        document.documentElement.setAttribute(
+            "data-tema",
+            temaValido
+        );
+
+
+        document.documentElement.classList.toggle(
+            "tema-claro",
+            temaValido === "claro"
+        );
+
+
+        document.documentElement.classList.toggle(
+            "tema-oscuro",
+            temaValido === "oscuro"
+        );
+
+
+        if (document.body) {
+
+            document.body.setAttribute(
+                "data-tema",
+                temaValido
+            );
+
+
+            document.body.classList.toggle(
+                "tema-claro",
+                temaValido === "claro"
+            );
+
+
+            document.body.classList.toggle(
+                "tema-oscuro",
+                temaValido === "oscuro"
+            );
+
+
+            actualizarLogos(
+                temaValido
+            );
+        }
+
+
+        localStorage.setItem(
+            CLAVE_TEMA,
+            temaValido
+        );
+    }
+
+
+    window.aplicarTemaGlobal =
+        aplicarTema;
+
+
+    const temaInicial =
+        obtenerTemaGuardado();
+
 
     document.documentElement.setAttribute(
         "data-tema",
-        tema
+        temaInicial
     );
+
 
     document.documentElement.classList.toggle(
         "tema-claro",
-        tema === "claro"
+        temaInicial === "claro"
     );
+
 
     document.documentElement.classList.toggle(
         "tema-oscuro",
-        tema === "oscuro"
+        temaInicial === "oscuro"
     );
 
-    document.addEventListener("DOMContentLoaded", () => {
 
-        document.body.setAttribute(
-            "data-tema",
-            tema
-        );
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
 
-        document.body.classList.toggle(
-            "tema-claro",
-            tema === "claro"
-        );
+            aplicarTema(
+                temaInicial
+            );
 
-        document.body.classList.toggle(
-            "tema-oscuro",
-            tema === "oscuro"
-        );
+        }
+    );
 
-        actualizarLogos(tema);
-
-    });
-
-
-    function actualizarLogos(modo) {
-
-        const logos = document.querySelectorAll(
-            'img[data-logo-lifesync]'
-        );
-
-        logos.forEach((logo) => {
-
-            const logoClaro =
-                logo.dataset.logoClaro;
-
-            const logoOscuro =
-                logo.dataset.logoOscuro;
-
-            if (modo === "claro" && logoClaro) {
-
-                logo.src = logoClaro;
-
-            } else if (modo === "oscuro" && logoOscuro) {
-
-                logo.src = logoOscuro;
-
-            }
-
-        });
-
-    }
 
 })();

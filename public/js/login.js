@@ -7,7 +7,7 @@ const btnLogin = document.getElementById("btnLogin");
 const googleLogin = document.getElementById("googleLogin");
 const appleLogin = document.getElementById("appleLogin");
 
-const ENDPOINT_LOGIN = "../auth/login.php";
+const ENDPOINT_LOGIN = "auth/login.php";
 
 
 function mostrarMensaje(mensaje) {
@@ -48,22 +48,14 @@ if (loginForm) {
 
     loginForm.addEventListener(
         "submit",
-        async function(event) {
+        async function (event) {
 
             event.preventDefault();
 
             limpiarMensaje();
 
-            const correo =
-                correoInput
-                    ? correoInput.value.trim()
-                    : "";
-
-            const password =
-                passwordInput
-                    ? passwordInput.value
-                    : "";
-
+            const correo = correoInput.value.trim();
+            const password = passwordInput.value;
 
             if (!correo || !password) {
 
@@ -74,11 +66,7 @@ if (loginForm) {
                 return;
             }
 
-
-            if (
-                correoInput &&
-                !correoInput.checkValidity()
-            ) {
+            if (!correoInput.checkValidity()) {
 
                 mostrarMensaje(
                     "Ingresa un correo electrónico válido."
@@ -87,41 +75,45 @@ if (loginForm) {
                 return;
             }
 
-
             cambiarEstadoBoton(true);
-
 
             try {
 
-                const respuesta =
-                    await fetch(
-                        ENDPOINT_LOGIN,
-                        {
-                            method: "POST",
+                const respuesta = await fetch(
+                    ENDPOINT_LOGIN,
+                    {
+                        method: "POST",
 
-                            headers: {
-                                "Content-Type":
-                                    "application/json",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json"
+                        },
 
-                                "Accept":
-                                    "application/json"
-                            },
+                        credentials: "same-origin",
 
-                            credentials:
-                                "same-origin",
+                        body: JSON.stringify({
+                            correo: correo,
+                            password: password
+                        })
+                    }
+                );
 
-                            body:
-                                JSON.stringify({
-                                    correo: correo,
-                                    password: password
-                                })
-                        }
+                let datos;
+
+                try {
+
+                    datos = await respuesta.json();
+
+                } catch (error) {
+
+                    mostrarMensaje(
+                        "El servidor devolvió una respuesta no válida."
                     );
 
+                    cambiarEstadoBoton(false);
 
-                const datos =
-                    await respuesta.json();
-
+                    return;
+                }
 
                 if (
                     !respuesta.ok ||
@@ -138,20 +130,15 @@ if (loginForm) {
                     return;
                 }
 
-
                 if (datos.usuario) {
 
                     localStorage.setItem(
                         "lifesync_usuario",
-                        JSON.stringify(
-                            datos.usuario
-                        )
+                        JSON.stringify(datos.usuario)
                     );
                 }
 
-
-                window.location.href =
-                    "inicio.html";
+                window.location.href = "inicio.html";
 
             } catch (error) {
 
@@ -175,11 +162,12 @@ if (googleLogin) {
 
     googleLogin.addEventListener(
         "click",
-        function() {
+        function () {
 
             mostrarMensaje(
                 "El inicio de sesión con Google estará disponible próximamente."
             );
+
         }
     );
 }
@@ -189,11 +177,12 @@ if (appleLogin) {
 
     appleLogin.addEventListener(
         "click",
-        function() {
+        function () {
 
             mostrarMensaje(
                 "El inicio de sesión con Apple estará disponible próximamente."
             );
+
         }
     );
 }

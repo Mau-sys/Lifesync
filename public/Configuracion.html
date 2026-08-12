@@ -59,8 +59,6 @@
             class="configuracion-form">
 
 
-            <!-- APARIENCIA -->
-
             <section class="seccion-configuracion">
 
                 <h2>
@@ -96,8 +94,6 @@
 
             </section>
 
-
-            <!-- NOTIFICACIONES -->
 
             <section class="seccion-configuracion">
 
@@ -192,8 +188,6 @@
             </section>
 
 
-            <!-- IDIOMA -->
-
             <section class="seccion-configuracion">
 
                 <h2>
@@ -225,13 +219,12 @@
             </section>
 
 
-            <!-- SINCRONIZACIÓN -->
-
             <section class="seccion-configuracion">
 
                 <h2>
                     ☁️ Sincronización
                 </h2>
+
 
                 <div class="opcion">
 
@@ -287,8 +280,6 @@
 
             </section>
 
-
-            <!-- SEGURIDAD -->
 
             <section class="seccion-configuracion">
 
@@ -351,8 +342,6 @@
             </section>
 
 
-            <!-- ACCIONES -->
-
             <section class="acciones">
 
                 <button
@@ -378,8 +367,6 @@
 
     </main>
 
-
-    <!-- MODAL CAMBIAR CONTRASEÑA -->
 
     <div
         id="modalContrasena"
@@ -441,7 +428,8 @@
             <p
                 id="mensajeContrasena"
                 class="mensaje"
-                role="alert">
+                role="alert"
+                aria-live="polite">
             </p>
 
 
@@ -473,8 +461,6 @@
     </div>
 
 
-    <!-- MODAL SESIONES ACTIVAS -->
-
     <div
         id="modalSesiones"
         class="modal">
@@ -490,15 +476,14 @@
             </p>
 
 
-            <div id="listaSesiones">
-
-            </div>
+            <div id="listaSesiones"></div>
 
 
             <p
                 id="mensajeSesiones"
                 class="mensaje"
-                role="alert">
+                role="alert"
+                aria-live="polite">
             </p>
 
 
@@ -519,7 +504,9 @@
 
     </div>
 
+
     <script src="js/tema-global.js"></script>
+
     <script src="js/configuracion.js"></script>
 
 </body>

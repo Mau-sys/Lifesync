@@ -28,7 +28,9 @@ CREATE TABLE IF NOT EXISTS usuario (
         'activo',
         'suspendido'
     ) DEFAULT 'activo'
+
 );
+
 
 CREATE TABLE IF NOT EXISTS categorias (
 
@@ -37,7 +39,9 @@ CREATE TABLE IF NOT EXISTS categorias (
     nombre_categoria VARCHAR(100) NOT NULL UNIQUE,
 
     descripcion VARCHAR(255) NULL
+
 );
+
 
 INSERT IGNORE INTO categorias (
     nombre_categoria,
@@ -68,6 +72,7 @@ INSERT IGNORE INTO categorias (
     'Crea un hábito completamente personalizado.'
 );
 
+
 CREATE TABLE IF NOT EXISTS usuario_categorias (
 
     id_usuario INT NOT NULL,
@@ -86,7 +91,9 @@ CREATE TABLE IF NOT EXISTS usuario_categorias (
     FOREIGN KEY (id_categoria)
         REFERENCES categorias(id_categoria)
         ON DELETE CASCADE
+
 );
+
 
 CREATE TABLE IF NOT EXISTS preferencias_usuario (
 
@@ -106,6 +113,8 @@ CREATE TABLE IF NOT EXISTS preferencias_usuario (
 
     sonidos_activados BOOLEAN DEFAULT TRUE,
 
+    sincronizacion_automatica BOOLEAN DEFAULT TRUE,
+
     fecha_actualizacion DATETIME
         DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
@@ -113,7 +122,9 @@ CREATE TABLE IF NOT EXISTS preferencias_usuario (
     FOREIGN KEY (id_usuario)
         REFERENCES usuario(id_usuario)
         ON DELETE CASCADE
+
 );
+
 
 CREATE TABLE IF NOT EXISTS perfil_usuario (
 
@@ -132,7 +143,9 @@ CREATE TABLE IF NOT EXISTS perfil_usuario (
     FOREIGN KEY (id_usuario)
         REFERENCES usuario(id_usuario)
         ON DELETE CASCADE
+
 );
+
 
 CREATE TABLE IF NOT EXISTS habitos (
 
@@ -183,7 +196,9 @@ CREATE TABLE IF NOT EXISTS habitos (
     FOREIGN KEY (id_categoria)
         REFERENCES categorias(id_categoria)
         ON DELETE SET NULL
+
 );
+
 
 CREATE TABLE IF NOT EXISTS recordatorios (
 
@@ -219,7 +234,9 @@ CREATE TABLE IF NOT EXISTS recordatorios (
     FOREIGN KEY (id_categoria)
         REFERENCES categorias(id_categoria)
         ON DELETE SET NULL
+
 );
+
 
 CREATE TABLE IF NOT EXISTS notificaciones (
 
@@ -238,7 +255,9 @@ CREATE TABLE IF NOT EXISTS notificaciones (
     FOREIGN KEY (id_usuario)
         REFERENCES usuario(id_usuario)
         ON DELETE CASCADE
+
 );
+
 
 CREATE TABLE IF NOT EXISTS configuracion_notificaciones (
 
@@ -253,7 +272,9 @@ CREATE TABLE IF NOT EXISTS configuracion_notificaciones (
     FOREIGN KEY (id_usuario)
         REFERENCES usuario(id_usuario)
         ON DELETE CASCADE
+
 );
+
 
 CREATE TABLE IF NOT EXISTS registros_habitos (
 
@@ -270,7 +291,9 @@ CREATE TABLE IF NOT EXISTS registros_habitos (
     FOREIGN KEY (id_habito)
         REFERENCES habitos(id_habito)
         ON DELETE CASCADE
+
 );
+
 
 CREATE TABLE IF NOT EXISTS rachas (
 
@@ -291,7 +314,9 @@ CREATE TABLE IF NOT EXISTS rachas (
     FOREIGN KEY (id_habito)
         REFERENCES habitos(id_habito)
         ON DELETE CASCADE
+
 );
+
 
 CREATE TABLE IF NOT EXISTS estadisticas_habitos (
 
@@ -317,7 +342,9 @@ CREATE TABLE IF NOT EXISTS estadisticas_habitos (
         id_habito,
         fecha
     )
+
 );
+
 
 CREATE TABLE IF NOT EXISTS logros (
 
@@ -330,7 +357,9 @@ CREATE TABLE IF NOT EXISTS logros (
     icono VARCHAR(100) NULL,
 
     requisito INT DEFAULT 0
+
 );
+
 
 CREATE TABLE IF NOT EXISTS usuario_logros (
 
@@ -352,7 +381,9 @@ CREATE TABLE IF NOT EXISTS usuario_logros (
     FOREIGN KEY (id_logro)
         REFERENCES logros(id_logro)
         ON DELETE CASCADE
+
 );
+
 
 CREATE TABLE IF NOT EXISTS configuracion_usuario (
 
@@ -375,10 +406,12 @@ CREATE TABLE IF NOT EXISTS configuracion_usuario (
     FOREIGN KEY (id_usuario)
         REFERENCES usuario(id_usuario)
         ON DELETE CASCADE
+
 );
-ALTER TABLE preferencias_usuario
-ADD COLUMN sincronizacion_automatica BOOLEAN DEFAULT TRUE;
+
+
 CREATE TABLE IF NOT EXISTS sesiones_usuario (
+
     id_sesion INT AUTO_INCREMENT PRIMARY KEY,
 
     id_usuario INT NOT NULL,
@@ -398,4 +431,5 @@ CREATE TABLE IF NOT EXISTS sesiones_usuario (
     FOREIGN KEY (id_usuario)
         REFERENCES usuario(id_usuario)
         ON DELETE CASCADE
+
 );

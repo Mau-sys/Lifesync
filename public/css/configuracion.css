@@ -81,10 +81,6 @@
     white-space: nowrap;
 }
 
-/*==================================*
-*=          SWITCH MODERNO          =*
-*==================================*/
-
 .switch {
     position: relative;
     display: inline-block;
@@ -136,10 +132,6 @@
     transform: translateX(28px);
 }
 
-/*==================================*
-*=            BOTONES               =*
-*==================================*/
-
 .btn-secundario {
     padding: 11px 20px;
 
@@ -181,9 +173,6 @@
     box-shadow: var(--sombra-morada);
 }
 
-/*==================================*
-*=            MODALES               =*
-*==================================*/
 
 .modal {
     position: fixed;
@@ -242,10 +231,6 @@
     margin-top: 24px;
 }
 
-/*==================================*
-*=          EFECTOS                 =*
-*==================================*/
-
 .opcion:hover h3 {
     color: var(--color-morado);
 }
@@ -274,10 +259,6 @@
         box-shadow var(--transicion);
 }
 
-/*==================================*
-*=          ANIMACIONES              =*
-*==================================*/
-
 @keyframes aparecer {
     from {
         opacity: 0;
@@ -299,10 +280,6 @@
         transform: translateY(0);
     }
 }
-
-/*==================================*
-*=           RESPONSIVE              =*
-*==================================*/
 
 @media (max-width: 900px) {
 
@@ -394,9 +371,6 @@
 
 }
 
-/*==================================*
-*=      PEQUEÑOS DETALLES VISUALES  =*
-*==================================*/
 
 .seccion-configuracion:first-child {
     margin-top: 6px;
