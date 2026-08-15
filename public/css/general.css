@@ -127,7 +127,8 @@ textarea {
     transition:
         border-color var(--transicion),
         box-shadow var(--transicion),
-        background-color var(--transicion);
+        background-color var(--transicion),
+        color var(--transicion);
 
 }
 

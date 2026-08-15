@@ -1,9 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* =========================================================
-       ELEMENTOS DEL DOM
-    ========================================================= */
-
     const btnNotificaciones =
         document.getElementById("btnNotificaciones");
 
@@ -30,11 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const fotoPerfil =
         document.getElementById("fotoPerfil");
-
-
-    /* =========================================================
-       NOTIFICACIONES
-    ========================================================= */
 
     function abrirNotificaciones() {
 
@@ -168,10 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    /* =========================================================
-       CARGAR TODOS LOS DATOS DE INICIO
-    ========================================================= */
-
     async function cargarDatosInicio() {
 
         try {
@@ -206,10 +193,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            /* -------------------------
-               NOTIFICACIONES
-            ------------------------- */
-
             actualizarContador(
                 resultado.notificaciones_no_leidas
             );
@@ -219,28 +202,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 resultado.notificaciones
             );
 
-
-            /* -------------------------
-               RACHA
-            ------------------------- */
-
             actualizarRacha(
                 resultado.racha
             );
 
-
-            /* -------------------------
-               PROGRESO
-            ------------------------- */
-
             actualizarProgreso(
                 resultado.progreso
             );
-
-
-            /* -------------------------
-               CATEGORÍAS / HÁBITOS
-            ------------------------- */
 
             actualizarCategorias(
                 resultado.habitos_pendientes
@@ -259,11 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
     }
-
-
-    /* =========================================================
-       CONTADOR DE NOTIFICACIONES
-    ========================================================= */
 
     function actualizarContador(cantidad) {
 
@@ -313,11 +276,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
     }
-
-
-    /* =========================================================
-       MOSTRAR NOTIFICACIONES
-    ========================================================= */
 
     function mostrarNotificaciones(notificaciones) {
 
@@ -573,11 +531,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    /* =========================================================
-       MARCAR NOTIFICACIONES COMO LEÍDAS
-    ========================================================= */
-
     async function marcarNotificacionesLeidas() {
 
         try {
@@ -641,10 +594,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =========================================================
-       FECHA ACTUAL
-    ========================================================= */
-
     function mostrarFechaActual() {
 
         if (!fechaActual) {
@@ -669,10 +618,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    /* =========================================================
-       DATOS DEL USUARIO
-    ========================================================= */
 
     async function cargarDatosUsuario() {
 
@@ -742,10 +687,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =========================================================
-       RACHA
-    ========================================================= */
-
     function actualizarRacha(racha) {
 
         const diasRacha =
@@ -768,10 +709,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    /* =========================================================
-       PROGRESO GENERAL
-    ========================================================= */
 
     function actualizarProgreso(progreso) {
 
@@ -834,10 +771,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    /* =========================================================
-       CATEGORÍAS DINÁMICAS
-    ========================================================= */
 
     function actualizarCategorias(habitos) {
 
@@ -1070,11 +1003,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    /* =========================================================
-       ICONOS DE CATEGORÍAS
-    ========================================================= */
-
     function obtenerIconoCategoria(nombre) {
 
         const iconos = {
@@ -1106,11 +1034,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
     }
-
-
-    /* =========================================================
-       ERROR GENERAL
-    ========================================================= */
 
     function mostrarErrorInicio(mensaje) {
 
@@ -1150,20 +1073,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =========================================================
-       INICIO
-    ========================================================= */
-
     mostrarFechaActual();
 
     cargarDatosUsuario();
 
     cargarDatosInicio();
-
-
-    /* =========================================================
-       ACTUALIZACIÓN AUTOMÁTICA
-    ========================================================= */
 
     setInterval(
         () => {
@@ -1173,11 +1087,6 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         30000
     );
-
-
-    /* =========================================================
-       MARCAR COMO LEÍDAS AL ABRIR
-    ========================================================= */
 
     if (panelNotificaciones) {
 

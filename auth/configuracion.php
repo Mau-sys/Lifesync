@@ -8,11 +8,6 @@ header(
     'Content-Type: application/json; charset=utf-8'
 );
 
-
-/* =====================================================
-   RESPUESTA JSON
-===================================================== */
-
 function responder(
     bool $exito,
     string $mensaje = '',
@@ -36,20 +31,10 @@ function responder(
     exit;
 }
 
-
-/* =====================================================
-   CONEXIÓN
-===================================================== */
-
 try {
 
     require_once __DIR__ . '/../config/conexion.php';
 
-
-    /*
-     * El proyecto puede utilizar $pdo
-     * o la clase Database.
-     */
 
     if (
         isset($pdo) &&
@@ -92,11 +77,6 @@ try {
         );
 
     }
-
-
-    /* =================================================
-       USUARIO DE LA SESIÓN
-    ================================================= */
 
     $idsSesion = [
 
@@ -148,20 +128,10 @@ try {
 
     }
 
-
-    /* =================================================
-       ACCIÓN
-    ================================================= */
-
     $accion =
         $_POST['accion']
         ?? $_GET['accion']
         ?? '';
-
-
-    /* =================================================
-       OBTENER CONFIGURACIÓN
-    ================================================= */
 
     if (
         $accion === 'obtener'
@@ -212,12 +182,6 @@ try {
             $consulta->fetch(
                 PDO::FETCH_ASSOC
             );
-
-
-        /*
-         * Si todavía no existe la configuración,
-         * se crea automáticamente.
-         */
 
         if (
             !$configuracion
@@ -286,12 +250,6 @@ try {
                             $idUsuario
                     ]
                 );
-
-
-                /*
-                 * Solo crear configuración_usuario
-                 * si la tabla existe.
-                 */
 
                 try {
 
@@ -400,11 +358,6 @@ try {
         );
 
     }
-
-
-    /* =================================================
-       GUARDAR CONFIGURACIÓN
-    ================================================= */
 
     if (
         $accion === 'guardar'
@@ -516,10 +469,6 @@ try {
 
         try {
 
-            /*
-             * Preferencias principales
-             */
-
             $consulta =
                 $db->prepare(
                     "
@@ -585,11 +534,6 @@ try {
 
                 ]
             );
-
-
-            /*
-             * Configuración de correos
-             */
 
             $consultaCorreo =
                 $db->prepare(
@@ -763,11 +707,6 @@ try {
 
     }
 
-
-    /* =================================================
-       CAMBIAR CONTRASEÑA
-    ================================================= */
-
     if (
         $accion === 'cambiar_contrasena'
     ) {
@@ -917,11 +856,6 @@ try {
 
     }
 
-
-    /* =================================================
-       SESIONES ACTIVAS
-    ================================================= */
-
     if (
         $accion === 'sesiones'
     ) {
@@ -974,11 +908,6 @@ try {
         );
 
     }
-
-
-    /* =================================================
-       CERRAR SESIÓN
-    ================================================= */
 
     if (
         $accion === 'cerrar_sesion'
@@ -1169,11 +1098,6 @@ try {
         );
 
     }
-
-
-    /* =================================================
-       ACCIÓN DESCONOCIDA
-    ================================================= */
 
     responder(
         false,

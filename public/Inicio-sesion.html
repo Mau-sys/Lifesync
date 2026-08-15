@@ -11,7 +11,8 @@
 
     <meta
         name="description"
-        content="LifeSync - Plataforma para el seguimiento de hábitos saludables">
+        content="LifeSync - Plataforma para el seguimiento de hábitos saludables"
+        data-i18n="login.metaDescripcion">
 
     <title>LifeSync | Iniciar sesión</title>
 
@@ -56,8 +57,12 @@
 
                 <div class="input-group">
 
-                    <label for="correo">
+                    <label
+                        for="correo"
+                        data-i18n="login.correo">
+
                         Correo electrónico
+
                     </label>
 
                     <input
@@ -65,6 +70,7 @@
                         id="correo"
                         name="correo"
                         placeholder="Ingresa tu correo electrónico"
+                        data-i18n-placeholder="login.placeholderCorreo"
                         autocomplete="email"
                         required>
 
@@ -72,8 +78,12 @@
 
                 <div class="input-group">
 
-                    <label for="password">
+                    <label
+                        for="password"
+                        data-i18n="login.contrasena">
+
                         Contraseña
+
                     </label>
 
                     <input
@@ -81,6 +91,7 @@
                         id="password"
                         name="password"
                         placeholder="Ingresa tu contraseña"
+                        data-i18n-placeholder="login.placeholderContrasena"
                         autocomplete="current-password"
                         required>
 
@@ -96,7 +107,8 @@
                 <a
                     href="Recuperar-contraseña.html"
                     id="recuperarPassword"
-                    class="forgot-password">
+                    class="forgot-password"
+                    data-i18n="login.olvidasteContrasena">
 
                     ¿Olvidaste tu contraseña?
 
@@ -105,7 +117,8 @@
                 <button
                     type="submit"
                     id="btnLogin"
-                    class="btn-primary">
+                    class="btn-primary"
+                    data-i18n="login.iniciarSesion">
 
                     Iniciar sesión
 
@@ -115,8 +128,10 @@
 
             <div class="social-login">
 
-                <p>
+                <p data-i18n="login.oContinuaCon">
+
                     O continúa con
+
                 </p>
 
                 <div class="social-buttons">
@@ -125,7 +140,8 @@
                         type="button"
                         id="googleLogin"
                         class="social-button"
-                        aria-label="Continuar con Google">
+                        aria-label="Continuar con Google"
+                        data-i18n-aria-label="login.google">
 
                         <img
                             src="img/Logo-G.png"
@@ -137,7 +153,8 @@
                         type="button"
                         id="appleLogin"
                         class="social-button"
-                        aria-label="Continuar con Apple">
+                        aria-label="Continuar con Apple"
+                        data-i18n-aria-label="login.apple">
 
                         <img
                             src="img/Logo-A.png"
@@ -151,10 +168,18 @@
 
             <p class="register-link">
 
-                ¿No tienes una cuenta?
+                <span data-i18n="login.noTienesCuenta">
 
-                <a href="Registro.html">
+                    ¿No tienes una cuenta?
+
+                </span>
+
+                <a
+                    href="Registro.html"
+                    data-i18n="login.registrate">
+
                     Regístrate
+
                 </a>
 
             </p>
@@ -165,6 +190,7 @@
 
     
     <script src="js/tema-global.js"></script>
+    <script src="js/idioma-global.js"></script>
     <script src="js/login.js"></script>
 
 </body>

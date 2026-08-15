@@ -3,118 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeSync - Hidratación</title>
+
+    <title data-i18n="hidratacion.tituloPagina">
+        LifeSync - Hidratación
+    </title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="stylesheet" href="css/hidratacion.css">
 </head>
+
 <body class="bg-lifesync p-0 m-0">
 
     <div class="card-full-screen d-flex flex-column justify-content-between">
-        
+
         <div>
+
             <div class="d-flex justify-content-end align-items-center mb-3">
+
                 <div class="position-relative">
-                    <button class="btn btn-options p-0" id="btn-options-hidratacion" aria-label="Opciones">
+
+                    <button
+                        class="btn btn-options p-0"
+                        id="btn-options-hidratacion"
+                        aria-label="Opciones"
+                        data-i18n-aria-label="comun.opciones">
+
                         <i class="fa-solid fa-ellipsis-vertical"></i>
+
                     </button>
-                    <div class="kebab-dropdown-menu" id="kebab-menu-hidratacion">
-                        <button class="kebab-item btn-kebab-action" id="btn-regresar">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Regresar
+
+                    <div
+                        class="kebab-dropdown-menu"
+                        id="kebab-menu-hidratacion">
+
+                        <button
+                            class="kebab-item btn-kebab-action"
+                            id="btn-regresar">
+
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+
+                            <span data-i18n="comun.regresar">
+                                Regresar
+                            </span>
+
                         </button>
-                        <a href="#" class="kebab-item" id="btn-editar-meta" data-bs-toggle="modal" data-bs-target="#modalEditarHidratacion">
-                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
+
+                        <a
+                            href="#"
+                            class="kebab-item"
+                            id="btn-editar-meta"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalEditarHidratacion">
+
+                            <i class="fa-solid fa-pen-to-square me-2"></i>
+
+                            <span data-i18n="hidratacion.editarMeta">
+                                Editar meta
+                            </span>
+
                         </a>
+
                         <div class="dropdown-divider my-1"></div>
-                        <a href="#" class="kebab-item danger" id="btn-deshabilitar-habito">
-                            <i class="fa-solid fa-ban me-2"></i>Deshabilitar hábito
+
+                        <a
+                            href="#"
+                            class="kebab-item danger"
+                            id="btn-deshabilitar-habito">
+
+                            <i class="fa-solid fa-ban me-2"></i>
+
+                            <span data-i18n="comun.deshabilitarHabito">
+                                Deshabilitar hábito
+                            </span>
+
                         </a>
+
                     </div>
+
                 </div>
+
             </div>
-            
+
+
             <div class="text-center mt-2">
+
                 <div class="icon-circle bg-cyan-soft mx-auto mb-2">
+
                     <i class="fa-solid fa-droplet text-cyan"></i>
+
                 </div>
-                <h4 class="fw-bold text-white mb-0 font-sora texto-titulo-fluido">Hidratación</h4>
+
+                <h4
+                    class="fw-bold text-white mb-0 font-sora texto-titulo-fluido"
+                    data-i18n="hidratacion.titulo">
+
+                    Hidratación
+
+                </h4>
+
             </div>
+
         </div>
+
 
         <div class="my-auto py-2 text-center d-flex flex-column align-items-center justify-content-center">
-            <div class="progress-ring ring-cyan mx-auto mb-3" id="ring-hidratacion">
+
+            <div
+                class="progress-ring ring-cyan mx-auto mb-3"
+                id="ring-hidratacion">
+
                 <div class="progress-content">
-                    <h1 class="fw-bold mb-0 text-white font-sora contador-fluido" id="contador-vasos">0/8</h1>
-                    <span class="text-subtle fw-medium subtexto-fluido">vasos</span>
+
+                    <h1
+                        class="fw-bold mb-0 text-white font-sora contador-fluido"
+                        id="contador-vasos">
+
+                        0/8
+
+                    </h1>
+
+                    <span
+                        class="text-subtle fw-medium subtexto-fluido"
+                        data-i18n="hidratacion.vasos">
+
+                        vasos
+
+                    </span>
+
                 </div>
+
             </div>
+
 
             <div class="text-center">
-                <span class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido">Meta Diaria</span>
-                <span class="text-cyan fw-bold meta-texto-fluido" id="meta-vasos">8 vasos al día (2.0L - 250ml/vaso)</span>
+
+                <span
+                    class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido"
+                    data-i18n="hidratacion.metaDiaria">
+
+                    Meta Diaria
+
+                </span>
+
+                <span
+                    class="text-cyan fw-bold meta-texto-fluido"
+                    id="meta-vasos">
+
+                    8 vasos al día (2.0L - 250ml/vaso)
+
+                </span>
+
             </div>
+
         </div>
+
 
         <div class="w-100">
-            <div class="vasos-container p-3 rounded-4 mb-3 text-center">
-                <span class="text-subtle d-block fw-semibold mb-2 label-fluido text-start">Progreso visual</span>
-                <div class="d-flex justify-content-center flex-wrap gap-2 py-1 icon-row" id="contenedor-vasos-iconos">
+
+            <div
+                class="vasos-container p-3 rounded-4 mb-3 text-center">
+
+                <span
+                    class="text-subtle d-block fw-semibold mb-2 label-fluido text-start"
+                    data-i18n="hidratacion.progresoVisual">
+
+                    Progreso visual
+
+                </span>
+
+                <div
+                    class="d-flex justify-content-center flex-wrap gap-2 py-1 icon-row"
+                    id="contenedor-vasos-iconos">
                 </div>
+
             </div>
 
-            <button class="btn btn-action-cyan w-100 rounded-pill fw-bold font-sora boton-fluido" id="btn-add-vaso">+1 vaso</button>
+
+            <button
+                class="btn btn-action-cyan w-100 rounded-pill fw-bold font-sora boton-fluido"
+                id="btn-add-vaso">
+
+                <span data-i18n="hidratacion.agregarVaso">
+                    +1 vaso
+                </span>
+
+            </button>
+
         </div>
 
     </div>
 
-    <div class="modal fade" id="modalEditarHidratacion" tabindex="-1" aria-hidden="true">
+
+    <div
+        class="modal fade"
+        id="modalEditarHidratacion"
+        tabindex="-1"
+        aria-hidden="true">
+
         <div class="modal-dialog modal-dialog-centered">
+
             <div class="modal-content config-modal-bg text-white border-0 rounded-4">
+
                 <div class="modal-header border-bottom border-secondary border-opacity-25">
+
                     <h5 class="modal-title font-sora fw-bold">
-                        <i class="fa-solid fa-gear text-cyan me-2"></i>Ajustar Meta Diaria
+
+                        <i class="fa-solid fa-gear text-cyan me-2"></i>
+
+                        <span data-i18n="hidratacion.ajustarMeta">
+                            Ajustar Meta Diaria
+                        </span>
+
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body py-4">
-                    <form id="form-config-hidratacion">
-                        <div class="mb-3">
-                            <label for="input-vasos" class="form-label text-subtle fw-semibold">Vasos al día (Máx. 30)</label>
-                            <input type="number" class="form-control config-input text-white" id="input-vasos" min="1" max="30" value="8" required>
-                        </div>
 
-                        <div class="mb-3">
-                            <label for="input-capacidad" class="form-label text-subtle fw-semibold">Capacidad por vaso</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control config-input text-white" id="input-capacidad" min="100" max="1000" step="50" value="250" required>
-                                <span class="input-group-text config-input text-subtle border-start-0">ml</span>
-                            </div>
-                        </div>
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                        data-i18n-aria-label="comun.cerrar">
 
-                        <div class="p-3 bg-cyan-soft rounded-3 border border-info border-opacity-25 text-center">
-                            <span class="text-subtle d-block small">Meta total de consumo diario:</span>
-                            <span class="fw-bold text-cyan fs-5" id="preview-meta-total">2.0 Litros / día</span>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-top border-secondary border-opacity-25 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-outline-danger rounded-pill px-3" id="btn-reiniciar-meta">
-                        <i class="fa-solid fa-rotate-left me-1"></i> Reiniciar
                     </button>
-                    <button type="button" class="btn btn-outline-light rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-action-cyan rounded-pill px-4" id="btn-guardar-config">Guardar cambios</button>
+
                 </div>
+
+
+                <div class="modal-body py-4">
+
+                    <form id="form-config-hidratacion">
+
+                        <div class="mb-3">
+
+                            <label
+                                for="input-vasos"
+                                class="form-label text-subtle fw-semibold"
+                                data-i18n="hidratacion.vasosAlDia">
+
+                                Vasos al día (Máx. 30)
+
+                            </label>
+
+                            <input
+                                type="number"
+                                class="form-control config-input text-white"
+                                id="input-vasos"
+                                min="1"
+                                max="30"
+                                value="8"
+                                required>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label
+                                for="input-capacidad"
+                                class="form-label text-subtle fw-semibold"
+                                data-i18n="hidratacion.capacidadVaso">
+
+                                Capacidad por vaso
+
+                            </label>
+
+                            <div class="input-group">
+
+                                <input
+                                    type="number"
+                                    class="form-control config-input text-white"
+                                    id="input-capacidad"
+                                    min="100"
+                                    max="1000"
+                                    step="50"
+                                    value="250"
+                                    required>
+
+                                <span
+                                    class="input-group-text config-input text-subtle border-start-0">
+
+                                    ml
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="p-3 bg-cyan-soft rounded-3 border border-info border-opacity-25 text-center">
+
+                            <span
+                                class="text-subtle d-block small"
+                                data-i18n="hidratacion.metaTotalConsumo">
+
+                                Meta total de consumo diario:
+
+                            </span>
+
+                            <span
+                                class="fw-bold text-cyan fs-5"
+                                id="preview-meta-total">
+
+                                2.0 Litros / día
+
+                            </span>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <div
+                    class="modal-footer border-top border-secondary border-opacity-25 d-flex justify-content-end gap-2">
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-danger rounded-pill px-3"
+                        id="btn-reiniciar-meta">
+
+                        <i class="fa-solid fa-rotate-left me-1"></i>
+
+                        <span data-i18n="comun.reiniciar">
+                            Reiniciar
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-light rounded-pill px-3"
+                        data-bs-dismiss="modal">
+
+                        <span data-i18n="comun.cancelar">
+                            Cancelar
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-action-cyan rounded-pill px-4"
+                        id="btn-guardar-config">
+
+                        <span data-i18n="comun.guardarCambios">
+                            Guardar cambios
+                        </span>
+
+                    </button>
+
+                </div>
+
             </div>
+
         </div>
+
     </div>
+
 
     <script src="js/tema-global.js"></script>
+
+    <script src="js/idioma-global.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="js/HHidratacion.js"></script>
+
 </body>
 </html>

@@ -27,38 +27,31 @@
 
             <a
                 href="inicio.html"
-                class="volver">
+                class="volver"
+                data-i18n="general.volver">
 
                 ← Volver
 
             </a>
 
-            <h1>
-
+            <h1 data-i18n="rachas.titulo">
                 Rachas
-
             </h1>
 
-            <p>
-
+            <p data-i18n="rachas.descripcion">
                 Mantén tus hábitos y observa cómo tu constelación se ilumina.
-
             </p>
 
         </header>
 
         <section class="constelacion">
 
-            <h2>
-
+            <h2 data-i18n="rachas.constelacionMes">
                 Constelación del mes
-
             </h2>
 
-            <p>
-
+            <p data-i18n="rachas.constelacionDescripcion">
                 Cada estrella representa un día en el que completaste todos tus hábitos durante este mes.
-
             </p>
 
             <div
@@ -106,7 +99,8 @@
                 <button
                     type="button"
                     id="abrirHistorial"
-                    class="btn-historial">
+                    class="btn-historial"
+                    data-i18n="rachas.explorar">
 
                     ✨ Explorar constelaciones
 
@@ -123,22 +117,16 @@
                 alt="Racha"
                 class="icono-racha">
 
-            <h2>
-
+            <h2 data-i18n="rachas.actual">
                 Racha actual
-
             </h2>
 
             <span id="rachaActual">
-
                 0 días
-
             </span>
 
-            <p>
-
+            <p data-i18n="rachas.actualDescripcion">
                 ¡Sigue así! Cada día consecutivo fortalece tu constancia.
-
             </p>
 
         </section>
@@ -147,59 +135,46 @@
 
             <article class="tarjeta-resumen">
 
-                <h3>
-
+                <h3 data-i18n="rachas.mejor">
                     Mejor racha
-
                 </h3>
 
                 <span id="mejorRacha">
-
                     0 días
-
                 </span>
 
             </article>
 
             <article class="tarjeta-resumen">
 
-                <h3>
-
+                <h3 data-i18n="rachas.completados">
                     Hábitos completados
-
                 </h3>
 
                 <span id="habitosCompletados">
-
                     0
-
                 </span>
 
             </article>
 
             <article class="tarjeta-resumen">
 
-                <h3>
-
+                <h3 data-i18n="rachas.registrados">
                     Días registrados
-
                 </h3>
 
                 <span id="diasRegistrados">
-
                     0
-
                 </span>
 
             </article>
 
         </section>
-                <section class="categorias">
 
-            <h2>
+        <section class="categorias">
 
+            <h2 data-i18n="rachas.constanciaCategoria">
                 Constancia por categoría
-
             </h2>
 
             <div id="listaCategorias">
@@ -212,10 +187,8 @@
 
                     <div class="info-categoria">
 
-                        <h3>
-
+                        <h3 data-i18n="categorias.hidratacion">
                             Hidratación
-
                         </h3>
 
                         <div class="barra">
@@ -224,7 +197,9 @@
 
                         </div>
 
-                        <p class="porcentaje">
+                        <p
+                            class="porcentaje"
+                            data-i18n="rachas.ejemploProgreso">
 
                             Ejemplo de progreso por categoría.
 
@@ -240,10 +215,8 @@
 
         <section class="historial">
 
-            <h2>
-
+            <h2 data-i18n="rachas.historial">
                 Historial de rachas
-
             </h2>
 
             <div
@@ -254,24 +227,18 @@
 
                     <div>
 
-                        <strong>
-
+                        <strong data-i18n="rachas.ultima">
                             Última racha registrada
-
                         </strong>
 
-                        <p>
-
+                        <p data-i18n="rachas.ultimaDescripcion">
                             Aquí aparecerán automáticamente las rachas que el usuario vaya completando.
-
                         </p>
 
                     </div>
 
                     <span>
-
                         0 días
-
                     </span>
 
                 </div>
@@ -290,16 +257,16 @@
 
             <div class="encabezado-modal">
 
-                <h2>
-
+                <h2 data-i18n="rachas.historialConstelaciones">
                     Historial de constelaciones
-
                 </h2>
 
                 <button
                     type="button"
                     class="cerrar-modal"
-                    id="cerrarHistorial">
+                    id="cerrarHistorial"
+                    aria-label="Cerrar"
+                    data-i18n-aria-label="general.cerrar">
 
                     ✕
 
@@ -307,18 +274,14 @@
 
             </div>
 
-            <p>
-
+            <p data-i18n="rachas.historialDescripcion">
                 Aquí podrás consultar las constelaciones obtenidas en los meses anteriores.
-
             </p>
 
             <div class="mes-constelacion">
 
                 <h3>
-
                     Junio 2026
-
                 </h3>
 
                 <div class="constelacion-grid">
@@ -341,9 +304,7 @@
             <div class="mes-constelacion">
 
                 <h3>
-
                     Julio 2026
-
                 </h3>
 
                 <div class="constelacion-grid">
@@ -366,9 +327,7 @@
             <div class="mes-constelacion">
 
                 <h3>
-
                     Agosto 2026
-
                 </h3>
 
                 <div class="constelacion-grid">
@@ -393,7 +352,8 @@
     </div>
 
     <script src="js/tema-global.js"></script>
-    <script src="../js/racha.js"></script>
+    <script src="js/idioma-global.js"></script>
+    <script src="js/racha.js"></script>
 
 </body>
 

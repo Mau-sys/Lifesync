@@ -2,13 +2,6 @@
 
     let audioContext = null;
 
-
-    /*
-    =====================================================
-    OBTENER CONFIGURACIÓN DE SONIDO
-    =====================================================
-    */
-
     function sonidosActivados() {
 
         const configuracion =
@@ -35,13 +28,6 @@
             return true;
         }
     }
-
-
-    /*
-    =====================================================
-    CREAR CONTEXTO DE AUDIO
-    =====================================================
-    */
 
     function obtenerContextoAudio() {
 
@@ -70,12 +56,6 @@
         return audioContext;
     }
 
-
-    /*
-    =====================================================
-    REPRODUCIR SONIDO
-    =====================================================
-    */
 
     function reproducirSonidoNotificacion() {
 
@@ -175,12 +155,6 @@
 
     }
 
-
-    /*
-    =====================================================
-    EXPONER FUNCIÓN GLOBAL
-    =====================================================
-    */
 
     window.reproducirSonidoNotificacion =
         reproducirSonidoNotificacion;

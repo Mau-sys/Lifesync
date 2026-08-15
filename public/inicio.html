@@ -11,7 +11,8 @@
 
     <meta
         name="description"
-        content="Panel principal de LifeSync">
+        content="Panel principal de LifeSync"
+        data-i18n="inicio.metaDescripcion">
 
     <title>LifeSync | Inicio</title>
 
@@ -44,6 +45,7 @@
                 <img
                     src="img/Perfil.png"
                     alt="Foto de perfil"
+                    data-i18n-alt="inicio.fotoPerfil"
                     id="fotoPerfil"
                     class="foto-perfil">
 
@@ -52,10 +54,15 @@
             <div>
 
                 <p class="saludo">
-                    ¡Hola,
+
+                    <span data-i18n="inicio.hola">
+                        ¡Hola,
+                    </span>
+
                     <span id="nombreUsuario">
                         Usuario
                     </span>!
+
                 </p>
 
                 <span id="fechaActual"></span>
@@ -70,18 +77,23 @@
             id="btnNotificaciones"
             class="btn-notificaciones"
             aria-label="Abrir notificaciones"
+            data-i18n-aria-label="inicio.abrirNotificaciones"
             aria-expanded="false"
             aria-controls="panelNotificaciones">
 
             <img
                 src="img/Campana.png"
-                alt="Notificaciones">
+                alt="Notificaciones"
+                data-i18n-alt="inicio.notificaciones">
 
             <span
                 id="contadorNotificaciones"
                 class="contador-notificaciones"
-                aria-label="Notificaciones no leídas">
+                aria-label="Notificaciones no leídas"
+                data-i18n-aria-label="inicio.notificacionesNoLeidas">
+
                 0
+
             </span>
 
         </button>
@@ -98,13 +110,18 @@
 
             <div>
 
-                <h2>
+                <h2 data-i18n="inicio.notificaciones">
+
                     Notificaciones
+
                 </h2>
 
                 <span
-                    class="estado-notificaciones">
+                    class="estado-notificaciones"
+                    data-i18n="inicio.estadoNotificaciones">
+
                     Recordatorios, rachas, progreso y logros
+
                 </span>
 
             </div>
@@ -113,7 +130,8 @@
                 type="button"
                 id="cerrarPanel"
                 class="cerrar-panel"
-                aria-label="Cerrar panel">
+                aria-label="Cerrar panel"
+                data-i18n-aria-label="comun.cerrarPanel">
 
                 ✕
 
@@ -130,16 +148,21 @@
 
                 <img
                     src="img/Campana.png"
-                    alt="Sin notificaciones">
+                    alt="Sin notificaciones"
+                    data-i18n-alt="inicio.sinNotificaciones">
 
-                <h3>
+                <h3 data-i18n="inicio.todoAlDia">
+
                     Todo está al día
+
                 </h3>
 
-                <p>
+                <p data-i18n="inicio.descripcionNotificaciones">
+
                     Aquí aparecerán tus recordatorios,
                     logros, rachas, hábitos completados
                     y avisos de LifeSync.
+
                 </p>
 
             </div>
@@ -158,13 +181,15 @@
     <a
         href="rachas.html"
         class="tarjeta-racha"
-        aria-label="Ir a Rachas">
+        aria-label="Ir a Rachas"
+        data-i18n-aria-label="inicio.irRachas">
 
         <div class="info-racha">
 
             <img
                 src="img/Racha.png"
-                alt="Racha">
+                alt="Racha"
+                data-i18n-alt="inicio.racha">
 
             <div>
 
@@ -172,8 +197,10 @@
                     0
                 </span>
 
-                <p>
+                <p data-i18n="inicio.diasEnRacha">
+
                     días en racha
+
                 </p>
 
             </div>
@@ -183,7 +210,9 @@
         <span
             class="flecha"
             aria-hidden="true">
+
             →
+
         </span>
 
     </a>
@@ -193,12 +222,16 @@
 
         <div class="titulo-progreso">
 
-            <span>
+            <span data-i18n="inicio.progresoDelDia">
+
                 Progreso del día
+
             </span>
 
             <span id="porcentajeGeneral">
+
                 0%
+
             </span>
 
         </div>
@@ -214,8 +247,10 @@
 
     <section class="categorias">
 
-        <h2>
+        <h2 data-i18n="inicio.hoy">
+
             Hoy
+
         </h2>
 
 
@@ -226,12 +261,16 @@
             href="categorias.html"
             class="btnCategorias">
 
-            <span>
+            <span data-i18n="inicio.verCategorias">
+
                 Ver todas las categorías
+
             </span>
 
             <span aria-hidden="true">
+
                 →
+
             </span>
 
         </a>
@@ -242,6 +281,7 @@
 
 <script src="js/sonido-notificaciones.js"></script>
 <script src="js/tema-global.js"></script>
+<script src="js/idioma-global.js"></script>
 <script src="js/inicio.js"></script>
 
 </body>

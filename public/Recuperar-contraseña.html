@@ -26,8 +26,9 @@
         <section class="recovery-card">
 
             <a
-                href="/public/Inicio-sesion.html"
-                class="btn-back">
+                href="Inicio-sesion.html"
+                class="btn-back"
+                data-i18n="general.volver">
 
                 ← Volver
 
@@ -35,13 +36,13 @@
 
             <header class="recovery-header">
 
-                <h1>
+                <h1 data-i18n="recuperar.titulo">
 
                     ¿Olvidaste tu contraseña?
 
                 </h1>
 
-                <p>
+                <p data-i18n="recuperar.descripcion">
 
                     Ingresa el correo electrónico asociado a tu cuenta para recuperar el acceso a LifeSync.
 
@@ -55,7 +56,9 @@
 
                 <div class="input-group">
 
-                    <label for="correo">
+                    <label
+                        for="correo"
+                        data-i18n="recuperar.correo">
 
                         Correo electrónico
 
@@ -66,6 +69,7 @@
                         id="correo"
                         name="correo"
                         placeholder="Ingresa tu correo electrónico"
+                        data-i18n-placeholder="recuperar.correoPlaceholder"
                         autocomplete="email"
                         required>
 
@@ -74,13 +78,13 @@
                 <p
                     id="mensajeRecuperacion"
                     class="mensaje">
-
                 </p>
 
                 <button
                     type="submit"
                     id="btnRecuperar"
-                    class="btn-primary">
+                    class="btn-primary"
+                    data-i18n="recuperar.boton">
 
                     Enviar enlace de recuperación
 
@@ -90,10 +94,13 @@
 
             <p class="login-link">
 
-                ¿Recuerdas tu contraseña?
+                <span data-i18n="recuperar.recuerdas">
+                    ¿Recuerdas tu contraseña?
+                </span>
 
                 <a
-                    href="/public/Inicio-sesion.html">
+                    href="Inicio-sesion.html"
+                    data-i18n="general.iniciarSesion">
 
                     Inicia sesión
 
@@ -106,7 +113,8 @@
     </main>
 
     <script src="js/tema-global.js"></script>
-    <script src="/js/recuperar-contraseña.js"></script>
+    <script src="js/idioma-global.js"></script>
+    <script src="js/recuperar-contraseña.js"></script>
 
 </body>
 

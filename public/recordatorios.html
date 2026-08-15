@@ -37,17 +37,18 @@
 
             <a
                 href="Perfil.html"
-                class="volver">
+                class="volver"
+                data-i18n="general.volver">
 
                 ← Volver
 
             </a>
 
-            <h1>
+            <h1 data-i18n="recordatorios.titulo">
                 Recordatorios
             </h1>
 
-            <p>
+            <p data-i18n="recordatorios.descripcion">
                 Organiza tus recordatorios para no olvidar ninguno de tus hábitos.
             </p>
 
@@ -59,7 +60,8 @@
             <button
                 type="button"
                 id="btnNuevoRecordatorio"
-                class="btn-principal">
+                class="btn-principal"
+                data-i18n="recordatorios.nuevo">
 
                 Nuevo recordatorio
 
@@ -79,11 +81,11 @@
             id="sinRecordatorios"
             class="sin-recordatorios">
 
-            <h2>
+            <h2 data-i18n="recordatorios.sinRecordatorios">
                 No tienes recordatorios.
             </h2>
 
-            <p>
+            <p data-i18n="recordatorios.creaUno">
                 Crea uno para comenzar a recibir notificaciones.
             </p>
 
@@ -105,15 +107,20 @@
 
             <div class="modal-header">
 
-                <h2 id="tituloModalRecordatorio">
+                <h2
+                    id="tituloModalRecordatorio"
+                    data-i18n="recordatorios.modal.titulo">
+
                     Nuevo recordatorio
+
                 </h2>
 
                 <button
                     type="button"
                     id="cerrarModal"
                     class="btn-cerrar"
-                    aria-label="Cerrar">
+                    aria-label="Cerrar"
+                    data-i18n-aria-label="general.cerrar">
 
                     ✕
 
@@ -128,8 +135,12 @@
 
                 <div class="campo">
 
-                    <label for="titulo">
+                    <label
+                        for="titulo"
+                        data-i18n="recordatorios.nombre">
+
                         Nombre del recordatorio
+
                     </label>
 
                     <input
@@ -138,6 +149,7 @@
                         name="titulo"
                         maxlength="150"
                         placeholder="Ej. Leer 20 páginas"
+                        data-i18n-placeholder="recordatorios.nombrePlaceholder"
                         required>
 
                 </div>
@@ -145,40 +157,72 @@
 
                 <div class="campo">
 
-                    <label for="categoria">
+                    <label
+                        for="categoria"
+                        data-i18n="recordatorios.categoria">
+
                         Categoría
+
                     </label>
 
                     <select
                         id="categoria"
                         name="categoria">
 
-                        <option value="">
+                        <option
+                            value=""
+                            data-i18n="recordatorios.seleccionar">
+
                             Seleccionar
+
                         </option>
 
-                        <option value="1">
+                        <option
+                            value="1"
+                            data-i18n="categorias.hidratacion">
+
                             Hidratación
+
                         </option>
 
-                        <option value="2">
+                        <option
+                            value="2"
+                            data-i18n="categorias.alimentacion">
+
                             Alimentación
+
                         </option>
 
-                        <option value="3">
+                        <option
+                            value="3"
+                            data-i18n="categorias.saludMental">
+
                             Salud Mental
+
                         </option>
 
-                        <option value="4">
+                        <option
+                            value="4"
+                            data-i18n="categorias.actividadFisica">
+
                             Actividad Física
+
                         </option>
 
-                        <option value="5">
+                        <option
+                            value="5"
+                            data-i18n="categorias.registroAcademico">
+
                             Registro Académico
+
                         </option>
 
-                        <option value="6">
+                        <option
+                            value="6"
+                            data-i18n="categorias.habitoPersonalizado">
+
                             Hábito Personalizado
+
                         </option>
 
                     </select>
@@ -188,8 +232,12 @@
 
                 <div class="campo">
 
-                    <label for="hora">
+                    <label
+                        for="hora"
+                        data-i18n="recordatorios.hora">
+
                         Hora
+
                     </label>
 
                     <input
@@ -203,8 +251,12 @@
 
                 <div class="campo">
 
-                    <label for="repeticion">
+                    <label
+                        for="repeticion"
+                        data-i18n="recordatorios.repetir">
+
                         Repetir
+
                     </label>
 
                     <select
@@ -212,20 +264,36 @@
                         name="repeticion"
                         required>
 
-                        <option value="diario">
+                        <option
+                            value="diario"
+                            data-i18n="recordatorios.todosDias">
+
                             Todos los días
+
                         </option>
 
-                        <option value="lunes_viernes">
+                        <option
+                            value="lunes_viernes"
+                            data-i18n="recordatorios.lunesViernes">
+
                             Lunes a viernes
+
                         </option>
 
-                        <option value="una_vez">
+                        <option
+                            value="una_vez"
+                            data-i18n="recordatorios.unaVez">
+
                             Solo una vez
+
                         </option>
 
-                        <option value="personalizado">
+                        <option
+                            value="personalizado"
+                            data-i18n="recordatorios.personalizado">
+
                             Personalizado
+
                         </option>
 
                     </select>
@@ -238,8 +306,12 @@
                     id="campoFecha"
                     hidden>
 
-                    <label for="fechaRecordatorio">
+                    <label
+                        for="fechaRecordatorio"
+                        data-i18n="recordatorios.fecha">
+
                         Fecha
+
                     </label>
 
                     <input
@@ -252,8 +324,12 @@
 
                 <div class="campo">
 
-                    <label for="mensaje">
+                    <label
+                        for="mensaje"
+                        data-i18n="recordatorios.mensaje">
+
                         Mensaje
+
                     </label>
 
                     <textarea
@@ -261,7 +337,8 @@
                         name="mensaje"
                         rows="3"
                         maxlength="255"
-                        placeholder="Agrega una nota o recordatorio (opcional)"></textarea>
+                        placeholder="Agrega una nota o recordatorio (opcional)"
+                        data-i18n-placeholder="recordatorios.mensajePlaceholder"></textarea>
 
                 </div>
 
@@ -271,7 +348,8 @@
                     <button
                         type="button"
                         id="cancelarRecordatorio"
-                        class="btn-secundario">
+                        class="btn-secundario"
+                        data-i18n="general.cancelar">
 
                         Cancelar
 
@@ -279,7 +357,8 @@
 
                     <button
                         type="submit"
-                        class="btn-principal">
+                        class="btn-principal"
+                        data-i18n="general.guardar">
 
                         Guardar
 
@@ -294,6 +373,7 @@
     </div>
 
     <script src="js/tema-global.js"></script>
+    <script src="js/idioma-global.js"></script>
     <script src="js/recordatorios.js"></script>
 
 </body>

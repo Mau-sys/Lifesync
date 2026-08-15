@@ -91,7 +91,6 @@
 
 }
 
-
 [data-tema="claro"] {
 
     --color-fondo: #FFFFFF;
@@ -115,5 +114,24 @@
 
     --sombra-suave:
         0 8px 25px rgba(0, 0, 0, 0.10);
+
+}
+
+html,
+body,
+.card,
+.tarjeta,
+.seccion,
+.seccion-configuracion,
+.modal-contenido,
+input,
+select,
+textarea {
+
+    transition:
+        background-color var(--transicion),
+        color var(--transicion),
+        border-color var(--transicion),
+        box-shadow var(--transicion);
 
 }

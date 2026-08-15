@@ -1,168 +1,533 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeSync - Alimentación</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/Alimentacion.css">
+    <title data-i18n="alimentacion.tituloPagina">
+        LifeSync - Alimentación
+    </title>
+
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sora:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link
+        rel="stylesheet"
+        href="css/Alimentacion.css">
+
 </head>
+
+
 <body class="bg-lifesync p-0 m-0">
 
     <div class="card-full-screen d-flex flex-column justify-content-between">
-        
+
         <div>
+
             <div class="d-flex justify-content-end align-items-center mb-3">
+
                 <div class="position-relative">
-                    <button class="btn btn-options p-0" id="btn-options-academico" aria-label="Opciones">
+
+                    <button
+                        class="btn btn-options p-0"
+                        id="btn-options-academico"
+                        aria-label="Opciones"
+                        data-i18n-aria-label="comun.opciones">
+
                         <i class="fa-solid fa-ellipsis-vertical"></i>
+
                     </button>
-                    <div class="kebab-dropdown-menu" id="kebab-menu-academico">
-                        <a href="inicio.html" class="kebab-item" id="btn-regresar">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Regresar
+
+
+                    <div
+                        class="kebab-dropdown-menu"
+                        id="kebab-menu-academico">
+
+                        <a
+                            href="inicio.html"
+                            class="kebab-item"
+                            id="btn-regresar">
+
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+
+                            <span data-i18n="comun.regresar">
+                                Regresar
+                            </span>
+
                         </a>
-                        <a href="#" class="kebab-item" id="btn-editar-meta" data-bs-toggle="modal" data-bs-target="#modalEditarMeta">
-                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta y horarios
+
+
+                        <a
+                            href="#"
+                            class="kebab-item"
+                            id="btn-editar-meta"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalEditarMeta">
+
+                            <i class="fa-solid fa-pen-to-square me-2"></i>
+
+                            <span data-i18n="alimentacion.editarMetaHorarios">
+                                Editar meta y horarios
+                            </span>
+
                         </a>
+
+
                         <div class="dropdown-divider my-1"></div>
-                        <a href="#" class="kebab-item danger" id="btn-deshabilitar-habito">
-                            <i class="fa-solid fa-ban me-2"></i>Deshabilitar hábito
+
+
+                        <a
+                            href="#"
+                            class="kebab-item danger"
+                            id="btn-deshabilitar-habito">
+
+                            <i class="fa-solid fa-ban me-2"></i>
+
+                            <span data-i18n="comun.deshabilitarHabito">
+                                Deshabilitar hábito
+                            </span>
+
                         </a>
+
                     </div>
+
                 </div>
+
             </div>
-            
+
+
             <div class="text-center">
+
                 <div class="icon-circle bg-emerald-soft mx-auto mb-2">
+
                     <i class="fa-solid fa-apple-whole text-emerald"></i>
+
                 </div>
-                <h4 class="fw-bold text-white mt-2 mb-0 font-sora texto-titulo-fluido">Alimentación</h4>
+
+
+                <h4
+                    class="fw-bold text-white mt-2 mb-0 font-sora texto-titulo-fluido"
+                    data-i18n="alimentacion.titulo">
+
+                    Alimentación
+
+                </h4>
+
             </div>
+
         </div>
+
 
         <div class="my-auto py-2 text-center d-flex flex-column align-items-center justify-content-center">
-            <div class="progress-ring ring-emerald mx-auto mb-3" id="ring-comidas">
+
+            <div
+                class="progress-ring ring-emerald mx-auto mb-3"
+                id="ring-comidas">
+
                 <div class="progress-content">
-                    <h1 class="fw-bold mb-0 text-white font-sora contador-fluido" id="contador-comidas">0/3</h1>
-                    <span class="text-subtle fw-medium subtexto-fluido">comidas</span>
+
+                    <h1
+                        class="fw-bold mb-0 text-white font-sora contador-fluido"
+                        id="contador-comidas">
+
+                        0/3
+
+                    </h1>
+
+
+                    <span
+                        class="text-subtle fw-medium subtexto-fluido"
+                        data-i18n="alimentacion.comidas">
+
+                        comidas
+
+                    </span>
+
                 </div>
+
             </div>
+
 
             <div class="text-center">
-                <span class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido">Meta diaria</span>
-                <span class="text-emerald fw-bold meta-texto-fluido" id="meta-comidas">3 tiempos al día</span>
+
+                <span
+                    class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido"
+                    data-i18n="alimentacion.metaDiaria">
+
+                    Meta diaria
+
+                </span>
+
+
+                <span
+                    class="text-emerald fw-bold meta-texto-fluido"
+                    id="meta-comidas">
+
+                    3 tiempos al día
+
+                </span>
+
             </div>
+
         </div>
+
 
         <div class="w-100">
-            <div class="d-flex justify-content-around align-items-center mb-3 comidainfo-container p-3 rounded-4 flex-wrap gap-2" id="lista-comidas">
+
+            <div
+                class="d-flex justify-content-around align-items-center mb-3 comidainfo-container p-3 rounded-4 flex-wrap gap-2"
+                id="lista-comidas">
             </div>
 
-            <button class="btn btn-action-emerald w-100 rounded-pill fw-bold font-sora boton-fluido" id="btn-add-comida">+1 comida</button>
+
+            <button
+                class="btn btn-action-emerald w-100 rounded-pill fw-bold font-sora boton-fluido"
+                id="btn-add-comida">
+
+                <span data-i18n="alimentacion.agregarComida">
+                    +1 comida
+                </span>
+
+            </button>
+
         </div>
 
     </div>
 
-    <div class="modal fade" id="modalEditarMeta" tabindex="-1" aria-labelledby="modalEditarMetaLabel" aria-hidden="true">
+
+    <div
+        class="modal fade"
+        id="modalEditarMeta"
+        tabindex="-1"
+        aria-labelledby="modalEditarMetaLabel"
+        aria-hidden="true">
+
         <div class="modal-dialog modal-dialog-centered modal-md">
+
             <div class="modal-content bg-dark-card text-white border-secondary">
+
                 <div class="modal-header border-bottom-subtle py-2 px-3">
-                    <h6 class="modal-title font-sora text-emerald fw-bold mb-0" id="modalEditarMetaLabel">
-                        <i class="fa-solid fa-sliders me-2"></i>Configurar Comidas
+
+                    <h6
+                        class="modal-title font-sora text-emerald fw-bold mb-0"
+                        id="modalEditarMetaLabel">
+
+                        <i class="fa-solid fa-sliders me-2"></i>
+
+                        <span data-i18n="alimentacion.configurarComidas">
+                            Configurar Comidas
+                        </span>
+
                     </h6>
-                    <button type="button" class="btn-close btn-close-white btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white btn-sm"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                        data-i18n-aria-label="comun.cerrar">
+
+                    </button>
+
                 </div>
+
+
                 <div class="modal-body p-3">
+
                     <form id="form-horarios">
-                        <div class="alert alert-danger d-none py-1 px-2 small mb-2" id="alert-horario-error" role="alert"></div>
 
-                        <div class="row align-items-center mb-2 pb-2 border-bottom-subtle g-2">
-                            <div class="col-4 fw-semibold text-emerald small">
-                                <i class="fa-solid fa-cloud-sun me-1"></i>Desayuno
-                            </div>
-                            <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-desayuno-inicio" required>
-                            </div>
-                            <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-desayuno-fin" required>
-                            </div>
+                        <div
+                            class="alert alert-danger d-none py-1 px-2 small mb-2"
+                            id="alert-horario-error"
+                            role="alert">
                         </div>
 
-                        <div class="row align-items-center mb-2 pb-2 border-bottom-subtle g-2">
+
+                        <div
+                            class="row align-items-center mb-2 pb-2 border-bottom-subtle g-2">
+
+                            <div class="col-4 fw-semibold text-emerald small">
+
+                                <i class="fa-solid fa-cloud-sun me-1"></i>
+
+                                <span data-i18n="alimentacion.desayuno">
+                                    Desayuno
+                                </span>
+
+                            </div>
+
+
                             <div class="col-4">
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-desayuno-inicio"
+                                    required>
+
+                            </div>
+
+
+                            <div class="col-4">
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-desayuno-fin"
+                                    required>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="row align-items-center mb-2 pb-2 border-bottom-subtle g-2">
+
+                            <div class="col-4">
+
                                 <div class="form-check form-switch m-0 p-0 d-flex align-items-center gap-2">
-                                    <input class="form-check-input m-0" type="checkbox" id="switch-merienda-m">
-                                    <label class="form-check-label fw-semibold text-white small" for="switch-merienda-m">
+
+                                    <input
+                                        class="form-check-input m-0"
+                                        type="checkbox"
+                                        id="switch-merienda-m">
+
+                                    <label
+                                        class="form-check-label fw-semibold text-white small"
+                                        for="switch-merienda-m"
+                                        data-i18n="alimentacion.meriendaManana">
+
                                         Merienda M.
+
                                     </label>
+
                                 </div>
+
                             </div>
+
+
                             <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-merienda-m-inicio" disabled>
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-merienda-m-inicio"
+                                    disabled>
+
                             </div>
+
+
                             <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-merienda-m-fin" disabled>
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-merienda-m-fin"
+                                    disabled>
+
                             </div>
+
                         </div>
 
-                        <div class="row align-items-center mb-2 pb-2 border-bottom-subtle g-2">
+
+                        <div
+                            class="row align-items-center mb-2 pb-2 border-bottom-subtle g-2">
+
                             <div class="col-4 fw-semibold text-emerald small">
-                                <i class="fa-solid fa-sun me-1"></i>Almuerzo
+
+                                <i class="fa-solid fa-sun me-1"></i>
+
+                                <span data-i18n="alimentacion.almuerzo">
+                                    Almuerzo
+                                </span>
+
                             </div>
+
+
                             <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-almuerzo-inicio" required>
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-almuerzo-inicio"
+                                    required>
+
                             </div>
+
+
                             <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-almuerzo-fin" required>
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-almuerzo-fin"
+                                    required>
+
                             </div>
+
                         </div>
 
-                        <div class="row align-items-center mb-2 pb-2 border-bottom-subtle g-2">
+
+                        <div
+                            class="row align-items-center mb-2 pb-2 border-bottom-subtle g-2">
+
                             <div class="col-4">
+
                                 <div class="form-check form-switch m-0 p-0 d-flex align-items-center gap-2">
-                                    <input class="form-check-input m-0" type="checkbox" id="switch-merienda-t">
-                                    <label class="form-check-label fw-semibold text-white small" for="switch-merienda-t">
+
+                                    <input
+                                        class="form-check-input m-0"
+                                        type="checkbox"
+                                        id="switch-merienda-t">
+
+                                    <label
+                                        class="form-check-label fw-semibold text-white small"
+                                        for="switch-merienda-t"
+                                        data-i18n="alimentacion.meriendaTarde">
+
                                         Merienda T.
+
                                     </label>
+
                                 </div>
+
                             </div>
+
+
                             <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-merienda-t-inicio" disabled>
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-merienda-t-inicio"
+                                    disabled>
+
                             </div>
+
+
                             <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-merienda-t-fin" disabled>
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-merienda-t-fin"
+                                    disabled>
+
                             </div>
+
                         </div>
 
-                        <div class="row align-items-center mb-1 g-2">
+
+                        <div
+                            class="row align-items-center mb-1 g-2">
+
                             <div class="col-4 fw-semibold text-emerald small">
-                                <i class="fa-solid fa-moon me-1"></i>Cena
+
+                                <i class="fa-solid fa-moon me-1"></i>
+
+                                <span data-i18n="alimentacion.cena">
+                                    Cena
+                                </span>
+
                             </div>
+
+
                             <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-cena-inicio" required>
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-cena-inicio"
+                                    required>
+
                             </div>
+
+
                             <div class="col-4">
-                                <input type="time" class="form-control form-control-sm input-dark" id="time-cena-fin" required>
+
+                                <input
+                                    type="time"
+                                    class="form-control form-control-sm input-dark"
+                                    id="time-cena-fin"
+                                    required>
+
                             </div>
+
                         </div>
+
                     </form>
+
                 </div>
+
+
                 <div class="modal-footer border-top-subtle py-2 px-3">
-                    <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-sm btn-action-emerald rounded-pill px-3" id="btn-guardar-configuracion">Guardar</button>
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-light rounded-pill px-3"
+                        data-bs-dismiss="modal">
+
+                        <span data-i18n="comun.cancelar">
+                            Cancelar
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-action-emerald rounded-pill px-3"
+                        id="btn-guardar-configuracion">
+
+                        <span data-i18n="comun.guardar">
+                            Guardar
+                        </span>
+
+                    </button>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 
     <script src="js/tema-global.js"></script>
+
+    <script src="js/idioma-global.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="js/HAlimentacion.js"></script>
+
 </body>
 </html>

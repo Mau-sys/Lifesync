@@ -9,7 +9,8 @@
           content="width=device-width, initial-scale=1.0">
 
     <meta name="description"
-          content="Administra tus hábitos personalizados">
+          content="Administra tus hábitos personalizados"
+          data-i18n="personalizados.metaDescripcion">
 
     <title>LifeSync | Hábitos personalizados</title>
 
@@ -32,19 +33,20 @@
 
             <a
                 href="perfil.html"
-                class="volver">
+                class="volver"
+                data-i18n="comun.volver">
 
                 ← Volver
 
             </a>
 
-            <h1>
+            <h1 data-i18n="personalizados.titulo">
 
                 Hábitos personalizados
 
             </h1>
 
-            <p>
+            <p data-i18n="personalizados.descripcion">
 
                 Administra todos tus hábitos personalizados desde un solo lugar.
 
@@ -56,7 +58,8 @@
         <button
             type="button"
             id="btnNuevoHabito"
-            class="btn-principal btn-nuevo">
+            class="btn-principal btn-nuevo"
+            data-i18n="personalizados.nuevoHabito">
 
             + Nuevo hábito
 
@@ -84,7 +87,7 @@
 
             <div class="modal-header">
 
-                <h2>
+                <h2 data-i18n="personalizados.modalNuevoTitulo">
 
                     Nuevo hábito
 
@@ -94,7 +97,8 @@
                     type="button"
                     id="cerrarModal"
                     class="btn-cerrar"
-                    aria-label="Cerrar">
+                    aria-label="Cerrar"
+                    data-i18n-aria-label="comun.cerrar">
 
                     ✕
 
@@ -110,7 +114,9 @@
 
                 <div class="input-group">
 
-                    <label for="nombreHabito">
+                    <label
+                        for="nombreHabito"
+                        data-i18n="personalizados.nombreHabito">
 
                         Nombre del hábito
 
@@ -121,6 +127,7 @@
                         id="nombreHabito"
                         name="nombreHabito"
                         placeholder="Ej. Leer 20 páginas"
+                        data-i18n-placeholder="personalizados.placeholderNombre"
                         maxlength="150"
                         required>
 
@@ -129,7 +136,9 @@
 
                 <div class="input-group">
 
-                    <label for="objetivo">
+                    <label
+                        for="objetivo"
+                        data-i18n="personalizados.objetivo">
 
                         Objetivo
 
@@ -140,6 +149,7 @@
                         name="objetivo"
                         rows="3"
                         placeholder="Describe qué quieres lograr con este hábito."
+                        data-i18n-placeholder="personalizados.placeholderObjetivo"
                         maxlength="500"
                         required></textarea>
 
@@ -148,7 +158,9 @@
 
                 <div class="input-group">
 
-                    <label for="frecuencia">
+                    <label
+                        for="frecuencia"
+                        data-i18n="personalizados.frecuencia">
 
                         Frecuencia
 
@@ -159,25 +171,33 @@
                         name="frecuencia"
                         required>
 
-                        <option value="">
+                        <option
+                            value=""
+                            data-i18n="personalizados.seleccionaOpcion">
 
                             Selecciona una opción
 
                         </option>
 
-                        <option value="diaria">
+                        <option
+                            value="diaria"
+                            data-i18n="personalizados.diario">
 
                             Diario
 
                         </option>
 
-                        <option value="semanal">
+                        <option
+                            value="semanal"
+                            data-i18n="personalizados.semanal">
 
                             Semanal
 
                         </option>
 
-                        <option value="mensual">
+                        <option
+                            value="mensual"
+                            data-i18n="personalizados.mensual">
 
                             Mensual
 
@@ -190,7 +210,9 @@
 
                 <div class="input-group">
 
-                    <label for="fechaInicio">
+                    <label
+                        for="fechaInicio"
+                        data-i18n="personalizados.fechaInicio">
 
                         Fecha de inicio
 
@@ -207,7 +229,9 @@
 
                 <div class="input-group">
 
-                    <label for="fechaFin">
+                    <label
+                        for="fechaFin"
+                        data-i18n="personalizados.fechaFin">
 
                         Fecha de finalización
 
@@ -226,7 +250,8 @@
                     <button
                         type="button"
                         id="cancelarModal"
-                        class="btn-secundario">
+                        class="btn-secundario"
+                        data-i18n="comun.cancelar">
 
                         Cancelar
 
@@ -235,7 +260,8 @@
 
                     <button
                         type="submit"
-                        class="btn-principal">
+                        class="btn-principal"
+                        data-i18n="personalizados.guardarHabito">
 
                         Guardar hábito
 
@@ -258,13 +284,13 @@
 
         <div class="modal-contenido modal-pequeno">
 
-            <h2>
+            <h2 data-i18n="personalizados.eliminarTitulo">
 
                 ¿Eliminar hábito?
 
             </h2>
 
-            <p>
+            <p data-i18n="personalizados.eliminarDescripcion">
 
                 Esta acción no se puede deshacer.
 
@@ -276,7 +302,8 @@
                 <button
                     type="button"
                     id="cancelarEliminar"
-                    class="btn-secundario">
+                    class="btn-secundario"
+                    data-i18n="comun.cancelar">
 
                     Cancelar
 
@@ -286,7 +313,8 @@
                 <button
                     type="button"
                     id="confirmarEliminar"
-                    class="btn-peligro">
+                    class="btn-peligro"
+                    data-i18n="comun.eliminar">
 
                     Eliminar
 
@@ -299,6 +327,7 @@
     </div>
 
     <script src="js/tema-global.js"></script>
+    <script src="js/idioma-global.js"></script>
     <script src="js/personalizados.js"></script>
 
 </body>

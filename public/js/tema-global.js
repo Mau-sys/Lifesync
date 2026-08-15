@@ -1,10 +1,15 @@
 (function () {
 
+    "use strict";
+
+
     const CLAVE_TEMA = "lifesync_tema";
+
 
     function obtenerTemaGuardado() {
 
-        const tema = localStorage.getItem(CLAVE_TEMA);
+        const tema =
+            localStorage.getItem(CLAVE_TEMA);
 
         if (tema === "claro") {
             return "claro";
@@ -16,30 +21,46 @@
 
     function actualizarLogos(tema) {
 
-        const logos = document.querySelectorAll(
-            "img[data-logo-lifesync]"
-        );
+        const logos =
+            document.querySelectorAll(
+                "img[data-logo-lifesync]"
+            );
+
 
         logos.forEach(function (logo) {
 
-            const logoClaro = logo.dataset.logoClaro;
-            const logoOscuro = logo.dataset.logoOscuro;
+            const logoClaro =
+                logo.dataset.logoClaro;
 
-            if (tema === "claro" && logoClaro) {
+            const logoOscuro =
+                logo.dataset.logoOscuro;
+
+
+            if (
+                tema === "claro" &&
+                logoClaro
+            ) {
 
                 logo.src = logoClaro;
 
-            } else if (tema === "oscuro" && logoOscuro) {
+            }
+
+
+            if (
+                tema === "oscuro" &&
+                logoOscuro
+            ) {
 
                 logo.src = logoOscuro;
 
             }
 
         });
+
     }
 
 
-    function aplicarTema(tema, guardar = true) {
+    function aplicarTema(tema) {
 
         const temaValido =
             tema === "claro"
@@ -53,14 +74,15 @@
         );
 
 
-        document.documentElement.classList.remove(
+        document.documentElement.classList.toggle(
             "tema-claro",
-            "tema-oscuro"
+            temaValido === "claro"
         );
 
 
-        document.documentElement.classList.add(
-            "tema-" + temaValido
+        document.documentElement.classList.toggle(
+            "tema-oscuro",
+            temaValido === "oscuro"
         );
 
 
@@ -72,66 +94,69 @@
             );
 
 
-            document.body.classList.remove(
+            document.body.classList.toggle(
                 "tema-claro",
-                "tema-oscuro"
+                temaValido === "claro"
             );
 
 
-            document.body.classList.add(
-                "tema-" + temaValido
+            document.body.classList.toggle(
+                "tema-oscuro",
+                temaValido === "oscuro"
             );
 
 
             actualizarLogos(temaValido);
+
         }
 
 
-        if (guardar) {
+        localStorage.setItem(
+            CLAVE_TEMA,
+            temaValido
+        );
 
-            localStorage.setItem(
-                CLAVE_TEMA,
-                temaValido
-            );
-        }
+
+        window.dispatchEvent(
+            new CustomEvent(
+                "lifesyncTemaCambiado",
+                {
+                    detail: {
+                        tema: temaValido
+                    }
+                }
+            )
+        );
+
     }
 
 
-    function alternarTema() {
-
-        const temaActual =
-            document.documentElement.getAttribute(
-                "data-tema"
-            );
+    window.aplicarTemaGlobal =
+        aplicarTema;
 
 
-        const nuevoTema =
-            temaActual === "oscuro"
-                ? "claro"
-                : "oscuro";
-
-
-        aplicarTema(nuevoTema);
-    }
-
-
-    window.aplicarTemaGlobal = aplicarTema;
-
-    window.alternarTemaGlobal = alternarTema;
-
+    window.obtenerTemaGlobal =
+        obtenerTemaGuardado;
 
     const temaInicial =
         obtenerTemaGuardado();
 
 
-    /*
-     * IMPORTANTE:
-     * Se aplica inmediatamente al <html>,
-     * antes de que cargue toda la página.
-     */
-    aplicarTema(
-        temaInicial,
-        false
+    document.documentElement.setAttribute(
+        "data-tema",
+        temaInicial
+    );
+
+
+    document.documentElement.classList.toggle(
+        "tema-claro",
+        temaInicial === "claro"
+    );
+
+
+    document.documentElement.classList.toggle(
+        "tema-oscuro",
+        temaInicial === "oscuro"
     );
 
 
@@ -140,8 +165,7 @@
         function () {
 
             aplicarTema(
-                obtenerTemaGuardado(),
-                false
+                temaInicial
             );
 
         }

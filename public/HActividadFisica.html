@@ -1,190 +1,770 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeSync - Actividad Física</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/ActividadFisica.css">
+    <title data-i18n="actividadFisica.tituloPagina">
+        LifeSync - Actividad Física
+    </title>
+
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sora:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link
+        rel="stylesheet"
+        href="css/ActividadFisica.css">
+
 </head>
+
+
 <body class="bg-lifesync p-0 m-0">
 
     <div class="card-full-screen d-flex flex-column justify-content-between">
-        
+
         <div>
+
             <div class="d-flex justify-content-end align-items-center mb-3">
+
                 <div class="position-relative">
-                    <button class="btn btn-options p-0" id="btn-options-academico" aria-label="Opciones">
+
+                    <button
+                        class="btn btn-options p-0"
+                        id="btn-options-academico"
+                        aria-label="Opciones"
+                        data-i18n-aria-label="comun.opciones">
+
                         <i class="fa-solid fa-ellipsis-vertical"></i>
+
                     </button>
-                    <div class="kebab-dropdown-menu" id="kebab-menu-academico">
-                        <a href="inicio.html" class="kebab-item" id="btn-regresar">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Regresar
+
+
+                    <div
+                        class="kebab-dropdown-menu"
+                        id="kebab-menu-academico">
+
+                        <a
+                            href="inicio.html"
+                            class="kebab-item"
+                            id="btn-regresar">
+
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+
+                            <span data-i18n="comun.regresar">
+                                Regresar
+                            </span>
+
                         </a>
-                        <a href="#" class="kebab-item" id="btn-editar-meta" data-bs-toggle="modal" data-bs-target="#modalEditarMetaFisica">
-                            <i class="fa-regular fa-pen-to-square me-2"></i>Editar meta
+
+
+                        <a
+                            href="#"
+                            class="kebab-item"
+                            id="btn-editar-meta"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalEditarMetaFisica">
+
+                            <i class="fa-regular fa-pen-to-square me-2"></i>
+
+                            <span data-i18n="actividadFisica.editarMeta">
+                                Editar meta
+                            </span>
+
                         </a>
+
+
                         <div class="dropdown-divider my-1"></div>
-                        <a href="#" class="kebab-item danger" id="btn-deshabilitar-habito">
-                            <i class="fa-solid fa-ban me-2"></i>Deshabilitar hábito
+
+
+                        <a
+                            href="#"
+                            class="kebab-item danger"
+                            id="btn-deshabilitar-habito">
+
+                            <i class="fa-solid fa-ban me-2"></i>
+
+                            <span data-i18n="comun.deshabilitarHabito">
+                                Deshabilitar hábito
+                            </span>
+
                         </a>
+
                     </div>
+
                 </div>
+
             </div>
-            
+
+
             <div class="text-center">
+
                 <div class="icon-circle bg-amber-soft mx-auto mb-2">
+
                     <i class="fa-solid fa-dumbbell text-amber"></i>
+
                 </div>
-                <h4 class="fw-bold text-white mt-2 mb-0 font-sora texto-titulo-fluido">Actividad Física</h4>
+
+
+                <h4
+                    class="fw-bold text-white mt-2 mb-0 font-sora texto-titulo-fluido"
+                    data-i18n="actividadFisica.titulo">
+
+                    Actividad Física
+
+                </h4>
+
             </div>
+
         </div>
+
 
         <div class="my-auto py-2 text-center d-flex flex-column align-items-center justify-content-center">
-            <div class="progress-ring ring-amber mx-auto mb-3" id="ring-sesiones-fisica">
+
+            <div
+                class="progress-ring ring-amber mx-auto mb-3"
+                id="ring-sesiones-fisica">
+
                 <div class="progress-content">
-                    <h1 class="fw-bold mb-0 text-white font-sora contador-fluido" id="contador-sesiones-fisica">0/5</h1>
-                    <span class="text-subtle fw-medium subtexto-fluido" id="label-progreso-unidad">sesiones</span>
+
+                    <h1
+                        class="fw-bold mb-0 text-white font-sora contador-fluido"
+                        id="contador-sesiones-fisica">
+
+                        0/5
+
+                    </h1>
+
+
+                    <span
+                        class="text-subtle fw-medium subtexto-fluido"
+                        id="label-progreso-unidad"
+                        data-i18n="actividadFisica.sesiones">
+
+                        sesiones
+
+                    </span>
+
                 </div>
+
             </div>
+
 
             <div class="text-center">
-                <span class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido" id="label-tipo-meta">Meta de 3 días</span>
-                <span class="text-amber fw-bold meta-texto-fluido" id="meta-fisica">5 sesiones (2 horas y 30 min)</span>
+
+                <span
+                    class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido"
+                    id="label-tipo-meta"
+                    data-i18n="actividadFisica.metaDias">
+
+                    Meta de 3 días
+
+                </span>
+
+
+                <span
+                    class="text-amber fw-bold meta-texto-fluido"
+                    id="meta-fisica">
+
+                    5 sesiones (2 horas y 30 min)
+
+                </span>
+
             </div>
+
         </div>
+
 
         <div class="w-100">
-            <div class="tiempo-box text-center rounded-4 mb-3" id="box-tiempo-fisica">
-                <span class="text-subtle d-block fw-semibold text-uppercase tracking-wider mb-1 label-fluido">Tiempo acumulado</span>
-                <span class="text-amber fw-bold tiempo-texto-fluido" id="tiempo-acumulado-fisica">0 min / 150 min</span>
+
+            <div
+                class="tiempo-box text-center rounded-4 mb-3"
+                id="box-tiempo-fisica">
+
+                <span
+                    class="text-subtle d-block fw-semibold text-uppercase tracking-wider mb-1 label-fluido"
+                    data-i18n="actividadFisica.tiempoAcumulado">
+
+                    Tiempo acumulado
+
+                </span>
+
+
+                <span
+                    class="text-amber fw-bold tiempo-texto-fluido"
+                    id="tiempo-acumulado-fisica">
+
+                    0 min / 150 min
+
+                </span>
+
             </div>
 
-            <button class="btn btn-action-amber w-100 rounded-pill fw-bold font-sora boton-fluido" id="btn-add-sesion-fisica">+ Registrar sesión</button>
+
+            <button
+                class="btn btn-action-amber w-100 rounded-pill fw-bold font-sora boton-fluido"
+                id="btn-add-sesion-fisica">
+
+                <span data-i18n="actividadFisica.registrarSesion">
+                    + Registrar sesión
+                </span>
+
+            </button>
+
         </div>
 
     </div>
 
-    <div class="modal fade" id="modalRegistrarSesion" tabindex="-1" aria-labelledby="modalRegistrarSesionLabel" aria-hidden="true">
+
+    <div
+        class="modal fade"
+        id="modalRegistrarSesion"
+        tabindex="-1"
+        aria-labelledby="modalRegistrarSesionLabel"
+        aria-hidden="true">
+
         <div class="modal-dialog modal-dialog-centered modal-sm">
+
             <div class="modal-content modal-custom-card text-white">
-                <div class="modal-header border-0 pb-0 pt-3 px-3 align-items-center">
-                    <h6 class="modal-title font-sora text-amber fw-bold mb-0" id="modalRegistrarSesionLabel">
-                        <i class="fa-solid fa-stopwatch me-2"></i>Nueva Sesión
+
+                <div
+                    class="modal-header border-0 pb-0 pt-3 px-3 align-items-center">
+
+                    <h6
+                        class="modal-title font-sora text-amber fw-bold mb-0"
+                        id="modalRegistrarSesionLabel">
+
+                        <i class="fa-solid fa-stopwatch me-2"></i>
+
+                        <span data-i18n="actividadFisica.nuevaSesion">
+                            Nueva Sesión
+                        </span>
+
                     </h6>
-                    <button type="button" class="btn-close btn-close-white btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white btn-sm"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                        data-i18n-aria-label="comun.cerrar">
+
+                    </button>
+
                 </div>
+
+
                 <div class="modal-body p-3">
-                    <form id="form-registrar-sesion" class="d-flex flex-column gap-2">
+
+                    <form
+                        id="form-registrar-sesion"
+                        class="d-flex flex-column gap-2">
+
                         <div>
-                            <label for="select-tipo-actividad" class="form-label font-sora small fw-semibold text-light mb-1">Actividad</label>
-                            <select class="form-select custom-select-dark py-2" id="select-tipo-actividad">
-                                <option value="Gimnasio">🏋️‍♂️ Gimnasio</option>
-                                <option value="Correr">🏃‍♂️ Correr</option>
-                                <option value="Caminar">🚶‍♂️ Caminar</option>
-                                <option value="Yoga">🧘‍♀️ Yoga / Estiramiento</option>
-                                <option value="Ciclismo">🚴‍♂️ Ciclismo</option>
-                                <option value="Natación">🏊‍♂️ Natación</option>
-                                <option value="Otro">⚡ Otro deporte</option>
+
+                            <label
+                                for="select-tipo-actividad"
+                                class="form-label font-sora small fw-semibold text-light mb-1"
+                                data-i18n="actividadFisica.actividad">
+
+                                Actividad
+
+                            </label>
+
+
+                            <select
+                                class="form-select custom-select-dark py-2"
+                                id="select-tipo-actividad">
+
+                                <option
+                                    value="Gimnasio"
+                                    data-i18n="actividadFisica.gimnasio">
+
+                                    🏋️‍♂️ Gimnasio
+
+                                </option>
+
+                                <option
+                                    value="Correr"
+                                    data-i18n="actividadFisica.correr">
+
+                                    🏃‍♂️ Correr
+
+                                </option>
+
+                                <option
+                                    value="Caminar"
+                                    data-i18n="actividadFisica.caminar">
+
+                                    🚶‍♂️ Caminar
+
+                                </option>
+
+                                <option
+                                    value="Yoga"
+                                    data-i18n="actividadFisica.yoga">
+
+                                    🧘‍♀️ Yoga / Estiramiento
+
+                                </option>
+
+                                <option
+                                    value="Ciclismo"
+                                    data-i18n="actividadFisica.ciclismo">
+
+                                    🚴‍♂️ Ciclismo
+
+                                </option>
+
+                                <option
+                                    value="Natación"
+                                    data-i18n="actividadFisica.natacion">
+
+                                    🏊‍♂️ Natación
+
+                                </option>
+
+                                <option
+                                    value="Otro"
+                                    data-i18n="actividadFisica.otroDeporte">
+
+                                    ⚡ Otro deporte
+
+                                </option>
+
                             </select>
+
                         </div>
+
+
                         <div>
-                            <label for="input-duracion-minutos" class="form-label font-sora small fw-semibold text-light mb-1">Duración (1 - 360 min)</label>
+
+                            <label
+                                for="input-duracion-minutos"
+                                class="form-label font-sora small fw-semibold text-light mb-1"
+                                data-i18n="actividadFisica.duracion">
+
+                                Duración (1 - 360 min)
+
+                            </label>
+
+
                             <div class="input-group custom-input-group">
-                                <input type="number" class="form-control custom-input-dark py-2" id="input-duracion-minutos" min="1" max="360" value="30" required>
-                                <span class="input-group-text custom-input-addon py-2">minutos</span>
+
+                                <input
+                                    type="number"
+                                    class="form-control custom-input-dark py-2"
+                                    id="input-duracion-minutos"
+                                    min="1"
+                                    max="360"
+                                    value="30"
+                                    required>
+
+
+                                <span
+                                    class="input-group-text custom-input-addon py-2"
+                                    data-i18n="actividadFisica.minutos">
+
+                                    minutos
+
+                                </span>
+
                             </div>
+
                         </div>
+
                     </form>
+
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-3 px-3 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-pill-cancel btn-sm px-3" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-pill-submit btn-sm px-3" id="btn-guardar-sesion">Guardar</button>
+
+
+                <div
+                    class="modal-footer border-0 pt-0 pb-3 px-3 d-flex justify-content-end gap-2">
+
+                    <button
+                        type="button"
+                        class="btn btn-pill-cancel btn-sm px-3"
+                        data-bs-dismiss="modal">
+
+                        <span data-i18n="comun.cancelar">
+                            Cancelar
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-pill-submit btn-sm px-3"
+                        id="btn-guardar-sesion">
+
+                        <span data-i18n="comun.guardar">
+                            Guardar
+                        </span>
+
+                    </button>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
-    <div class="modal fade" id="modalEditarMetaFisica" tabindex="-1" aria-labelledby="modalEditarMetaFisicaLabel" aria-hidden="true">
+
+    <div
+        class="modal fade"
+        id="modalEditarMetaFisica"
+        tabindex="-1"
+        aria-labelledby="modalEditarMetaFisicaLabel"
+        aria-hidden="true">
+
         <div class="modal-dialog modal-dialog-centered">
+
             <div class="modal-content modal-custom-card text-white">
-                
-                <div class="modal-header border-0 pb-0 pt-4 px-4 align-items-center">
-                    <h5 class="modal-title font-sora fw-bold d-flex align-items-center gap-2 text-white" id="modalEditarMetaFisicaLabel">
+
+                <div
+                    class="modal-header border-0 pb-0 pt-4 px-4 align-items-center">
+
+                    <h5
+                        class="modal-title font-sora fw-bold d-flex align-items-center gap-2 text-white"
+                        id="modalEditarMetaFisicaLabel">
+
                         <i class="fa-solid fa-gear text-amber"></i>
-                        <span>Editar Meta de Actividad Física</span>
+
+                        <span data-i18n="actividadFisica.editarMetaActividad">
+                            Editar Meta de Actividad Física
+                        </span>
+
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                        data-i18n-aria-label="comun.cerrar">
+
+                    </button>
+
                 </div>
+
 
                 <div class="modal-body p-4">
-                    <form id="form-config-meta" class="d-flex flex-column gap-3">
-                        
+
+                    <form
+                        id="form-config-meta"
+                        class="d-flex flex-column gap-3">
+
                         <div>
-                            <label for="select-tipo-meta" class="form-label font-sora small fw-semibold text-light mb-2">Frecuencia de la meta</label>
-                            <select class="form-select custom-select-dark" id="select-tipo-meta">
-                                <option value="diaria">Diaria</option>
-                                <option value="semanal">Semanal</option>
-                                <option value="mensual">Mensual</option>
-                                <option value="personalizado">Personalizada (Días específicos)</option>
+
+                            <label
+                                for="select-tipo-meta"
+                                class="form-label font-sora small fw-semibold text-light mb-2"
+                                data-i18n="actividadFisica.frecuenciaMeta">
+
+                                Frecuencia de la meta
+
+                            </label>
+
+
+                            <select
+                                class="form-select custom-select-dark"
+                                id="select-tipo-meta">
+
+                                <option
+                                    value="diaria"
+                                    data-i18n="actividadFisica.diaria">
+
+                                    Diaria
+
+                                </option>
+
+                                <option
+                                    value="semanal"
+                                    data-i18n="actividadFisica.semanal">
+
+                                    Semanal
+
+                                </option>
+
+                                <option
+                                    value="mensual"
+                                    data-i18n="actividadFisica.mensual">
+
+                                    Mensual
+
+                                </option>
+
+                                <option
+                                    value="personalizado"
+                                    data-i18n="actividadFisica.personalizada">
+
+                                    Personalizada (Días específicos)
+
+                                </option>
+
                             </select>
+
                         </div>
 
-                        <div id="contenedor-dias-semana" class="d-none">
-                            <label class="form-label font-sora small fw-semibold text-light mb-2">Selecciona los días activos</label>
+
+                        <div
+                            id="contenedor-dias-semana"
+                            class="d-none">
+
+                            <label
+                                class="form-label font-sora small fw-semibold text-light mb-2"
+                                data-i18n="actividadFisica.diasActivos">
+
+                                Selecciona los días activos
+
+                            </label>
+
+
                             <div class="dias-pill-container">
-                                <button type="button" class="btn-dia-pill" data-dia="0">L</button>
-                                <button type="button" class="btn-dia-pill" data-dia="1">M</button>
-                                <button type="button" class="btn-dia-pill" data-dia="2">Mi</button>
-                                <button type="button" class="btn-dia-pill" data-dia="3">J</button>
-                                <button type="button" class="btn-dia-pill" data-dia="4">V</button>
-                                <button type="button" class="btn-dia-pill" data-dia="5">S</button>
-                                <button type="button" class="btn-dia-pill" data-dia="6">D</button>
+
+                                <button
+                                    type="button"
+                                    class="btn-dia-pill"
+                                    data-dia="0">
+
+                                    L
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-dia-pill"
+                                    data-dia="1">
+
+                                    M
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-dia-pill"
+                                    data-dia="2">
+
+                                    Mi
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-dia-pill"
+                                    data-dia="3">
+
+                                    J
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-dia-pill"
+                                    data-dia="4">
+
+                                    V
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-dia-pill"
+                                    data-dia="5">
+
+                                    S
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-dia-pill"
+                                    data-dia="6">
+
+                                    D
+
+                                </button>
+
                             </div>
+
                         </div>
+
 
                         <div id="contenedor-meta-cantidad">
-                            <label for="input-meta-cantidad" class="form-label font-sora small fw-semibold text-light mb-2" id="label-meta-cantidad">
-                                Sesiones <span class="text-subtle fw-normal" id="help-limite-sesiones">(Máx. 14)</span>
+
+                            <label
+                                for="input-meta-cantidad"
+                                class="form-label font-sora small fw-semibold text-light mb-2"
+                                id="label-meta-cantidad">
+
+                                <span data-i18n="actividadFisica.sesiones">
+                                    Sesiones
+                                </span>
+
+                                <span
+                                    class="text-subtle fw-normal"
+                                    id="help-limite-sesiones"
+                                    data-i18n="actividadFisica.maximo14">
+
+                                    (Máx. 14)
+
+                                </span>
+
                             </label>
-                            <input type="number" class="form-control custom-input-dark" id="input-meta-cantidad" min="1" max="14" value="5" required>
+
+
+                            <input
+                                type="number"
+                                class="form-control custom-input-dark"
+                                id="input-meta-cantidad"
+                                min="1"
+                                max="14"
+                                value="5"
+                                required>
+
                         </div>
 
+
                         <div>
-                            <label for="input-meta-minutos" class="form-label font-sora small fw-semibold text-light mb-2">
-                                Duración acumulada objetivo <span class="text-subtle fw-normal">(Máx. 3000 min)</span>
+
+                            <label
+                                for="input-meta-minutos"
+                                class="form-label font-sora small fw-semibold text-light mb-2">
+
+                                <span data-i18n="actividadFisica.duracionAcumulada">
+                                    Duración acumulada objetivo
+                                </span>
+
+                                <span
+                                    class="text-subtle fw-normal"
+                                    data-i18n="actividadFisica.maximo3000">
+
+                                    (Máx. 3000 min)
+
+                                </span>
+
                             </label>
+
+
                             <div class="input-group custom-input-group">
-                                <input type="number" class="form-control custom-input-dark" id="input-meta-minutos" min="10" max="3000" step="5" value="150" required>
-                                <span class="input-group-text custom-input-addon">minutos</span>
+
+                                <input
+                                    type="number"
+                                    class="form-control custom-input-dark"
+                                    id="input-meta-minutos"
+                                    min="10"
+                                    max="3000"
+                                    step="5"
+                                    value="150"
+                                    required>
+
+
+                                <span
+                                    class="input-group-text custom-input-addon"
+                                    data-i18n="actividadFisica.minutos">
+
+                                    minutos
+
+                                </span>
+
                             </div>
+
                         </div>
 
                     </form>
+
                 </div>
 
-                <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between align-items-center gap-2">
-                    <button type="button" class="btn btn-pill-danger" id="btn-reiniciar-habito-modal">
-                        <i class="fa-solid fa-rotate-right me-1"></i> Reiniciar
+
+                <div
+                    class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between align-items-center gap-2">
+
+                    <button
+                        type="button"
+                        class="btn btn-pill-danger"
+                        id="btn-reiniciar-habito-modal">
+
+                        <i class="fa-solid fa-rotate-right me-1"></i>
+
+                        <span data-i18n="comun.reiniciar">
+                            Reiniciar
+                        </span>
+
                     </button>
+
+
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-pill-cancel" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-pill-submit" id="btn-guardar-meta">Guardar cambios</button>
+
+                        <button
+                            type="button"
+                            class="btn btn-pill-cancel"
+                            data-bs-dismiss="modal">
+
+                            <span data-i18n="comun.cancelar">
+                                Cancelar
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="btn btn-pill-submit"
+                            id="btn-guardar-meta">
+
+                            <span data-i18n="comun.guardarCambios">
+                                Guardar cambios
+                            </span>
+
+                        </button>
+
                     </div>
+
                 </div>
 
             </div>
+
         </div>
+
     </div>
 
+
     <script src="js/tema-global.js"></script>
+
+    <script src="js/idioma-global.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="js/HActividadFisica.js"></script>
+
 </body>
 </html>

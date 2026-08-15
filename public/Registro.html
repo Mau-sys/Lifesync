@@ -27,9 +27,13 @@
 
             <div class="header-register">
 
-                <h1>Crear cuenta</h1>
+                <h1 data-i18n="registro.titulo">
+                    Crear cuenta
+                </h1>
 
-                <p>Comienza tu mejor versión</p>
+                <p data-i18n="registro.subtitulo">
+                    Comienza tu mejor versión
+                </p>
 
             </div>
 
@@ -41,8 +45,12 @@
 
                 <div class="input-group">
 
-                    <label for="nombre">
+                    <label
+                        for="nombre"
+                        data-i18n="registro.nombre">
+
                         Nombre completo
+
                     </label>
 
                     <input
@@ -50,6 +58,7 @@
                         id="nombre"
                         name="nombre"
                         placeholder="Ingresa tu nombre completo"
+                        data-i18n-placeholder="registro.nombrePlaceholder"
                         autocomplete="name"
                         maxlength="50"
                         required>
@@ -58,8 +67,12 @@
 
                 <div class="input-group">
 
-                    <label for="correo">
+                    <label
+                        for="correo"
+                        data-i18n="registro.correo">
+
                         Correo electrónico
+
                     </label>
 
                     <input
@@ -67,6 +80,7 @@
                         id="correo"
                         name="correo"
                         placeholder="Ingresa tu correo electrónico"
+                        data-i18n-placeholder="registro.correoPlaceholder"
                         autocomplete="email"
                         maxlength="150"
                         required>
@@ -75,8 +89,12 @@
 
                 <div class="input-group">
 
-                    <label for="password">
+                    <label
+                        for="password"
+                        data-i18n="registro.password">
+
                         Contraseña
+
                     </label>
 
                     <input
@@ -84,6 +102,7 @@
                         id="password"
                         name="password"
                         placeholder="Crea una contraseña"
+                        data-i18n-placeholder="registro.passwordPlaceholder"
                         autocomplete="new-password"
                         minlength="8"
                         required>
@@ -92,8 +111,12 @@
 
                 <div class="input-group">
 
-                    <label for="confirmarPassword">
+                    <label
+                        for="confirmarPassword"
+                        data-i18n="registro.confirmarPassword">
+
                         Confirmar contraseña
+
                     </label>
 
                     <input
@@ -101,6 +124,7 @@
                         id="confirmarPassword"
                         name="confirmarPassword"
                         placeholder="Confirma tu contraseña"
+                        data-i18n-placeholder="registro.confirmarPlaceholder"
                         autocomplete="new-password"
                         minlength="8"
                         required>
@@ -117,7 +141,8 @@
                 <button
                     type="submit"
                     id="btnRegistro"
-                    class="btn-primary">
+                    class="btn-primary"
+                    data-i18n="registro.boton">
 
                     Registrarse
 
@@ -127,7 +152,9 @@
 
             <div class="social-register">
 
-                <p>O continúa con</p>
+                <p data-i18n="registro.continuar">
+                    O continúa con
+                </p>
 
                 <div class="social-buttons">
 
@@ -135,7 +162,8 @@
                         type="button"
                         id="googleRegister"
                         class="social-button"
-                        aria-label="Continuar con Google">
+                        aria-label="Continuar con Google"
+                        data-i18n-aria-label="registro.google">
 
                         <img
                             src="img/Logo-G.png"
@@ -147,7 +175,8 @@
                         type="button"
                         id="appleRegister"
                         class="social-button"
-                        aria-label="Continuar con Apple">
+                        aria-label="Continuar con Apple"
+                        data-i18n-aria-label="registro.apple">
 
                         <img
                             src="img/Logo-A.png"
@@ -161,10 +190,16 @@
 
             <p class="login-link">
 
-                ¿Ya tienes una cuenta?
+                <span data-i18n="registro.yaCuenta">
+                    ¿Ya tienes una cuenta?
+                </span>
 
-                <a href="Inicio-sesion.html">
+                <a
+                    href="Inicio-sesion.html"
+                    data-i18n="registro.iniciarSesion">
+
                     Inicia sesión
+
                 </a>
 
             </p>
@@ -174,6 +209,9 @@
     </main>
 
     <script src="js/tema-global.js"></script>
+
+    <script src="js/idioma-global.js"></script>
+
     <script src="js/registro.js"></script>
 
 </body>

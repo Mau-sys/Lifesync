@@ -1,78 +1,248 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeSync - Hábito Personalizado</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/habitoPersonalizado.css">
+    <title data-i18n="personalizado.tituloPagina">
+        LifeSync - Hábito Personalizado
+    </title>
+
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link
+        rel="stylesheet"
+        href="css/habitoPersonalizado.css">
+
 </head>
+
+
 <body class="bg-lifesync p-0 m-0">
 
     <div class="card-full-screen d-flex flex-column justify-content-between">
-        
+
         <div>
-             <div class="d-flex justify-content-end align-items-center mb-3">
+
+            <div class="d-flex justify-content-end align-items-center mb-3">
+
                 <div class="position-relative">
-                    <button class="btn btn-options p-0" id="btn-options-academico" aria-label="Opciones">
+
+                    <button
+                        class="btn btn-options p-0"
+                        id="btn-options-academico"
+                        aria-label="Opciones"
+                        data-i18n-aria-label="comun.opciones">
+
                         <i class="fa-solid fa-ellipsis-vertical"></i>
+
                     </button>
-                    <div class="kebab-dropdown-menu" id="kebab-menu-academico">
-                        <a href="inicio.html" class="kebab-item" id="btn-regresar">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Regresar
+
+
+                    <div
+                        class="kebab-dropdown-menu"
+                        id="kebab-menu-academico">
+
+                        <a
+                            href="inicio.html"
+                            class="kebab-item"
+                            id="btn-regresar">
+
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+
+                            <span data-i18n="comun.regresar">
+                                Regresar
+                            </span>
+
                         </a>
-                         <a href="#" class="kebab-item" id="btn-editar-meta">
-                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
+
+
+                        <a
+                            href="#"
+                            class="kebab-item"
+                            id="btn-editar-meta">
+
+                            <i class="fa-solid fa-pen-to-square me-2"></i>
+
+                            <span data-i18n="personalizado.editarMeta">
+                                Editar meta
+                            </span>
+
                         </a>
+
+
                         <div class="dropdown-divider my-1"></div>
-                        <a href="#" class="kebab-item danger" id="btn-eliminar-habito">
-    <i class="fa-solid fa-trash me-2"></i>Eliminar hábito
-</a>
+
+
+                        <a
+                            href="#"
+                            class="kebab-item danger"
+                            id="btn-eliminar-habito">
+
+                            <i class="fa-solid fa-trash me-2"></i>
+
+                            <span data-i18n="personalizado.eliminarHabito">
+                                Eliminar hábito
+                            </span>
+
                         </a>
+
                     </div>
+
                 </div>
+
             </div>
+
+
             <div class="text-center mt-2">
+
                 <div class="icon-circle bg-orange-soft mx-auto mb-2">
+
                     <i class="fa-regular fa-star text-orange"></i>
+
                 </div>
-                <h4 class="fw-bold text-white mb-0 font-sora texto-titulo-fluido">Hábito Personalizado</h4>
+
+
+                <h4
+                    class="fw-bold text-white mb-0 font-sora texto-titulo-fluido"
+                    data-i18n="personalizado.titulo">
+
+                    Hábito Personalizado
+
+                </h4>
+
             </div>
+
         </div>
+
 
         <div class="my-auto py-2 text-center d-flex flex-column align-items-center justify-content-center">
-            <div class="progress-ring ring-orange mx-auto mb-3" id="ring-veces-personalizado">
+
+            <div
+                class="progress-ring ring-orange mx-auto mb-3"
+                id="ring-veces-personalizado">
+
                 <div class="progress-content">
-                    <h1 class="fw-bold mb-0 text-white font-sora contador-fluido" id="contador-veces-personalizado">2/5</h1>
-                    <span class="text-subtle fw-medium subtexto-fluido">veces</span>
+
+                    <h1
+                        class="fw-bold mb-0 text-white font-sora contador-fluido"
+                        id="contador-veces-personalizado">
+
+                        2/5
+
+                    </h1>
+
+
+                    <span
+                        class="text-subtle fw-medium subtexto-fluido"
+                        data-i18n="personalizado.veces">
+
+                        veces
+
+                    </span>
+
                 </div>
+
             </div>
+
 
             <div class="text-center">
-                <span class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido">Mi hábito</span>
-                <span class="text-orange fw-bold meta-texto-fluido" id="habito-descripcion">Leer 20 páginas</span>
+
+                <span
+                    class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido"
+                    data-i18n="personalizado.miHabito">
+
+                    Mi hábito
+
+                </span>
+
+
+                <span
+                    class="text-orange fw-bold meta-texto-fluido"
+                    id="habito-descripcion">
+
+                    Leer 20 páginas
+
+                </span>
+
             </div>
+
         </div>
 
+
         <div class="w-100">
-            <div class="frecuencia-box p-3 rounded-4 mb-3 text-center" id="box-frecuencia">
-                <span class="text-subtle d-block fw-semibold label-fluido text-uppercase tracking-wider mb-1">Frecuencia</span>
-                <span class="text-white fw-bold meta-texto-fluido" id="habito-frecuencia">Diario</span>
+
+            <div
+                class="frecuencia-box p-3 rounded-4 mb-3 text-center"
+                id="box-frecuencia">
+
+                <span
+                    class="text-subtle d-block fw-semibold label-fluido text-uppercase tracking-wider mb-1"
+                    data-i18n="personalizado.frecuencia">
+
+                    Frecuencia
+
+                </span>
+
+
+                <span
+                    class="text-white fw-bold meta-texto-fluido"
+                    id="habito-frecuencia">
+
+                    Diario
+
+                </span>
+
             </div>
 
-            <button class="btn btn-action-orange w-100 rounded-pill fw-bold font-sora boton-fluido" id="btn-add-registro">+1 registro</button>
+
+            <button
+                class="btn btn-action-orange w-100 rounded-pill fw-bold font-sora boton-fluido"
+                id="btn-add-registro">
+
+                <span data-i18n="personalizado.agregarRegistro">
+                    +1 registro
+                </span>
+
+            </button>
+
         </div>
 
     </div>
 
+
     <script src="js/tema-global.js"></script>
+
+    <script src="js/idioma-global.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="js/HHabitoPersonalizado.js"></script>
+
 </body>
 </html>

@@ -396,10 +396,6 @@
     min-width: 120px;
 }
 
-/* =========================================
-   MENSAJES DE CONFIGURACIÓN
-   ========================================= */
-
 .mensaje {
     min-height: 24px;
     margin-top: 10px;
@@ -417,11 +413,6 @@
     color: #ef4444;
 }
 
-
-/* =========================================
-   MODALES
-   ========================================= */
-
 .modal[aria-hidden="true"] {
     display: none;
 }
@@ -430,18 +421,10 @@
     display: flex;
 }
 
-
-/* Evita que el contenido del modal se desborde */
-
 .modal-contenido {
     max-height: 90vh;
     overflow-y: auto;
 }
-
-
-/* =========================================
-   LISTA DE SESIONES
-   ========================================= */
 
 .lista-sesion {
     display: flex;
@@ -499,11 +482,6 @@
     transform: translateY(-1px);
 }
 
-
-/* =========================================
-   TEMA CLARO
-   ========================================= */
-
 body.modo-claro {
     --color-fondo: #f5f7fb;
     --color-superficie: #ffffff;
@@ -512,11 +490,6 @@ body.modo-claro {
     --color-texto-secundario: #687080;
     --color-borde: #dfe3eb;
 }
-
-
-/* =========================================
-   ACCESIBILIDAD
-   ========================================= */
 
 button:focus-visible,
 input:focus-visible,
@@ -526,10 +499,6 @@ a:focus-visible {
     outline-offset: 3px;
 }
 
-/* =========================================
-   MENSAJES DE CONFIGURACIÓN
-   ========================================= */
-
 .mensaje {
     min-height: 24px;
     margin-top: 10px;
@@ -547,11 +516,6 @@ a:focus-visible {
     color: #ef4444;
 }
 
-
-/* =========================================
-   MODALES
-   ========================================= */
-
 .modal[aria-hidden="true"] {
     display: none;
 }
@@ -560,18 +524,10 @@ a:focus-visible {
     display: flex;
 }
 
-
-/* Evita que el contenido del modal se desborde */
-
 .modal-contenido {
     max-height: 90vh;
     overflow-y: auto;
 }
-
-
-/* =========================================
-   LISTA DE SESIONES
-   ========================================= */
 
 .lista-sesion {
     display: flex;
@@ -629,11 +585,6 @@ a:focus-visible {
     transform: translateY(-1px);
 }
 
-
-/* =========================================
-   TEMA CLARO
-   ========================================= */
-
 body.modo-claro {
     --color-fondo: #f5f7fb;
     --color-superficie: #ffffff;
@@ -642,11 +593,6 @@ body.modo-claro {
     --color-texto-secundario: #687080;
     --color-borde: #dfe3eb;
 }
-
-
-/* =========================================
-   ACCESIBILIDAD
-   ========================================= */
 
 button:focus-visible,
 input:focus-visible,
@@ -656,10 +602,6 @@ a:focus-visible {
     outline-offset: 3px;
 }
 
-/* =========================================
-   MENSAJES DE CONFIGURACIÓN
-   ========================================= */
-
 .mensaje {
     min-height: 24px;
     margin-top: 10px;
@@ -677,11 +619,6 @@ a:focus-visible {
     color: #ef4444;
 }
 
-
-/* =========================================
-   MODALES
-   ========================================= */
-
 .modal[aria-hidden="true"] {
     display: none;
 }
@@ -690,18 +627,10 @@ a:focus-visible {
     display: flex;
 }
 
-
-/* Evita que el contenido del modal se desborde */
-
 .modal-contenido {
     max-height: 90vh;
     overflow-y: auto;
 }
-
-
-/* =========================================
-   LISTA DE SESIONES
-   ========================================= */
 
 .lista-sesion {
     display: flex;
@@ -760,10 +689,6 @@ a:focus-visible {
 }
 
 
-/* =========================================
-   TEMA CLARO
-   ========================================= */
-
 body.modo-claro {
     --color-fondo: #f5f7fb;
     --color-superficie: #ffffff;
@@ -772,11 +697,6 @@ body.modo-claro {
     --color-texto-secundario: #687080;
     --color-borde: #dfe3eb;
 }
-
-
-/* =========================================
-   ACCESIBILIDAD
-   ========================================= */
 
 button:focus-visible,
 input:focus-visible,

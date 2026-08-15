@@ -3,12 +3,6 @@
     "use strict";
 
 
-    /*
-    =====================================================
-    CONFIGURACIÓN GENERAL
-    =====================================================
-    */
-
     const CLAVE_CONFIGURACION =
         "lifeSyncConfiguracion";
 
@@ -29,263 +23,6 @@
 
     };
 
-
-    /*
-    =====================================================
-    TRADUCCIONES
-    =====================================================
-    */
-
-    const traducciones = {
-
-        es: {
-
-            volver: "← Volver",
-
-            configuracion: "Configuración",
-
-            descripcionConfiguracion:
-                "Personaliza el funcionamiento de tu cuenta y de la aplicación.",
-
-            apariencia:
-                "🎨 Apariencia",
-
-            modoOscuro:
-                "Modo oscuro",
-
-            descripcionModoOscuro:
-                "Activa el tema oscuro para una experiencia más cómoda durante la noche.",
-
-            notificacionesTitulo:
-                "🔔 Notificaciones",
-
-            recordatorios:
-                "Recordatorios",
-
-            descripcionRecordatorios:
-                "Recibe recordatorios para completar tus hábitos diarios.",
-
-            sonidos:
-                "Sonidos de la aplicación",
-
-            descripcionSonidos:
-                "Reproduce sonidos al completar hábitos, obtener logros y recibir notificaciones.",
-
-            correos:
-                "Correos electrónicos",
-
-            descripcionCorreos:
-                "Envía recordatorios importantes y resúmenes semanales a tu correo.",
-
-            idiomaTitulo:
-                "🌐 Idioma",
-
-            seleccionarIdioma:
-                "Selecciona el idioma",
-
-            espanol:
-                "Español",
-
-            ingles:
-                "English",
-
-            sincronizacionTitulo:
-                "☁️ Sincronización",
-
-            sincronizacionAutomatica:
-                "Sincronización automática",
-
-            descripcionSincronizacion:
-                "Guarda automáticamente tus hábitos, estadísticas, rachas y configuraciones para mantenerlas disponibles en todos tus dispositivos.",
-
-            estadoSincronizacionTitulo:
-                "Estado de sincronización",
-
-            textoSincronizada:
-                "Tu información se encuentra respaldada correctamente.",
-
-            sincronizada:
-                "● Sincronizada",
-
-            seguridadTitulo:
-                "🔒 Seguridad",
-
-            cambiarContrasena:
-                "Cambiar contraseña",
-
-            descripcionContrasena:
-                "Actualiza tu contraseña para proteger tu cuenta.",
-
-            cambiar:
-                "Cambiar",
-
-            sesionesActivas:
-                "Sesiones activas",
-
-            descripcionSesiones:
-                "Consulta y administra los dispositivos donde has iniciado sesión.",
-
-            administrar:
-                "Administrar",
-
-            guardarCambios:
-                "Guardar cambios",
-
-            introducirContrasenas:
-                "Introduce tu contraseña actual y después la nueva contraseña.",
-
-            contrasenaActual:
-                "Contraseña actual",
-
-            nuevaContrasena:
-                "Nueva contraseña",
-
-            confirmarContrasena:
-                "Confirmar nueva contraseña",
-
-            cancelar:
-                "Cancelar",
-
-            guardar:
-                "Guardar",
-
-            descripcionModalSesiones:
-                "Aquí aparecerán los dispositivos donde hayas iniciado sesión. También podrás cerrar cualquier sesión de forma segura.",
-
-            cerrar:
-                "Cerrar"
-
-        },
-
-
-        en: {
-
-            volver: "← Back",
-
-            configuracion:
-                "Settings",
-
-            descripcionConfiguracion:
-                "Customize how your account and application work.",
-
-            apariencia:
-                "🎨 Appearance",
-
-            modoOscuro:
-                "Dark mode",
-
-            descripcionModoOscuro:
-                "Enable the dark theme for a more comfortable experience at night.",
-
-            notificacionesTitulo:
-                "🔔 Notifications",
-
-            recordatorios:
-                "Reminders",
-
-            descripcionRecordatorios:
-                "Receive reminders to complete your daily habits.",
-
-            sonidos:
-                "Application sounds",
-
-            descripcionSonidos:
-                "Play sounds when completing habits, earning achievements, and receiving notifications.",
-
-            correos:
-                "Emails",
-
-            descripcionCorreos:
-                "Receive important reminders and weekly summaries by email.",
-
-            idiomaTitulo:
-                "🌐 Language",
-
-            seleccionarIdioma:
-                "Select language",
-
-            espanol:
-                "Spanish",
-
-            ingles:
-                "English",
-
-            sincronizacionTitulo:
-                "☁️ Synchronization",
-
-            sincronizacionAutomatica:
-                "Automatic synchronization",
-
-            descripcionSincronizacion:
-                "Automatically save your habits, statistics, streaks, and settings to keep them available across your devices.",
-
-            estadoSincronizacionTitulo:
-                "Synchronization status",
-
-            textoSincronizada:
-                "Your information is backed up correctly.",
-
-            sincronizada:
-                "● Synchronized",
-
-            seguridadTitulo:
-                "🔒 Security",
-
-            cambiarContrasena:
-                "Change password",
-
-            descripcionContrasena:
-                "Update your password to protect your account.",
-
-            cambiar:
-                "Change",
-
-            sesionesActivas:
-                "Active sessions",
-
-            descripcionSesiones:
-                "View and manage the devices where you are signed in.",
-
-            administrar:
-                "Manage",
-
-            guardarCambios:
-                "Save changes",
-
-            introducirContrasenas:
-                "Enter your current password and then your new password.",
-
-            contrasenaActual:
-                "Current password",
-
-            nuevaContrasena:
-                "New password",
-
-            confirmarContrasena:
-                "Confirm new password",
-
-            cancelar:
-                "Cancel",
-
-            guardar:
-                "Save",
-
-            descripcionModalSesiones:
-                "Your signed-in devices will appear here. You will also be able to safely close any session.",
-
-            cerrar:
-                "Close"
-
-        }
-
-    };
-
-
-    /*
-    =====================================================
-    OBTENER CONFIGURACIÓN
-    =====================================================
-    */
 
     function obtenerConfiguracion() {
 
@@ -335,13 +72,9 @@
     }
 
 
-    /*
-    =====================================================
-    GUARDAR CONFIGURACIÓN LOCAL
-    =====================================================
-    */
-
-    function guardarConfiguracionLocal(configuracion) {
+    function guardarConfiguracionLocal(
+        configuracion
+    ) {
 
         localStorage.setItem(
 
@@ -354,74 +87,34 @@
     }
 
 
-    /*
-    =====================================================
-    TRADUCIR LA PÁGINA
-    =====================================================
-    */
+    function aplicarConfiguracionTema(
+        activado
+    ) {
 
-    function aplicarIdioma(idioma) {
+        if (
+            typeof window.aplicarTemaGlobal !==
+            "function"
+        ) {
 
-        if (!traducciones[idioma]) {
+            console.error(
+                "tema-global.js no está cargado."
+            );
 
-            idioma = "es";
+            return;
 
         }
 
 
-        const textos =
-            traducciones[idioma];
-
-
-        document.documentElement.lang =
-            idioma;
-
-
-        const elementos =
-            document.querySelectorAll(
-                "[data-i18n]"
-            );
-
-
-        elementos.forEach(function (elemento) {
-
-            const clave =
-                elemento.dataset.i18n;
-
-
-            if (
-                Object.prototype.hasOwnProperty.call(
-                    textos,
-                    clave
-                )
-            ) {
-
-                elemento.textContent =
-                    textos[clave];
-
-            }
-
-        });
-
-
-        document.title =
-            idioma === "en"
-                ? "LifeSync | Settings"
-                : "LifeSync | Configuración";
-
-
-        actualizarMensajesEstado(idioma);
+        window.aplicarTemaGlobal(
+            activado
+                ? "oscuro"
+                : "claro"
+        );
 
     }
 
 
-    /*
-    =====================================================
-    ACTUALIZAR TEXTO DE SINCRONIZACIÓN
-    =====================================================
-    */
-
-    function actualizarMensajesEstado(idioma) {
+    function actualizarMensajesEstado() {
 
         const estado =
             document.getElementById(
@@ -435,18 +128,32 @@
             );
 
 
-        if (!estado || !texto) {
+        const sincronizacion =
+            document.getElementById(
+                "sincronizacion"
+            );
+
+
+        if (
+            !estado ||
+            !texto ||
+            !sincronizacion
+        ) {
+
             return;
+
         }
+
+
+        const idioma =
+            document.getElementById(
+                "idioma"
+            )?.value || "es";
 
 
         if (idioma === "en") {
 
-            if (
-                document.getElementById(
-                    "sincronizacion"
-                ).checked
-            ) {
+            if (sincronizacion.checked) {
 
                 estado.textContent =
                     "● Synchronized";
@@ -466,11 +173,7 @@
 
         } else {
 
-            if (
-                document.getElementById(
-                    "sincronizacion"
-                ).checked
-            ) {
+            if (sincronizacion.checked) {
 
                 estado.textContent =
                     "● Sincronizada";
@@ -493,47 +196,6 @@
     }
 
 
-    /*
-    =====================================================
-    APLICAR MODO OSCURO
-    =====================================================
-    */
-
-    function aplicarModoOscuro(activado) {
-
-        document.body.classList.toggle(
-            "modo-claro",
-            !activado
-        );
-
-
-        document.documentElement.classList.toggle(
-            "modo-claro",
-            !activado
-        );
-
-
-        localStorage.setItem(
-            "lifeSyncModoOscuro",
-            activado ? "true" : "false"
-        );
-
-
-        /*
-        Si tema-global.js utiliza esta misma
-        clave, ambos archivos podrán compartir
-        el estado del tema.
-        */
-
-    }
-
-
-    /*
-    =====================================================
-    CARGAR CONFIGURACIÓN EN LOS CONTROLES
-    =====================================================
-    */
-
     function cargarControles() {
 
         const configuracion =
@@ -545,25 +207,30 @@
                 "modoOscuro"
             );
 
+
         const notificaciones =
             document.getElementById(
                 "notificaciones"
             );
+
 
         const sonidos =
             document.getElementById(
                 "sonidos"
             );
 
+
         const correo =
             document.getElementById(
                 "correo"
             );
 
+
         const idioma =
             document.getElementById(
                 "idioma"
             );
+
 
         const sincronizacion =
             document.getElementById(
@@ -619,23 +286,27 @@
         }
 
 
-        aplicarModoOscuro(
+        aplicarConfiguracionTema(
             configuracion.modoOscuro
         );
 
 
-        aplicarIdioma(
-            configuracion.idioma
-        );
+        if (
+            typeof window.aplicarIdiomaGlobal ===
+            "function"
+        ) {
+
+            window.aplicarIdiomaGlobal(
+                configuracion.idioma
+            );
+
+        }
+
+
+        actualizarMensajesEstado();
 
     }
 
-
-    /*
-    =====================================================
-    MOSTRAR MENSAJE GENERAL
-    =====================================================
-    */
 
     function mostrarMensaje(
         elemento,
@@ -653,29 +324,17 @@
 
         setTimeout(function () {
 
-            elemento.textContent = "";
+            elemento.textContent =
+                "";
 
         }, 3500);
 
     }
 
 
-    /*
-    =====================================================
-    INICIALIZAR
-    =====================================================
-    */
-
     function inicializar() {
 
         cargarControles();
-
-
-        /*
-        -------------------------------------------------
-        CAMBIO DE MODO OSCURO
-        -------------------------------------------------
-        */
 
         const modoOscuro =
             document.getElementById(
@@ -689,7 +348,7 @@
                 "change",
                 function () {
 
-                    aplicarModoOscuro(
+                    aplicarConfiguracionTema(
                         modoOscuro.checked
                     );
 
@@ -697,13 +356,6 @@
             );
 
         }
-
-
-        /*
-        -------------------------------------------------
-        CAMBIO DE IDIOMA
-        -------------------------------------------------
-        */
 
         const idioma =
             document.getElementById(
@@ -717,21 +369,24 @@
                 "change",
                 function () {
 
-                    aplicarIdioma(
-                        idioma.value
-                    );
+                    if (
+                        typeof window.aplicarIdiomaGlobal ===
+                        "function"
+                    ) {
+
+                        window.aplicarIdiomaGlobal(
+                            idioma.value
+                        );
+
+                    }
+
+
+                    actualizarMensajesEstado();
 
                 }
             );
 
         }
-
-
-        /*
-        -------------------------------------------------
-        CAMBIO DE SINCRONIZACIÓN
-        -------------------------------------------------
-        */
 
         const sincronizacion =
             document.getElementById(
@@ -745,23 +400,12 @@
                 "change",
                 function () {
 
-                    actualizarMensajesEstado(
-                        document.getElementById(
-                            "idioma"
-                        ).value
-                    );
+                    actualizarMensajesEstado();
 
                 }
             );
 
         }
-
-
-        /*
-        -------------------------------------------------
-        FORMULARIO
-        -------------------------------------------------
-        */
 
         const formulario =
             document.getElementById(
@@ -818,14 +462,24 @@
                     );
 
 
-                    aplicarModoOscuro(
+                    aplicarConfiguracionTema(
                         configuracion.modoOscuro
                     );
 
 
-                    aplicarIdioma(
-                        configuracion.idioma
-                    );
+                    if (
+                        typeof window.aplicarIdiomaGlobal ===
+                        "function"
+                    ) {
+
+                        window.aplicarIdiomaGlobal(
+                            configuracion.idioma
+                        );
+
+                    }
+
+
+                    actualizarMensajesEstado();
 
 
                     const mensaje =
@@ -834,15 +488,11 @@
                         );
 
 
-                    const idiomaActual =
-                        configuracion.idioma;
-
-
                     mostrarMensaje(
 
                         mensaje,
 
-                        idiomaActual === "en"
+                        configuracion.idioma === "en"
                             ? "Changes saved successfully."
                             : "Los cambios se guardaron correctamente."
 
@@ -852,13 +502,6 @@
             );
 
         }
-
-
-        /*
-        =================================================
-        MODAL CAMBIAR CONTRASEÑA
-        =================================================
-        */
 
         const modalContrasena =
             document.getElementById(
@@ -907,20 +550,12 @@
         }
 
 
-        if (
-            modalContrasena &&
-            btnCancelarContrasena
-        ) {
-
-            btnCancelarContrasena.addEventListener(
-                "click",
-                cerrarModalContrasena
-            );
-
-        }
-
-
         function cerrarModalContrasena() {
+
+            if (!modalContrasena) {
+                return;
+            }
+
 
             modalContrasena.classList.remove(
                 "activo"
@@ -931,33 +566,61 @@
                 "";
 
 
-            document.getElementById(
-                "actual"
-            ).value = "";
+            const actual =
+                document.getElementById(
+                    "actual"
+                );
 
 
-            document.getElementById(
-                "nueva"
-            ).value = "";
+            const nueva =
+                document.getElementById(
+                    "nueva"
+                );
 
 
-            document.getElementById(
-                "confirmar"
-            ).value = "";
+            const confirmar =
+                document.getElementById(
+                    "confirmar"
+                );
 
 
-            document.getElementById(
-                "mensajeContrasena"
-            ).textContent = "";
+            const mensaje =
+                document.getElementById(
+                    "mensajeContrasena"
+                );
+
+
+            if (actual) {
+                actual.value = "";
+            }
+
+
+            if (nueva) {
+                nueva.value = "";
+            }
+
+
+            if (confirmar) {
+                confirmar.value = "";
+            }
+
+
+            if (mensaje) {
+                mensaje.textContent = "";
+            }
 
         }
 
 
-        /*
-        -------------------------------------------------
-        GUARDAR NUEVA CONTRASEÑA
-        -------------------------------------------------
-        */
+        if (btnCancelarContrasena) {
+
+            btnCancelarContrasena.addEventListener(
+                "click",
+                cerrarModalContrasena
+            );
+
+        }
+
 
         if (btnGuardarContrasena) {
 
@@ -968,19 +631,19 @@
                     const actual =
                         document.getElementById(
                             "actual"
-                        ).value.trim();
+                        )?.value.trim();
 
 
                     const nueva =
                         document.getElementById(
                             "nueva"
-                        ).value.trim();
+                        )?.value.trim();
 
 
                     const confirmar =
                         document.getElementById(
                             "confirmar"
-                        ).value.trim();
+                        )?.value.trim();
 
 
                     const mensaje =
@@ -992,23 +655,23 @@
                     const idiomaActual =
                         document.getElementById(
                             "idioma"
-                        ).value;
+                        )?.value || "es";
 
 
-                    /*
-                    IMPORTANTE:
-                    Aquí todavía NO se cambia la
-                    contraseña real porque no existe
-                    una cuenta conectada al servidor.
-                    */
+                    if (
+                        !actual ||
+                        !nueva ||
+                        !confirmar
+                    ) {
 
+                        if (mensaje) {
 
-                    if (!actual || !nueva || !confirmar) {
+                            mensaje.textContent =
+                                idiomaActual === "en"
+                                    ? "Please complete all fields."
+                                    : "Completa todos los campos.";
 
-                        mensaje.textContent =
-                            idiomaActual === "en"
-                                ? "Please complete all fields."
-                                : "Completa todos los campos.";
+                        }
 
                         return;
 
@@ -1017,10 +680,14 @@
 
                     if (nueva.length < 8) {
 
-                        mensaje.textContent =
-                            idiomaActual === "en"
-                                ? "The new password must contain at least 8 characters."
-                                : "La nueva contraseña debe tener al menos 8 caracteres.";
+                        if (mensaje) {
+
+                            mensaje.textContent =
+                                idiomaActual === "en"
+                                    ? "The new password must contain at least 8 characters."
+                                    : "La nueva contraseña debe tener al menos 8 caracteres.";
+
+                        }
 
                         return;
 
@@ -1029,32 +696,33 @@
 
                     if (nueva !== confirmar) {
 
-                        mensaje.textContent =
-                            idiomaActual === "en"
-                                ? "The new passwords do not match."
-                                : "Las nuevas contraseñas no coinciden.";
+                        if (mensaje) {
+
+                            mensaje.textContent =
+                                idiomaActual === "en"
+                                    ? "The new passwords do not match."
+                                    : "Las nuevas contraseñas no coinciden.";
+
+                        }
 
                         return;
 
                     }
 
 
-                    mensaje.textContent =
-                        idiomaActual === "en"
-                            ? "The form is ready. The real password change will be connected when the account system is available."
-                            : "El formulario está listo. El cambio real de contraseña se conectará cuando esté disponible el sistema de cuentas.";
+                    if (mensaje) {
+
+                        mensaje.textContent =
+                            idiomaActual === "en"
+                                ? "The form is ready. The real password change will be connected when the account system is available."
+                                : "El formulario está listo. El cambio real de contraseña se conectará cuando esté disponible el sistema de cuentas.";
+
+                    }
 
                 }
             );
 
         }
-
-
-        /*
-        =================================================
-        MODAL SESIONES
-        =================================================
-        */
 
         const modalSesiones =
             document.getElementById(
@@ -1085,9 +753,11 @@
 
                     cargarSesiones();
 
+
                     modalSesiones.classList.add(
                         "activo"
                     );
+
 
                     document.body.style.overflow =
                         "hidden";
@@ -1098,20 +768,12 @@
         }
 
 
-        if (
-            modalSesiones &&
-            btnCerrarModalSesiones
-        ) {
-
-            btnCerrarModalSesiones.addEventListener(
-                "click",
-                cerrarModalSesiones
-            );
-
-        }
-
-
         function cerrarModalSesiones() {
+
+            if (!modalSesiones) {
+                return;
+            }
+
 
             modalSesiones.classList.remove(
                 "activo"
@@ -1124,11 +786,15 @@
         }
 
 
-        /*
-        -------------------------------------------------
-        LISTA DE SESIONES
-        -------------------------------------------------
-        */
+        if (btnCerrarModalSesiones) {
+
+            btnCerrarModalSesiones.addEventListener(
+                "click",
+                cerrarModalSesiones
+            );
+
+        }
+
 
         function cargarSesiones() {
 
@@ -1141,7 +807,7 @@
             const idiomaActual =
                 document.getElementById(
                     "idioma"
-                ).value;
+                )?.value || "es";
 
 
             if (!lista) {
@@ -1161,11 +827,14 @@
             dispositivo.style.padding =
                 "16px";
 
+
             dispositivo.style.marginBottom =
                 "12px";
 
+
             dispositivo.style.border =
                 "1px solid var(--color-borde)";
+
 
             dispositivo.style.borderRadius =
                 "var(--radio-medio)";
@@ -1214,13 +883,6 @@
 
         }
 
-
-        /*
-        =================================================
-        CERRAR MODALES AL HACER CLIC FUERA
-        =================================================
-        */
-
         if (modalContrasena) {
 
             modalContrasena.addEventListener(
@@ -1263,12 +925,6 @@
         }
 
 
-        /*
-        =================================================
-        ESC PARA CERRAR MODALES
-        =================================================
-        */
-
         document.addEventListener(
             "keydown",
             function (evento) {
@@ -1276,7 +932,9 @@
                 if (
                     evento.key !== "Escape"
                 ) {
+
                     return;
+
                 }
 
 
@@ -1308,12 +966,6 @@
 
     }
 
-
-    /*
-    =====================================================
-    EJECUTAR CUANDO CARGUE LA PÁGINA
-    =====================================================
-    */
 
     if (
         document.readyState ===

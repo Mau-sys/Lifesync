@@ -1,144 +1,491 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>LifeSync - Salud Mental</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/SaludMental.css">
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link
+        rel="stylesheet"
+        href="css/SaludMental.css">
+
 </head>
+
 <body class="bg-lifesync p-0 m-0">
 
     <div class="card-full-screen d-flex flex-column justify-content-between">
         
         <div>
+
             <div class="d-flex justify-content-end align-items-center mb-3">
+
                 <div class="position-relative">
-                    <button class="btn btn-options p-0" id="btn-options-saludmental" aria-label="Opciones">
+
+                    <button
+                        class="btn btn-options p-0"
+                        id="btn-options-saludmental"
+                        aria-label="Opciones"
+                        data-i18n-aria-label="saludMental.opciones">
+
                         <i class="fa-solid fa-ellipsis-vertical"></i>
+
                     </button>
 
-                    <div class="kebab-dropdown-menu" id="kebab-menu-saludmental">
-                        <button class="kebab-item btn-kebab-action" id="btn-regresar">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Regresar
+                    <div
+                        class="kebab-dropdown-menu"
+                        id="kebab-menu-saludmental">
+
+                        <button
+                            class="kebab-item btn-kebab-action"
+                            id="btn-regresar">
+
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+
+                            <span data-i18n="comun.regresar">
+                                Regresar
+                            </span>
+
                         </button>
-                        <a href="#" class="kebab-item" id="btn-editar-meta" data-bs-toggle="modal" data-bs-target="#modalEditarSaludMental">
-                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar meta
+
+                        <a
+                            href="#"
+                            class="kebab-item"
+                            id="btn-editar-meta"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalEditarSaludMental">
+
+                            <i class="fa-solid fa-pen-to-square me-2"></i>
+
+                            <span data-i18n="saludMental.editarMeta">
+                                Editar meta
+                            </span>
+
                         </a>
+
                         <div class="dropdown-divider my-1"></div>
-                        <a href="#" class="kebab-item danger" id="btn-eliminar-habito">
-                            <i class="fa-solid fa-ban me-2"></i>Deshabilitar hábito
+
+                        <a
+                            href="#"
+                            class="kebab-item danger"
+                            id="btn-eliminar-habito">
+
+                            <i class="fa-solid fa-ban me-2"></i>
+
+                            <span data-i18n="saludMental.deshabilitarHabito">
+                                Deshabilitar hábito
+                            </span>
+
                         </a>
+
                     </div>
+
                 </div>
+
             </div>
             
             <div class="text-center mt-2">
+
                 <div class="icon-circle bg-purple-soft mx-auto mb-2">
+
                     <i class="fa-solid fa-brain text-purple"></i>
+
                 </div>
-                <h4 class="fw-bold text-white mb-0 font-sora texto-titulo-fluido">Salud Mental</h4>
+
+                <h4
+                    class="fw-bold text-white mb-0 font-sora texto-titulo-fluido"
+                    data-i18n="saludMental.titulo">
+
+                    Salud Mental
+
+                </h4>
+
             </div>
+
         </div>
 
+
         <div class="my-auto py-2 text-center d-flex flex-column align-items-center justify-content-center">
-            <div class="progress-ring ring-purple mx-auto mb-3" id="ring-saludmental">
+
+            <div
+                class="progress-ring ring-purple mx-auto mb-3"
+                id="ring-saludmental">
+
                 <div class="progress-content">
-                    <h1 class="fw-bold mb-0 text-white font-sora contador-fluido" id="contador-saludmental">0/2</h1>
-                    <span class="text-subtle fw-medium subtexto-fluido">pausas</span>
+
+                    <h1
+                        class="fw-bold mb-0 text-white font-sora contador-fluido"
+                        id="contador-saludmental">
+
+                        0/2
+
+                    </h1>
+
+                    <span
+                        class="text-subtle fw-medium subtexto-fluido"
+                        data-i18n="saludMental.pausas">
+
+                        pausas
+
+                    </span>
+
                 </div>
+
             </div>
 
             <div class="text-center">
-                <span class="text-purple fw-bold meta-texto-fluido" id="meta-saludmental">2 pausas (15 min/pausa)</span>
+
+                <span
+                    class="text-purple fw-bold meta-texto-fluido"
+                    id="meta-saludmental">
+
+                    2 pausas (15 min/pausa)
+
+                </span>
+
             </div>
+
         </div>
+
 
         <div class="w-100">
+
             <div class="pausas-container p-3 rounded-4 mb-3">
-                <span class="text-subtle d-block fw-semibold mb-2 label-fluido">Pausas del periodo</span>
+
+                <span
+                    class="text-subtle d-block fw-semibold mb-2 label-fluido"
+                    data-i18n="saludMental.pausasPeriodo">
+
+                    Pausas del periodo
+
+                </span>
+
                 <div id="lista-pausas"></div>
+
             </div>
 
-            <button class="btn btn-action-purple w-100 rounded-pill fw-bold font-sora boton-fluido" id="btn-add-pausa">+1 pausa</button>
+            <button
+                class="btn btn-action-purple w-100 rounded-pill fw-bold font-sora boton-fluido"
+                id="btn-add-pausa"
+                data-i18n="saludMental.agregarPausa">
+
+                +1 pausa
+
+            </button>
+
         </div>
 
     </div>
 
-    <div class="modal fade" id="modalEditarSaludMental" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+
+    <div
+        class="modal fade"
+        id="modalEditarSaludMental"
+        tabindex="-1"
+        aria-labelledby="modalEditarLabel"
+        aria-hidden="true">
+
         <div class="modal-dialog modal-dialog-centered">
+
             <div class="modal-content config-modal-bg text-white border-0 rounded-4">
+
                 <div class="modal-header border-bottom border-secondary border-opacity-25">
-                    <h5 class="modal-title font-sora fw-bold" id="modalEditarLabel">
-                        <i class="fa-solid fa-gear text-purple me-2"></i>Editar Meta de Salud Mental
+
+                    <h5
+                        class="modal-title font-sora fw-bold"
+                        id="modalEditarLabel">
+
+                        <i class="fa-solid fa-gear text-purple me-2"></i>
+
+                        <span data-i18n="saludMental.editarMetaTitulo">
+                            Editar Meta de Salud Mental
+                        </span>
+
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                        data-i18n-aria-label="comun.cerrar">
+
+                    </button>
+
                 </div>
+
                 <div class="modal-body py-4">
+
                     <form id="form-config-saludmental">
+
                         <div class="mb-3">
-                            <label for="select-frecuencia" class="form-label text-subtle fw-semibold">
+
+                            <label
+                                for="select-frecuencia"
+                                class="form-label text-subtle fw-semibold"
+                                data-i18n="saludMental.frecuenciaMeta">
+
                                 Frecuencia de la meta
+
                             </label>
-                            <select class="form-select config-input text-white" id="select-frecuencia">
-                                <option value="diaria" selected>Diaria (Todos los días)</option>
-                                <option value="semanal">Semanal (Meta global para la semana)</option>
-                                <option value="personalizada">Personalizada (Días específicos)</option>
+
+                            <select
+                                class="form-select config-input text-white"
+                                id="select-frecuencia">
+
+                                <option
+                                    value="diaria"
+                                    selected
+                                    data-i18n="saludMental.diaria">
+
+                                    Diaria (Todos los días)
+
+                                </option>
+
+                                <option
+                                    value="semanal"
+                                    data-i18n="saludMental.semanal">
+
+                                    Semanal (Meta global para la semana)
+
+                                </option>
+
+                                <option
+                                    value="personalizada"
+                                    data-i18n="saludMental.personalizada">
+
+                                    Personalizada (Días específicos)
+
+                                </option>
+
                             </select>
+
                         </div>
 
-                        <div class="mb-4 d-none" id="contenedor-dias-semana">
-                            <label class="form-label text-subtle fw-semibold d-block">Selecciona los días activos</label>
-                            <div class="d-flex justify-content-between gap-1" id="grupo-dias">
-                                <button type="button" class="btn btn-dia flex-fill" data-dia="1">L</button>
-                                <button type="button" class="btn btn-dia flex-fill" data-dia="2">M</button>
-                                <button type="button" class="btn btn-dia flex-fill" data-dia="3">Mi</button>
-                                <button type="button" class="btn btn-dia flex-fill" data-dia="4">J</button>
-                                <button type="button" class="btn btn-dia flex-fill" data-dia="5">V</button>
-                                <button type="button" class="btn btn-dia flex-fill" data-dia="6">S</button>
-                                <button type="button" class="btn btn-dia flex-fill" data-dia="0">D</button>
+
+                        <div
+                            class="mb-4 d-none"
+                            id="contenedor-dias-semana">
+
+                            <label
+                                class="form-label text-subtle fw-semibold d-block"
+                                data-i18n="saludMental.diasActivos">
+
+                                Selecciona los días activos
+
+                            </label>
+
+                            <div
+                                class="d-flex justify-content-between gap-1"
+                                id="grupo-dias">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-dia flex-fill"
+                                    data-dia="1">
+
+                                    L
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-dia flex-fill"
+                                    data-dia="2">
+
+                                    M
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-dia flex-fill"
+                                    data-dia="3">
+
+                                    Mi
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-dia flex-fill"
+                                    data-dia="4">
+
+                                    J
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-dia flex-fill"
+                                    data-dia="5">
+
+                                    V
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-dia flex-fill"
+                                    data-dia="6">
+
+                                    S
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-dia flex-fill"
+                                    data-dia="0">
+
+                                    D
+
+                                </button>
+
                             </div>
+
                         </div>
+
 
                         <div class="mb-4">
-                            <label for="input-pausas" class="form-label text-subtle fw-semibold" id="label-pausas">
+
+                            <label
+                                for="input-pausas"
+                                class="form-label text-subtle fw-semibold"
+                                id="label-pausas"
+                                data-i18n="saludMental.cantidadPausas">
+
                                 Cantidad de pausas (Máx. 50)
+
                             </label>
-                            <input type="number" class="form-control config-input text-white" id="input-pausas" min="1" max="50" value="2" required>
+
+                            <input
+                                type="number"
+                                class="form-control config-input text-white"
+                                id="input-pausas"
+                                min="1"
+                                max="50"
+                                value="2"
+                                required>
+
                         </div>
+
 
                         <div class="mb-3">
-                            <label for="input-duracion" class="form-label text-subtle fw-semibold">
+
+                            <label
+                                for="input-duracion"
+                                class="form-label text-subtle fw-semibold"
+                                data-i18n="saludMental.duracionPausa">
+
                                 Duración por pausa (Máx. 4 horas / 240 min)
+
                             </label>
+
                             <div class="input-group">
-                                <input type="number" class="form-control config-input text-white" id="input-duracion" min="1" max="240" value="15" required>
-                                <span class="input-group-text config-input text-subtle border-start-0">minutos</span>
+
+                                <input
+                                    type="number"
+                                    class="form-control config-input text-white"
+                                    id="input-duracion"
+                                    min="1"
+                                    max="240"
+                                    value="15"
+                                    required>
+
+                                <span
+                                    class="input-group-text config-input text-subtle border-start-0"
+                                    data-i18n="saludMental.minutos">
+
+                                    minutos
+
+                                </span>
+
                             </div>
+
                         </div>
+
                     </form>
+
                 </div>
+
+
                 <div class="modal-footer border-top border-secondary border-opacity-25 d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-danger rounded-pill px-3" id="btn-reiniciar-meta">
-                        <i class="fa-solid fa-rotate-left me-1"></i> Reiniciar
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-danger rounded-pill px-3"
+                        id="btn-reiniciar-meta">
+
+                        <i class="fa-solid fa-rotate-left me-1"></i>
+
+                        <span data-i18n="comun.reiniciar">
+                            Reiniciar
+                        </span>
+
                     </button>
+
                     <div>
-                        <button type="button" class="btn btn-outline-light rounded-pill px-3 me-2" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-action-purple rounded-pill px-4" id="btn-guardar-config">Guardar cambios</button>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-light rounded-pill px-3 me-2"
+                            data-bs-dismiss="modal"
+                            data-i18n="comun.cancelar">
+
+                            Cancelar
+
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-action-purple rounded-pill px-4"
+                            id="btn-guardar-config"
+                            data-i18n="comun.guardarCambios">
+
+                            Guardar cambios
+
+                        </button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
+
     <script src="js/tema-global.js"></script>
+    <script src="js/idioma-global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/HSaludMental.js"></script>
+
 </body>
+
 </html>
