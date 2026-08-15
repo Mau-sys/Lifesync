@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 session_start();
 
-header('Content-Type: application/json; charset=utf-8');
+header(
+    'Content-Type: application/json; charset=utf-8'
+);
 
-require_once __DIR__ . '/../config/conexion.php';
 
+/* =====================================================
+   RESPUESTA JSON
+===================================================== */
 
 function responder(
     bool $exito,
@@ -33,131 +37,173 @@ function responder(
 }
 
 
-function obtenerUsuarioSesion(): int {
+/* =====================================================
+   CONEXIÓN
+===================================================== */
 
-    $ids = [
-        $_SESSION['id_usuario'] ?? null,
-        $_SESSION['usuario_id'] ?? null,
-        $_SESSION['id'] ?? null
+try {
+
+    require_once __DIR__ . '/../config/conexion.php';
+
+
+    /*
+     * El proyecto puede utilizar $pdo
+     * o la clase Database.
+     */
+
+    if (
+        isset($pdo) &&
+        $pdo instanceof PDO
+    ) {
+
+        $db = $pdo;
+
+    } elseif (
+        class_exists('Database')
+    ) {
+
+        $database =
+            new Database();
+
+        $db =
+            $database->getConnection();
+
+    } else {
+
+        responder(
+            false,
+            'No se encontró una conexión válida con la base de datos.',
+            [],
+            500
+        );
+
+    }
+
+
+    if (
+        !($db instanceof PDO)
+    ) {
+
+        responder(
+            false,
+            'La conexión a la base de datos no es válida.',
+            [],
+            500
+        );
+
+    }
+
+
+    /* =================================================
+       USUARIO DE LA SESIÓN
+    ================================================= */
+
+    $idsSesion = [
+
+        $_SESSION['usuario_id']
+            ?? null,
+
+        $_SESSION['id_usuario']
+            ?? null,
+
+        $_SESSION['id']
+            ?? null
+
     ];
 
-    foreach ($ids as $id) {
+
+    $idUsuario = 0;
+
+
+    foreach (
+        $idsSesion
+        as $id
+    ) {
 
         if (
             is_numeric($id) &&
             (int) $id > 0
         ) {
 
-            return (int) $id;
+            $idUsuario =
+                (int) $id;
+
+            break;
+
         }
+
     }
 
-    responder(
-        false,
-        'La sesión del usuario no es válida.',
-        [],
-        401
-    );
-}
-
-
-function obtenerTokenSesion(): ?string {
-
-    $token =
-        $_SESSION['token_sesion'] ??
-        null;
 
     if (
-        is_string($token) &&
-        $token !== ''
-    ) {
-
-        return $token;
-    }
-
-    return null;
-}
-
-
-function valorBooleano(mixed $valor): int {
-
-    if (
-        $valor === '1' ||
-        $valor === 1 ||
-        $valor === true ||
-        $valor === 'true' ||
-        $valor === 'on'
-    ) {
-
-        return 1;
-    }
-
-    return 0;
-}
-
-
-try {
-
-    if (
-        !isset($pdo) ||
-        !($pdo instanceof PDO)
+        $idUsuario <= 0
     ) {
 
         responder(
             false,
-            'No se pudo establecer la conexión con la base de datos.',
+            'La sesión del usuario no es válida.',
             [],
-            500
+            401
         );
+
     }
 
 
-    $idUsuario =
-        obtenerUsuarioSesion();
-
+    /* =================================================
+       ACCIÓN
+    ================================================= */
 
     $accion =
-        $_POST['accion'] ??
-        $_GET['accion'] ??
-        '';
+        $_POST['accion']
+        ?? $_GET['accion']
+        ?? '';
 
 
-    if ($accion === 'obtener') {
+    /* =================================================
+       OBTENER CONFIGURACIÓN
+    ================================================= */
 
-        $consulta = $pdo->prepare(
-            "
-            SELECT
-                p.tema,
-                p.idioma,
-                p.notificaciones_activas,
-                p.sonidos_activados,
-                p.sincronizacion_automatica,
+    if (
+        $accion === 'obtener'
+    ) {
 
-                COALESCE(
-                    cn.correo_recordatorios,
-                    1
-                ) AS correo_recordatorios,
+        $consulta =
+            $db->prepare(
+                "
+                SELECT
+                    p.tema,
+                    p.idioma,
+                    p.notificaciones_activas,
+                    p.sonidos_activados,
+                    p.sincronizacion_automatica,
 
-                COALESCE(
-                    cn.correo_logros,
-                    1
-                ) AS correo_logros
+                    COALESCE(
+                        cn.correo_recordatorios,
+                        1
+                    ) AS correo_recordatorios,
 
-            FROM preferencias_usuario p
+                    COALESCE(
+                        cn.correo_logros,
+                        1
+                    ) AS correo_logros
 
-            LEFT JOIN configuracion_notificaciones cn
-                ON cn.id_usuario = p.id_usuario
+                FROM preferencias_usuario p
 
-            WHERE p.id_usuario = :id_usuario
+                LEFT JOIN configuracion_notificaciones cn
+                    ON cn.id_usuario = p.id_usuario
 
-            LIMIT 1
-            "
-        );
+                WHERE p.id_usuario =
+                    :id_usuario
+
+                LIMIT 1
+                "
+            );
 
 
         $consulta->execute(
             [
-                ':id_usuario' => $idUsuario
+                ':id_usuario' =>
+                    $idUsuario
             ]
         );
 
@@ -168,14 +214,22 @@ try {
             );
 
 
-        if (!$configuracion) {
+        /*
+         * Si todavía no existe la configuración,
+         * se crea automáticamente.
+         */
 
-            $pdo->beginTransaction();
+        if (
+            !$configuracion
+        ) {
+
+            $db->beginTransaction();
+
 
             try {
 
                 $crearPreferencias =
-                    $pdo->prepare(
+                    $db->prepare(
                         "
                         INSERT INTO preferencias_usuario
                         (
@@ -201,13 +255,14 @@ try {
 
                 $crearPreferencias->execute(
                     [
-                        ':id_usuario' => $idUsuario
+                        ':id_usuario' =>
+                            $idUsuario
                     ]
                 );
 
 
                 $crearNotificaciones =
-                    $pdo->prepare(
+                    $db->prepare(
                         "
                         INSERT INTO configuracion_notificaciones
                         (
@@ -227,64 +282,111 @@ try {
 
                 $crearNotificaciones->execute(
                     [
-                        ':id_usuario' => $idUsuario
+                        ':id_usuario' =>
+                            $idUsuario
                     ]
                 );
 
 
-                $crearConfiguracionUsuario =
-                    $pdo->prepare(
-                        "
-                        INSERT INTO configuracion_usuario
-                        (
-                            id_usuario,
-                            modo_tema,
-                            idioma,
-                            notificaciones,
-                            sonidos
-                        )
-                        VALUES
-                        (
-                            :id_usuario,
-                            'oscuro',
-                            'es',
-                            1,
-                            1
-                        )
-                        "
+                /*
+                 * Solo crear configuración_usuario
+                 * si la tabla existe.
+                 */
+
+                try {
+
+                    $crearUsuario =
+                        $db->prepare(
+                            "
+                            INSERT INTO configuracion_usuario
+                            (
+                                id_usuario,
+                                modo_tema,
+                                idioma,
+                                notificaciones,
+                                sonidos
+                            )
+                            VALUES
+                            (
+                                :id_usuario,
+                                'oscuro',
+                                'es',
+                                1,
+                                1
+                            )
+                            "
+                        );
+
+
+                    $crearUsuario->execute(
+                        [
+                            ':id_usuario' =>
+                                $idUsuario
+                        ]
                     );
 
+                } catch (
+                    Throwable $error
+                ) {
 
-                $crearConfiguracionUsuario->execute(
-                    [
-                        ':id_usuario' => $idUsuario
-                    ]
-                );
+                    /*
+                     * No detenemos todo si esta tabla
+                     * todavía no existe.
+                     */
+
+                    error_log(
+                        'configuracion_usuario: ' .
+                        $error->getMessage()
+                    );
+
+                }
 
 
-                $pdo->commit();
+                $db->commit();
 
 
-            } catch (Throwable $error) {
+            } catch (
+                Throwable $error
+            ) {
 
-                if ($pdo->inTransaction()) {
+                if (
+                    $db->inTransaction()
+                ) {
 
-                    $pdo->rollBack();
+                    $db->rollBack();
+
                 }
 
                 throw $error;
+
             }
 
 
             $configuracion = [
-                'tema' => 'oscuro',
-                'idioma' => 'es',
-                'notificaciones_activas' => 1,
-                'sonidos_activados' => 1,
-                'sincronizacion_automatica' => 1,
-                'correo_recordatorios' => 1,
-                'correo_logros' => 1
+
+                'tema' =>
+                    'oscuro',
+
+                'idioma' =>
+                    'es',
+
+                'notificaciones_activas' =>
+                    1,
+
+                'sonidos_activados' =>
+                    1,
+
+                'sincronizacion_automatica' =>
+                    1,
+
+                'correo_recordatorios' =>
+                    1,
+
+                'correo_logros' =>
+                    1
+
             ];
+
         }
 
 
@@ -296,49 +398,75 @@ try {
                     $configuracion
             ]
         );
+
     }
 
 
-    if ($accion === 'guardar') {
+    /* =================================================
+       GUARDAR CONFIGURACIÓN
+    ================================================= */
+
+    if (
+        $accion === 'guardar'
+    ) {
 
         $tema =
-            $_POST['tema'] ??
-            'oscuro';
+            $_POST['tema']
+            ?? 'oscuro';
 
 
         $idioma =
-            $_POST['idioma'] ??
-            'es';
+            $_POST['idioma']
+            ?? 'es';
 
 
         $notificaciones =
-            valorBooleano(
-                $_POST['notificaciones'] ?? 0
-            );
+            (
+                $_POST['notificaciones']
+                ?? '0'
+            ) === '1'
+                ? 1
+                : 0;
 
 
         $sonidos =
-            valorBooleano(
-                $_POST['sonidos'] ?? 0
-            );
+            (
+                $_POST['sonidos']
+                ?? '0'
+            ) === '1'
+                ? 1
+                : 0;
 
 
         $correoRecordatorios =
-            valorBooleano(
-                $_POST['correo_recordatorios'] ?? 0
-            );
+            (
+                $_POST[
+                    'correo_recordatorios'
+                ]
+                ?? '0'
+            ) === '1'
+                ? 1
+                : 0;
 
 
         $correoLogros =
-            valorBooleano(
-                $_POST['correo_logros'] ?? 0
-            );
+            (
+                $_POST[
+                    'correo_logros'
+                ]
+                ?? '0'
+            ) === '1'
+                ? 1
+                : 0;
 
 
         $sincronizacion =
-            valorBooleano(
-                $_POST['sincronizacion'] ?? 0
-            );
+            (
+                $_POST['sincronizacion']
+                ?? '0'
+            ) === '1'
+                ? 1
+                : 0;
 
 
         if (
@@ -358,6 +486,7 @@ try {
                 [],
                 400
             );
+
         }
 
 
@@ -378,15 +507,21 @@ try {
                 [],
                 400
             );
+
         }
 
 
-        $pdo->beginTransaction();
+        $db->beginTransaction();
+
 
         try {
 
+            /*
+             * Preferencias principales
+             */
+
             $consulta =
-                $pdo->prepare(
+                $db->prepare(
                     "
                     INSERT INTO preferencias_usuario
                     (
@@ -409,9 +544,11 @@ try {
 
                     ON DUPLICATE KEY UPDATE
 
-                        tema = VALUES(tema),
+                        tema =
+                            VALUES(tema),
 
-                        idioma = VALUES(idioma),
+                        idioma =
+                            VALUES(idioma),
 
                         notificaciones_activas =
                             VALUES(notificaciones_activas),
@@ -427,6 +564,7 @@ try {
 
             $consulta->execute(
                 [
+
                     ':id_usuario' =>
                         $idUsuario,
 
@@ -444,12 +582,17 @@ try {
 
                     ':sincronizacion' =>
                         $sincronizacion
+
                 ]
             );
 
 
+            /*
+             * Configuración de correos
+             */
+
             $consultaCorreo =
-                $pdo->prepare(
+                $db->prepare(
                     "
                     INSERT INTO configuracion_notificaciones
                     (
@@ -477,6 +620,7 @@ try {
 
             $consultaCorreo->execute(
                 [
+
                     ':id_usuario' =>
                         $idUsuario,
 
@@ -485,78 +629,104 @@ try {
 
                     ':correo_logros' =>
                         $correoLogros
+
                 ]
             );
 
 
-            $consultaUsuario =
-                $pdo->prepare(
-                    "
-                    INSERT INTO configuracion_usuario
-                    (
-                        id_usuario,
-                        modo_tema,
-                        idioma,
-                        notificaciones,
-                        sonidos
-                    )
-                    VALUES
-                    (
-                        :id_usuario,
-                        :tema,
-                        :idioma,
-                        :notificaciones,
-                        :sonidos
-                    )
+            /*
+             * Configuración secundaria.
+             */
 
-                    ON DUPLICATE KEY UPDATE
+            try {
 
-                        modo_tema =
-                            VALUES(modo_tema),
+                $consultaUsuario =
+                    $db->prepare(
+                        "
+                        INSERT INTO configuracion_usuario
+                        (
+                            id_usuario,
+                            modo_tema,
+                            idioma,
+                            notificaciones,
+                            sonidos
+                        )
+                        VALUES
+                        (
+                            :id_usuario,
+                            :tema,
+                            :idioma,
+                            :notificaciones,
+                            :sonidos
+                        )
 
-                        idioma =
-                            VALUES(idioma),
+                        ON DUPLICATE KEY UPDATE
 
-                        notificaciones =
-                            VALUES(notificaciones),
+                            modo_tema =
+                                VALUES(modo_tema),
 
-                        sonidos =
-                            VALUES(sonidos)
-                    "
+                            idioma =
+                                VALUES(idioma),
+
+                            notificaciones =
+                                VALUES(notificaciones),
+
+                            sonidos =
+                                VALUES(sonidos)
+                        "
+                    );
+
+
+                $consultaUsuario->execute(
+                    [
+
+                        ':id_usuario' =>
+                            $idUsuario,
+
+                        ':tema' =>
+                            $tema,
+
+                        ':idioma' =>
+                            $idioma,
+
+                        ':notificaciones' =>
+                            $notificaciones,
+
+                        ':sonidos' =>
+                            $sonidos
+
+                    ]
                 );
 
+            } catch (
+                Throwable $error
+            ) {
 
-            $consultaUsuario->execute(
-                [
-                    ':id_usuario' =>
-                        $idUsuario,
+                error_log(
+                    'configuracion_usuario: ' .
+                    $error->getMessage()
+                );
 
-                    ':tema' =>
-                        $tema,
-
-                    ':idioma' =>
-                        $idioma,
-
-                    ':notificaciones' =>
-                        $notificaciones,
-
-                    ':sonidos' =>
-                        $sonidos
-                ]
-            );
+            }
 
 
-            $pdo->commit();
+            $db->commit();
 
 
-        } catch (Throwable $error) {
+        } catch (
+            Throwable $error
+        ) {
 
-            if ($pdo->inTransaction()) {
+            if (
+                $db->inTransaction()
+            ) {
 
-                $pdo->rollBack();
+                $db->rollBack();
+
             }
 
             throw $error;
+
         }
 
 
@@ -565,6 +735,7 @@ try {
             'Configuración guardada correctamente.',
             [
                 'configuracion' => [
+
                     'tema' =>
                         $tema,
 
@@ -585,22 +756,30 @@ try {
 
                     'correo_logros' =>
                         $correoLogros
+
                 ]
             ]
         );
+
     }
 
 
-    if ($accion === 'cambiar_contrasena') {
+    /* =================================================
+       CAMBIAR CONTRASEÑA
+    ================================================= */
+
+    if (
+        $accion === 'cambiar_contrasena'
+    ) {
 
         $actual =
-            $_POST['actual'] ??
-            '';
+            $_POST['actual']
+            ?? '';
 
 
         $nueva =
-            $_POST['nueva'] ??
-            '';
+            $_POST['nueva']
+            ?? '';
 
 
         if (
@@ -614,6 +793,7 @@ try {
                 [],
                 400
             );
+
         }
 
 
@@ -627,11 +807,16 @@ try {
                 [],
                 400
             );
+
         }
 
 
+        /*
+         * Buscar contraseña actual.
+         */
+
         $consulta =
-            $pdo->prepare(
+            $db->prepare(
                 "
                 SELECT
                     password_hash
@@ -660,7 +845,9 @@ try {
             );
 
 
-        if (!$usuario) {
+        if (
+            !$usuario
+        ) {
 
             responder(
                 false,
@@ -668,6 +855,7 @@ try {
                 [],
                 404
             );
+
         }
 
 
@@ -684,6 +872,7 @@ try {
                 [],
                 400
             );
+
         }
 
 
@@ -695,7 +884,7 @@ try {
 
 
         $actualizar =
-            $pdo->prepare(
+            $db->prepare(
                 "
                 UPDATE usuario
 
@@ -710,11 +899,13 @@ try {
 
         $actualizar->execute(
             [
+
                 ':password_hash' =>
                     $nuevoHash,
 
                 ':id_usuario' =>
                     $idUsuario
+
             ]
         );
 
@@ -723,13 +914,20 @@ try {
             true,
             'Contraseña actualizada correctamente.'
         );
+
     }
 
 
-    if ($accion === 'sesiones') {
+    /* =================================================
+       SESIONES ACTIVAS
+    ================================================= */
+
+    if (
+        $accion === 'sesiones'
+    ) {
 
         $consulta =
-            $pdo->prepare(
+            $db->prepare(
                 "
                 SELECT
                     id_sesion,
@@ -774,18 +972,30 @@ try {
                     $sesiones
             ]
         );
+
     }
 
 
-    if ($accion === 'cerrar_sesion') {
+    /* =================================================
+       CERRAR SESIÓN
+    ================================================= */
+
+    if (
+        $accion === 'cerrar_sesion'
+    ) {
 
         $idSesion =
-            isset($_POST['id_sesion'])
-                ? (int) $_POST['id_sesion']
+            isset(
+                $_POST['id_sesion']
+            )
+                ? (int)
+                    $_POST['id_sesion']
                 : 0;
 
 
-        if ($idSesion <= 0) {
+        if (
+            $idSesion <= 0
+        ) {
 
             responder(
                 false,
@@ -793,11 +1003,12 @@ try {
                 [],
                 400
             );
+
         }
 
 
         $consulta =
-            $pdo->prepare(
+            $db->prepare(
                 "
                 SELECT
                     id_sesion,
@@ -820,11 +1031,13 @@ try {
 
         $consulta->execute(
             [
+
                 ':id_sesion' =>
                     $idSesion,
 
                 ':id_usuario' =>
                     $idUsuario
+
             ]
         );
 
@@ -835,7 +1048,9 @@ try {
             );
 
 
-        if (!$sesion) {
+        if (
+            !$sesion
+        ) {
 
             responder(
                 false,
@@ -843,23 +1058,35 @@ try {
                 [],
                 404
             );
+
         }
 
 
         $tokenActual =
-            obtenerTokenSesion();
+            $_SESSION[
+                'token_sesion'
+            ] ?? null;
 
 
         $esSesionActual =
-            $tokenActual !== null &&
+            is_string(
+                $tokenActual
+            ) &&
+            $tokenActual !== '' &&
+            isset(
+                $sesion['token_sesion']
+            ) &&
             hash_equals(
-                (string) $sesion['token_sesion'],
+                (string)
+                    $sesion[
+                        'token_sesion'
+                    ],
                 $tokenActual
             );
 
 
         $cerrar =
-            $pdo->prepare(
+            $db->prepare(
                 "
                 UPDATE sesiones_usuario
 
@@ -876,22 +1103,28 @@ try {
 
         $cerrar->execute(
             [
+
                 ':id_sesion' =>
                     $idSesion,
 
                 ':id_usuario' =>
                     $idUsuario
+
             ]
         );
 
 
-        if ($esSesionActual) {
+        if (
+            $esSesionActual
+        ) {
 
             $_SESSION = [];
 
 
             if (
-                ini_get('session.use_cookies')
+                ini_get(
+                    'session.use_cookies'
+                )
             ) {
 
                 $parametros =
@@ -907,6 +1140,7 @@ try {
                     $parametros['secure'],
                     $parametros['httponly']
                 );
+
             }
 
 
@@ -921,6 +1155,7 @@ try {
                         true
                 ]
             );
+
         }
 
 
@@ -932,8 +1167,13 @@ try {
                     false
             ]
         );
+
     }
 
+
+    /* =================================================
+       ACCIÓN DESCONOCIDA
+    ================================================= */
 
     responder(
         false,
@@ -943,15 +1183,18 @@ try {
     );
 
 
-} catch (Throwable $error) {
+} catch (
+    Throwable $error
+) {
 
     if (
-        isset($pdo) &&
-        $pdo instanceof PDO &&
-        $pdo->inTransaction()
+        isset($db) &&
+        $db instanceof PDO &&
+        $db->inTransaction()
     ) {
 
-        $pdo->rollBack();
+        $db->rollBack();
+
     }
 
 
@@ -967,4 +1210,5 @@ try {
         [],
         500
     );
+
 }

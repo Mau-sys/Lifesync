@@ -433,3 +433,22 @@ CREATE TABLE IF NOT EXISTS sesiones_usuario (
         ON DELETE CASCADE
 
 );
+CREATE TABLE IF NOT EXISTS configuracion_usuario (
+    id_configuracion INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL UNIQUE,
+
+    idioma VARCHAR(10) NOT NULL DEFAULT 'es',
+
+    notificaciones_activas BOOLEAN NOT NULL DEFAULT TRUE,
+    sonido_notificaciones BOOLEAN NOT NULL DEFAULT TRUE,
+    correo_notificaciones BOOLEAN NOT NULL DEFAULT FALSE,
+
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_configuracion_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id_usuario)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);

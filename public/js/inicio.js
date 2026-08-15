@@ -1,5 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    /* =========================================================
+       ELEMENTOS DEL DOM
+    ========================================================= */
+
     const btnNotificaciones =
         document.getElementById("btnNotificaciones");
 
@@ -27,6 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const fotoPerfil =
         document.getElementById("fotoPerfil");
 
+
+    /* =========================================================
+       NOTIFICACIONES
+    ========================================================= */
 
     function abrirNotificaciones() {
 
@@ -56,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "panel-notificaciones-abierto"
         );
 
-        cargarNotificaciones();
+        cargarDatosInicio();
 
     }
 
@@ -99,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
             () => {
 
                 const estaOculto =
+                    !panelNotificaciones ||
                     panelNotificaciones.classList.contains(
                         "oculto"
                     );
@@ -159,7 +168,11 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    async function cargarNotificaciones() {
+    /* =========================================================
+       CARGAR TODOS LOS DATOS DE INICIO
+    ========================================================= */
+
+    async function cargarDatosInicio() {
 
         try {
 
@@ -168,27 +181,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     "auth/inicio.php",
                     {
                         method: "GET",
-                        cache: "no-cache"
+                        cache: "no-cache",
+                        credentials: "same-origin",
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        }
                     }
                 );
-
-
-            if (!respuesta.ok) {
-
-                throw new Error(
-                    "No se pudieron cargar las notificaciones."
-                );
-
-            }
 
 
             const resultado =
                 await respuesta.json();
 
 
-            if (!resultado.exito) {
+            if (!respuesta.ok || !resultado.exito) {
 
-                mostrarErrorNotificaciones(
+                mostrarErrorInicio(
                     resultado.mensaje
                 );
 
@@ -196,6 +205,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
+
+            /* -------------------------
+               NOTIFICACIONES
+            ------------------------- */
 
             actualizarContador(
                 resultado.notificaciones_no_leidas
@@ -207,17 +220,50 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
+            /* -------------------------
+               RACHA
+            ------------------------- */
+
+            actualizarRacha(
+                resultado.racha
+            );
+
+
+            /* -------------------------
+               PROGRESO
+            ------------------------- */
+
+            actualizarProgreso(
+                resultado.progreso
+            );
+
+
+            /* -------------------------
+               CATEGORÍAS / HÁBITOS
+            ------------------------- */
+
+            actualizarCategorias(
+                resultado.habitos_pendientes
+            );
+
+
         } catch (error) {
 
             console.error(
-                "Error al cargar notificaciones:",
+                "Error al cargar los datos de Inicio:",
                 error
             );
+
+            mostrarErrorInicio();
 
         }
 
     }
 
+
+    /* =========================================================
+       CONTADOR DE NOTIFICACIONES
+    ========================================================= */
 
     function actualizarContador(cantidad) {
 
@@ -269,9 +315,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function mostrarNotificaciones(
-        notificaciones
-    ) {
+    /* =========================================================
+       MOSTRAR NOTIFICACIONES
+    ========================================================= */
+
+    function mostrarNotificaciones(notificaciones) {
 
         if (!listaNotificaciones) {
             return;
@@ -311,9 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function crearNotificacion(
-        notificacion
-    ) {
+    function crearNotificacion(notificacion) {
 
         const articulo =
             document.createElement("article");
@@ -480,9 +526,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function mostrarErrorNotificaciones(
-        mensaje
-    ) {
+    function mostrarErrorNotificaciones(mensaje) {
 
         if (!listaNotificaciones) {
             return;
@@ -530,6 +574,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    /* =========================================================
+       MARCAR NOTIFICACIONES COMO LEÍDAS
+    ========================================================= */
+
     async function marcarNotificacionesLeidas() {
 
         try {
@@ -539,8 +587,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     "auth/notificaciones-leer.php",
                     {
                         method: "POST",
+                        credentials: "same-origin",
                         headers: {
                             "Content-Type":
+                                "application/json",
+                            "Accept":
                                 "application/json"
                         }
                     }
@@ -571,7 +622,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             setTimeout(
-                cargarNotificaciones,
+                () => {
+                    cargarDatosInicio();
+                },
                 300
             );
 
@@ -587,6 +640,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
+
+    /* =========================================================
+       FECHA ACTUAL
+    ========================================================= */
 
     function mostrarFechaActual() {
 
@@ -613,6 +670,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    /* =========================================================
+       DATOS DEL USUARIO
+    ========================================================= */
+
     async function cargarDatosUsuario() {
 
         if (!nombreUsuario) {
@@ -627,7 +688,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     "auth/usuario.php",
                     {
                         method: "GET",
-                        cache: "no-cache"
+                        cache: "no-cache",
+                        credentials: "same-origin",
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        }
                     }
                 );
 
@@ -676,63 +742,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    async function cargarResumenInicio() {
-
-        try {
-
-            const respuesta =
-                await fetch(
-                    "auth/inicio.php",
-                    {
-                        method: "GET",
-                        cache: "no-cache"
-                    }
-                );
-
-
-            if (!respuesta.ok) {
-                mostrarErrorInicio();
-                return;
-            }
-
-
-            const resultado =
-                await respuesta.json();
-
-
-            if (!resultado.exito) {
-                mostrarErrorInicio();
-                return;
-            }
-
-
-            actualizarRacha(
-                resultado.racha
-            );
-
-
-            actualizarProgreso(
-                resultado.progreso
-            );
-
-
-            actualizarCategorias(
-                resultado.habitos_pendientes
-            );
-
-        } catch (error) {
-
-            console.error(
-                "No se pudo cargar el resumen de Inicio:",
-                error
-            );
-
-            mostrarErrorInicio();
-
-        }
-
-    }
-
+    /* =========================================================
+       RACHA
+    ========================================================= */
 
     function actualizarRacha(racha) {
 
@@ -757,9 +769,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function actualizarProgreso(
-        progreso
-    ) {
+    /* =========================================================
+       PROGRESO GENERAL
+    ========================================================= */
+
+    function actualizarProgreso(progreso) {
 
         const porcentajeGeneral =
             document.getElementById(
@@ -821,9 +835,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function actualizarCategorias(
-        habitos
-    ) {
+    /* =========================================================
+       CATEGORÍAS DINÁMICAS
+    ========================================================= */
+
+    function actualizarCategorias(habitos) {
 
         const contenedor =
             document.getElementById(
@@ -930,7 +946,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     "detalle-categoria";
 
                 detalle.textContent =
-                    `${grupo.completados} de ${grupo.total} hábitos pendientes`;
+                    `${grupo.pendientes} hábito(s) pendiente(s)`;
 
 
                 texto.appendChild(
@@ -994,41 +1010,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function mostrarErrorInicio() {
-
-        const contenedor =
-            document.getElementById(
-                "contenedorCategorias"
-            );
-
-
-        if (!contenedor) {
-            return;
-        }
-
-
-        contenedor.innerHTML = "";
-
-
-        const mensaje =
-            document.createElement("p");
-
-        mensaje.className =
-            "categoria-vacia";
-
-        mensaje.textContent =
-            "No se pudieron cargar tus hábitos.";
-
-        contenedor.appendChild(
-            mensaje
-        );
-
-    }
-
-
-    function agruparHabitosPorCategoria(
-        habitos
-    ) {
+    function agruparHabitosPorCategoria(habitos) {
 
         const grupos = {};
 
@@ -1046,7 +1028,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     grupos[nombre] = {
                         nombre: nombre,
                         total: 0,
-                        completados: 0
+                        completados: 0,
+                        pendientes: 0
                     };
 
                 }
@@ -1073,6 +1056,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     grupos[nombre].completados++;
 
+                } else {
+
+                    grupos[nombre].pendientes++;
+
                 }
 
             }
@@ -1084,9 +1071,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function obtenerIconoCategoria(
-        nombre
-    ) {
+    /* =========================================================
+       ICONOS DE CATEGORÍAS
+    ========================================================= */
+
+    function obtenerIconoCategoria(nombre) {
 
         const iconos = {
 
@@ -1119,27 +1108,76 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    async function actualizarNotificacionesIniciales() {
+    /* =========================================================
+       ERROR GENERAL
+    ========================================================= */
 
-        await cargarNotificaciones();
+    function mostrarErrorInicio(mensaje) {
+
+        const contenedor =
+            document.getElementById(
+                "contenedorCategorias"
+            );
+
+
+        if (contenedor) {
+
+            contenedor.innerHTML = "";
+
+
+            const elemento =
+                document.createElement("p");
+
+            elemento.className =
+                "categoria-vacia";
+
+            elemento.textContent =
+                mensaje ||
+                "No se pudieron cargar tus hábitos.";
+
+
+            contenedor.appendChild(
+                elemento
+            );
+
+        }
+
+
+        mostrarErrorNotificaciones(
+            mensaje
+        );
 
     }
 
+
+    /* =========================================================
+       INICIO
+    ========================================================= */
 
     mostrarFechaActual();
 
     cargarDatosUsuario();
 
-    cargarResumenInicio();
+    cargarDatosInicio();
 
-    actualizarNotificacionesIniciales();
 
+    /* =========================================================
+       ACTUALIZACIÓN AUTOMÁTICA
+    ========================================================= */
 
     setInterval(
-        cargarNotificaciones,
+        () => {
+
+            cargarDatosInicio();
+
+        },
         30000
     );
 
+
+    /* =========================================================
+       MARCAR COMO LEÍDAS AL ABRIR
+    ========================================================= */
 
     if (panelNotificaciones) {
 
@@ -1151,6 +1189,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     !panelNotificaciones.classList.contains(
                         "oculto"
                     );
+
 
                 if (estaAbierto) {
 

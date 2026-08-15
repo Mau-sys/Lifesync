@@ -6,6 +6,7 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require_once "../config/conexion.php";
 
+
 if (!isset($_SESSION["usuario_id"])) {
 
     http_response_code(401);
@@ -18,30 +19,127 @@ if (!isset($_SESSION["usuario_id"])) {
     exit;
 }
 
-$usuarioId = (int) $_SESSION["usuario_id"];
+
+$usuarioId =
+    (int) $_SESSION["usuario_id"];
+
 
 try {
 
-    $database = new Database();
+    $database =
+        new Database();
 
-    $db = $database->getConnection();
+    $db =
+        $database->getConnection();
 
-    if ($db === null) {
 
-        http_response_code(500);
+    if (!$db) {
+
+        throw new Exception(
+            "No se pudo conectar con la base de datos."
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONFIGURACIÓN
+    |--------------------------------------------------------------------------
+    */
+
+    $consultaConfiguracion =
+        $db->prepare(
+            "SELECT
+                notificaciones_activas
+             FROM configuracion_usuario
+             WHERE id_usuario = :id_usuario
+             LIMIT 1"
+        );
+
+
+    $consultaConfiguracion->execute([
+        ":id_usuario" =>
+            $usuarioId
+    ]);
+
+
+    $configuracion =
+        $consultaConfiguracion->fetch(
+            PDO::FETCH_ASSOC
+        );
+
+
+    /*
+    | Si no existe configuración,
+    | se crean los valores predeterminados.
+    */
+
+    if (!$configuracion) {
+
+        $crearConfiguracion =
+            $db->prepare(
+                "INSERT INTO configuracion_usuario
+                (
+                    id_usuario,
+                    idioma,
+                    notificaciones_activas,
+                    sonido_notificaciones,
+                    correo_notificaciones
+                )
+                VALUES
+                (
+                    :id_usuario,
+                    'es',
+                    TRUE,
+                    TRUE,
+                    FALSE
+                )"
+            );
+
+
+        $crearConfiguracion->execute([
+            ":id_usuario" =>
+                $usuarioId
+        ]);
+
+
+        $notificacionesActivas =
+            true;
+
+    } else {
+
+        $notificacionesActivas =
+            (bool)
+            $configuracion[
+                "notificaciones_activas"
+            ];
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SI ESTÁN DESACTIVADAS, NO GENERAR
+    |--------------------------------------------------------------------------
+    */
+
+    if (!$notificacionesActivas) {
 
         echo json_encode([
-            "exito" => false,
-            "mensaje" =>
-                "No se pudo conectar con la base de datos."
+            "exito" => true,
+            "creadas" => 0,
+            "notificaciones_activas" =>
+                false
         ]);
 
         exit;
     }
 
-    $hoy = date("Y-m-d");
 
-    $creadas = 0;
+    /*
+    |--------------------------------------------------------------------------
+    | FUNCIONES
+    |--------------------------------------------------------------------------
+    */
 
     function existeNotificacion(
         PDO $db,
@@ -50,24 +148,35 @@ try {
         string $mensaje
     ): bool {
 
-        $consulta = $db->prepare(
-            "SELECT COUNT(*)
-             FROM notificaciones
-             WHERE id_usuario = :id_usuario
-             AND titulo = :titulo
-             AND mensaje = :mensaje
-             AND DATE(fecha_notificacion) = CURDATE()"
-        );
+        $consulta =
+            $db->prepare(
+                "SELECT COUNT(*)
+                 FROM notificaciones
+                 WHERE id_usuario = :id_usuario
+                 AND titulo = :titulo
+                 AND mensaje = :mensaje
+                 AND DATE(fecha_notificacion) =
+                     CURDATE()"
+            );
+
 
         $consulta->execute([
-            ":id_usuario" => $usuarioId,
-            ":titulo" => $titulo,
-            ":mensaje" => $mensaje
+            ":id_usuario" =>
+                $usuarioId,
+
+            ":titulo" =>
+                $titulo,
+
+            ":mensaje" =>
+                $mensaje
         ]);
 
+
         return
-            (int) $consulta->fetchColumn() > 0;
+            (int)
+            $consulta->fetchColumn() > 0;
     }
+
 
     function crearNotificacion(
         PDO $db,
@@ -84,98 +193,138 @@ try {
                 $mensaje
             )
         ) {
+
             return false;
         }
 
-        $consulta = $db->prepare(
-            "INSERT INTO notificaciones
-            (
-                id_usuario,
-                titulo,
-                mensaje,
-                leida
-            )
-            VALUES
-            (
-                :id_usuario,
-                :titulo,
-                :mensaje,
-                FALSE
-            )"
-        );
+
+        $consulta =
+            $db->prepare(
+                "INSERT INTO notificaciones
+                (
+                    id_usuario,
+                    titulo,
+                    mensaje,
+                    leida
+                )
+                VALUES
+                (
+                    :id_usuario,
+                    :titulo,
+                    :mensaje,
+                    FALSE
+                )"
+            );
+
 
         $consulta->execute([
-            ":id_usuario" => $usuarioId,
-            ":titulo" => $titulo,
-            ":mensaje" => $mensaje
+            ":id_usuario" =>
+                $usuarioId,
+
+            ":titulo" =>
+                $titulo,
+
+            ":mensaje" =>
+                $mensaje
         ]);
+
 
         return true;
     }
 
 
+    $creadas = 0;
+
+
     /*
-     * PROGRESO DEL DÍA
-     */
+    |--------------------------------------------------------------------------
+    | PROGRESO DEL DÍA
+    |--------------------------------------------------------------------------
+    */
 
-    $consultaHabitos = $db->prepare(
-        "SELECT
-            h.id_habito,
-            h.nombre_habito,
-            h.objetivo,
-            h.tipo_medicion,
+    $consultaHabitos =
+        $db->prepare(
+            "SELECT
+                h.id_habito,
+                h.nombre_habito,
+                h.objetivo,
 
-            COALESCE(
-                (
-                    SELECT SUM(rh.valor_registrado)
-                    FROM registros_habitos rh
-                    WHERE rh.id_habito = h.id_habito
-                    AND DATE(rh.fecha_registro) = CURDATE()
-                ),
-                0
-            ) AS progreso
+                COALESCE(
+                    (
+                        SELECT
+                            SUM(rh.valor_registrado)
+                        FROM registros_habitos rh
+                        WHERE rh.id_habito =
+                            h.id_habito
+                        AND DATE(
+                            rh.fecha_registro
+                        ) = CURDATE()
+                    ),
+                    0
+                ) AS progreso
 
-         FROM habitos h
+             FROM habitos h
 
-         WHERE h.id_usuario = :id_usuario
-         AND h.activo = TRUE"
-    );
+             WHERE h.id_usuario =
+                :id_usuario
+
+             AND h.activo = TRUE"
+        );
+
 
     $consultaHabitos->execute([
-        ":id_usuario" => $usuarioId
+        ":id_usuario" =>
+            $usuarioId
     ]);
 
+
     $habitos =
-        $consultaHabitos->fetchAll(PDO::FETCH_ASSOC);
+        $consultaHabitos->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+
 
     $totalHabitos = 0;
     $completados = 0;
 
+
     foreach ($habitos as $habito) {
 
         $objetivo =
-            (float) $habito["objetivo"];
+            (float)
+            $habito["objetivo"];
+
 
         $progreso =
-            (float) $habito["progreso"];
+            (float)
+            $habito["progreso"];
+
 
         if ($objetivo <= 0) {
             continue;
         }
 
+
         $totalHabitos++;
 
-        if ($progreso >= $objetivo) {
+
+        if (
+            $progreso >=
+            $objetivo
+        ) {
 
             $completados++;
+
 
             $titulo =
                 "Hábito completado";
 
+
             $mensaje =
-                "¡Completaste tu hábito \""
-                . $habito["nombre_habito"]
-                . "\" hoy!";
+                '¡Completaste tu hábito "' .
+                $habito["nombre_habito"] .
+                '" hoy!';
+
 
             if (
                 crearNotificacion(
@@ -193,21 +342,29 @@ try {
 
 
     /*
-     * PROGRESO GENERAL
-     */
+    |--------------------------------------------------------------------------
+    | PROGRESO GENERAL
+    |--------------------------------------------------------------------------
+    */
 
     if ($totalHabitos > 0) {
 
         $porcentaje =
-            ($completados / $totalHabitos) * 100;
+            (
+                $completados /
+                $totalHabitos
+            ) * 100;
+
 
         if ($porcentaje >= 100) {
 
             $titulo =
                 "¡Día completado!";
 
+
             $mensaje =
                 "Completaste todos tus hábitos de hoy. ¡Excelente trabajo!";
+
 
             if (
                 crearNotificacion(
@@ -221,13 +378,16 @@ try {
                 $creadas++;
             }
 
+
         } elseif ($porcentaje >= 75) {
 
             $titulo =
                 "¡Vas muy bien!";
 
+
             $mensaje =
                 "Ya completaste más del 75% de tus hábitos de hoy.";
+
 
             if (
                 crearNotificacion(
@@ -245,33 +405,45 @@ try {
 
 
     /*
-     * RACHA
-     */
+    |--------------------------------------------------------------------------
+    | RACHA
+    |--------------------------------------------------------------------------
+    */
 
-    $consultaRacha = $db->prepare(
-        "SELECT
-            COALESCE(
-                MAX(r.racha_actual),
-                0
-            ) AS racha
+    $consultaRacha =
+        $db->prepare(
+            "SELECT
+                COALESCE(
+                    MAX(r.racha_actual),
+                    0
+                ) AS racha
 
-         FROM rachas r
+             FROM rachas r
 
-         INNER JOIN habitos h
-            ON h.id_habito = r.id_habito
+             INNER JOIN habitos h
+                ON h.id_habito =
+                   r.id_habito
 
-         WHERE h.id_usuario = :id_usuario
-         AND h.activo = TRUE"
-    );
+             WHERE h.id_usuario =
+                   :id_usuario
+
+             AND h.activo = TRUE"
+        );
+
 
     $consultaRacha->execute([
-        ":id_usuario" => $usuarioId
+        ":id_usuario" =>
+            $usuarioId
     ]);
 
+
     $racha =
-        (int) (
-            $consultaRacha->fetchColumn() ?: 0
+        (int)
+        (
+            $consultaRacha->fetchColumn()
+            ?: 0
         );
+
 
     $hitosRacha = [
         3,
@@ -281,6 +453,7 @@ try {
         60,
         100
     ];
+
 
     if (
         in_array(
@@ -293,10 +466,12 @@ try {
         $titulo =
             "🔥 ¡Nueva racha!";
 
+
         $mensaje =
-            "Llevas "
-            . $racha
-            . " días manteniendo tus hábitos.";
+            "Llevas " .
+            $racha .
+            " días manteniendo tus hábitos.";
+
 
         if (
             crearNotificacion(
@@ -313,63 +488,87 @@ try {
 
 
     /*
-     * RECORDATORIOS
-     *
-     * Los recordatorios existentes se
-     * convierten en notificaciones cuando
-     * corresponden al momento actual.
-     */
+    |--------------------------------------------------------------------------
+    | RECORDATORIOS
+    |--------------------------------------------------------------------------
+    */
+
+    $hoy =
+        date("Y-m-d");
+
 
     $horaActual =
         date("H:i");
 
-    $consultaRecordatorios = $db->prepare(
-        "SELECT
-            id_recordatorio,
-            titulo,
-            mensaje,
-            hora,
-            fecha,
-            repeticion
 
-         FROM recordatorios
+    $consultaRecordatorios =
+        $db->prepare(
+            "SELECT
+                id_recordatorio,
+                titulo,
+                mensaje,
+                hora,
+                fecha,
+                repeticion
 
-         WHERE id_usuario = :id_usuario
-         AND activo = TRUE
+             FROM recordatorios
 
-         AND (
+             WHERE id_usuario =
+                   :id_usuario
+
+             AND activo = TRUE
+
+             AND
              (
-                 fecha IS NULL
-                 AND hora <= :hora_actual
-             )
-             OR
-             (
-                 fecha = :hoy
-                 AND hora <= :hora_actual
-             )
-         )
+                (
+                    fecha IS NULL
+                    AND hora <= :hora_actual
+                )
 
-         ORDER BY hora ASC"
-    );
+                OR
+
+                (
+                    fecha = :hoy
+                    AND hora <= :hora_actual
+                )
+             )
+
+             ORDER BY hora ASC"
+        );
+
 
     $consultaRecordatorios->execute([
-        ":id_usuario" => $usuarioId,
-        ":hora_actual" => $horaActual,
-        ":hoy" => $hoy
+        ":id_usuario" =>
+            $usuarioId,
+
+        ":hora_actual" =>
+            $horaActual,
+
+        ":hoy" =>
+            $hoy
     ]);
 
-    $recordatorios =
-        $consultaRecordatorios->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($recordatorios as $recordatorio) {
+    $recordatorios =
+        $consultaRecordatorios->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+
+
+    foreach (
+        $recordatorios
+        as $recordatorio
+    ) {
 
         $titulo =
             $recordatorio["titulo"]
             ?: "Recordatorio";
 
+
         $mensaje =
             $recordatorio["mensaje"]
             ?: "Tienes un recordatorio pendiente.";
+
 
         if (
             crearNotificacion(
@@ -385,19 +584,30 @@ try {
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | RESPUESTA
+    |--------------------------------------------------------------------------
+    */
+
     echo json_encode([
         "exito" => true,
-        "creadas" => $creadas
+        "creadas" => $creadas,
+        "notificaciones_activas" =>
+            true
     ]);
 
-} catch (PDOException $error) {
+
+} catch (Throwable $error) {
 
     http_response_code(500);
 
     echo json_encode([
         "exito" => false,
         "mensaje" =>
-            "No se pudieron procesar las notificaciones."
+            "No se pudieron procesar las notificaciones.",
+        "detalle" =>
+            $error->getMessage()
     ]);
 }
 ?>

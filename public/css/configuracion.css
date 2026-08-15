@@ -395,3 +395,513 @@
 .modal-contenido .btn-secundario {
     min-width: 120px;
 }
+
+/* =========================================
+   MENSAJES DE CONFIGURACIÓN
+   ========================================= */
+
+.mensaje {
+    min-height: 24px;
+    margin-top: 10px;
+    padding: 0;
+    font-size: 14px;
+    font-weight: var(--peso-semibold);
+    text-align: right;
+}
+
+.mensaje.exito {
+    color: #22c55e;
+}
+
+.mensaje.error {
+    color: #ef4444;
+}
+
+
+/* =========================================
+   MODALES
+   ========================================= */
+
+.modal[aria-hidden="true"] {
+    display: none;
+}
+
+.modal[aria-hidden="false"] {
+    display: flex;
+}
+
+
+/* Evita que el contenido del modal se desborde */
+
+.modal-contenido {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+
+/* =========================================
+   LISTA DE SESIONES
+   ========================================= */
+
+.lista-sesion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    padding: 16px;
+
+    margin-bottom: 12px;
+
+    background: var(--color-superficie-clara);
+
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-medio);
+}
+
+.info-sesion {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-sesion strong {
+    color: var(--color-texto-principal);
+}
+
+.info-sesion span {
+    color: var(--color-texto-secundario);
+    font-size: 14px;
+}
+
+.btn-cerrar-sesion {
+    padding: 9px 14px;
+
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-medio);
+
+    background: transparent;
+    color: var(--color-texto-principal);
+
+    font-weight: var(--peso-semibold);
+
+    cursor: pointer;
+
+    transition:
+        border-color var(--transicion),
+        color var(--transicion),
+        transform var(--transicion);
+}
+
+.btn-cerrar-sesion:hover {
+    border-color: var(--color-morado);
+    color: var(--color-morado);
+    transform: translateY(-1px);
+}
+
+
+/* =========================================
+   TEMA CLARO
+   ========================================= */
+
+body.modo-claro {
+    --color-fondo: #f5f7fb;
+    --color-superficie: #ffffff;
+    --color-superficie-clara: #f8f9fc;
+    --color-texto-principal: #20232a;
+    --color-texto-secundario: #687080;
+    --color-borde: #dfe3eb;
+}
+
+
+/* =========================================
+   ACCESIBILIDAD
+   ========================================= */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--color-morado);
+    outline-offset: 3px;
+}
+
+/* =========================================
+   MENSAJES DE CONFIGURACIÓN
+   ========================================= */
+
+.mensaje {
+    min-height: 24px;
+    margin-top: 10px;
+    padding: 0;
+    font-size: 14px;
+    font-weight: var(--peso-semibold);
+    text-align: right;
+}
+
+.mensaje.exito {
+    color: #22c55e;
+}
+
+.mensaje.error {
+    color: #ef4444;
+}
+
+
+/* =========================================
+   MODALES
+   ========================================= */
+
+.modal[aria-hidden="true"] {
+    display: none;
+}
+
+.modal[aria-hidden="false"] {
+    display: flex;
+}
+
+
+/* Evita que el contenido del modal se desborde */
+
+.modal-contenido {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+
+/* =========================================
+   LISTA DE SESIONES
+   ========================================= */
+
+.lista-sesion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    padding: 16px;
+
+    margin-bottom: 12px;
+
+    background: var(--color-superficie-clara);
+
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-medio);
+}
+
+.info-sesion {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-sesion strong {
+    color: var(--color-texto-principal);
+}
+
+.info-sesion span {
+    color: var(--color-texto-secundario);
+    font-size: 14px;
+}
+
+.btn-cerrar-sesion {
+    padding: 9px 14px;
+
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-medio);
+
+    background: transparent;
+    color: var(--color-texto-principal);
+
+    font-weight: var(--peso-semibold);
+
+    cursor: pointer;
+
+    transition:
+        border-color var(--transicion),
+        color var(--transicion),
+        transform var(--transicion);
+}
+
+.btn-cerrar-sesion:hover {
+    border-color: var(--color-morado);
+    color: var(--color-morado);
+    transform: translateY(-1px);
+}
+
+
+/* =========================================
+   TEMA CLARO
+   ========================================= */
+
+body.modo-claro {
+    --color-fondo: #f5f7fb;
+    --color-superficie: #ffffff;
+    --color-superficie-clara: #f8f9fc;
+    --color-texto-principal: #20232a;
+    --color-texto-secundario: #687080;
+    --color-borde: #dfe3eb;
+}
+
+
+/* =========================================
+   ACCESIBILIDAD
+   ========================================= */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--color-morado);
+    outline-offset: 3px;
+}
+
+/* =========================================
+   MENSAJES DE CONFIGURACIÓN
+   ========================================= */
+
+.mensaje {
+    min-height: 24px;
+    margin-top: 10px;
+    padding: 0;
+    font-size: 14px;
+    font-weight: var(--peso-semibold);
+    text-align: right;
+}
+
+.mensaje.exito {
+    color: #22c55e;
+}
+
+.mensaje.error {
+    color: #ef4444;
+}
+
+
+/* =========================================
+   MODALES
+   ========================================= */
+
+.modal[aria-hidden="true"] {
+    display: none;
+}
+
+.modal[aria-hidden="false"] {
+    display: flex;
+}
+
+
+/* Evita que el contenido del modal se desborde */
+
+.modal-contenido {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+
+/* =========================================
+   LISTA DE SESIONES
+   ========================================= */
+
+.lista-sesion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    padding: 16px;
+
+    margin-bottom: 12px;
+
+    background: var(--color-superficie-clara);
+
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-medio);
+}
+
+.info-sesion {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-sesion strong {
+    color: var(--color-texto-principal);
+}
+
+.info-sesion span {
+    color: var(--color-texto-secundario);
+    font-size: 14px;
+}
+
+.btn-cerrar-sesion {
+    padding: 9px 14px;
+
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-medio);
+
+    background: transparent;
+    color: var(--color-texto-principal);
+
+    font-weight: var(--peso-semibold);
+
+    cursor: pointer;
+
+    transition:
+        border-color var(--transicion),
+        color var(--transicion),
+        transform var(--transicion);
+}
+
+.btn-cerrar-sesion:hover {
+    border-color: var(--color-morado);
+    color: var(--color-morado);
+    transform: translateY(-1px);
+}
+
+
+/* =========================================
+   TEMA CLARO
+   ========================================= */
+
+body.modo-claro {
+    --color-fondo: #f5f7fb;
+    --color-superficie: #ffffff;
+    --color-superficie-clara: #f8f9fc;
+    --color-texto-principal: #20232a;
+    --color-texto-secundario: #687080;
+    --color-borde: #dfe3eb;
+}
+
+
+/* =========================================
+   ACCESIBILIDAD
+   ========================================= */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--color-morado);
+    outline-offset: 3px;
+}
+
+.mensaje {
+    min-height: 24px;
+    margin-top: 10px;
+    padding: 0;
+    font-size: 14px;
+    font-weight: var(--peso-semibold);
+    text-align: right;
+}
+
+.mensaje.exito {
+    color: #22c55e;
+}
+
+.mensaje.error {
+    color: #ef4444;
+}
+
+.modal[aria-hidden="true"] {
+    display: none;
+}
+
+.modal[aria-hidden="false"] {
+    display: flex;
+}
+
+.modal-contenido {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.lista-sesion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    padding: 16px;
+
+    margin-bottom: 12px;
+
+    background: var(--color-superficie-clara);
+
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-medio);
+}
+
+.info-sesion {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-sesion strong {
+    color: var(--color-texto-principal);
+}
+
+.info-sesion span {
+    color: var(--color-texto-secundario);
+    font-size: 14px;
+}
+
+.btn-cerrar-sesion {
+    padding: 9px 14px;
+
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-medio);
+
+    background: transparent;
+    color: var(--color-texto-principal);
+
+    font-weight: var(--peso-semibold);
+
+    cursor: pointer;
+
+    transition:
+        border-color var(--transicion),
+        color var(--transicion),
+        transform var(--transicion);
+}
+
+.btn-cerrar-sesion:hover {
+    border-color: var(--color-morado);
+    color: var(--color-morado);
+    transform: translateY(-1px);
+}
+
+body.modo-claro {
+    --color-fondo: #f5f7fb;
+    --color-superficie: #ffffff;
+    --color-superficie-clara: #f8f9fc;
+    --color-texto-principal: #20232a;
+    --color-texto-secundario: #687080;
+    --color-borde: #dfe3eb;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--color-morado);
+    outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+
+    .lista-sesion {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-cerrar-sesion {
+        width: 100%;
+    }
+
+    .mensaje {
+        text-align: center;
+    }
+
+}
