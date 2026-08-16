@@ -1,987 +1,1239 @@
-(function () {
+/* =========================================================
+   IDIOMA GLOBAL — textos dinámicos
+   ========================================================= */
+function LS(texto) {
+    if (typeof window !== "undefined" &&
+        typeof window.traducirLifeSync === "function") {
+        return window.traducirLifeSync(texto);
+    }
+    return texto;
+}
 
-    "use strict";
-
-
-    const CLAVE_CONFIGURACION =
-        "lifeSyncConfiguracion";
-
-
-    const CONFIGURACION_POR_DEFECTO = {
-
-        modoOscuro: true,
-
-        notificaciones: true,
-
-        sonidos: true,
-
-        correo: true,
-
-        idioma: "es",
-
-        sincronizacion: true
-
-    };
+const ENDPOINT = "auth/configuracion.php";
 
 
-    function obtenerConfiguracion() {
+const modoOscuro =
+    document.getElementById("modoOscuro");
 
-        const guardada =
-            localStorage.getItem(
-                CLAVE_CONFIGURACION
-            );
+const idioma =
+    document.getElementById("idioma");
 
+const notificaciones =
+    document.getElementById("notificaciones");
 
-        if (!guardada) {
+const sonidos =
+    document.getElementById("sonidos");
 
-            return {
-                ...CONFIGURACION_POR_DEFECTO
-            };
+const correo =
+    document.getElementById("correo");
 
-        }
-
-
-        try {
-
-            const configuracion =
-                JSON.parse(guardada);
+const sincronizacion =
+    document.getElementById("sincronizacion");
 
 
-            return {
+const formulario =
+    document.getElementById("configuracionForm");
 
-                ...CONFIGURACION_POR_DEFECTO,
+const btnGuardar =
+    document.getElementById("btnGuardarConfiguracion");
 
-                ...configuracion
-
-            };
-
-        } catch (error) {
-
-            console.error(
-                "No se pudo leer la configuración:",
-                error
-            );
+const mensaje =
+    document.getElementById("mensajeConfiguracion");
 
 
-            return {
-                ...CONFIGURACION_POR_DEFECTO
-            };
+const btnCambiarContrasena =
+    document.getElementById("btnCambiarContrasena");
 
-        }
+const modalContrasena =
+    document.getElementById("modalContrasena");
 
+const btnCancelarContrasena =
+    document.getElementById("btnCancelarContrasena");
+
+const btnGuardarContrasena =
+    document.getElementById("btnGuardarContrasena");
+
+const contrasenaActual =
+    document.getElementById("actual");
+
+const contrasenaNueva =
+    document.getElementById("nueva");
+
+const contrasenaConfirmar =
+    document.getElementById("confirmar");
+
+const mensajeContrasena =
+    document.getElementById("mensajeContrasena");
+
+
+const btnSesiones =
+    document.getElementById("btnSesiones");
+
+const modalSesiones =
+    document.getElementById("modalSesiones");
+
+const btnCerrarModalSesiones =
+    document.getElementById("btnCerrarModalSesiones");
+
+const listaSesiones =
+    document.getElementById("listaSesiones");
+
+const mensajeSesiones =
+    document.getElementById("mensajeSesiones");
+
+
+const textoEstadoSincronizacion =
+    document.getElementById(
+        "textoEstadoSincronizacion"
+    );
+
+const estadoSincronizacion =
+    document.getElementById(
+        "estadoSincronizacion"
+    );
+
+
+function mostrarMensaje(texto) {
+
+    if (!mensaje) {
+        return;
     }
 
+    mensaje.textContent = texto;
+}
 
-    function guardarConfiguracionLocal(
-        configuracion
-    ) {
 
-        localStorage.setItem(
+function mostrarMensajeContrasena(texto) {
 
-            CLAVE_CONFIGURACION,
-
-            JSON.stringify(configuracion)
-
-        );
-
+    if (!mensajeContrasena) {
+        return;
     }
 
+    mensajeContrasena.textContent = texto;
+}
 
-    function aplicarConfiguracionTema(
-        activado
+
+function mostrarMensajeSesiones(texto) {
+
+    if (!mensajeSesiones) {
+        return;
+    }
+
+    mensajeSesiones.textContent = texto;
+}
+
+
+function cambiarEstadoGuardado(cargando) {
+
+    if (!btnGuardar) {
+        return;
+    }
+
+    btnGuardar.disabled = cargando;
+
+    btnGuardar.textContent =
+        cargando
+            ? LS("Guardando...")
+            : "Guardar cambios";
+}
+
+
+function aplicarTema(tema) {
+
+    const temaValido =
+        tema === "claro"
+            ? "claro"
+            : "oscuro";
+
+
+    if (
+        typeof window.aplicarTemaGlobal ===
+        "function"
     ) {
-
-        if (
-            typeof window.aplicarTemaGlobal !==
-            "function"
-        ) {
-
-            console.error(
-                "tema-global.js no está cargado."
-            );
-
-            return;
-
-        }
-
 
         window.aplicarTemaGlobal(
-            activado
-                ? "oscuro"
-                : "claro"
+            temaValido
         );
 
+        return;
     }
 
 
-    function actualizarMensajesEstado() {
+    document.documentElement.setAttribute(
+        "data-tema",
+        temaValido
+    );
 
-        const estado =
-            document.getElementById(
-                "estadoSincronizacion"
+    document.documentElement.classList.toggle(
+        "tema-claro",
+        temaValido === "claro"
+    );
+
+    document.documentElement.classList.toggle(
+        "tema-oscuro",
+        temaValido === "oscuro"
+    );
+
+
+    if (document.body) {
+
+        document.body.setAttribute(
+            "data-tema",
+            temaValido
+        );
+
+        document.body.classList.toggle(
+            "tema-claro",
+            temaValido === "claro"
+        );
+
+        document.body.classList.toggle(
+            "tema-oscuro",
+            temaValido === "oscuro"
+        );
+    }
+
+
+    localStorage.setItem(
+        "lifesync_tema",
+        temaValido
+    );
+}
+
+
+function actualizarTemaDesdeCheckbox() {
+
+    if (!modoOscuro) {
+        return;
+    }
+
+
+    const tema =
+        modoOscuro.checked
+            ? "oscuro"
+            : "claro";
+
+
+    aplicarTema(tema);
+}
+
+
+function actualizarEstadoSincronizacion(activa) {
+
+    if (textoEstadoSincronizacion) {
+
+        textoEstadoSincronizacion.textContent =
+            activa
+                ? "Tu información se encuentra respaldada correctamente."
+                : "La sincronización automática está desactivada.";
+    }
+
+
+    if (estadoSincronizacion) {
+
+        estadoSincronizacion.textContent =
+            activa
+                ? "● Sincronizada"
+                : "● Desactivada";
+
+
+        estadoSincronizacion.classList.toggle(
+            "estado-activo",
+            activa
+        );
+    }
+}
+
+
+async function cargarConfiguracion() {
+
+    try {
+
+        const respuesta =
+            await fetch(
+                `${ENDPOINT}?accion=obtener`,
+                {
+                    method: "GET",
+
+                    credentials: "same-origin",
+
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    }
+                }
             );
 
 
-        const texto =
-            document.getElementById(
-                "textoEstadoSincronizacion"
-            );
-
-
-        const sincronizacion =
-            document.getElementById(
-                "sincronizacion"
-            );
+        const datos =
+            await respuesta.json();
 
 
         if (
-            !estado ||
-            !texto ||
-            !sincronizacion
+            !respuesta.ok ||
+            !datos.exito ||
+            !datos.configuracion
         ) {
 
+            mostrarMensaje(
+                datos.mensaje ||
+                "No se pudo cargar la configuración."
+            );
+
             return;
-
         }
 
-
-        const idioma =
-            document.getElementById(
-                "idioma"
-            )?.value || "es";
-
-
-        if (idioma === "en") {
-
-            if (sincronizacion.checked) {
-
-                estado.textContent =
-                    "● Synchronized";
-
-                texto.textContent =
-                    "Your information is backed up correctly.";
-
-            } else {
-
-                estado.textContent =
-                    "● Not synchronized";
-
-                texto.textContent =
-                    "Automatic synchronization is disabled.";
-
-            }
-
-        } else {
-
-            if (sincronizacion.checked) {
-
-                estado.textContent =
-                    "● Sincronizada";
-
-                texto.textContent =
-                    "Tu información se encuentra respaldada correctamente.";
-
-            } else {
-
-                estado.textContent =
-                    "● No sincronizada";
-
-                texto.textContent =
-                    "La sincronización automática está desactivada.";
-
-            }
-
-        }
-
-    }
-
-
-    function cargarControles() {
 
         const configuracion =
-            obtenerConfiguracion();
-
-
-        const modoOscuro =
-            document.getElementById(
-                "modoOscuro"
-            );
-
-
-        const notificaciones =
-            document.getElementById(
-                "notificaciones"
-            );
-
-
-        const sonidos =
-            document.getElementById(
-                "sonidos"
-            );
-
-
-        const correo =
-            document.getElementById(
-                "correo"
-            );
-
-
-        const idioma =
-            document.getElementById(
-                "idioma"
-            );
-
-
-        const sincronizacion =
-            document.getElementById(
-                "sincronizacion"
-            );
+            datos.configuracion;
 
 
         if (modoOscuro) {
 
             modoOscuro.checked =
-                configuracion.modoOscuro;
-
-        }
-
-
-        if (notificaciones) {
-
-            notificaciones.checked =
-                configuracion.notificaciones;
-
-        }
-
-
-        if (sonidos) {
-
-            sonidos.checked =
-                configuracion.sonidos;
-
-        }
-
-
-        if (correo) {
-
-            correo.checked =
-                configuracion.correo;
-
+                configuracion.tema ===
+                "oscuro";
         }
 
 
         if (idioma) {
 
             idioma.value =
-                configuracion.idioma;
+                configuracion.idioma ===
+                "en"
+                    ? "en"
+                    : "es";
+        }
 
+
+        if (notificaciones) {
+
+            notificaciones.checked =
+                Number(
+                    configuracion
+                        .notificaciones_activas
+                ) === 1;
+        }
+
+
+        if (sonidos) {
+
+            sonidos.checked =
+                Number(
+                    configuracion
+                        .sonidos_activados
+                ) === 1;
+        }
+
+
+        if (correo) {
+
+            const recordatorios =
+                Number(
+                    configuracion
+                        .correo_recordatorios
+                ) === 1;
+
+            const logros =
+                Number(
+                    configuracion
+                        .correo_logros
+                ) === 1;
+
+
+            correo.checked =
+                recordatorios &&
+                logros;
         }
 
 
         if (sincronizacion) {
 
             sincronizacion.checked =
-                configuracion.sincronizacion;
-
+                Number(
+                    configuracion
+                        .sincronizacion_automatica
+                ) === 1;
         }
 
 
-        aplicarConfiguracionTema(
-            configuracion.modoOscuro
+        aplicarTema(
+            configuracion.tema ===
+            "claro"
+                ? "claro"
+                : "oscuro"
         );
 
 
-        if (
-            typeof window.aplicarIdiomaGlobal ===
-            "function"
-        ) {
+        actualizarEstadoSincronizacion(
+            sincronizacion
+                ? sincronizacion.checked
+                : false
+        );
 
-            window.aplicarIdiomaGlobal(
-                configuracion.idioma
+
+    } catch (error) {
+
+        console.error(
+            "Error al cargar la configuración:",
+            error
+        );
+
+
+        mostrarMensaje(
+            "No se pudo cargar la configuración."
+        );
+    }
+}
+
+
+async function guardarConfiguracion(event) {
+
+    event.preventDefault();
+
+
+    mostrarMensaje("");
+
+
+    cambiarEstadoGuardado(true);
+
+
+    const datos =
+        new URLSearchParams();
+
+
+    datos.append(
+        "accion",
+        "guardar"
+    );
+
+
+    datos.append(
+        "tema",
+        modoOscuro &&
+        modoOscuro.checked
+            ? "oscuro"
+            : "claro"
+    );
+
+
+    datos.append(
+        "idioma",
+        idioma
+            ? idioma.value
+            : "es"
+    );
+
+
+    datos.append(
+        "notificaciones",
+        notificaciones &&
+        notificaciones.checked
+            ? "1"
+            : "0"
+    );
+
+
+    datos.append(
+        "sonidos",
+        sonidos &&
+        sonidos.checked
+            ? "1"
+            : "0"
+    );
+
+
+    const correoActivo =
+        correo &&
+        correo.checked
+            ? "1"
+            : "0";
+
+
+    datos.append(
+        "correo_recordatorios",
+        correoActivo
+    );
+
+
+    datos.append(
+        "correo_logros",
+        correoActivo
+    );
+
+
+    datos.append(
+        "sincronizacion",
+        sincronizacion &&
+        sincronizacion.checked
+            ? "1"
+            : "0"
+    );
+
+
+    try {
+
+        const respuesta =
+            await fetch(
+                ENDPOINT,
+                {
+                    method: "POST",
+
+                    credentials:
+                        "same-origin",
+
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+
+                        "Accept":
+                            "application/json"
+                    },
+
+                    body:
+                        datos.toString()
+                }
             );
 
-        }
+
+        const resultado =
+            await respuesta.json();
 
 
-        actualizarMensajesEstado();
+        if (
+            !respuesta.ok ||
+            !resultado.exito
+        ) {
 
-    }
+            mostrarMensaje(
+                resultado.mensaje ||
+                "No se pudieron guardar los cambios."
+            );
 
-
-    function mostrarMensaje(
-        elemento,
-        mensaje
-    ) {
-
-        if (!elemento) {
             return;
         }
 
 
-        elemento.textContent =
-            mensaje;
+        const tema =
+            modoOscuro &&
+            modoOscuro.checked
+                ? "oscuro"
+                : "claro";
 
 
-        setTimeout(function () {
+        aplicarTema(tema);
 
-            elemento.textContent =
-                "";
 
-        }, 3500);
+        actualizarEstadoSincronizacion(
+            sincronizacion
+                ? sincronizacion.checked
+                : false
+        );
 
+
+        mostrarMensaje(
+            resultado.mensaje ||
+            "Configuración guardada correctamente."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al guardar la configuración:",
+            error
+        );
+
+
+        mostrarMensaje(
+            "No se pudieron guardar los cambios."
+        );
+
+
+    } finally {
+
+        cambiarEstadoGuardado(false);
+    }
+}
+
+
+function abrirModalContrasena() {
+
+    if (!modalContrasena) {
+        return;
     }
 
 
-    function inicializar() {
-
-        cargarControles();
-
-        const modoOscuro =
-            document.getElementById(
-                "modoOscuro"
-            );
+    modalContrasena.classList.add(
+        "activo"
+    );
 
 
-        if (modoOscuro) {
+    mostrarMensajeContrasena("");
 
-            modoOscuro.addEventListener(
-                "change",
-                function () {
 
-                    aplicarConfiguracionTema(
-                        modoOscuro.checked
-                    );
+    if (contrasenaActual) {
+        contrasenaActual.value = "";
+    }
 
+
+    if (contrasenaNueva) {
+        contrasenaNueva.value = "";
+    }
+
+
+    if (contrasenaConfirmar) {
+        contrasenaConfirmar.value = "";
+    }
+
+
+    if (contrasenaActual) {
+
+        setTimeout(
+            function () {
+
+                contrasenaActual.focus();
+
+            },
+            50
+        );
+    }
+}
+
+
+function cerrarModalContrasena() {
+
+    if (!modalContrasena) {
+        return;
+    }
+
+
+    modalContrasena.classList.remove(
+        "activo"
+    );
+
+
+    mostrarMensajeContrasena("");
+}
+
+
+async function cambiarContrasena() {
+
+    mostrarMensajeContrasena("");
+
+
+    const actual =
+        contrasenaActual
+            ? contrasenaActual.value
+            : "";
+
+
+    const nueva =
+        contrasenaNueva
+            ? contrasenaNueva.value
+            : "";
+
+
+    const confirmar =
+        contrasenaConfirmar
+            ? contrasenaConfirmar.value
+            : "";
+
+
+    if (
+        !actual ||
+        !nueva ||
+        !confirmar
+    ) {
+
+        mostrarMensajeContrasena(
+            LS("Completa todos los campos.")
+        );
+
+        return;
+    }
+
+
+    if (nueva.length < 8) {
+
+        mostrarMensajeContrasena(
+            LS("La nueva contraseña debe tener al menos 8 caracteres.")
+        );
+
+        return;
+    }
+
+
+    if (nueva !== confirmar) {
+
+        mostrarMensajeContrasena(
+            LS("Las nuevas contraseñas no coinciden.")
+        );
+
+        return;
+    }
+
+
+    if (btnGuardarContrasena) {
+
+        btnGuardarContrasena.disabled =
+            true;
+
+        btnGuardarContrasena.textContent =
+            LS("Guardando...");
+    }
+
+
+    const datos =
+        new URLSearchParams();
+
+
+    datos.append(
+        "accion",
+        "cambiar_contrasena"
+    );
+
+
+    datos.append(
+        "actual",
+        actual
+    );
+
+
+    datos.append(
+        "nueva",
+        nueva
+    );
+
+
+    try {
+
+        const respuesta =
+            await fetch(
+                ENDPOINT,
+                {
+                    method: "POST",
+
+                    credentials:
+                        "same-origin",
+
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+
+                        "Accept":
+                            "application/json"
+                    },
+
+                    body:
+                        datos.toString()
                 }
             );
 
-        }
 
-        const idioma =
-            document.getElementById(
-                "idioma"
+        const resultado =
+            await respuesta.json();
+
+
+        if (
+            !respuesta.ok ||
+            !resultado.exito
+        ) {
+
+            mostrarMensajeContrasena(
+                resultado.mensaje ||
+                LS("No se pudo cambiar la contraseña.")
             );
 
+            return;
+        }
 
-        if (idioma) {
 
-            idioma.addEventListener(
-                "change",
-                function () {
+        mostrarMensajeContrasena(
+            resultado.mensaje ||
+            LS("Contraseña actualizada correctamente.")
+        );
 
-                    if (
-                        typeof window.aplicarIdiomaGlobal ===
-                        "function"
-                    ) {
 
-                        window.aplicarIdiomaGlobal(
-                            idioma.value
-                        );
+        if (contrasenaActual) {
+            contrasenaActual.value = "";
+        }
 
+
+        if (contrasenaNueva) {
+            contrasenaNueva.value = "";
+        }
+
+
+        if (contrasenaConfirmar) {
+            contrasenaConfirmar.value = "";
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al cambiar la contraseña:",
+            error
+        );
+
+
+        mostrarMensajeContrasena(
+            LS("No se pudo cambiar la contraseña.")
+        );
+
+
+    } finally {
+
+        if (btnGuardarContrasena) {
+
+            btnGuardarContrasena.disabled =
+                false;
+
+            btnGuardarContrasena.textContent =
+                LS("Guardar");
+        }
+    }
+}
+
+
+async function cargarSesiones() {
+
+    mostrarMensajeSesiones("");
+
+
+    if (!listaSesiones) {
+        return;
+    }
+
+
+    listaSesiones.innerHTML =
+        LS("Cargando sesiones...");
+
+
+    try {
+
+        const respuesta =
+            await fetch(
+                `${ENDPOINT}?accion=sesiones`,
+                {
+                    method: "GET",
+
+                    credentials:
+                        "same-origin",
+
+                    headers: {
+                        "Accept":
+                            "application/json"
                     }
-
-
-                    actualizarMensajesEstado();
-
                 }
             );
 
+
+        const resultado =
+            await respuesta.json();
+
+
+        if (
+            !respuesta.ok ||
+            !resultado.exito
+        ) {
+
+            listaSesiones.innerHTML =
+                "";
+
+
+            mostrarMensajeSesiones(
+                resultado.mensaje ||
+                LS("No se pudieron cargar las sesiones.")
+            );
+
+            return;
         }
 
-        const sincronizacion =
-            document.getElementById(
-                "sincronizacion"
-            );
+
+        const sesiones =
+            Array.isArray(
+                resultado.sesiones
+            )
+                ? resultado.sesiones
+                : [];
 
 
-        if (sincronizacion) {
+        listaSesiones.innerHTML =
+            "";
 
-            sincronizacion.addEventListener(
-                "change",
-                function () {
 
-                    actualizarMensajesEstado();
+        if (sesiones.length === 0) {
 
-                }
-            );
+            listaSesiones.textContent =
+                LS("No hay sesiones activas registradas.");
 
+            return;
         }
 
-        const formulario =
-            document.getElementById(
-                "configuracionForm"
-            );
 
+        sesiones.forEach(
+            function (sesion) {
 
-        if (formulario) {
-
-            formulario.addEventListener(
-                "submit",
-                function (evento) {
-
-                    evento.preventDefault();
-
-
-                    const configuracion = {
-
-                        modoOscuro:
-                            document.getElementById(
-                                "modoOscuro"
-                            ).checked,
-
-                        notificaciones:
-                            document.getElementById(
-                                "notificaciones"
-                            ).checked,
-
-                        sonidos:
-                            document.getElementById(
-                                "sonidos"
-                            ).checked,
-
-                        correo:
-                            document.getElementById(
-                                "correo"
-                            ).checked,
-
-                        idioma:
-                            document.getElementById(
-                                "idioma"
-                            ).value,
-
-                        sincronizacion:
-                            document.getElementById(
-                                "sincronizacion"
-                            ).checked
-
-                    };
-
-
-                    guardarConfiguracionLocal(
-                        configuracion
+                const contenedor =
+                    document.createElement(
+                        "div"
                     );
 
 
-                    aplicarConfiguracionTema(
-                        configuracion.modoOscuro
+                contenedor.className =
+                    "sesion-item";
+
+
+                const dispositivo =
+                    document.createElement(
+                        "p"
                     );
 
 
-                    if (
-                        typeof window.aplicarIdiomaGlobal ===
-                        "function"
-                    ) {
+                dispositivo.textContent =
+                    sesion.dispositivo ||
+                    LS("Dispositivo desconocido");
 
-                        window.aplicarIdiomaGlobal(
-                            configuracion.idioma
+
+                const fechaInicio =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                fechaInicio.textContent =
+                    `Inicio: ${
+                        sesion.fecha_inicio ||
+                        LS("Sin información")
+                    }`;
+
+
+                const ultimoAcceso =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                ultimoAcceso.textContent =
+                    `Último acceso: ${
+                        sesion.ultimo_acceso ||
+                        LS("Sin información")
+                    }`;
+
+
+                const boton =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                boton.type =
+                    "button";
+
+
+                boton.className =
+                    "btn-secundario";
+
+
+                boton.textContent =
+                    LS("Cerrar sesión");
+
+
+                boton.addEventListener(
+                    "click",
+                    function () {
+
+                        cerrarSesion(
+                            sesion.id_sesion
                         );
-
                     }
+                );
 
 
-                    actualizarMensajesEstado();
+                contenedor.appendChild(
+                    dispositivo
+                );
 
 
-                    const mensaje =
-                        document.getElementById(
-                            "mensajeConfiguracion"
-                        );
+                contenedor.appendChild(
+                    fechaInicio
+                );
 
 
-                    mostrarMensaje(
+                contenedor.appendChild(
+                    ultimoAcceso
+                );
 
-                        mensaje,
 
-                        configuracion.idioma === "en"
-                            ? "Changes saved successfully."
-                            : "Los cambios se guardaron correctamente."
+                contenedor.appendChild(
+                    boton
+                );
 
-                    );
 
+                listaSesiones.appendChild(
+                    contenedor
+                );
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al cargar sesiones:",
+            error
+        );
+
+
+        listaSesiones.innerHTML =
+            "";
+
+
+        mostrarMensajeSesiones(
+            LS("No se pudieron cargar las sesiones.")
+        );
+    }
+}
+
+
+async function cerrarSesion(idSesion) {
+
+    if (!idSesion) {
+        return;
+    }
+
+
+    const datos =
+        new URLSearchParams();
+
+
+    datos.append(
+        "accion",
+        "cerrar_sesion"
+    );
+
+
+    datos.append(
+        "id_sesion",
+        idSesion
+    );
+
+
+    try {
+
+        const respuesta =
+            await fetch(
+                ENDPOINT,
+                {
+                    method: "POST",
+
+                    credentials:
+                        "same-origin",
+
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+
+                        "Accept":
+                            "application/json"
+                    },
+
+                    body:
+                        datos.toString()
                 }
             );
 
+
+        const resultado =
+            await respuesta.json();
+
+
+        if (
+            !respuesta.ok ||
+            !resultado.exito
+        ) {
+
+            mostrarMensajeSesiones(
+                resultado.mensaje ||
+                "No se pudo cerrar la sesión."
+            );
+
+            return;
         }
 
-        const modalContrasena =
-            document.getElementById(
-                "modalContrasena"
+
+        if (
+            resultado.sesion_actual
+        ) {
+
+            localStorage.removeItem(
+                "lifesync_tema"
             );
 
 
-        const btnCambiarContrasena =
-            document.getElementById(
-                "btnCambiarContrasena"
+            window.location.href =
+                "inicio-sesion.html";
+
+            return;
+        }
+
+
+        await cargarSesiones();
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al cerrar la sesión:",
+            error
+        );
+
+
+        mostrarMensajeSesiones(
+            "No se pudo cerrar la sesión."
+        );
+    }
+}
+
+
+if (formulario) {
+
+    formulario.addEventListener(
+        "submit",
+        guardarConfiguracion
+    );
+}
+
+
+if (modoOscuro) {
+
+    modoOscuro.addEventListener(
+        "change",
+        function () {
+
+            actualizarTemaDesdeCheckbox();
+
+        }
+    );
+}
+
+
+if (sincronizacion) {
+
+    sincronizacion.addEventListener(
+        "change",
+        function () {
+
+            actualizarEstadoSincronizacion(
+                sincronizacion.checked
             );
 
-
-        const btnCancelarContrasena =
-            document.getElementById(
-                "btnCancelarContrasena"
-            );
+        }
+    );
+}
 
 
-        const btnGuardarContrasena =
-            document.getElementById(
-                "btnGuardarContrasena"
-            );
+if (btnCambiarContrasena) {
+
+    btnCambiarContrasena.addEventListener(
+        "click",
+        abrirModalContrasena
+    );
+}
+
+
+if (btnCancelarContrasena) {
+
+    btnCancelarContrasena.addEventListener(
+        "click",
+        cerrarModalContrasena
+    );
+}
+
+
+if (btnGuardarContrasena) {
+
+    btnGuardarContrasena.addEventListener(
+        "click",
+        cambiarContrasena
+    );
+}
+
+
+if (btnSesiones) {
+
+    btnSesiones.addEventListener(
+        "click",
+        function () {
+
+            if (modalSesiones) {
+
+                modalSesiones.classList.add(
+                    "activo"
+                );
+            }
+
+
+            cargarSesiones();
+        }
+    );
+}
+
+
+if (btnCerrarModalSesiones) {
+
+    btnCerrarModalSesiones.addEventListener(
+        "click",
+        function () {
+
+            if (modalSesiones) {
+
+                modalSesiones.classList.remove(
+                    "activo"
+                );
+            }
+        }
+    );
+}
+
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key !== "Escape"
+        ) {
+            return;
+        }
 
 
         if (
             modalContrasena &&
-            btnCambiarContrasena
+            modalContrasena.classList.contains(
+                "activo"
+            )
         ) {
 
-            btnCambiarContrasena.addEventListener(
-                "click",
-                function () {
-
-                    modalContrasena.classList.add(
-                        "activo"
-                    );
-
-
-                    document.body.style.overflow =
-                        "hidden";
-
-                }
-            );
-
+            cerrarModalContrasena();
         }
-
-
-        function cerrarModalContrasena() {
-
-            if (!modalContrasena) {
-                return;
-            }
-
-
-            modalContrasena.classList.remove(
-                "activo"
-            );
-
-
-            document.body.style.overflow =
-                "";
-
-
-            const actual =
-                document.getElementById(
-                    "actual"
-                );
-
-
-            const nueva =
-                document.getElementById(
-                    "nueva"
-                );
-
-
-            const confirmar =
-                document.getElementById(
-                    "confirmar"
-                );
-
-
-            const mensaje =
-                document.getElementById(
-                    "mensajeContrasena"
-                );
-
-
-            if (actual) {
-                actual.value = "";
-            }
-
-
-            if (nueva) {
-                nueva.value = "";
-            }
-
-
-            if (confirmar) {
-                confirmar.value = "";
-            }
-
-
-            if (mensaje) {
-                mensaje.textContent = "";
-            }
-
-        }
-
-
-        if (btnCancelarContrasena) {
-
-            btnCancelarContrasena.addEventListener(
-                "click",
-                cerrarModalContrasena
-            );
-
-        }
-
-
-        if (btnGuardarContrasena) {
-
-            btnGuardarContrasena.addEventListener(
-                "click",
-                function () {
-
-                    const actual =
-                        document.getElementById(
-                            "actual"
-                        )?.value.trim();
-
-
-                    const nueva =
-                        document.getElementById(
-                            "nueva"
-                        )?.value.trim();
-
-
-                    const confirmar =
-                        document.getElementById(
-                            "confirmar"
-                        )?.value.trim();
-
-
-                    const mensaje =
-                        document.getElementById(
-                            "mensajeContrasena"
-                        );
-
-
-                    const idiomaActual =
-                        document.getElementById(
-                            "idioma"
-                        )?.value || "es";
-
-
-                    if (
-                        !actual ||
-                        !nueva ||
-                        !confirmar
-                    ) {
-
-                        if (mensaje) {
-
-                            mensaje.textContent =
-                                idiomaActual === "en"
-                                    ? "Please complete all fields."
-                                    : "Completa todos los campos.";
-
-                        }
-
-                        return;
-
-                    }
-
-
-                    if (nueva.length < 8) {
-
-                        if (mensaje) {
-
-                            mensaje.textContent =
-                                idiomaActual === "en"
-                                    ? "The new password must contain at least 8 characters."
-                                    : "La nueva contraseña debe tener al menos 8 caracteres.";
-
-                        }
-
-                        return;
-
-                    }
-
-
-                    if (nueva !== confirmar) {
-
-                        if (mensaje) {
-
-                            mensaje.textContent =
-                                idiomaActual === "en"
-                                    ? "The new passwords do not match."
-                                    : "Las nuevas contraseñas no coinciden.";
-
-                        }
-
-                        return;
-
-                    }
-
-
-                    if (mensaje) {
-
-                        mensaje.textContent =
-                            idiomaActual === "en"
-                                ? "The form is ready. The real password change will be connected when the account system is available."
-                                : "El formulario está listo. El cambio real de contraseña se conectará cuando esté disponible el sistema de cuentas.";
-
-                    }
-
-                }
-            );
-
-        }
-
-        const modalSesiones =
-            document.getElementById(
-                "modalSesiones"
-            );
-
-
-        const btnSesiones =
-            document.getElementById(
-                "btnSesiones"
-            );
-
-
-        const btnCerrarModalSesiones =
-            document.getElementById(
-                "btnCerrarModalSesiones"
-            );
 
 
         if (
             modalSesiones &&
-            btnSesiones
+            modalSesiones.classList.contains(
+                "activo"
+            )
         ) {
-
-            btnSesiones.addEventListener(
-                "click",
-                function () {
-
-                    cargarSesiones();
-
-
-                    modalSesiones.classList.add(
-                        "activo"
-                    );
-
-
-                    document.body.style.overflow =
-                        "hidden";
-
-                }
-            );
-
-        }
-
-
-        function cerrarModalSesiones() {
-
-            if (!modalSesiones) {
-                return;
-            }
-
 
             modalSesiones.classList.remove(
                 "activo"
             );
-
-
-            document.body.style.overflow =
-                "";
-
         }
-
-
-        if (btnCerrarModalSesiones) {
-
-            btnCerrarModalSesiones.addEventListener(
-                "click",
-                cerrarModalSesiones
-            );
-
-        }
-
-
-        function cargarSesiones() {
-
-            const lista =
-                document.getElementById(
-                    "listaSesiones"
-                );
-
-
-            const idiomaActual =
-                document.getElementById(
-                    "idioma"
-                )?.value || "es";
-
-
-            if (!lista) {
-                return;
-            }
-
-
-            lista.innerHTML = "";
-
-
-            const dispositivo =
-                document.createElement(
-                    "div"
-                );
-
-
-            dispositivo.style.padding =
-                "16px";
-
-
-            dispositivo.style.marginBottom =
-                "12px";
-
-
-            dispositivo.style.border =
-                "1px solid var(--color-borde)";
-
-
-            dispositivo.style.borderRadius =
-                "var(--radio-medio)";
-
-
-            dispositivo.innerHTML = `
-
-                <strong>
-                    💻 ${
-                        idiomaActual === "en"
-                            ? "Current device"
-                            : "Dispositivo actual"
-                    }
-                </strong>
-
-                <p style="margin: 8px 0 0;">
-                    ${
-                        idiomaActual === "en"
-                            ? "This session"
-                            : "Esta sesión"
-                    }
-                </p>
-
-            `;
-
-
-            lista.appendChild(
-                dispositivo
-            );
-
-
-            const mensaje =
-                document.getElementById(
-                    "mensajeSesiones"
-                );
-
-
-            if (mensaje) {
-
-                mensaje.textContent =
-                    idiomaActual === "en"
-                        ? "Other sessions will appear here when the account system is connected."
-                        : "Las demás sesiones aparecerán aquí cuando el sistema de cuentas esté conectado.";
-
-            }
-
-        }
-
-        if (modalContrasena) {
-
-            modalContrasena.addEventListener(
-                "click",
-                function (evento) {
-
-                    if (
-                        evento.target ===
-                        modalContrasena
-                    ) {
-
-                        cerrarModalContrasena();
-
-                    }
-
-                }
-            );
-
-        }
-
-
-        if (modalSesiones) {
-
-            modalSesiones.addEventListener(
-                "click",
-                function (evento) {
-
-                    if (
-                        evento.target ===
-                        modalSesiones
-                    ) {
-
-                        cerrarModalSesiones();
-
-                    }
-
-                }
-            );
-
-        }
-
-
-        document.addEventListener(
-            "keydown",
-            function (evento) {
-
-                if (
-                    evento.key !== "Escape"
-                ) {
-
-                    return;
-
-                }
-
-
-                if (
-                    modalContrasena &&
-                    modalContrasena.classList.contains(
-                        "activo"
-                    )
-                ) {
-
-                    cerrarModalContrasena();
-
-                }
-
-
-                if (
-                    modalSesiones &&
-                    modalSesiones.classList.contains(
-                        "activo"
-                    )
-                ) {
-
-                    cerrarModalSesiones();
-
-                }
-
-            }
-        );
-
     }
+);
 
 
-    if (
-        document.readyState ===
-        "loading"
-    ) {
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            inicializar
-        );
-
-    } else {
-
-        inicializar();
-
-    }
-
-
-})();
+cargarConfiguracion();

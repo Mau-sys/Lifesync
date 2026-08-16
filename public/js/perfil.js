@@ -1,41 +1,78 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    cargarPerfil();
+        cargarPerfil();
 
-    configurarCerrarSesion();
+        configurarCerrarSesion();
 
-});
+    }
+);
+
+
+function texto(clave) {
+
+    if (
+        typeof window.traducirLifeSync ===
+        "function"
+    ) {
+
+        return window.traducirLifeSync(
+            clave
+        );
+
+    }
+
+    return clave;
+}
 
 
 async function cargarPerfil() {
 
     const nombreUsuario =
-        document.getElementById("nombreUsuario");
+        document.getElementById(
+            "nombreUsuario"
+        );
 
     const fotoPerfil =
-        document.getElementById("fotoPerfil");
+        document.getElementById(
+            "fotoPerfil"
+        );
 
 
-    if (!nombreUsuario || !fotoPerfil) {
+    if (
+        !nombreUsuario ||
+        !fotoPerfil
+    ) {
+
         return;
+
     }
 
 
     try {
 
-        const respuesta = await fetch(
-            "../auth/perfil.php",
-            {
-                method: "GET",
-                credentials: "include"
-            }
-        );
+        const respuesta =
+            await fetch(
+                "../auth/perfil.php",
+                {
+                    method:
+                        "GET",
+
+                    credentials:
+                        "include"
+                }
+            );
 
 
-        const datos = await respuesta.json();
+        const datos =
+            await respuesta.json();
 
 
-        if (!respuesta.ok || !datos.exito) {
+        if (
+            !respuesta.ok ||
+            !datos.exito
+        ) {
 
             console.error(
                 datos.mensaje ||
@@ -47,7 +84,8 @@ async function cargarPerfil() {
         }
 
 
-        const usuario = datos.usuario;
+        const usuario =
+            datos.usuario;
 
 
         nombreUsuario.textContent =
@@ -62,14 +100,16 @@ async function cargarPerfil() {
         }
 
 
-        fotoPerfil.onerror = () => {
+        fotoPerfil.onerror =
+            () => {
 
-            fotoPerfil.onerror = null;
+                fotoPerfil.onerror =
+                    null;
 
-            fotoPerfil.src =
-                "img/Perfil.png";
+                fotoPerfil.src =
+                    "img/Perfil.png";
 
-        };
+            };
 
 
     } catch (error) {
@@ -87,11 +127,15 @@ async function cargarPerfil() {
 function configurarCerrarSesion() {
 
     const botonCerrarSesion =
-        document.getElementById("btnCerrarSesion");
+        document.getElementById(
+            "btnCerrarSesion"
+        );
 
 
     if (!botonCerrarSesion) {
+
         return;
+
     }
 
 
@@ -101,37 +145,51 @@ function configurarCerrarSesion() {
 
             const confirmar =
                 confirm(
-                    "¿Seguro que deseas cerrar sesión?"
+                    texto(
+                        "cerrarSesionConfirmacion"
+                    )
                 );
 
 
             if (!confirmar) {
+
                 return;
+
             }
 
 
-            botonCerrarSesion.disabled = true;
+            botonCerrarSesion.disabled =
+                true;
 
             botonCerrarSesion.textContent =
-                "Cerrando sesión...";
+                texto(
+                    "cerrandoSesion"
+                );
 
 
             try {
 
-                const respuesta = await fetch(
-                    "../auth/cerrar-sesion.php",
-                    {
-                        method: "POST",
-                        credentials: "include"
-                    }
-                );
+                const respuesta =
+                    await fetch(
+                        "../auth/cerrar-sesion.php",
+                        {
+                            method:
+                                "POST",
+
+                            credentials:
+                                "include"
+                        }
+                    );
 
 
                 const datos =
                     await respuesta.json();
 
 
-                if (!respuesta.ok || !datos.exito) {
+                if (
+                    !respuesta.ok ||
+                    !datos.exito
+                ) {
 
                     throw new Error(
                         datos.mensaje ||
@@ -157,7 +215,10 @@ function configurarCerrarSesion() {
                     false;
 
                 botonCerrarSesion.textContent =
-                    "Cerrar sesión";
+                    texto(
+                        "cerrarSesion"
+                    );
+
 
                 alert(
                     "No se pudo cerrar la sesión. Inténtalo nuevamente."

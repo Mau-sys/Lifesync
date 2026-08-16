@@ -1,13 +1,43 @@
-const loginForm = document.getElementById("loginForm");
-const correoInput = document.getElementById("correo");
-const passwordInput = document.getElementById("password");
-const mensajeError = document.getElementById("mensajeError");
-const btnLogin = document.getElementById("btnLogin");
+const loginForm =
+    document.getElementById("loginForm");
 
-const googleLogin = document.getElementById("googleLogin");
-const appleLogin = document.getElementById("appleLogin");
+const correoInput =
+    document.getElementById("correo");
 
-const ENDPOINT_LOGIN = "auth/login.php";
+const passwordInput =
+    document.getElementById("password");
+
+const mensajeError =
+    document.getElementById("mensajeError");
+
+const btnLogin =
+    document.getElementById("btnLogin");
+
+const googleLogin =
+    document.getElementById("googleLogin");
+
+const appleLogin =
+    document.getElementById("appleLogin");
+
+const ENDPOINT_LOGIN =
+    "auth/login.php";
+
+
+function texto(clave) {
+
+    if (
+        typeof window.traducirLifeSync ===
+        "function"
+    ) {
+
+        return window.traducirLifeSync(
+            clave
+        );
+
+    }
+
+    return clave;
+}
 
 
 function mostrarMensaje(mensaje) {
@@ -16,7 +46,8 @@ function mostrarMensaje(mensaje) {
         return;
     }
 
-    mensajeError.textContent = mensaje;
+    mensajeError.textContent =
+        mensaje;
 }
 
 
@@ -26,7 +57,8 @@ function limpiarMensaje() {
         return;
     }
 
-    mensajeError.textContent = "";
+    mensajeError.textContent =
+        "";
 }
 
 
@@ -36,11 +68,13 @@ function cambiarEstadoBoton(cargando) {
         return;
     }
 
-    btnLogin.disabled = cargando;
+    btnLogin.disabled =
+        cargando;
 
-    btnLogin.textContent = cargando
-        ? "Iniciando sesión..."
-        : "Iniciar sesión";
+    btnLogin.textContent =
+        cargando
+            ? texto("iniciandoSesion")
+            : texto("iniciarSesion");
 }
 
 
@@ -54,66 +88,93 @@ if (loginForm) {
 
             limpiarMensaje();
 
-            const correo = correoInput.value.trim();
-            const password = passwordInput.value;
+
+            const correo =
+                correoInput.value.trim();
+
+            const password =
+                passwordInput.value;
+
 
             if (!correo || !password) {
 
                 mostrarMensaje(
-                    "Completa todos los campos."
+                    texto("camposIncompletos")
                 );
 
                 return;
             }
+
 
             if (!correoInput.checkValidity()) {
 
                 mostrarMensaje(
-                    "Ingresa un correo electrónico válido."
+                    texto(
+                        "Ingresa un correo electrónico válido."
+                    )
                 );
 
                 return;
             }
 
+
             cambiarEstadoBoton(true);
+
 
             try {
 
-                const respuesta = await fetch(
-                    ENDPOINT_LOGIN,
-                    {
-                        method: "POST",
+                const respuesta =
+                    await fetch(
+                        ENDPOINT_LOGIN,
+                        {
+                            method: "POST",
 
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json"
-                        },
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
 
-                        credentials: "same-origin",
+                                "Accept":
+                                    "application/json"
+                            },
 
-                        body: JSON.stringify({
-                            correo: correo,
-                            password: password
-                        })
-                    }
-                );
+                            credentials:
+                                "same-origin",
+
+                            body:
+                                JSON.stringify({
+                                    correo:
+                                        correo,
+
+                                    password:
+                                        password
+                                })
+                        }
+                    );
+
 
                 let datos;
 
+
                 try {
 
-                    datos = await respuesta.json();
+                    datos =
+                        await respuesta.json();
 
                 } catch (error) {
 
                     mostrarMensaje(
-                        "El servidor devolvió una respuesta no válida."
+                        texto(
+                            "El servidor devolvió una respuesta no válida."
+                        )
                     );
 
-                    cambiarEstadoBoton(false);
+                    cambiarEstadoBoton(
+                        false
+                    );
 
                     return;
                 }
+
 
                 if (
                     !respuesta.ok ||
@@ -122,23 +183,33 @@ if (loginForm) {
 
                     mostrarMensaje(
                         datos.mensaje ||
-                        "El correo o la contraseña son incorrectos."
+                        texto(
+                            "El correo o la contraseña son incorrectos."
+                        )
                     );
 
-                    cambiarEstadoBoton(false);
+                    cambiarEstadoBoton(
+                        false
+                    );
 
                     return;
                 }
+
 
                 if (datos.usuario) {
 
                     localStorage.setItem(
                         "lifesync_usuario",
-                        JSON.stringify(datos.usuario)
+                        JSON.stringify(
+                            datos.usuario
+                        )
                     );
+
                 }
 
-                window.location.href = "inicio.html";
+
+                window.location.href =
+                    "inicio.html";
 
             } catch (error) {
 
@@ -148,11 +219,17 @@ if (loginForm) {
                 );
 
                 mostrarMensaje(
-                    "No se pudo conectar con el servidor. Inténtalo nuevamente."
+                    texto(
+                        "No se pudo conectar con el servidor. Inténtalo nuevamente."
+                    )
                 );
 
-                cambiarEstadoBoton(false);
+                cambiarEstadoBoton(
+                    false
+                );
+
             }
+
         }
     );
 }
@@ -165,7 +242,9 @@ if (googleLogin) {
         function () {
 
             mostrarMensaje(
-                "El inicio de sesión con Google estará disponible próximamente."
+                texto(
+                    "loginGoogleProximamente"
+                )
             );
 
         }
@@ -180,7 +259,9 @@ if (appleLogin) {
         function () {
 
             mostrarMensaje(
-                "El inicio de sesión con Apple estará disponible próximamente."
+                texto(
+                    "loginAppleProximamente"
+                )
             );
 
         }
@@ -194,6 +275,7 @@ if (correoInput) {
         "input",
         limpiarMensaje
     );
+
 }
 
 
@@ -203,4 +285,5 @@ if (passwordInput) {
         "input",
         limpiarMensaje
     );
+
 }

@@ -2,20 +2,57 @@
 
     "use strict";
 
-
     const CLAVE_TEMA = "lifesync_tema";
+    const CLAVE_CONFIGURACION = "lifeSyncConfiguracion";
 
 
     function obtenerTemaGuardado() {
 
-        const tema =
-            localStorage.getItem(CLAVE_TEMA);
+        let temaConfigurado = null;
 
-        if (tema === "claro") {
-            return "claro";
+        try {
+
+            const configuracion =
+                JSON.parse(
+                    localStorage.getItem(
+                        CLAVE_CONFIGURACION
+                    )
+                );
+
+            if (
+                configuracion &&
+                typeof configuracion.modoOscuro === "boolean"
+            ) {
+
+                temaConfigurado =
+                    configuracion.modoOscuro
+                        ? "oscuro"
+                        : "claro";
+
+            }
+
+        } catch (error) {
+
+            temaConfigurado = null;
+
         }
 
-        return "oscuro";
+
+        if (temaConfigurado) {
+
+            return temaConfigurado;
+
+        }
+
+
+        const tema =
+            localStorage.getItem(
+                CLAVE_TEMA
+            );
+
+        return tema === "claro"
+            ? "claro"
+            : "oscuro";
     }
 
 
@@ -26,7 +63,6 @@
                 "img[data-logo-lifesync]"
             );
 
-
         logos.forEach(function (logo) {
 
             const logoClaro =
@@ -35,23 +71,23 @@
             const logoOscuro =
                 logo.dataset.logoOscuro;
 
-
             if (
                 tema === "claro" &&
                 logoClaro
             ) {
 
-                logo.src = logoClaro;
+                logo.src =
+                    logoClaro;
 
             }
-
 
             if (
                 tema === "oscuro" &&
                 logoOscuro
             ) {
 
-                logo.src = logoOscuro;
+                logo.src =
+                    logoOscuro;
 
             }
 
@@ -106,7 +142,9 @@
             );
 
 
-            actualizarLogos(temaValido);
+            actualizarLogos(
+                temaValido
+            );
 
         }
 
@@ -131,12 +169,57 @@
     }
 
 
+    function sincronizarConfiguracionTema(
+        tema
+    ) {
+
+        let configuracion = {};
+
+        try {
+
+            configuracion =
+                JSON.parse(
+                    localStorage.getItem(
+                        CLAVE_CONFIGURACION
+                    )
+                ) || {};
+
+        } catch (error) {
+
+            configuracion = {};
+
+        }
+
+
+        configuracion.modoOscuro =
+            tema === "oscuro";
+
+
+        localStorage.setItem(
+            CLAVE_CONFIGURACION,
+            JSON.stringify(configuracion)
+        );
+
+    }
+
+
     window.aplicarTemaGlobal =
-        aplicarTema;
+        function (tema) {
+
+            aplicarTema(
+                tema
+            );
+
+            sincronizarConfiguracionTema(
+                tema
+            );
+
+        };
 
 
     window.obtenerTemaGlobal =
         obtenerTemaGuardado;
+
 
     const temaInicial =
         obtenerTemaGuardado();
@@ -165,7 +248,7 @@
         function () {
 
             aplicarTema(
-                temaInicial
+                obtenerTemaGuardado()
             );
 
         }

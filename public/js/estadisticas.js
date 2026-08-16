@@ -1,73 +1,151 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const progresoGeneral = document.getElementById("progresoGeneral");
-    const diasRacha = document.getElementById("diasRacha");
-    const habitosCompletados = document.getElementById("habitosCompletados");
+    const progresoGeneral =
+        document.getElementById("progresoGeneral");
 
-    const periodo = document.getElementById("periodo");
+    const diasRacha =
+        document.getElementById("diasRacha");
 
-    const graficaGeneral = document.getElementById("graficaGeneral");
+    const habitosCompletados =
+        document.getElementById("habitosCompletados");
 
-    const listaCategorias = document.getElementById("listaCategorias");
-    const listaHabitos = document.getElementById("listaHabitos");
+    const periodo =
+        document.getElementById("periodo");
+
+    const graficaGeneral =
+        document.getElementById("graficaGeneral");
+
+    const listaCategorias =
+        document.getElementById("listaCategorias");
+
+    const listaHabitos =
+        document.getElementById("listaHabitos");
 
     const mensajeEstadisticas =
         document.getElementById("mensajeEstadisticas");
 
 
+    /*
+     * Traducción global
+     *
+     * Utiliza idioma-global.js.
+     * Si todavía no está cargado, devuelve el texto original.
+     */
+    function LS(texto) {
+
+        if (
+            typeof window !== "undefined" &&
+            typeof window.traducirLifeSync === "function"
+        ) {
+
+            return window.traducirLifeSync(texto);
+
+        }
+
+        return texto;
+
+    }
+
+
     function escaparHTML(texto) {
 
-        const elemento = document.createElement("div");
+        const elemento =
+            document.createElement("div");
 
-        elemento.textContent = texto ?? "";
+        elemento.textContent =
+            texto ?? "";
 
         return elemento.innerHTML;
+
     }
 
 
     function limitarPorcentaje(valor) {
 
-        const numero = Number(valor) || 0;
+        const numero =
+            Number(valor) || 0;
 
         return Math.max(
             0,
-            Math.min(100, numero)
+            Math.min(
+                100,
+                numero
+            )
         );
+
     }
 
 
-    function mostrarMensaje(texto = "", tipo = "") {
+    function mostrarMensaje(
+        texto = "",
+        tipo = ""
+    ) {
 
-        mensajeEstadisticas.textContent = texto;
+        if (!mensajeEstadisticas) {
+            return;
+        }
 
-        mensajeEstadisticas.className = "mensaje";
+        mensajeEstadisticas.textContent =
+            texto;
+
+        mensajeEstadisticas.className =
+            "mensaje";
 
         if (tipo) {
-            mensajeEstadisticas.classList.add(tipo);
+
+            mensajeEstadisticas.classList.add(
+                tipo
+            );
+
         }
+
     }
 
 
-    function mostrarResumen(resumen = {}) {
+    function mostrarResumen(
+        resumen = {}
+    ) {
 
-        progresoGeneral.textContent =
-            `${Math.round(
-                limitarPorcentaje(
-                    resumen.progreso_general
-                )
-            )}%`;
+        if (progresoGeneral) {
+
+            progresoGeneral.textContent =
+                `${Math.round(
+                    limitarPorcentaje(
+                        resumen.progreso_general
+                    )
+                )}%`;
+
+        }
 
 
-        diasRacha.textContent =
-            Number(resumen.dias_racha) || 0;
+        if (diasRacha) {
+
+            diasRacha.textContent =
+                Number(
+                    resumen.dias_racha
+                ) || 0;
+
+        }
 
 
-        habitosCompletados.textContent =
-            Number(resumen.habitos_completados) || 0;
+        if (habitosCompletados) {
+
+            habitosCompletados.textContent =
+                Number(
+                    resumen.habitos_completados
+                ) || 0;
+
+        }
+
     }
 
 
     function mostrarGrafica(datos) {
+
+        if (!graficaGeneral) {
+            return;
+        }
+
 
         graficaGeneral.innerHTML = "";
 
@@ -77,13 +155,23 @@ document.addEventListener("DOMContentLoaded", () => {
             datos.length === 0
         ) {
 
-            graficaGeneral.innerHTML = `
-                <p class="sin-datos">
-                    No hay datos suficientes para mostrar la gráfica.
-                </p>
-            `;
+            const mensaje =
+                document.createElement("p");
+
+            mensaje.className =
+                "sin-datos";
+
+            mensaje.textContent =
+                LS(
+                    "No hay datos suficientes para mostrar la gráfica."
+                );
+
+            graficaGeneral.appendChild(
+                mensaje
+            );
 
             return;
+
         }
 
 
@@ -97,7 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
         datos.forEach((dato) => {
 
             const porcentaje =
-                limitarPorcentaje(dato.porcentaje);
+                limitarPorcentaje(
+                    dato.porcentaje
+                );
 
 
             const columna =
@@ -117,31 +207,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     <div
                         class="barra-relleno"
-                        style="height: ${porcentaje}%;">
-                    </div>
+                        style="height: ${porcentaje}%;"
+                    ></div>
 
                 </div>
 
                 <span class="barra-etiqueta">
-                    ${escaparHTML(dato.etiqueta)}
+                    ${escaparHTML(
+                        dato.etiqueta
+                    )}
                 </span>
 
             `;
 
 
-            contenedor.appendChild(columna);
+            contenedor.appendChild(
+                columna
+            );
 
         });
 
 
-        graficaGeneral.appendChild(contenedor);
+        graficaGeneral.appendChild(
+            contenedor
+        );
+
     }
 
 
-    function crearTarjetaEstadistica(elemento) {
+    function crearTarjetaEstadistica(
+        elemento
+    ) {
 
         const porcentaje =
-            limitarPorcentaje(elemento.porcentaje);
+            limitarPorcentaje(
+                elemento.porcentaje
+            );
 
 
         const tarjeta =
@@ -151,53 +252,109 @@ document.addEventListener("DOMContentLoaded", () => {
             "tarjeta-estadistica";
 
 
-        tarjeta.innerHTML = `
+        const informacion =
+            document.createElement("div");
 
-            <div class="estadistica-info">
-
-                <h3>
-                    ${escaparHTML(
-                        elemento.nombre
-                    )}
-                </h3>
-
-                <p>
-                    ${escaparHTML(
-                        elemento.detalle ||
-                        "Sin información disponible."
-                    )}
-                </p>
-
-            </div>
+        informacion.className =
+            "estadistica-info";
 
 
-            <div class="estadistica-progreso">
+        const titulo =
+            document.createElement("h3");
 
-                <span>
-                    ${Math.round(porcentaje)}%
-                </span>
+        titulo.textContent =
+            elemento.nombre ?? "";
 
-                <div class="barra-progreso">
 
-                    <div
-                        class="barra-progreso-relleno"
-                        style="width: ${porcentaje}%;">
-                    </div>
+        const detalle =
+            document.createElement("p");
 
-                </div>
+        detalle.textContent =
+            elemento.detalle ||
+            LS(
+                "Sin información disponible."
+            );
 
-            </div>
 
-        `;
+        informacion.appendChild(
+            titulo
+        );
+
+        informacion.appendChild(
+            detalle
+        );
+
+
+        const progreso =
+            document.createElement("div");
+
+        progreso.className =
+            "estadistica-progreso";
+
+
+        const porcentajeTexto =
+            document.createElement("span");
+
+        porcentajeTexto.textContent =
+            `${Math.round(porcentaje)}%`;
+
+
+        const barra =
+            document.createElement("div");
+
+        barra.className =
+            "barra-progreso";
+
+
+        const barraRelleno =
+            document.createElement("div");
+
+        barraRelleno.className =
+            "barra-progreso-relleno";
+
+        barraRelleno.style.width =
+            `${porcentaje}%`;
+
+
+        barra.appendChild(
+            barraRelleno
+        );
+
+
+        progreso.appendChild(
+            porcentajeTexto
+        );
+
+        progreso.appendChild(
+            barra
+        );
+
+
+        tarjeta.appendChild(
+            informacion
+        );
+
+        tarjeta.appendChild(
+            progreso
+        );
 
 
         return tarjeta;
+
     }
 
 
-    function mostrarCategorias(categorias) {
+    function mostrarCategorias(
+        categorias
+    ) {
 
-        listaCategorias.innerHTML = "";
+        if (!listaCategorias) {
+            return;
+        }
+
+
+        listaCategorias.innerHTML =
+            "";
 
 
         if (
@@ -205,30 +362,52 @@ document.addEventListener("DOMContentLoaded", () => {
             categorias.length === 0
         ) {
 
-            listaCategorias.innerHTML = `
-                <p class="sin-datos">
-                    Todavía no hay datos de categorías.
-                </p>
-            `;
+            const mensaje =
+                document.createElement("p");
+
+            mensaje.className =
+                "sin-datos";
+
+            mensaje.textContent =
+                LS(
+                    "Todavía no hay datos de categorías."
+                );
+
+            listaCategorias.appendChild(
+                mensaje
+            );
 
             return;
+
         }
 
 
-        categorias.forEach((categoria) => {
+        categorias.forEach(
+            (categoria) => {
 
-            listaCategorias.appendChild(
-                crearTarjetaEstadistica(categoria)
-            );
+                listaCategorias.appendChild(
+                    crearTarjetaEstadistica(
+                        categoria
+                    )
+                );
 
-        });
+            }
+        );
 
     }
 
 
-    function mostrarHabitos(habitos) {
+    function mostrarHabitos(
+        habitos
+    ) {
 
-        listaHabitos.innerHTML = "";
+        if (!listaHabitos) {
+            return;
+        }
+
+
+        listaHabitos.innerHTML =
+            "";
 
 
         if (
@@ -236,31 +415,51 @@ document.addEventListener("DOMContentLoaded", () => {
             habitos.length === 0
         ) {
 
-            listaHabitos.innerHTML = `
-                <p class="sin-datos">
-                    Todavía no tienes hábitos personalizados.
-                </p>
-            `;
+            const mensaje =
+                document.createElement("p");
+
+            mensaje.className =
+                "sin-datos";
+
+            mensaje.textContent =
+                LS(
+                    "Todavía no tienes hábitos personalizados."
+                );
+
+            listaHabitos.appendChild(
+                mensaje
+            );
 
             return;
+
         }
 
 
-        habitos.forEach((habito) => {
+        habitos.forEach(
+            (habito) => {
 
-            listaHabitos.appendChild(
-                crearTarjetaEstadistica(habito)
-            );
+                listaHabitos.appendChild(
+                    crearTarjetaEstadistica(
+                        habito
+                    )
+                );
 
-        });
+            }
+        );
 
     }
 
 
     async function cargarEstadisticas() {
 
+        if (!periodo) {
+            return;
+        }
+
+
         const periodoSeleccionado =
-            periodo.value || "semana";
+            periodo.value ||
+            "semana";
 
 
         try {
@@ -275,10 +474,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     )}`,
                     {
                         method: "GET",
-                        credentials: "same-origin",
-                        cache: "no-store",
+
+                        credentials:
+                            "same-origin",
+
+                        cache:
+                            "no-store",
+
                         headers: {
-                            "Accept": "application/json"
+                            "Accept":
+                                "application/json"
                         }
                     }
                 );
@@ -305,8 +510,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     textoRespuesta
                 );
 
+
                 throw new Error(
-                    "El servidor no devolvió una respuesta válida."
+                    LS(
+                        "El servidor no devolvió una respuesta válida."
+                    )
                 );
 
             }
@@ -316,7 +524,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 throw new Error(
                     datos.mensaje ||
-                    "No se pudieron cargar las estadísticas."
+                    LS(
+                        "No se pudieron cargar las estadísticas."
+                    )
                 );
 
             }
@@ -326,7 +536,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 throw new Error(
                     datos.mensaje ||
-                    "No se pudieron cargar las estadísticas."
+                    LS(
+                        "No se pudieron cargar las estadísticas."
+                    )
                 );
 
             }
@@ -362,7 +574,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             mostrarMensaje(
                 error.message ||
-                "No se pudieron cargar las estadísticas.",
+                LS(
+                    "No se pudieron cargar las estadísticas."
+                ),
                 "error"
             );
 
@@ -371,10 +585,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    periodo.addEventListener(
-        "change",
-        cargarEstadisticas
-    );
+    if (periodo) {
+
+        periodo.addEventListener(
+            "change",
+            cargarEstadisticas
+        );
+
+    }
 
 
     cargarEstadisticas();

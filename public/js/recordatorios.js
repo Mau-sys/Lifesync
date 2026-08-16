@@ -1,50 +1,116 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     const btnNuevoRecordatorio =
-        document.getElementById("btnNuevoRecordatorio");
+        document.getElementById(
+            "btnNuevoRecordatorio"
+        );
+
 
     const modal =
-        document.getElementById("modalRecordatorio");
+        document.getElementById(
+            "modalRecordatorio"
+        );
+
 
     const cerrarModal =
-        document.getElementById("cerrarModal");
+        document.getElementById(
+            "cerrarModal"
+        );
+
 
     const cancelarRecordatorio =
-        document.getElementById("cancelarRecordatorio");
+        document.getElementById(
+            "cancelarRecordatorio"
+        );
+
 
     const formulario =
-        document.getElementById("recordatorioForm");
+        document.getElementById(
+            "recordatorioForm"
+        );
+
 
     const lista =
-        document.getElementById("listaRecordatorios");
+        document.getElementById(
+            "listaRecordatorios"
+        );
+
 
     const sinRecordatorios =
-        document.getElementById("sinRecordatorios");
+        document.getElementById(
+            "sinRecordatorios"
+        );
+
 
     const repeticion =
-        document.getElementById("repeticion");
+        document.getElementById(
+            "repeticion"
+        );
+
 
     const campoFecha =
-        document.getElementById("campoFecha");
+        document.getElementById(
+            "campoFecha"
+        );
+
 
     const fechaRecordatorio =
-        document.getElementById("fechaRecordatorio");
+        document.getElementById(
+            "fechaRecordatorio"
+        );
+
 
     const titulo =
-        document.getElementById("titulo");
+        document.getElementById(
+            "titulo"
+        );
+
+
+    function traducir(clave) {
+
+        if (
+            typeof window.traducirLifeSync ===
+            "function"
+        ) {
+
+            return window.traducirLifeSync(
+                clave
+            );
+
+        }
+
+        return clave;
+
+    }
 
 
     function abrirModal() {
 
-        modal.classList.remove("oculto");
+        if (!modal) {
+            return;
+        }
 
-        modal.setAttribute("aria-hidden", "false");
 
-        document.body.style.overflow = "hidden";
+        modal.classList.remove(
+            "oculto"
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+        document.body.style.overflow =
+            "hidden";
+
 
         setTimeout(() => {
 
-            titulo.focus();
+            if (titulo) {
+                titulo.focus();
+            }
 
         }, 100);
 
@@ -53,13 +119,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function cerrarModalFuncion() {
 
-        modal.classList.add("oculto");
+        if (!modal) {
+            return;
+        }
 
-        modal.setAttribute("aria-hidden", "true");
 
-        document.body.style.overflow = "";
+        modal.classList.add(
+            "oculto"
+        );
 
-        formulario.reset();
+
+        modal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        document.body.style.overflow =
+            "";
+
+
+        if (formulario) {
+
+            formulario.reset();
+
+        }
+
 
         actualizarCampoFecha();
 
@@ -68,235 +153,373 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function actualizarCampoFecha() {
 
-        if (repeticion.value === "una_vez") {
+        if (
+            !repeticion ||
+            !campoFecha ||
+            !fechaRecordatorio
+        ) {
 
-            campoFecha.hidden = false;
+            return;
 
-            fechaRecordatorio.required = true;
+        }
+
+
+        if (
+            repeticion.value ===
+            "una_vez"
+        ) {
+
+            campoFecha.hidden =
+                false;
+
+
+            fechaRecordatorio.required =
+                true;
 
         } else {
 
-            campoFecha.hidden = true;
+            campoFecha.hidden =
+                true;
 
-            fechaRecordatorio.required = false;
 
-            fechaRecordatorio.value = "";
+            fechaRecordatorio.required =
+                false;
+
+
+            fechaRecordatorio.value =
+                "";
 
         }
 
     }
 
 
-    btnNuevoRecordatorio.addEventListener(
-        "click",
-        abrirModal
-    );
+    if (btnNuevoRecordatorio) {
+
+        btnNuevoRecordatorio.addEventListener(
+            "click",
+            abrirModal
+        );
+
+    }
 
 
-    cerrarModal.addEventListener(
-        "click",
-        cerrarModalFuncion
-    );
+    if (cerrarModal) {
+
+        cerrarModal.addEventListener(
+            "click",
+            cerrarModalFuncion
+        );
+
+    }
 
 
-    cancelarRecordatorio.addEventListener(
-        "click",
-        cerrarModalFuncion
-    );
+    if (cancelarRecordatorio) {
+
+        cancelarRecordatorio.addEventListener(
+            "click",
+            cerrarModalFuncion
+        );
+
+    }
 
 
-    repeticion.addEventListener(
-        "change",
-        actualizarCampoFecha
-    );
+    if (repeticion) {
+
+        repeticion.addEventListener(
+            "change",
+            actualizarCampoFecha
+        );
+
+    }
 
 
-    modal.addEventListener("click", (evento) => {
+    if (modal) {
 
-        if (evento.target === modal) {
+        modal.addEventListener(
+            "click",
+            (evento) => {
 
-            cerrarModalFuncion();
+                if (
+                    evento.target ===
+                    modal
+                ) {
 
-        }
-
-    });
-
-
-    document.addEventListener("keydown", (evento) => {
-
-        if (
-            evento.key === "Escape" &&
-            !modal.classList.contains("oculto")
-        ) {
-
-            cerrarModalFuncion();
-
-        }
-
-    });
-
-
-    formulario.addEventListener("submit", async (evento) => {
-
-        evento.preventDefault();
-
-
-        const datos = {
-
-            accion: "crear",
-
-            titulo:
-                document.getElementById("titulo").value.trim(),
-
-            id_categoria:
-                document.getElementById("categoria").value,
-
-            hora:
-                document.getElementById("hora").value,
-
-            repeticion:
-                document.getElementById("repeticion").value,
-
-            fecha_recordatorio:
-                document.getElementById("fechaRecordatorio").value,
-
-            mensaje:
-                document.getElementById("mensaje").value.trim()
-
-        };
-
-
-        if (!datos.titulo) {
-
-            alert(
-                "Escribe un nombre para el recordatorio."
-            );
-
-            return;
-
-        }
-
-
-        if (!datos.hora) {
-
-            alert(
-                "Selecciona una hora."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            datos.repeticion === "una_vez" &&
-            !datos.fecha_recordatorio
-        ) {
-
-            alert(
-                "Selecciona la fecha del recordatorio."
-            );
-
-            return;
-
-        }
-
-
-        try {
-
-            const respuesta = await fetch(
-                "auth/recordatorios.php",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify(datos)
+                    cerrarModalFuncion();
 
                 }
-            );
+
+            }
+        );
+
+    }
 
 
-            const resultado =
-                await respuesta.json();
+    document.addEventListener(
+        "keydown",
+        (evento) => {
 
+            if (
+                evento.key === "Escape" &&
+                modal &&
+                !modal.classList.contains(
+                    "oculto"
+                )
+            ) {
 
-            if (!resultado.exito) {
-
-                alert(resultado.mensaje);
-
-                return;
+                cerrarModalFuncion();
 
             }
 
-
-            cerrarModalFuncion();
-
-            cargarRecordatorios();
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            alert(
-                "No se pudo guardar el recordatorio."
-            );
-
         }
+    );
 
-    });
+
+    if (formulario) {
+
+        formulario.addEventListener(
+            "submit",
+            async (evento) => {
+
+                evento.preventDefault();
+
+
+                const datos = {
+
+                    accion:
+                        "crear",
+
+                    titulo:
+                        document
+                            .getElementById(
+                                "titulo"
+                            )
+                            ?.value
+                            .trim() || "",
+
+                    id_categoria:
+                        document
+                            .getElementById(
+                                "categoria"
+                            )
+                            ?.value || "",
+
+                    hora:
+                        document
+                            .getElementById(
+                                "hora"
+                            )
+                            ?.value || "",
+
+                    repeticion:
+                        document
+                            .getElementById(
+                                "repeticion"
+                            )
+                            ?.value || "",
+
+                    fecha_recordatorio:
+                        document
+                            .getElementById(
+                                "fechaRecordatorio"
+                            )
+                            ?.value || "",
+
+                    mensaje:
+                        document
+                            .getElementById(
+                                "mensaje"
+                            )
+                            ?.value
+                            .trim() || ""
+
+                };
+
+
+                if (!datos.titulo) {
+
+                    alert(
+                        traducir(
+                            "escribeNombreRecordatorio"
+                        )
+                    );
+
+                    return;
+
+                }
+
+
+                if (!datos.hora) {
+
+                    alert(
+                        traducir(
+                            "seleccionaHora"
+                        )
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    datos.repeticion ===
+                        "una_vez" &&
+                    !datos.fecha_recordatorio
+                ) {
+
+                    alert(
+                        traducir(
+                            "seleccionaFecha"
+                        )
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const respuesta =
+                        await fetch(
+                            "auth/recordatorios.php",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        datos
+                                    )
+
+                            }
+                        );
+
+
+                    const resultado =
+                        await respuesta.json();
+
+
+                    if (
+                        !resultado.exito
+                    ) {
+
+                        alert(
+                            resultado.mensaje
+                        );
+
+                        return;
+
+                    }
+
+
+                    cerrarModalFuncion();
+
+                    cargarRecordatorios();
+
+                } catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+
+                    alert(
+                        traducir(
+                            "noSePudoGuardarRecordatorio"
+                        )
+                    );
+
+                }
+
+            }
+        );
+
+    }
 
 
     async function cargarRecordatorios() {
 
         try {
 
-            const respuesta = await fetch(
-                "auth/recordatorios.php?accion=listar"
-            );
+            const respuesta =
+                await fetch(
+                    "auth/recordatorios.php?accion=listar"
+                );
 
 
             const resultado =
                 await respuesta.json();
 
 
-            if (!resultado.exito) {
+            if (
+                !resultado.exito
+            ) {
 
-                alert(resultado.mensaje);
+                alert(
+                    resultado.mensaje
+                );
 
                 return;
 
             }
 
 
-            lista.innerHTML = "";
+            if (lista) {
+
+                lista.innerHTML =
+                    "";
+
+            }
 
 
             if (
                 !resultado.recordatorios ||
-                resultado.recordatorios.length === 0
+                resultado.recordatorios.length ===
+                    0
             ) {
 
-                sinRecordatorios.style.display = "block";
+                if (sinRecordatorios) {
+
+                    sinRecordatorios.style.display =
+                        "block";
+
+                }
 
                 return;
 
             }
 
 
-            sinRecordatorios.style.display = "none";
+            if (sinRecordatorios) {
+
+                sinRecordatorios.style.display =
+                    "none";
+
+            }
 
 
             resultado.recordatorios.forEach(
                 (recordatorio) => {
 
                     const tarjeta =
-                        crearTarjeta(recordatorio);
+                        crearTarjeta(
+                            recordatorio
+                        );
 
-                    lista.appendChild(tarjeta);
+
+                    if (lista) {
+
+                        lista.appendChild(
+                            tarjeta
+                        );
+
+                    }
 
                 }
             );
@@ -304,105 +527,168 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                error
+            );
 
         }
 
     }
 
 
-    function crearTarjeta(recordatorio) {
+    function crearTarjeta(
+        recordatorio
+    ) {
 
         const articulo =
-            document.createElement("article");
+            document.createElement(
+                "article"
+            );
+
 
         articulo.className =
             "tarjeta-recordatorio";
 
 
         const contenido =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         contenido.className =
             "informacion-recordatorio";
 
 
         const tituloTarjeta =
-            document.createElement("h3");
+            document.createElement(
+                "h3"
+            );
+
 
         tituloTarjeta.textContent =
             recordatorio.titulo;
 
 
         const detalles =
-            document.createElement("p");
+            document.createElement(
+                "p"
+            );
+
 
         detalles.className =
             "detalles-recordatorio";
 
 
         const detalle =
-            document.createElement("span");
+            document.createElement(
+                "span"
+            );
+
 
         detalle.className =
             "detalle-recordatorio";
 
+
         detalle.textContent =
-            construirDetalle(recordatorio);
+            construirDetalle(
+                recordatorio
+            );
 
 
-        detalles.appendChild(detalle);
+        detalles.appendChild(
+            detalle
+        );
 
 
-        contenido.appendChild(tituloTarjeta);
+        contenido.appendChild(
+            tituloTarjeta
+        );
 
-        contenido.appendChild(detalles);
+
+        contenido.appendChild(
+            detalles
+        );
 
 
         if (recordatorio.mensaje) {
 
             const mensaje =
-                document.createElement("p");
+                document.createElement(
+                    "p"
+                );
+
 
             mensaje.textContent =
                 recordatorio.mensaje;
 
-            contenido.appendChild(mensaje);
+
+            contenido.appendChild(
+                mensaje
+            );
 
         }
 
 
         const acciones =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         acciones.className =
             "acciones-recordatorio";
 
 
         const hora =
-            document.createElement("strong");
+            document.createElement(
+                "strong"
+            );
+
 
         hora.className =
             "hora-recordatorio";
 
+
         hora.textContent =
-            String(recordatorio.hora).substring(0, 5);
+            String(
+                recordatorio.hora
+            ).substring(
+                0,
+                5
+            );
 
 
         const eliminar =
-            document.createElement("button");
+            document.createElement(
+                "button"
+            );
 
-        eliminar.type = "button";
+
+        eliminar.type =
+            "button";
+
 
         eliminar.className =
             "btn-eliminar-recordatorio";
 
-        eliminar.textContent = "🗑";
+
+        eliminar.textContent =
+            "🗑";
+
 
         eliminar.setAttribute(
             "aria-label",
-            "Eliminar recordatorio"
+            traducir(
+                "eliminarRecordatorio"
+            )
         );
+
+
+        eliminar.title =
+            traducir(
+                "eliminarRecordatorio"
+            );
 
 
         eliminar.addEventListener(
@@ -417,14 +703,24 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-        acciones.appendChild(hora);
+        acciones.appendChild(
+            hora
+        );
 
-        acciones.appendChild(eliminar);
+
+        acciones.appendChild(
+            eliminar
+        );
 
 
-        articulo.appendChild(contenido);
+        articulo.appendChild(
+            contenido
+        );
 
-        articulo.appendChild(acciones);
+
+        articulo.appendChild(
+            acciones
+        );
 
 
         return articulo;
@@ -432,21 +728,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function construirDetalle(recordatorio) {
+    function construirDetalle(
+        recordatorio
+    ) {
 
         const repeticionTexto = {
 
             diario:
-                "Todos los días",
+                traducir(
+                    "todosLosDias"
+                ),
 
             lunes_viernes:
-                "Lunes a viernes",
+                traducir(
+                    "lunesViernes"
+                ),
 
             una_vez:
-                "Solo una vez",
+                traducir(
+                    "soloUnaVez"
+                ),
 
             personalizado:
-                "Personalizado"
+                traducir(
+                    "personalizado"
+                )
 
         };
 
@@ -454,7 +760,9 @@ document.addEventListener("DOMContentLoaded", () => {
         let texto =
             (
                 recordatorio.categoria ||
-                "Sin categoría"
+                traducir(
+                    "sinCategoria"
+                )
             ) +
             " • " +
             (
@@ -466,7 +774,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         if (
-            recordatorio.repeticion === "una_vez" &&
+            recordatorio.repeticion ===
+                "una_vez" &&
             recordatorio.fecha_recordatorio
         ) {
 
@@ -482,51 +791,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    async function eliminarRecordatorio(id) {
+    async function eliminarRecordatorio(
+        id
+    ) {
 
         const confirmar =
             confirm(
-                "¿Quieres eliminar este recordatorio?"
+                traducir(
+                    "eliminarRecordatorioPregunta"
+                )
             );
 
 
         if (!confirmar) {
-
             return;
-
         }
 
 
         try {
 
-            const respuesta = await fetch(
-                "auth/recordatorios.php",
-                {
-                    method: "POST",
+            const respuesta =
+                await fetch(
+                    "auth/recordatorios.php",
+                    {
+                        method: "POST",
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-                    body: JSON.stringify({
+                        body:
+                            JSON.stringify({
 
-                        accion: "eliminar",
+                                accion:
+                                    "eliminar",
 
-                        id_recordatorio: id
+                                id_recordatorio:
+                                    id
 
-                    })
+                            })
 
-                }
-            );
+                    }
+                );
 
 
             const resultado =
                 await respuesta.json();
 
 
-            if (!resultado.exito) {
+            if (
+                !resultado.exito
+            ) {
 
-                alert(resultado.mensaje);
+                alert(
+                    resultado.mensaje
+                );
 
                 return;
 
@@ -538,10 +858,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                error
+            );
+
 
             alert(
-                "No se pudo eliminar el recordatorio."
+                traducir(
+                    "noSePudoEliminarRecordatorio"
+                )
             );
 
         }
@@ -552,5 +877,20 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarCampoFecha();
 
     cargarRecordatorios();
+
+
+    /*
+     * Si cambia el idioma mientras
+     * estamos en Recordatorios,
+     * reconstruimos las tarjetas.
+     */
+    window.addEventListener(
+        "lifesyncIdiomaCambiado",
+        function () {
+
+            cargarRecordatorios();
+
+        }
+    );
 
 });

@@ -2,57 +2,142 @@ document.addEventListener("DOMContentLoaded", () => {
 
     cargarHabitos();
 
+
     const btnNuevoHabito =
-        document.getElementById("btnNuevoHabito");
+        document.getElementById(
+            "btnNuevoHabito"
+        );
+
 
     const modalNuevoHabito =
-        document.getElementById("modalNuevoHabito");
+        document.getElementById(
+            "modalNuevoHabito"
+        );
+
 
     const cerrarModal =
-        document.getElementById("cerrarModal");
+        document.getElementById(
+            "cerrarModal"
+        );
+
 
     const cancelarModal =
-        document.getElementById("cancelarModal");
+        document.getElementById(
+            "cancelarModal"
+        );
+
 
     const habitoForm =
-        document.getElementById("habitoForm");
+        document.getElementById(
+            "habitoForm"
+        );
+
 
     const modalEliminar =
-        document.getElementById("modalEliminar");
+        document.getElementById(
+            "modalEliminar"
+        );
+
 
     const cancelarEliminar =
-        document.getElementById("cancelarEliminar");
+        document.getElementById(
+            "cancelarEliminar"
+        );
+
 
     const confirmarEliminar =
-        document.getElementById("confirmarEliminar");
+        document.getElementById(
+            "confirmarEliminar"
+        );
 
 
-    btnNuevoHabito.addEventListener("click", () => {
+    if (btnNuevoHabito) {
 
-        modalNuevoHabito.classList.remove("oculto");
+        btnNuevoHabito.addEventListener(
+            "click",
+            () => {
 
-    });
+                if (modalNuevoHabito) {
 
+                    modalNuevoHabito.classList.remove(
+                        "oculto"
+                    );
 
-    cerrarModal.addEventListener("click", cerrarModalNuevo);
+                }
 
+            }
+        );
 
-    cancelarModal.addEventListener("click", cerrarModalNuevo);
-
-
-    cancelarEliminar.addEventListener("click", () => {
-
-        modalEliminar.classList.add("oculto");
-
-    });
-
-
-    habitoForm.addEventListener("submit", crearHabito);
+    }
 
 
-    confirmarEliminar.addEventListener(
-        "click",
-        eliminarHabito
+    if (cerrarModal) {
+
+        cerrarModal.addEventListener(
+            "click",
+            cerrarModalNuevo
+        );
+
+    }
+
+
+    if (cancelarModal) {
+
+        cancelarModal.addEventListener(
+            "click",
+            cerrarModalNuevo
+        );
+
+    }
+
+
+    if (cancelarEliminar) {
+
+        cancelarEliminar.addEventListener(
+            "click",
+            () => {
+
+                if (modalEliminar) {
+
+                    modalEliminar.classList.add(
+                        "oculto"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (habitoForm) {
+
+        habitoForm.addEventListener(
+            "submit",
+            crearHabito
+        );
+
+    }
+
+
+    if (confirmarEliminar) {
+
+        confirmarEliminar.addEventListener(
+            "click",
+            eliminarHabito
+        );
+
+    }
+
+
+    window.addEventListener(
+        "lifesyncIdiomaCambiado",
+        function () {
+
+            cargarHabitos();
+
+        }
     );
 
 });
@@ -61,17 +146,52 @@ document.addEventListener("DOMContentLoaded", () => {
 let habitoAEliminar = null;
 
 
+function traducir(clave) {
+
+    if (
+        typeof window.traducirLifeSync ===
+        "function"
+    ) {
+
+        return window.traducirLifeSync(
+            clave
+        );
+
+    }
+
+    return clave;
+
+}
+
+
 function cerrarModalNuevo() {
 
     const modal =
-        document.getElementById("modalNuevoHabito");
+        document.getElementById(
+            "modalNuevoHabito"
+        );
+
 
     const formulario =
-        document.getElementById("habitoForm");
+        document.getElementById(
+            "habitoForm"
+        );
 
-    modal.classList.add("oculto");
 
-    formulario.reset();
+    if (modal) {
+
+        modal.classList.add(
+            "oculto"
+        );
+
+    }
+
+
+    if (formulario) {
+
+        formulario.reset();
+
+    }
 
 }
 
@@ -79,7 +199,9 @@ function cerrarModalNuevo() {
 async function cargarHabitos() {
 
     const contenedor =
-        document.getElementById("contenedorHabitos");
+        document.getElementById(
+            "contenedorHabitos"
+        );
 
 
     if (!contenedor) {
@@ -89,38 +211,49 @@ async function cargarHabitos() {
 
     try {
 
-        const respuesta = await fetch(
-            "auth/obtener-personalizados.php",
-            {
-                method: "GET",
-                credentials: "include"
-            }
-        );
+        const respuesta =
+            await fetch(
+                "auth/obtener-personalizados.php",
+                {
+                    method: "GET",
+
+                    credentials:
+                        "include"
+                }
+            );
 
 
-        const datos = await respuesta.json();
+        const datos =
+            await respuesta.json();
 
 
-        if (!respuesta.ok || !datos.exito) {
+        if (
+            !respuesta.ok ||
+            !datos.exito
+        ) {
 
             console.error(
                 datos.mensaje ||
                 "No se pudieron cargar los hábitos."
             );
 
-            contenedor.innerHTML = "";
+
+            contenedor.innerHTML =
+                "";
 
             return;
 
         }
 
 
-        contenedor.innerHTML = "";
+        contenedor.innerHTML =
+            "";
 
 
         if (
             !datos.habitos ||
-            datos.habitos.length === 0
+            datos.habitos.length ===
+                0
         ) {
 
             return;
@@ -128,14 +261,16 @@ async function cargarHabitos() {
         }
 
 
-        datos.habitos.forEach((habito) => {
+        datos.habitos.forEach(
+            (habito) => {
 
-            crearTarjetaHabito(
-                habito,
-                contenedor
-            );
+                crearTarjetaHabito(
+                    habito,
+                    contenedor
+                );
 
-        });
+            }
+        );
 
 
     } catch (error) {
@@ -156,26 +291,45 @@ function crearTarjetaHabito(
 ) {
 
     const tarjeta =
-        document.createElement("article");
+        document.createElement(
+            "article"
+        );
+
 
     tarjeta.className =
         "tarjeta-habito";
 
 
     const botonEliminar =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
-    botonEliminar.type = "button";
+
+    botonEliminar.type =
+        "button";
+
 
     botonEliminar.className =
         "btn-eliminar";
 
+
     botonEliminar.setAttribute(
         "aria-label",
-        "Eliminar hábito"
+        traducir(
+            "eliminarHabito"
+        )
     );
 
-    botonEliminar.textContent = "🗑";
+
+    botonEliminar.title =
+        traducir(
+            "eliminarHabito"
+        );
+
+
+    botonEliminar.textContent =
+        "🗑";
 
 
     botonEliminar.addEventListener(
@@ -183,7 +337,9 @@ function crearTarjetaHabito(
         (evento) => {
 
             evento.preventDefault();
+
             evento.stopPropagation();
+
 
             abrirModalEliminar(
                 habito.id_habito
@@ -194,84 +350,143 @@ function crearTarjetaHabito(
 
 
     const contenido =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
+
 
     contenido.className =
         "contenido-habito";
 
+
     contenido.href =
         "HHabitoPersonalizado.html?id=" +
-        encodeURIComponent(habito.id_habito);
+        encodeURIComponent(
+            habito.id_habito
+        );
 
 
     const informacion =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     informacion.className =
         "habito-info";
 
 
     const imagen =
-        document.createElement("img");
+        document.createElement(
+            "img"
+        );
+
 
     imagen.src =
         habito.icono ||
         "img/H-Perzona.png";
 
+
     imagen.alt =
-        "Hábito personalizado";
+        traducir(
+            "habitoPersonalizado"
+        );
 
 
     const datos =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     const titulo =
-        document.createElement("h3");
+        document.createElement(
+            "h3"
+        );
+
 
     titulo.textContent =
         habito.nombre_habito;
 
 
     const descripcion =
-        document.createElement("p");
+        document.createElement(
+            "p"
+        );
+
 
     descripcion.textContent =
-        obtenerTextoHabito(habito);
+        obtenerTextoHabito(
+            habito
+        );
 
 
-    datos.appendChild(titulo);
-    datos.appendChild(descripcion);
+    datos.appendChild(
+        titulo
+    );
 
 
-    informacion.appendChild(imagen);
-    informacion.appendChild(datos);
+    datos.appendChild(
+        descripcion
+    );
+
+
+    informacion.appendChild(
+        imagen
+    );
+
+
+    informacion.appendChild(
+        datos
+    );
 
 
     const progreso =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     progreso.className =
         "circulo-progreso";
 
+
     progreso.textContent =
-        calcularProgreso(habito) + "%";
+        calcularProgreso(
+            habito
+        ) + "%";
 
 
-    contenido.appendChild(informacion);
-    contenido.appendChild(progreso);
+    contenido.appendChild(
+        informacion
+    );
 
 
-    tarjeta.appendChild(botonEliminar);
-    tarjeta.appendChild(contenido);
+    contenido.appendChild(
+        progreso
+    );
 
 
-    contenedor.appendChild(tarjeta);
+    tarjeta.appendChild(
+        botonEliminar
+    );
+
+
+    tarjeta.appendChild(
+        contenido
+    );
+
+
+    contenedor.appendChild(
+        tarjeta
+    );
 
 }
 
 
-function obtenerTextoHabito(habito) {
+function obtenerTextoHabito(
+    habito
+) {
 
     const frecuencia =
         traducirFrecuencia(
@@ -280,28 +495,51 @@ function obtenerTextoHabito(habito) {
 
 
     const porcentaje =
-        calcularProgreso(habito);
+        calcularProgreso(
+            habito
+        );
 
 
-    return `${frecuencia} • ${porcentaje}% completado`;
+    return (
+        `${frecuencia} • ` +
+        `${porcentaje}% ` +
+        `${traducir("completado")}`
+    );
 
 }
 
 
-function traducirFrecuencia(frecuencia) {
+function traducirFrecuencia(
+    frecuencia
+) {
 
-    switch (frecuencia) {
+    switch (
+        frecuencia
+    ) {
 
         case "diaria":
-            return "Diario";
+
+            return traducir(
+                "frecuenciaDiario"
+            );
+
 
         case "semanal":
-            return "Semanal";
+
+            return traducir(
+                "frecuenciaSemanal"
+            );
+
 
         case "mensual":
-            return "Mensual";
+
+            return traducir(
+                "frecuenciaMensual"
+            );
+
 
         default:
+
             return frecuencia || "";
 
     }
@@ -309,68 +547,112 @@ function traducirFrecuencia(frecuencia) {
 }
 
 
-function calcularProgreso(habito) {
+function calcularProgreso(
+    habito
+) {
 
     const objetivo =
-        Number(habito.objetivo);
+        Number(
+            habito.objetivo
+        );
 
 
     const progreso =
-        Number(habito.progreso);
+        Number(
+            habito.progreso
+        );
 
 
-    if (!objetivo || objetivo <= 0) {
+    if (
+        !objetivo ||
+        objetivo <= 0
+    ) {
+
         return 0;
+
     }
 
 
     const porcentaje =
-        (progreso / objetivo) * 100;
+        (
+            progreso /
+            objetivo
+        ) * 100;
 
 
     return Math.min(
         100,
         Math.max(
             0,
-            Math.round(porcentaje)
+            Math.round(
+                porcentaje
+            )
         )
     );
 
 }
 
 
-async function crearHabito(evento) {
+async function crearHabito(
+    evento
+) {
 
     evento.preventDefault();
 
 
     const nombreHabito =
-        document.getElementById("nombreHabito").value.trim();
+        document
+            .getElementById(
+                "nombreHabito"
+            )
+            ?.value
+            .trim() || "";
 
 
     const objetivoTexto =
-        document.getElementById("objetivo").value.trim();
+        document
+            .getElementById(
+                "objetivo"
+            )
+            ?.value
+            .trim() || "";
 
 
     const frecuencia =
-        document.getElementById("frecuencia").value;
+        document
+            .getElementById(
+                "frecuencia"
+            )
+            ?.value || "";
 
 
     const fechaInicio =
-        document.getElementById("fechaInicio").value;
+        document
+            .getElementById(
+                "fechaInicio"
+            )
+            ?.value || "";
 
 
     const fechaFin =
-        document.getElementById("fechaFin").value;
+        document
+            .getElementById(
+                "fechaFin"
+            )
+            ?.value || "";
 
 
-    if (!nombreHabito ||
+    if (
+        !nombreHabito ||
         !objetivoTexto ||
         !frecuencia ||
-        !fechaInicio) {
+        !fechaInicio
+    ) {
 
         alert(
-            "Completa los campos obligatorios."
+            traducir(
+                "completo"
+            )
         );
 
         return;
@@ -380,46 +662,58 @@ async function crearHabito(evento) {
 
     try {
 
-        const respuesta = await fetch(
-            "auth/crear-personalizado.php",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify({
+        const respuesta =
+            await fetch(
+                "auth/crear-personalizado.php",
+                {
+                    method: "POST",
 
-                    nombre_habito:
-                        nombreHabito,
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                    descripcion:
-                        objetivoTexto,
+                    credentials:
+                        "include",
 
-                    frecuencia:
-                        frecuencia,
+                    body:
+                        JSON.stringify({
 
-                    fecha_inicio:
-                        fechaInicio,
+                            nombre_habito:
+                                nombreHabito,
 
-                    fecha_fin:
-                        fechaFin || null
+                            descripcion:
+                                objetivoTexto,
 
-                })
-            }
-        );
+                            frecuencia:
+                                frecuencia,
+
+                            fecha_inicio:
+                                fechaInicio,
+
+                            fecha_fin:
+                                fechaFin ||
+                                null
+
+                        })
+                }
+            );
 
 
         const datos =
             await respuesta.json();
 
 
-        if (!respuesta.ok || !datos.exito) {
+        if (
+            !respuesta.ok ||
+            !datos.exito
+        ) {
 
             alert(
                 datos.mensaje ||
-                "No se pudo crear el hábito."
+                traducir(
+                    "noSePudoCrearHabito"
+                )
             );
 
             return;
@@ -439,8 +733,11 @@ async function crearHabito(evento) {
             error
         );
 
+
         alert(
-            "Ocurrió un error al crear el hábito."
+            traducir(
+                "errorCrearHabito"
+            )
         );
 
     }
@@ -448,17 +745,27 @@ async function crearHabito(evento) {
 }
 
 
-function abrirModalEliminar(idHabito) {
+function abrirModalEliminar(
+    idHabito
+) {
 
     habitoAEliminar =
         idHabito;
 
 
     const modal =
-        document.getElementById("modalEliminar");
+        document.getElementById(
+            "modalEliminar"
+        );
 
 
-    modal.classList.remove("oculto");
+    if (modal) {
+
+        modal.classList.remove(
+            "oculto"
+        );
+
+    }
 
 }
 
@@ -472,34 +779,46 @@ async function eliminarHabito() {
 
     try {
 
-        const respuesta = await fetch(
-            "auth/eliminar-personalizado.php",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify({
+        const respuesta =
+            await fetch(
+                "auth/eliminar-personalizado.php",
+                {
+                    method: "POST",
 
-                    id_habito:
-                        habitoAEliminar
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                })
-            }
-        );
+                    credentials:
+                        "include",
+
+                    body:
+                        JSON.stringify({
+
+                            id_habito:
+                                habitoAEliminar
+
+                        })
+
+                }
+            );
 
 
         const datos =
             await respuesta.json();
 
 
-        if (!respuesta.ok || !datos.exito) {
+        if (
+            !respuesta.ok ||
+            !datos.exito
+        ) {
 
             alert(
                 datos.mensaje ||
-                "No se pudo eliminar el hábito."
+                traducir(
+                    "noSePudoEliminarHabito"
+                )
             );
 
             return;
@@ -507,12 +826,23 @@ async function eliminarHabito() {
         }
 
 
-        document
-            .getElementById("modalEliminar")
-            .classList.add("oculto");
+        const modal =
+            document.getElementById(
+                "modalEliminar"
+            );
 
 
-        habitoAEliminar = null;
+        if (modal) {
+
+            modal.classList.add(
+                "oculto"
+            );
+
+        }
+
+
+        habitoAEliminar =
+            null;
 
 
         await cargarHabitos();
@@ -525,8 +855,11 @@ async function eliminarHabito() {
             error
         );
 
+
         alert(
-            "Ocurrió un error al eliminar el hábito."
+            traducir(
+                "errorEliminarHabito"
+            )
         );
 
     }
