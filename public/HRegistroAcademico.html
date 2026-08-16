@@ -9,25 +9,9 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="description"
-        content="Seguimiento de tus hábitos académicos en LifeSync">
-
-    <title>LifeSync | Registro Académico</title>
-
-
-    <!-- Estilos globales de LifeSync -->
-
-    <link
-        rel="stylesheet"
-        href="css/variables.css">
-
-    <link
-        rel="stylesheet"
-        href="css/general.css">
-
-
-    <!-- Fuentes -->
+    <title data-i18n="registroAcademico.tituloPagina">
+        LifeSync - Registro Académico
+    </title>
 
     <link
         rel="preconnect"
@@ -42,22 +26,13 @@
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap"
         rel="stylesheet">
 
-
-    <!-- Bootstrap -->
-
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
         rel="stylesheet">
 
-
-    <!-- Font Awesome -->
-
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-
-    <!-- Estilo propio -->
 
     <link
         rel="stylesheet"
@@ -65,13 +40,9 @@
 
 </head>
 
-
 <body class="bg-lifesync p-0 m-0">
 
-    <main class="card-full-screen d-flex flex-column justify-content-between">
-
-
-        <!-- ENCABEZADO -->
+    <div class="card-full-screen d-flex flex-column justify-content-between">
 
         <div>
 
@@ -80,59 +51,60 @@
                 <div class="position-relative">
 
                     <button
-                        type="button"
                         class="btn btn-options p-0"
                         id="btn-options-academico"
-                        aria-label="Opciones">
+                        aria-label="Opciones"
+                        data-i18n-aria-label="comun.opciones">
 
                         <i class="fa-solid fa-ellipsis-vertical"></i>
 
                     </button>
 
-
                     <div
                         class="kebab-dropdown-menu"
                         id="kebab-menu-academico">
 
-                        <a
-                            href="inicio.html"
-                            class="kebab-item"
+                        <button
+                            class="kebab-item btn-kebab-action"
                             id="btn-regresar">
 
                             <i class="fa-solid fa-arrow-left me-2"></i>
 
-                            Regresar
-
-                        </a>
-
-
-                        <button
-                            type="button"
-                            class="kebab-item"
-                            id="btn-editar-meta"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalConfiguracion">
-
-                            <i class="fa-solid fa-pen-to-square me-2"></i>
-
-                            Editar meta
+                            <span data-i18n="comun.regresar">
+                                Regresar
+                            </span>
 
                         </button>
 
+                        <a
+                            href="#"
+                            class="kebab-item"
+                            id="btn-editar-meta"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalEditarAcademico">
+
+                            <i class="fa-solid fa-pen-to-square me-2"></i>
+
+                            <span data-i18n="registroAcademico.editarMeta">
+                                Editar meta
+                            </span>
+
+                        </a>
 
                         <div class="dropdown-divider my-1"></div>
 
-
-                        <button
-                            type="button"
+                        <a
+                            href="#"
                             class="kebab-item danger"
                             id="btn-deshabilitar-habito">
 
                             <i class="fa-solid fa-ban me-2"></i>
 
-                            Deshabilitar hábito
+                            <span data-i18n="comun.deshabilitarHabito">
+                                Deshabilitar hábito
+                            </span>
 
-                        </button>
+                        </a>
 
                     </div>
 
@@ -140,19 +112,17 @@
 
             </div>
 
-
             <div class="text-center mt-2">
 
-                <div
-                    class="icon-circle bg-pink-soft mx-auto mb-2">
+                <div class="icon-circle bg-pink-soft mx-auto mb-2">
 
                     <i class="fa-solid fa-book-open text-pink"></i>
 
                 </div>
 
-
                 <h4
-                    class="fw-bold text-white mb-0 font-sora texto-titulo-fluido">
+                    class="fw-bold text-white mb-0 font-sora texto-titulo-fluido"
+                    data-i18n="registroAcademico.titulo">
 
                     Registro Académico
 
@@ -163,29 +133,27 @@
         </div>
 
 
-        <!-- PROGRESO -->
-
-        <section
-            class="my-auto py-2 text-center d-flex flex-column align-items-center justify-content-center">
+        <div class="my-auto py-2 text-center d-flex flex-column align-items-center justify-content-center">
 
             <div
                 class="progress-ring ring-pink mx-auto mb-3"
-                id="ring-sesiones">
+                id="ring-academico">
 
                 <div class="progress-content">
 
                     <h1
                         class="fw-bold mb-0 text-white font-sora contador-fluido"
-                        id="contador-sesiones">
+                        id="contador-academico">
 
-                        0/0
+                        0/3
 
                     </h1>
 
                     <span
-                        class="text-subtle fw-medium subtexto-fluido">
+                        class="text-subtle fw-medium subtexto-fluido"
+                        data-i18n="registroAcademico.registros">
 
-                        sesiones
+                        registros
 
                     </span>
 
@@ -193,269 +161,119 @@
 
             </div>
 
-
             <div class="text-center">
 
                 <span
-                    class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido">
+                    class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido"
+                    data-i18n="registroAcademico.metaDiaria">
 
                     Meta diaria
 
                 </span>
 
-
                 <span
                     class="text-pink fw-bold meta-texto-fluido"
-                    id="meta-sesiones">
+                    id="meta-academico">
 
-                    -- sesiones de estudio
+                    3 registros académicos
 
                 </span>
 
             </div>
 
-        </section>
+        </div>
 
-
-        <!-- REGISTRO -->
 
         <div class="w-100">
 
             <div
-                class="tiempo-box p-3 rounded-4 mb-3 text-center"
-                id="box-tiempo">
+                class="registro-container p-3 rounded-4 mb-3"
+                id="lista-registros">
 
                 <span
-                    class="text-subtle d-block fw-semibold label-fluido text-uppercase tracking-wider mb-1">
+                    class="text-subtle d-block fw-semibold mb-2 label-fluido"
+                    data-i18n="registroAcademico.progreso">
 
-                    Tiempo acumulado
-
-                </span>
-
-
-                <span
-                    class="text-pink fw-bold meta-texto-fluido"
-                    id="tiempo-acumulado">
-
-                    0 min / 0 min
+                    Progreso académico
 
                 </span>
 
             </div>
 
-
             <button
-                type="button"
                 class="btn btn-action-pink w-100 rounded-pill fw-bold font-sora boton-fluido"
-                id="btn-add-sesion">
+                id="btn-add-registro">
 
-                +1 sesión de estudio
+                <span data-i18n="registroAcademico.agregarRegistro">
+                    +1 registro
+                </span>
 
             </button>
 
         </div>
 
-    </main>
+    </div>
 
-
-    <!-- MODAL CONFIGURACIÓN -->
 
     <div
         class="modal fade"
-        id="modalConfiguracion"
+        id="modalEditarAcademico"
         tabindex="-1"
-        aria-labelledby="modalConfiguracionLabel"
+        aria-labelledby="modalEditarAcademicoLabel"
         aria-hidden="true">
 
         <div class="modal-dialog modal-dialog-centered">
 
-            <div class="modal-content modal-lifesync p-2">
+            <div class="modal-content config-modal-bg text-white border-0 rounded-4">
 
-                <div
-                    class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                <div class="modal-header border-bottom border-secondary border-opacity-25">
 
                     <h5
-                        class="modal-title font-sora fw-bold text-white d-flex align-items-center gap-2 mb-0"
-                        id="modalConfiguracionLabel">
+                        class="modal-title font-sora fw-bold"
+                        id="modalEditarAcademicoLabel">
 
-                        <i class="fa-solid fa-gear text-pink"></i>
+                        <i class="fa-solid fa-gear text-pink me-2"></i>
 
-                        Editar Meta Académica
+                        <span data-i18n="registroAcademico.editarMetaTitulo">
+                            Editar Meta Académica
+                        </span>
 
                     </h5>
 
-
                     <button
                         type="button"
-                        class="btn-close btn-close-white m-0"
+                        class="btn-close btn-close-white"
                         data-bs-dismiss="modal"
-                        aria-label="Cerrar">
+                        aria-label="Cerrar"
+                        data-i18n-aria-label="comun.cerrar">
 
                     </button>
 
                 </div>
 
-
                 <div class="modal-body py-4">
 
-                    <form id="form-config-meta">
-
-
-                        <div class="mb-3">
-
-                            <label
-                                for="select-frecuencia"
-                                class="form-label text-subtle fw-semibold">
-
-                                Frecuencia de la meta
-
-                            </label>
-
-
-                            <select
-                                class="form-select custom-input"
-                                id="select-frecuencia">
-
-                                <option value="diario">
-
-                                    Diaria (Se reinicia cada día)
-
-                                </option>
-
-                                <option value="mensual">
-
-                                    Mensual (Se reinicia el día 1 de cada mes)
-
-                                </option>
-
-                                <option value="personalizada">
-
-                                    Personalizada (Días específicos)
-
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div
-                            class="mb-3 d-none"
-                            id="contenedor-dias-semana">
-
-                            <label
-                                class="form-label text-subtle fw-semibold d-block">
-
-                                Días activos de la meta
-
-                            </label>
-
-
-                            <div
-                                class="d-flex justify-content-between gap-1"
-                                id="grupo-dias-semana">
-
-                                <button type="button" class="btn btn-dia-semana flex-fill py-2 p-0" data-dia="1">L</button>
-                                <button type="button" class="btn btn-dia-semana flex-fill py-2 p-0" data-dia="2">M</button>
-                                <button type="button" class="btn btn-dia-semana flex-fill py-2 p-0" data-dia="3">X</button>
-                                <button type="button" class="btn btn-dia-semana flex-fill py-2 p-0" data-dia="4">J</button>
-                                <button type="button" class="btn btn-dia-semana flex-fill py-2 p-0" data-dia="5">V</button>
-                                <button type="button" class="btn btn-dia-semana flex-fill py-2 p-0" data-dia="6">S</button>
-                                <button type="button" class="btn btn-dia-semana flex-fill py-2 p-0" data-dia="0">D</button>
-
-                            </div>
-
-                        </div>
-
+                    <form id="form-config-academico">
 
                         <div class="mb-3">
 
                             <label
-                                for="input-num-sesiones"
-                                class="form-label text-subtle fw-semibold">
+                                for="input-registros"
+                                class="form-label text-subtle fw-semibold"
+                                data-i18n="registroAcademico.cantidadRegistros">
 
-                                Cantidad de sesiones por periodo
-
-                                <span class="text-subtle">
-
-                                    (Máx. 100)
-
-                                </span>
+                                Registros al día (Máx. 20)
 
                             </label>
-
 
                             <input
                                 type="number"
-                                class="form-control custom-input"
-                                id="input-num-sesiones"
+                                class="form-control config-input text-white"
+                                id="input-registros"
                                 min="1"
-                                max="100"
-                                value="5"
+                                max="20"
+                                value="3"
                                 required>
-
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <label
-                                for="input-duracion-sesion"
-                                class="form-label text-subtle fw-semibold">
-
-                                Duración por sesión
-
-                                <span class="text-subtle">
-
-                                    (Máx. 240 min)
-
-                                </span>
-
-                            </label>
-
-
-                            <div class="input-group">
-
-                                <input
-                                    type="number"
-                                    class="form-control custom-input input-group-left"
-                                    id="input-duracion-sesion"
-                                    min="5"
-                                    max="240"
-                                    step="5"
-                                    value="45"
-                                    required>
-
-
-                                <span
-                                    class="input-group-text custom-input-suffix">
-
-                                    minutos
-
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div
-                            class="p-3 bg-pink-soft rounded-3 border border-pink border-opacity-25 text-center">
-
-                            <span class="text-subtle d-block small">
-
-                                Tiempo de estudio meta estimado:
-
-                            </span>
-
-
-                            <span
-                                class="fw-bold text-pink fs-5"
-                                id="preview-meta-total">
-
-                                0 min (0 hrs 0 min)
-
-                            </span>
 
                         </div>
 
@@ -463,45 +281,44 @@
 
                 </div>
 
+                <div class="modal-footer border-top border-secondary border-opacity-25 d-flex justify-content-between">
 
-                <div class="modal-footer border-0 pt-0 px-3 pb-3">
+                    <button
+                        type="button"
+                        class="btn btn-outline-danger rounded-pill px-3"
+                        id="btn-reiniciar-meta">
 
-                    <div class="footer-buttons-container w-100">
+                        <i class="fa-solid fa-rotate-left me-1"></i>
+
+                        <span data-i18n="comun.reiniciar">
+                            Reiniciar
+                        </span>
+
+                    </button>
+
+                    <div>
 
                         <button
                             type="button"
-                            class="btn btn-outline-danger-custom rounded-pill px-3 py-2 fw-semibold"
-                            id="btn-reiniciar-meta">
+                            class="btn btn-outline-light rounded-pill px-3 me-2"
+                            data-bs-dismiss="modal">
 
-                            <i class="fa-solid fa-rotate-right me-1"></i>
-
-                            Reiniciar
+                            <span data-i18n="comun.cancelar">
+                                Cancelar
+                            </span>
 
                         </button>
 
+                        <button
+                            type="button"
+                            class="btn btn-action-pink rounded-pill px-4"
+                            id="btn-guardar-config">
 
-                        <div class="actions-right">
-
-                            <button
-                                type="button"
-                                class="btn btn-secondary-custom rounded-pill px-3 py-2 fw-semibold"
-                                data-bs-dismiss="modal">
-
-                                Cancelar
-
-                            </button>
-
-
-                            <button
-                                type="button"
-                                class="btn btn-action-pink rounded-pill px-3 py-2 fw-bold"
-                                id="btn-guardar-meta">
-
+                            <span data-i18n="comun.guardarCambios">
                                 Guardar cambios
+                            </span>
 
-                            </button>
-
-                        </div>
+                        </button>
 
                     </div>
 
@@ -514,14 +331,9 @@
     </div>
 
 
-    
-
     <script src="js/tema-global.js"></script>
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
-    </script>
-
+    <script src="js/idioma-global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/HRegistroAcademico.js"></script>
 
 </body>

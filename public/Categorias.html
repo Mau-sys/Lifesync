@@ -5,11 +5,14 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"
-          content="Categorías disponibles en LifeSync">
+    <meta
+        name="description"
+        content="Categorías disponibles en LifeSync"
+        data-i18n="categorias.descripcionMeta">
 
     <title>LifeSync | Categorías</title>
 
@@ -19,6 +22,7 @@
 
 </head>
 
+
 <body>
 
     <main class="contenedor-categorias">
@@ -27,19 +31,22 @@
 
             <a
                 href="inicio.html"
-                class="volver">
+                class="volver"
+                data-i18n="comun.volver">
 
                 ← Volver
 
             </a>
 
-            <h1>
+
+            <h1 data-i18n="categorias.titulo">
 
                 Categorías
 
             </h1>
 
-            <p>
+
+            <p data-i18n="categorias.descripcion">
 
                 Selecciona una categoría para administrar tus hábitos.
 
@@ -47,19 +54,24 @@
 
         </header>
 
+
         <section
             id="ejemploCategoria"
             class="ejemplo-categoria">
 
-            <div class="ejemplo-etiqueta">
+            <div
+                class="ejemplo-etiqueta"
+                data-i18n="categorias.vistaPrevia">
 
                 Vista previa de una categoría
 
             </div>
 
+
             <article
                 class="categoria ejemplo"
                 data-color="hidratacion">
+
 
                 <div class="categoria-superior">
 
@@ -67,25 +79,31 @@
 
                         <img
                             src="img/Hidrat.png"
-                            alt="Icono de categoría">
+                            alt="Icono de categoría"
+                            data-i18n-alt="categorias.iconoCategoria">
 
                     </div>
 
+
                     <div class="categoria-info">
 
-                        <h2>
+                        <h2 data-i18n="categorias.nombreCategoria">
 
                             Nombre de la categoría
 
                         </h2>
 
-                        <p>
+
+                        <p data-i18n="categorias.objetivoEjemplo">
 
                             Aquí aparecerá el objetivo del hábito seleccionado por el usuario.
 
                         </p>
 
-                        <span class="estado-categoria">
+
+                        <span
+                            class="estado-categoria"
+                            data-i18n="categorias.estadoHabito">
 
                             Estado del hábito
 
@@ -95,11 +113,12 @@
 
                 </div>
 
+
                 <div class="categoria-progreso">
 
                     <div class="progreso-info">
 
-                        <span>
+                        <span data-i18n="categorias.progresoDiario">
 
                             Progreso diario
 
@@ -113,6 +132,7 @@
 
                     </div>
 
+
                     <div class="barra-progreso">
 
                         <div
@@ -125,17 +145,18 @@
 
                 </div>
 
+
                 <div class="categoria-inferior">
 
                     <div class="resumen">
 
-                        <span>
+                        <span data-i18n="categorias.registro">
 
                             Registro
 
                         </span>
 
-                        <span>
+                        <span data-i18n="categorias.datosHabito">
 
                             Aquí se mostrarán automáticamente los datos del hábito.
 
@@ -143,11 +164,13 @@
 
                     </div>
 
-                    <a
-                    href="Hhidratacion.html"
-                    class="btn-categoria">
 
-                    Abrir categoría
+                    <a
+                        href="Hhidratacion.html"
+                        class="btn-categoria"
+                        data-i18n="categorias.abrirCategoria">
+
+                        Abrir categoría
 
                     </a>
 
@@ -157,11 +180,13 @@
 
         </section>
 
+
         <section
             id="listaCategorias"
             class="lista-categorias">
 
         </section>
+
 
         <section
             id="mensajeCategorias"
@@ -171,7 +196,9 @@
 
     </main>
 
+
     <script src="js/tema-global.js"></script>
+    <script src="js/idioma-global.js"></script>
     <script src="js/categorias.js"></script>
 
 </body>

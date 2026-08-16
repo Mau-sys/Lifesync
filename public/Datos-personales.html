@@ -5,18 +5,19 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"
-          content="Datos personales del usuario">
+    <meta
+        name="description"
+        content="Datos personales del usuario"
+        data-i18n="datosPersonales.descripcion">
 
     <title>LifeSync | Datos personales</title>
 
     <link rel="stylesheet" href="css/variables.css">
-
     <link rel="stylesheet" href="css/general.css">
-
     <link rel="stylesheet" href="css/datos-personales.css">
 
 </head>
@@ -30,14 +31,15 @@
 
             <a
                 href="perfil.html"
-                class="volver">
+                class="volver"
+                data-i18n="comun.volver">
 
                 ← Volver
 
             </a>
 
 
-            <h1>
+            <h1 data-i18n="datosPersonales.titulo">
 
                 Datos personales
 
@@ -53,14 +55,16 @@
                 <img
                     src="img/Perfil.png"
                     alt="Foto de perfil"
-                    id="fotoPerfil">
+                    id="fotoPerfil"
+                    data-i18n-alt="datosPersonales.fotoPerfil">
 
             </div>
 
 
             <label
                 for="nuevaFoto"
-                class="btn-cambiar-foto">
+                class="btn-cambiar-foto"
+                data-i18n="datosPersonales.cambiarFoto">
 
                 Cambiar foto
 
@@ -83,7 +87,9 @@
 
             <div class="campo">
 
-                <label for="usuario">
+                <label
+                    for="usuario"
+                    data-i18n="datosPersonales.nombreUsuario">
 
                     Nombre de usuario
 
@@ -102,7 +108,9 @@
 
             <div class="campo">
 
-                <label for="nombreCompleto">
+                <label
+                    for="nombreCompleto"
+                    data-i18n="datosPersonales.nombreCompleto">
 
                     Nombre completo
 
@@ -120,7 +128,9 @@
 
             <div class="campo">
 
-                <label for="correo">
+                <label
+                    for="correo"
+                    data-i18n="datosPersonales.correo">
 
                     Correo electrónico
 
@@ -139,7 +149,9 @@
 
             <div class="campo">
 
-                <label for="fechaNacimiento">
+                <label
+                    for="fechaNacimiento"
+                    data-i18n="datosPersonales.fechaNacimiento">
 
                     Fecha de nacimiento
 
@@ -156,7 +168,9 @@
 
             <div class="campo">
 
-                <label for="genero">
+                <label
+                    for="genero"
+                    data-i18n="datosPersonales.genero">
 
                     Género
 
@@ -167,28 +181,36 @@
                     id="genero"
                     name="genero">
 
-                    <option value="">
+                    <option
+                        value=""
+                        data-i18n="datosPersonales.seleccionar">
 
                         Seleccionar
 
                     </option>
 
 
-                    <option value="femenino">
+                    <option
+                        value="femenino"
+                        data-i18n="datosPersonales.femenino">
 
                         Femenino
 
                     </option>
 
 
-                    <option value="masculino">
+                    <option
+                        value="masculino"
+                        data-i18n="datosPersonales.masculino">
 
                         Masculino
 
                     </option>
 
 
-                    <option value="otro">
+                    <option
+                        value="otro"
+                        data-i18n="datosPersonales.prefieroNoDecirlo">
 
                         Prefiero no decirlo
 
@@ -202,7 +224,7 @@
             <hr>
 
 
-            <h2>
+            <h2 data-i18n="datosPersonales.seguridad">
 
                 Seguridad
 
@@ -211,7 +233,9 @@
 
             <div class="campo">
 
-                <label for="contrasenaActual">
+                <label
+                    for="contrasenaActual"
+                    data-i18n="datosPersonales.contrasenaActual">
 
                     Contraseña actual
 
@@ -229,7 +253,9 @@
 
             <div class="campo">
 
-                <label for="nuevaContrasena">
+                <label
+                    for="nuevaContrasena"
+                    data-i18n="datosPersonales.nuevaContrasena">
 
                     Nueva contraseña
 
@@ -247,7 +273,9 @@
 
             <div class="campo">
 
-                <label for="confirmarContrasena">
+                <label
+                    for="confirmarContrasena"
+                    data-i18n="datosPersonales.confirmarContrasena">
 
                     Confirmar nueva contraseña
 
@@ -275,7 +303,8 @@
 
                 <button
                     type="submit"
-                    id="btnGuardar">
+                    id="btnGuardar"
+                    data-i18n="comun.guardarCambios">
 
                     Guardar cambios
 
@@ -284,7 +313,8 @@
 
                 <button
                     type="button"
-                    id="btnCancelar">
+                    id="btnCancelar"
+                    data-i18n="comun.cancelar">
 
                     Cancelar
 
@@ -297,8 +327,9 @@
 
     </main>
 
-    <script src="js/tema-global.js"></script>
 
+    <script src="js/tema-global.js"></script>
+    <script src="js/idioma-global.js"></script>
     <script src="js/datos-personales.js"></script>
 
 </body>

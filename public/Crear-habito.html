@@ -5,11 +5,14 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"
-          content="Crea un hábito personalizado en LifeSync">
+    <meta
+        name="description"
+        content="Crea un hábito personalizado en LifeSync"
+        data-i18n="crearHabito.descripcionMeta">
 
     <title>LifeSync | Crear hábito personalizado</title>
 
@@ -19,6 +22,7 @@
 
 </head>
 
+
 <body>
 
     <main class="habit-page">
@@ -27,33 +31,45 @@
 
             <a
                 href="Preferencias.html"
-                class="btn-back">
+                class="btn-back"
+                data-i18n="comun.volver">
 
                 ← Volver
 
             </a>
 
+
             <header class="habit-header">
 
-                <h1>
+                <h1 data-i18n="crearHabito.titulo">
+
                     Define tu hábito
+
                 </h1>
 
-                <p>
+                <p data-i18n="crearHabito.descripcion">
+
                     Personaliza un hábito que se adapte a tus objetivos.
+
                 </p>
 
             </header>
+
 
             <form
                 id="habitoForm"
                 class="habit-form"
                 novalidate>
 
+
                 <div class="input-group">
 
-                    <label for="nombreHabito">
+                    <label
+                        for="nombreHabito"
+                        data-i18n="crearHabito.nombreHabito">
+
                         Nombre del hábito
+
                     </label>
 
                     <input
@@ -61,16 +77,22 @@
                         id="nombreHabito"
                         name="nombreHabito"
                         placeholder="Ej. Leer 20 páginas"
+                        data-i18n-placeholder="crearHabito.placeholderNombre"
                         maxlength="150"
                         autocomplete="off"
                         required>
 
                 </div>
 
+
                 <div class="input-group">
 
-                    <label for="objetivo">
+                    <label
+                        for="objetivo"
+                        data-i18n="crearHabito.objetivo">
+
                         Objetivo
+
                     </label>
 
                     <textarea
@@ -79,14 +101,20 @@
                         rows="3"
                         maxlength="500"
                         placeholder="Describe el objetivo de tu hábito..."
+                        data-i18n-placeholder="crearHabito.placeholderObjetivo"
                         required></textarea>
 
                 </div>
 
+
                 <div class="input-group">
 
-                    <label for="frecuencia">
+                    <label
+                        for="frecuencia"
+                        data-i18n="crearHabito.frecuencia">
+
                         Frecuencia
+
                     </label>
 
                     <select
@@ -94,30 +122,51 @@
                         name="frecuencia"
                         required>
 
-                        <option value="">
+                        <option
+                            value=""
+                            data-i18n="crearHabito.seleccionar">
+
                             Selecciona una opción
+
                         </option>
 
-                        <option value="diaria">
+                        <option
+                            value="diaria"
+                            data-i18n="crearHabito.diaria">
+
                             Diario
+
                         </option>
 
-                        <option value="semanal">
+                        <option
+                            value="semanal"
+                            data-i18n="crearHabito.semanal">
+
                             Semanal
+
                         </option>
 
-                        <option value="mensual">
+                        <option
+                            value="mensual"
+                            data-i18n="crearHabito.mensual">
+
                             Mensual
+
                         </option>
 
                     </select>
 
                 </div>
 
+
                 <div class="input-group">
 
-                    <label for="fechaInicio">
+                    <label
+                        for="fechaInicio"
+                        data-i18n="crearHabito.fechaInicio">
+
                         Fecha de inicio
+
                     </label>
 
                     <input
@@ -128,10 +177,15 @@
 
                 </div>
 
+
                 <div class="input-group">
 
-                    <label for="fechaFin">
+                    <label
+                        for="fechaFin"
+                        data-i18n="crearHabito.fechaFin">
+
                         Fecha de finalización
+
                     </label>
 
                     <input
@@ -139,11 +193,16 @@
                         id="fechaFin"
                         name="fechaFin">
 
-                    <small class="campo-ayuda">
+                    <small
+                        class="campo-ayuda"
+                        data-i18n="crearHabito.ayudaFechaFin">
+
                         Puedes dejarla vacía si el hábito no tiene fecha de finalización.
+
                     </small>
 
                 </div>
+
 
                 <p
                     id="mensajeHabito"
@@ -152,10 +211,12 @@
                     aria-live="polite">
                 </p>
 
+
                 <button
                     type="submit"
                     id="guardarHabito"
-                    class="btn-primary">
+                    class="btn-primary"
+                    data-i18n="crearHabito.guardar">
 
                     Guardar hábito
 
@@ -167,7 +228,9 @@
 
     </main>
 
+
     <script src="js/tema-global.js"></script>
+    <script src="js/idioma-global.js"></script>
     <script src="js/crear-habito.js"></script>
 
 </body>

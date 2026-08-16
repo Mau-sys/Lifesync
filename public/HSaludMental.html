@@ -5,17 +5,22 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <title>LifeSync - Salud Mental</title>
+    <title data-i18n="saludMental.tituloPagina">
+        LifeSync - Salud Mental
+    </title>
 
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com">
 
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap"
@@ -38,7 +43,7 @@
 <body class="bg-lifesync p-0 m-0">
 
     <div class="card-full-screen d-flex flex-column justify-content-between">
-        
+
         <div>
 
             <div class="d-flex justify-content-end align-items-center mb-3">
@@ -49,7 +54,7 @@
                         class="btn btn-options p-0"
                         id="btn-options-saludmental"
                         aria-label="Opciones"
-                        data-i18n-aria-label="saludMental.opciones">
+                        data-i18n-aria-label="comun.opciones">
 
                         <i class="fa-solid fa-ellipsis-vertical"></i>
 
@@ -91,11 +96,11 @@
                         <a
                             href="#"
                             class="kebab-item danger"
-                            id="btn-eliminar-habito">
+                            id="btn-deshabilitar-habito">
 
                             <i class="fa-solid fa-ban me-2"></i>
 
-                            <span data-i18n="saludMental.deshabilitarHabito">
+                            <span data-i18n="comun.deshabilitarHabito">
                                 Deshabilitar hábito
                             </span>
 
@@ -106,7 +111,7 @@
                 </div>
 
             </div>
-            
+
             <div class="text-center mt-2">
 
                 <div class="icon-circle bg-purple-soft mx-auto mb-2">
@@ -159,6 +164,14 @@
             <div class="text-center">
 
                 <span
+                    class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido"
+                    data-i18n="saludMental.metaDiaria">
+
+                    Meta diaria
+
+                </span>
+
+                <span
                     class="text-purple fw-bold meta-texto-fluido"
                     id="meta-saludmental">
 
@@ -189,10 +202,11 @@
 
             <button
                 class="btn btn-action-purple w-100 rounded-pill fw-bold font-sora boton-fluido"
-                id="btn-add-pausa"
-                data-i18n="saludMental.agregarPausa">
+                id="btn-add-pausa">
 
-                +1 pausa
+                <span data-i18n="saludMental.agregarPausa">
+                    +1 pausa
+                </span>
 
             </button>
 
@@ -260,25 +274,19 @@
                                     value="diaria"
                                     selected
                                     data-i18n="saludMental.diaria">
-
                                     Diaria (Todos los días)
-
                                 </option>
 
                                 <option
                                     value="semanal"
                                     data-i18n="saludMental.semanal">
-
                                     Semanal (Meta global para la semana)
-
                                 </option>
 
                                 <option
                                     value="personalizada"
                                     data-i18n="saludMental.personalizada">
-
                                     Personalizada (Días específicos)
-
                                 </option>
 
                             </select>
@@ -305,64 +313,57 @@
                                 <button
                                     type="button"
                                     class="btn btn-dia flex-fill"
-                                    data-dia="1">
-
+                                    data-dia="1"
+                                    data-i18n="comun.lunes">
                                     L
-
                                 </button>
 
                                 <button
                                     type="button"
                                     class="btn btn-dia flex-fill"
-                                    data-dia="2">
-
+                                    data-dia="2"
+                                    data-i18n="comun.martes">
                                     M
-
                                 </button>
 
                                 <button
                                     type="button"
                                     class="btn btn-dia flex-fill"
-                                    data-dia="3">
-
+                                    data-dia="3"
+                                    data-i18n="comun.miercoles">
                                     Mi
-
                                 </button>
 
                                 <button
                                     type="button"
                                     class="btn btn-dia flex-fill"
-                                    data-dia="4">
-
+                                    data-dia="4"
+                                    data-i18n="comun.jueves">
                                     J
-
                                 </button>
 
                                 <button
                                     type="button"
                                     class="btn btn-dia flex-fill"
-                                    data-dia="5">
-
+                                    data-dia="5"
+                                    data-i18n="comun.viernes">
                                     V
-
                                 </button>
 
                                 <button
                                     type="button"
                                     class="btn btn-dia flex-fill"
-                                    data-dia="6">
-
+                                    data-dia="6"
+                                    data-i18n="comun.sabado">
                                     S
-
                                 </button>
 
                                 <button
                                     type="button"
                                     class="btn btn-dia flex-fill"
-                                    data-dia="0">
-
+                                    data-dia="0"
+                                    data-i18n="comun.domingo">
                                     D
-
                                 </button>
 
                             </div>
@@ -453,20 +454,22 @@
                         <button
                             type="button"
                             class="btn btn-outline-light rounded-pill px-3 me-2"
-                            data-bs-dismiss="modal"
-                            data-i18n="comun.cancelar">
+                            data-bs-dismiss="modal">
 
-                            Cancelar
+                            <span data-i18n="comun.cancelar">
+                                Cancelar
+                            </span>
 
                         </button>
 
                         <button
                             type="button"
                             class="btn btn-action-purple rounded-pill px-4"
-                            id="btn-guardar-config"
-                            data-i18n="comun.guardarCambios">
+                            id="btn-guardar-config">
 
-                            Guardar cambios
+                            <span data-i18n="comun.guardarCambios">
+                                Guardar cambios
+                            </span>
 
                         </button>
 
