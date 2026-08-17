@@ -14,20 +14,42 @@
         content="Categorías disponibles en LifeSync"
         data-i18n="categorias.descripcionMeta">
 
-    <title>LifeSync | Categorías</title>
+    <title
+        data-i18n="categorias.tituloPagina">
+        LifeSync | Categorías
+    </title>
 
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/general.css">
-    <link rel="stylesheet" href="css/categorias.css">
+
+    <!-- ESTILOS -->
+
+    <link
+        rel="stylesheet"
+        href="css/variables.css">
+
+    <link
+        rel="stylesheet"
+        href="css/general.css">
+
+    <link
+        rel="stylesheet"
+        href="css/categorias.css">
+
 
 </head>
 
 
 <body>
 
+
     <main class="contenedor-categorias">
 
+
+        <!-- =================================================
+             ENCABEZADO
+        ================================================== -->
+
         <header class="encabezado">
+
 
             <a
                 href="inicio.html"
@@ -39,147 +61,34 @@
             </a>
 
 
-            <h1 data-i18n="categorias.titulo">
+            <h1
+                data-i18n="categorias.titulo">
 
                 Categorías
 
             </h1>
 
 
-            <p data-i18n="categorias.descripcion">
+            <p
+                data-i18n="categorias.descripcion">
 
-                Selecciona una categoría para administrar tus hábitos.
+                Selecciona una categoría para
+                administrar tus hábitos.
 
             </p>
+
 
         </header>
 
 
-        <section
-            id="ejemploCategoria"
-            class="ejemplo-categoria">
 
-            <div
-                class="ejemplo-etiqueta"
-                data-i18n="categorias.vistaPrevia">
+        <!-- =================================================
+             LISTA REAL DE CATEGORÍAS
 
-                Vista previa de una categoría
-
-            </div>
-
-
-            <article
-                class="categoria ejemplo"
-                data-color="hidratacion">
-
-
-                <div class="categoria-superior">
-
-                    <div class="categoria-icono">
-
-                        <img
-                            src="img/Hidrat.png"
-                            alt="Icono de categoría"
-                            data-i18n-alt="categorias.iconoCategoria">
-
-                    </div>
-
-
-                    <div class="categoria-info">
-
-                        <h2 data-i18n="categorias.nombreCategoria">
-
-                            Nombre de la categoría
-
-                        </h2>
-
-
-                        <p data-i18n="categorias.objetivoEjemplo">
-
-                            Aquí aparecerá el objetivo del hábito seleccionado por el usuario.
-
-                        </p>
-
-
-                        <span
-                            class="estado-categoria"
-                            data-i18n="categorias.estadoHabito">
-
-                            Estado del hábito
-
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div class="categoria-progreso">
-
-                    <div class="progreso-info">
-
-                        <span data-i18n="categorias.progresoDiario">
-
-                            Progreso diario
-
-                        </span>
-
-                        <span class="porcentaje">
-
-                            0%
-
-                        </span>
-
-                    </div>
-
-
-                    <div class="barra-progreso">
-
-                        <div
-                            class="barra hidratacion"
-                            style="width:0%;">
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="categoria-inferior">
-
-                    <div class="resumen">
-
-                        <span data-i18n="categorias.registro">
-
-                            Registro
-
-                        </span>
-
-                        <span data-i18n="categorias.datosHabito">
-
-                            Aquí se mostrarán automáticamente los datos del hábito.
-
-                        </span>
-
-                    </div>
-
-
-                    <a
-                        href="Hhidratacion.html"
-                        class="btn-categoria"
-                        data-i18n="categorias.abrirCategoria">
-
-                        Abrir categoría
-
-                    </a>
-
-                </div>
-
-            </article>
-
-        </section>
-
+             Las tarjetas serán creadas por
+             categorias.js utilizando los datos
+             provenientes de categorias.php.
+        ================================================== -->
 
         <section
             id="listaCategorias"
@@ -188,16 +97,49 @@
         </section>
 
 
+
+        <!-- =================================================
+             MENSAJES
+
+             Aquí aparecerán errores o mensajes
+             cuando no existan categorías.
+        ================================================== -->
+
         <section
             id="mensajeCategorias"
             class="mensaje-categorias">
 
         </section>
 
+
     </main>
 
-    <script src="js/idioma-global.js"></script>
-    <script src="js/tema-global.js"></script>
-    <script src="js/categorias.js"></script>
+
+
+    <!-- =====================================================
+         JAVASCRIPT GLOBAL
+    ====================================================== -->
+
+    <script
+        src="js/idioma-global.js">
+    </script>
+
+
+    <script
+        src="js/tema-global.js">
+    </script>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT DE CATEGORÍAS
+    ====================================================== -->
+
+    <script
+        src="js/categorias.js">
+    </script>
+
 
 </body>
+
+</html>

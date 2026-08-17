@@ -1,35 +1,67 @@
-
 <!DOCTYPE html>
 <html lang="es">
 
+
 <head>
 
+
     <meta charset="UTF-8">
+
 
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0">
+
 
     <meta
         name="description"
         content="Visualiza tus rachas en LifeSync"
         data-i18n="rachas.metaDescripcion">
 
-    <title data-i18n="rachas.tituloPagina">
+
+    <title
+        data-i18n="rachas.tituloPagina">
+
         LifeSync | Rachas
+
     </title>
 
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/general.css">
-    <link rel="stylesheet" href="css/rachas.css">
+
+    <!-- =====================================================
+         ESTILOS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="css/variables.css">
+
+
+    <link
+        rel="stylesheet"
+        href="css/general.css">
+
+
+    <link
+        rel="stylesheet"
+        href="css/rachas.css">
+
 
 </head>
 
+
+
 <body>
+
 
     <main class="contenedor-racha">
 
+
+        <!-- =================================================
+             ENCABEZADO
+        ================================================== -->
+
         <header class="encabezado">
+
 
             <a
                 href="inicio.html"
@@ -40,67 +72,76 @@
 
             </a>
 
-            <h1 data-i18n="rachas.titulo">
+
+            <h1
+                data-i18n="rachas.titulo">
+
                 Rachas
+
             </h1>
 
-            <p data-i18n="rachas.descripcion">
-                Mantén tus hábitos y observa cómo tu constelación se ilumina.
+
+            <p
+                data-i18n="rachas.descripcion">
+
+                Mantén tus hábitos y observa cómo
+                tu constelación se ilumina.
+
             </p>
+
 
         </header>
 
+
+
+        <!-- =================================================
+             CONSTELACIÓN DEL MES
+        ================================================== -->
+
         <section class="constelacion">
 
-            <h2 data-i18n="rachas.constelacionMes">
+
+            <h2
+                data-i18n="rachas.constelacionMes">
+
                 Constelación del mes
+
             </h2>
 
-            <p data-i18n="rachas.constelacionDescripcion">
-                Cada estrella representa un día en el que completaste todos tus hábitos durante este mes.
+
+            <p
+                data-i18n="rachas.constelacionDescripcion">
+
+                Cada estrella representa un día
+                en el que completaste todos tus
+                hábitos durante este mes.
+
             </p>
+
+
+
+            <!--
+
+                IMPORTANTE:
+
+                Las estrellas ya NO están escritas
+                manualmente.
+
+                racha.js las generará utilizando
+                los datos de MySQL.
+
+            -->
 
             <div
                 id="constelacionUsuario"
                 class="constelacion-grid">
 
-                <span class="estrella activa">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella activa">★</span>
-                <span class="estrella">★</span>
-                <span class="estrella">★</span>
-
-                <span class="estrella activa">★</span>
-
             </div>
 
+
+
             <div class="acciones-constelacion">
+
 
                 <button
                     type="button"
@@ -112,11 +153,20 @@
 
                 </button>
 
+
             </div>
+
 
         </section>
 
+
+
+        <!-- =================================================
+             RACHA ACTUAL
+        ================================================== -->
+
         <section class="racha-actual">
+
 
             <img
                 src="img/Racha.png"
@@ -124,150 +174,207 @@
                 data-i18n-alt="rachas.iconoRacha"
                 class="icono-racha">
 
-            <h2 data-i18n="rachas.actual">
+
+            <h2
+                data-i18n="rachas.actual">
+
                 Racha actual
+
             </h2>
 
+
             <span id="rachaActual">
+
                 0 días
+
             </span>
 
-            <p data-i18n="rachas.actualDescripcion">
-                ¡Sigue así! Cada día consecutivo fortalece tu constancia.
+
+            <p
+                data-i18n="rachas.actualDescripcion">
+
+                ¡Sigue así! Cada día consecutivo
+                fortalece tu constancia.
+
             </p>
 
+
         </section>
+
+
+
+        <!-- =================================================
+             RESUMEN
+        ================================================== -->
 
         <section class="resumen">
 
+
+            <!-- MEJOR RACHA -->
+
             <article class="tarjeta-resumen">
 
-                <h3 data-i18n="rachas.mejor">
+
+                <h3
+                    data-i18n="rachas.mejor">
+
                     Mejor racha
+
                 </h3>
+
 
                 <span id="mejorRacha">
+
                     0 días
+
                 </span>
+
 
             </article>
 
+
+
+            <!-- HÁBITOS COMPLETADOS -->
+
             <article class="tarjeta-resumen">
 
-                <h3 data-i18n="rachas.completados">
+
+                <h3
+                    data-i18n="rachas.completados">
+
                     Hábitos completados
+
                 </h3>
+
 
                 <span id="habitosCompletados">
+
                     0
+
                 </span>
 
+
             </article>
+
+
+
+            <!-- DÍAS REGISTRADOS -->
 
             <article class="tarjeta-resumen">
 
-                <h3 data-i18n="rachas.registrados">
+
+                <h3
+                    data-i18n="rachas.registrados">
+
                     Días registrados
+
                 </h3>
 
+
                 <span id="diasRegistrados">
+
                     0
+
                 </span>
+
 
             </article>
 
+
         </section>
+
+
+
+        <!-- =================================================
+             CONSTANCIA POR CATEGORÍA
+        ================================================== -->
 
         <section class="categorias">
 
-            <h2 data-i18n="rachas.constanciaCategoria">
+
+            <h2
+                data-i18n="rachas.constanciaCategoria">
+
                 Constancia por categoría
+
             </h2>
 
-            <div id="listaCategorias">
 
-                <div class="categoria-racha ejemplo">
 
-                    <img
-                        src="img/Hidrat.png"
-                        alt="Hidratación"
-                        data-i18n-alt="categorias.hidratacion">
+            <!--
 
-                    <div class="info-categoria">
+                NO ponemos Hidratación ni 55%
+                manualmente.
 
-                        <h3 data-i18n="categorias.hidratacion">
-                            Hidratación
-                        </h3>
+                racha.js creará las categorías
+                según los datos reales.
 
-                        <div class="barra">
+            -->
 
-                            <span style="width:55%;"></span>
-
-                        </div>
-
-                        <p
-                            class="porcentaje"
-                            data-i18n="rachas.ejemploProgreso">
-
-                            Ejemplo de progreso por categoría.
-
-                        </p>
-
-                    </div>
-
-                </div>
+            <div
+                id="listaCategorias">
 
             </div>
 
+
         </section>
+
+
+
+        <!-- =================================================
+             HISTORIAL DE RACHAS
+        ================================================== -->
 
         <section class="historial">
 
-            <h2 data-i18n="rachas.historial">
+
+            <h2
+                data-i18n="rachas.historial">
+
                 Historial de rachas
+
             </h2>
+
+
 
             <div
                 id="historialRachas"
                 class="lista-historial">
 
-                <div class="historial-item ejemplo">
-
-                    <div>
-
-                        <strong data-i18n="rachas.ultima">
-                            Última racha registrada
-                        </strong>
-
-                        <p data-i18n="rachas.ultimaDescripcion">
-                            Aquí aparecerán automáticamente las rachas que el usuario vaya completando.
-                        </p>
-
-                    </div>
-
-                    <span>
-                        0 días
-                    </span>
-
-                </div>
-
             </div>
+
 
         </section>
 
+
     </main>
+
+
+
+    <!-- =====================================================
+         MODAL DE CONSTELACIONES
+    ====================================================== -->
 
     <div
         id="modalConstelaciones"
         class="modal-constelaciones">
 
+
         <div class="contenido-modal">
+
+
+            <!-- ENCABEZADO DEL MODAL -->
 
             <div class="encabezado-modal">
 
-                <h2 data-i18n="rachas.historialConstelaciones">
+
+                <h2
+                    data-i18n="rachas.historialConstelaciones">
+
                     Historial de constelaciones
+
                 </h2>
+
 
                 <button
                     type="button"
@@ -280,88 +387,68 @@
 
                 </button>
 
+
             </div>
 
-            <p data-i18n="rachas.historialDescripcion">
-                Aquí podrás consultar las constelaciones obtenidas en los meses anteriores.
+
+
+            <!-- DESCRIPCIÓN -->
+
+            <p
+                data-i18n="rachas.historialDescripcion">
+
+                Aquí podrás consultar las
+                constelaciones obtenidas en
+                los meses anteriores.
+
             </p>
 
-            <div class="mes-constelacion">
 
-                <h3 data-i18n="meses.junio">
-                    Junio 2026
-                </h3>
 
-                <div class="constelacion-grid">
+            <!--
 
-                    <span class="estrella activa">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
+                Las constelaciones de los meses
+                anteriores serán creadas por
+                racha.js.
 
-                </div>
+            -->
+
+            <div
+                id="historialConstelaciones">
 
             </div>
 
-            <div class="mes-constelacion">
-
-                <h3 data-i18n="meses.julio">
-                    Julio 2026
-                </h3>
-
-                <div class="constelacion-grid">
-
-                    <span class="estrella activa">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
-
-                </div>
-
-            </div>
-
-            <div class="mes-constelacion">
-
-                <h3 data-i18n="meses.agosto">
-                    Agosto 2026
-                </h3>
-
-                <div class="constelacion-grid">
-
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
-                    <span class="estrella">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
-                    <span class="estrella activa">★</span>
-                    <span class="estrella">★</span>
-
-                </div>
-
-            </div>
 
         </div>
 
+
     </div>
 
-    <script src="js/idioma-global.js"></script>
-    <script src="js/tema-global.js"></script>
-    <script src="js/racha.js"></script>
+
+
+    <!-- =====================================================
+         JAVASCRIPT GLOBAL
+    ====================================================== -->
+
+    <script
+        src="js/idioma-global.js">
+    </script>
+
+
+    <script
+        src="js/tema-global.js">
+    </script>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT DE RACHAS
+    ====================================================== -->
+
+    <script
+        src="js/racha.js">
+    </script>
+
 
 </body>
 

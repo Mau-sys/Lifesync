@@ -1,466 +1,671 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    const progresoGeneral = document.getElementById("progresoGeneral");
-    const diasRacha = document.getElementById("diasRacha");
-    const habitosCompletados = document.getElementById("habitosCompletados");
+        const listaCategorias =
+            document.getElementById(
+                "listaCategorias"
+            );
 
-    const periodo = document.getElementById("periodo");
-
-    const graficaGeneral = document.getElementById("graficaGeneral");
-
-    const listaCategorias = document.getElementById("listaCategorias");
-    const listaHabitos = document.getElementById("listaHabitos");
-
-    const mensajeEstadisticas =
-        document.getElementById("mensajeEstadisticas");
+        const mensajeCategorias =
+            document.getElementById(
+                "mensajeCategorias"
+            );
 
 
-    function LS(texto) {
+        /*
+        =====================================================
+        CONFIGURACIÓN DE CATEGORÍAS
+        =====================================================
+        */
 
-        if (
-            typeof window !== "undefined" &&
-            typeof window.traducirLifeSync === "function"
-        ) {
-            return window.traducirLifeSync(texto);
-        }
+        const configuracion = {
 
-        return texto;
-    }
+            "Hidratación": {
+                icono: "img/Hidrat.png",
+                enlace: "Hhidratacion.html",
+                clase: "hidratacion"
+            },
 
+            "Alimentación": {
+                icono: "img/Alimentacion.png",
+                enlace: "Halimentacion.html",
+                clase: "alimentacion"
+            },
 
-    function escaparHTML(texto) {
+            "Salud Mental": {
+                icono: "img/SaludMental.png",
+                enlace: "HsaludMental.html",
+                clase: "salud-mental"
+            },
 
-        const elemento = document.createElement("div");
+            "Actividad Física": {
+                icono: "img/ActividadFisica.png",
+                enlace: "HactividadFisica.html",
+                clase: "actividad-fisica"
+            },
 
-        elemento.textContent = texto ?? "";
+            "Registro Académico": {
+                icono: "img/Academico.png",
+                enlace: "HregistroAcademico.html",
+                clase: "academico"
+            },
 
-        return elemento.innerHTML;
-    }
+            "Hábito Personalizado": {
+                icono: "img/H-Perzona.png",
+                enlace: "Personalizados.html",
+                clase: "personalizado"
+            }
 
-
-    function limitarPorcentaje(valor) {
-
-        const numero = Number(valor) || 0;
-
-        return Math.max(
-            0,
-            Math.min(100, numero)
-        );
-    }
-
-
-    function mostrarMensaje(texto = "", tipo = "") {
-
-        if (!mensajeEstadisticas) {
-            return;
-        }
-
-        mensajeEstadisticas.textContent = texto;
-
-        mensajeEstadisticas.className = "mensaje";
-
-        if (tipo) {
-            mensajeEstadisticas.classList.add(tipo);
-        }
-    }
+        };
 
 
-    function mostrarResumen(resumen = {}) {
+        /*
+        =====================================================
+        TRADUCCIÓN
+        =====================================================
+        */
 
-        if (progresoGeneral) {
-            progresoGeneral.textContent =
-                `${Math.round(
-                    limitarPorcentaje(
-                        resumen.progreso_general
-                    )
-                )}%`;
-        }
-
-
-        if (diasRacha) {
-            diasRacha.textContent =
-                Number(resumen.dias_racha) || 0;
-        }
-
-
-        if (habitosCompletados) {
-            habitosCompletados.textContent =
-                Number(resumen.habitos_completados) || 0;
-        }
-    }
-
-
-    function mostrarGrafica(datos) {
-
-        if (!graficaGeneral) {
-            return;
-        }
-
-        graficaGeneral.innerHTML = "";
-
-
-        if (
-            !Array.isArray(datos) ||
-            datos.length === 0
+        function traducir(
+            clave,
+            textoPredeterminado
         ) {
 
-            const mensaje =
-                document.createElement("p");
+            if (
+                typeof window
+                    .traducirLifeSync ===
+                "function"
+            ) {
 
-            mensaje.className = "sin-datos";
+                const resultado =
+                    window.traducirLifeSync(
+                        clave
+                    );
 
-            mensaje.textContent =
-                LS("graficaSinDatos");
 
-            graficaGeneral.appendChild(mensaje);
+                if (
+                    resultado &&
+                    resultado !== clave
+                ) {
 
-            return;
+                    return resultado;
+
+                }
+
+            }
+
+
+            return textoPredeterminado;
+
         }
 
 
-        const contenedor =
-            document.createElement("div");
+        /*
+        =====================================================
+        ESCAPAR HTML
+        =====================================================
+        */
 
-        contenedor.className =
-            "grafica-barras";
+        function escaparHTML(
+            texto
+        ) {
+
+            const elemento =
+                document.createElement(
+                    "div"
+                );
+
+            elemento.textContent =
+                texto ?? "";
+
+            return elemento.innerHTML;
+
+        }
 
 
-        datos.forEach((dato) => {
+        /*
+        =====================================================
+        CREAR TARJETA
+        =====================================================
+        */
+
+        function crearTarjeta(
+            categoria
+        ) {
+
+            const nombre =
+                categoria.nombre_categoria;
+
+
+            const config =
+                configuracion[nombre];
+
+
+            if (!config) {
+
+                return null;
+
+            }
+
+
+            const articulo =
+                document.createElement(
+                    "article"
+                );
+
+
+            articulo.className =
+                "categoria";
+
+
+            articulo.dataset.color =
+                config.clase;
+
+
+            /*
+            ---------------------------------------------
+            PARTE SUPERIOR
+            ---------------------------------------------
+            */
+
+            const superior =
+                document.createElement(
+                    "div"
+                );
+
+
+            superior.className =
+                "categoria-superior";
+
+
+            const contenedorIcono =
+                document.createElement(
+                    "div"
+                );
+
+
+            contenedorIcono.className =
+                "categoria-icono";
+
+
+            const imagen =
+                document.createElement(
+                    "img"
+                );
+
+
+            imagen.src =
+                config.icono;
+
+
+            imagen.alt =
+                nombre;
+
+
+            contenedorIcono.appendChild(
+                imagen
+            );
+
+
+            const informacion =
+                document.createElement(
+                    "div"
+                );
+
+
+            informacion.className =
+                "categoria-info";
+
+
+            const titulo =
+                document.createElement(
+                    "h2"
+                );
+
+
+            titulo.textContent =
+                nombre;
+
+
+            const descripcion =
+                document.createElement(
+                    "p"
+                );
+
+
+            descripcion.textContent =
+                categoria.descripcion ||
+                "Administra tus hábitos de esta categoría.";
+
+
+            const estado =
+                document.createElement(
+                    "span"
+                );
+
+
+            estado.className =
+                "estado-categoria";
+
+
+            if (
+                categoria.seleccionada
+            ) {
+
+                estado.textContent =
+                    "Categoría activa";
+
+            } else {
+
+                estado.textContent =
+                    "Disponible";
+
+            }
+
+
+            informacion.appendChild(
+                titulo
+            );
+
+            informacion.appendChild(
+                descripcion
+            );
+
+            informacion.appendChild(
+                estado
+            );
+
+
+            superior.appendChild(
+                contenedorIcono
+            );
+
+            superior.appendChild(
+                informacion
+            );
+
+
+            /*
+            ---------------------------------------------
+            PROGRESO
+            ---------------------------------------------
+            */
+
+            const progreso =
+                document.createElement(
+                    "div"
+                );
+
+
+            progreso.className =
+                "categoria-progreso";
+
+
+            const progresoInfo =
+                document.createElement(
+                    "div"
+                );
+
+
+            progresoInfo.className =
+                "progreso-info";
+
+
+            const textoProgreso =
+                document.createElement(
+                    "span"
+                );
+
+
+            textoProgreso.textContent =
+                "Progreso diario";
+
 
             const porcentaje =
-                limitarPorcentaje(dato.porcentaje);
+                document.createElement(
+                    "span"
+                );
 
 
-            const columna =
-                document.createElement("div");
+            porcentaje.className =
+                "porcentaje";
 
-            columna.className =
-                "barra-columna";
 
+            porcentaje.textContent =
+                Math.round(
+                    Number(
+                        categoria.porcentaje
+                    ) || 0
+                ) + "%";
 
-            columna.innerHTML = `
 
-                <span class="barra-valor">
-                    ${Math.round(porcentaje)}%
-                </span>
-
-                <div class="barra">
-
-                    <div
-                        class="barra-relleno"
-                        style="height: ${porcentaje}%;"
-                    ></div>
-
-                </div>
-
-                <span class="barra-etiqueta">
-                    ${escaparHTML(dato.etiqueta)}
-                </span>
-
-            `;
-
-
-            contenedor.appendChild(columna);
-
-        });
-
-
-        graficaGeneral.appendChild(contenedor);
-    }
-
-
-    function crearTarjetaEstadistica(elemento) {
-
-        const porcentaje =
-            limitarPorcentaje(elemento.porcentaje);
-
-
-        const tarjeta =
-            document.createElement("article");
-
-        tarjeta.className =
-            "tarjeta-estadistica";
-
-
-        const informacion =
-            document.createElement("div");
-
-        informacion.className =
-            "estadistica-info";
-
-
-        const titulo =
-            document.createElement("h3");
-
-        titulo.textContent =
-            elemento.nombre ?? "";
-
-
-        const detalle =
-            document.createElement("p");
-
-        detalle.textContent =
-            elemento.detalle ||
-            LS("sinInformacion");
-
-
-        informacion.appendChild(titulo);
-        informacion.appendChild(detalle);
-
-
-        const progreso =
-            document.createElement("div");
-
-        progreso.className =
-            "estadistica-progreso";
-
-
-        const porcentajeTexto =
-            document.createElement("span");
-
-        porcentajeTexto.textContent =
-            `${Math.round(porcentaje)}%`;
-
-
-        const barra =
-            document.createElement("div");
-
-        barra.className =
-            "barra-progreso";
-
-
-        const barraRelleno =
-            document.createElement("div");
-
-        barraRelleno.className =
-            "barra-progreso-relleno";
-
-        barraRelleno.style.width =
-            `${porcentaje}%`;
-
-
-        barra.appendChild(barraRelleno);
-
-        progreso.appendChild(porcentajeTexto);
-        progreso.appendChild(barra);
-
-
-        tarjeta.appendChild(informacion);
-        tarjeta.appendChild(progreso);
-
-
-        return tarjeta;
-    }
-
-
-    function mostrarCategorias(categorias) {
-
-        if (!listaCategorias) {
-            return;
-        }
-
-        listaCategorias.innerHTML = "";
-
-
-        if (
-            !Array.isArray(categorias) ||
-            categorias.length === 0
-        ) {
-
-            const mensaje =
-                document.createElement("p");
-
-            mensaje.className =
-                "sin-datos";
-
-            mensaje.textContent =
-                LS("sinCategorias");
-
-            listaCategorias.appendChild(mensaje);
-
-            return;
-        }
-
-
-        categorias.forEach((categoria) => {
-
-            listaCategorias.appendChild(
-                crearTarjetaEstadistica(categoria)
+            progresoInfo.appendChild(
+                textoProgreso
             );
 
-        });
-
-    }
-
-
-    function mostrarHabitos(habitos) {
-
-        if (!listaHabitos) {
-            return;
-        }
-
-        listaHabitos.innerHTML = "";
-
-
-        if (
-            !Array.isArray(habitos) ||
-            habitos.length === 0
-        ) {
-
-            const mensaje =
-                document.createElement("p");
-
-            mensaje.className =
-                "sin-datos";
-
-            mensaje.textContent =
-                LS("sinHabitosPersonalizados");
-
-            listaHabitos.appendChild(mensaje);
-
-            return;
-        }
-
-
-        habitos.forEach((habito) => {
-
-            listaHabitos.appendChild(
-                crearTarjetaEstadistica(habito)
+            progresoInfo.appendChild(
+                porcentaje
             );
 
-        });
 
-    }
+            const barraProgreso =
+                document.createElement(
+                    "div"
+                );
 
 
-    async function cargarEstadisticas() {
+            barraProgreso.className =
+                "barra-progreso";
 
-        if (!periodo) {
-            return;
+
+            const barra =
+                document.createElement(
+                    "div"
+                );
+
+
+            barra.className =
+                "barra " +
+                config.clase;
+
+
+            barra.style.width =
+                (
+                    Number(
+                        categoria.porcentaje
+                    ) || 0
+                ) + "%";
+
+
+            barraProgreso.appendChild(
+                barra
+            );
+
+
+            progreso.appendChild(
+                progresoInfo
+            );
+
+            progreso.appendChild(
+                barraProgreso
+            );
+
+
+            /*
+            ---------------------------------------------
+            PARTE INFERIOR
+            ---------------------------------------------
+            */
+
+            const inferior =
+                document.createElement(
+                    "div"
+                );
+
+
+            inferior.className =
+                "categoria-inferior";
+
+
+            const resumen =
+                document.createElement(
+                    "div"
+                );
+
+
+            resumen.className =
+                "resumen";
+
+
+            const registro =
+                document.createElement(
+                    "span"
+                );
+
+
+            registro.textContent =
+                "Registro";
+
+
+            const datos =
+                document.createElement(
+                    "span"
+                );
+
+
+            const total =
+                Number(
+                    categoria.total_habitos
+                ) || 0;
+
+
+            const completados =
+                Number(
+                    categoria.completados_hoy
+                ) || 0;
+
+
+            if (total > 0) {
+
+                datos.textContent =
+                    `${completados}/${total} hábitos completados hoy`;
+
+            } else {
+
+                datos.textContent =
+                    "Todavía no tienes hábitos en esta categoría.";
+
+            }
+
+
+            resumen.appendChild(
+                registro
+            );
+
+            resumen.appendChild(
+                datos
+            );
+
+
+            const boton =
+                document.createElement(
+                    "a"
+                );
+
+
+            boton.href =
+                config.enlace;
+
+
+            boton.className =
+                "btn-categoria";
+
+
+            boton.textContent =
+                "Abrir categoría";
+
+
+            inferior.appendChild(
+                resumen
+            );
+
+            inferior.appendChild(
+                boton
+            );
+
+
+            /*
+            ---------------------------------------------
+            ARMAR TARJETA
+            ---------------------------------------------
+            */
+
+            articulo.appendChild(
+                superior
+            );
+
+            articulo.appendChild(
+                progreso
+            );
+
+            articulo.appendChild(
+                inferior
+            );
+
+
+            return articulo;
+
         }
 
-        const periodoSeleccionado =
-            periodo.value || "semana";
+
+        /*
+        =====================================================
+        CARGAR CATEGORÍAS
+        =====================================================
+        */
+
+        async function cargarCategorias() {
+
+            try {
+
+                listaCategorias.innerHTML =
+                    "";
 
 
-        try {
+                if (
+                    mensajeCategorias
+                ) {
 
-            mostrarMensaje("");
+                    mensajeCategorias.textContent =
+                        "";
+
+                }
 
 
-            const respuesta =
-                await fetch(
-                    `../auth/estadisticas.php?periodo=${encodeURIComponent(
-                        periodoSeleccionado
-                    )}`,
-                    {
-                        method: "GET",
-                        credentials: "same-origin",
-                        cache: "no-store",
-                        headers: {
-                            "Accept": "application/json"
+                const respuesta =
+                    await fetch(
+                        "auth/categorias.php",
+                        {
+                            method: "GET",
+
+                            credentials:
+                                "same-origin",
+
+                            cache:
+                                "no-store",
+
+                            headers: {
+                                "Accept":
+                                    "application/json"
+                            }
                         }
+                    );
+
+
+                const datos =
+                    await respuesta.json();
+
+
+                if (
+                    !respuesta.ok ||
+                    !datos.exito
+                ) {
+
+                    throw new Error(
+                        datos.mensaje ||
+                        "No se pudieron cargar las categorías."
+                    );
+
+                }
+
+
+                const categorias =
+                    datos.categorias || [];
+
+
+                if (
+                    categorias.length === 0
+                ) {
+
+                    mostrarMensaje(
+                        "No hay categorías disponibles."
+                    );
+
+                    return;
+
+                }
+
+
+                categorias.forEach(
+                    (categoria) => {
+
+                        const tarjeta =
+                            crearTarjeta(
+                                categoria
+                            );
+
+
+                        if (tarjeta) {
+
+                            listaCategorias.appendChild(
+                                tarjeta
+                            );
+
+                        }
+
                     }
                 );
 
 
-            const textoRespuesta =
-                await respuesta.text();
-
-
-            let datos;
-
-
-            try {
-
-                datos =
-                    JSON.parse(
-                        textoRespuesta
-                    );
-
             } catch (error) {
 
                 console.error(
-                    "Respuesta recibida del servidor:",
-                    textoRespuesta
+                    "Error al cargar categorías:",
+                    error
                 );
 
-                throw new Error(
-                    LS(LS("servidorRespuestaInvalida"))
-                );
 
-            }
-
-
-            if (!respuesta.ok) {
-
-                throw new Error(
-                    datos.mensaje ||
-                    LS(LS("noEstadisticas"))
+                mostrarMensaje(
+                    error.message ||
+                    "No se pudieron cargar las categorías."
                 );
 
             }
-
-
-            if (!datos.exito) {
-
-                throw new Error(
-                    datos.mensaje ||
-                    LS(LS("noEstadisticas"))
-                );
-
-            }
-
-
-            mostrarResumen(
-                datos.resumen
-            );
-
-
-            mostrarGrafica(
-                datos.grafica
-            );
-
-
-            mostrarCategorias(
-                datos.categorias
-            );
-
-
-            mostrarHabitos(
-                datos.habitos
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Error al cargar estadísticas:",
-                error
-            );
-
-
-            mostrarMensaje(
-                error.message ||
-                LS(LS("noEstadisticas")),
-                "error"
-            );
 
         }
 
-    }
+
+        function mostrarMensaje(
+            mensaje
+        ) {
+
+            if (
+                !mensajeCategorias
+            ) {
+
+                return;
+
+            }
 
 
-    if (periodo) {
-        periodo.addEventListener(
-            "change",
-            cargarEstadisticas
+            mensajeCategorias.textContent =
+                mensaje;
+
+        }
+
+
+        cargarCategorias();
+
+
+        /*
+        Si cambia el idioma,
+        volvemos a cargar la información.
+        */
+
+        window.addEventListener(
+            "lifesyncIdiomaCambiado",
+            cargarCategorias
         );
+
     }
-
-
-    cargarEstadisticas();
-
-    window.addEventListener("lifesyncIdiomaCambiado", cargarEstadisticas);
-
-});
+);
