@@ -1,158 +1,766 @@
 <?php
 
+declare(strict_types=1);
+
 session_start();
 
-header("Content-Type: application/json; charset=UTF-8");
+header('Content-Type: application/json; charset=utf-8');
 
-require_once "../config/conexion.php";
+require_once __DIR__ . '/../config/conexion.php';
 
+
+/*
+=========================================================
+RESPUESTA JSON
+=========================================================
+*/
+
+function responder(
+    bool $exito,
+    string $mensaje = '',
+    array $datos = [],
+    int $codigo = 200
+): never {
+
+    http_response_code($codigo);
+
+    echo json_encode(
+        array_merge(
+            [
+                'exito' => $exito,
+                'mensaje' => $mensaje
+            ],
+            $datos
+        ),
+        JSON_UNESCAPED_UNICODE
+    );
+
+    exit;
+}
+
+
+/*
+=========================================================
+USUARIO DE LA SESIÓN
+=========================================================
+*/
+
+function obtenerUsuarioSesion(): int
+{
+    $ids = [
+        $_SESSION['id_usuario'] ?? null,
+        $_SESSION['usuario_id'] ?? null,
+        $_SESSION['id'] ?? null
+    ];
+
+    foreach ($ids as $id) {
+
+        if (
+            is_numeric($id) &&
+            (int)$id > 0
+        ) {
+
+            return (int)$id;
+
+        }
+
+    }
+
+    responder(
+        false,
+        'La sesión del usuario no es válida.',
+        [
+            'codigo' => 'SESION_INVALIDA'
+        ],
+        401
+    );
+}
+
+
+/*
+=========================================================
+CONEXIÓN
+=========================================================
+*/
 
 try {
 
     /*
-     * =====================================================
-     * USUARIO
-     * =====================================================
-     */
-
-    $idUsuario = $_SESSION["id_usuario"]
-        ?? $_SESSION["usuario_id"]
-        ?? null;
-
-
-    if (!$idUsuario) {
-
-        http_response_code(401);
-
-        echo json_encode([
-            "exito" => false,
-            "mensaje" => "Sesión no iniciada."
-        ], JSON_UNESCAPED_UNICODE);
-
-        exit;
-    }
-
-
-    /*
-     * =====================================================
-     * CONEXIÓN
-     * =====================================================
-     */
+    IMPORTANTE:
+    Tu conexion.php devuelve la conexión mediante
+    Database->getConnection().
+    */
 
     $database = new Database();
 
     $conexion = $database->getConnection();
 
+    if (!$conexion instanceof PDO) {
+
+        responder(
+            false,
+            'No se pudo establecer la conexión con la base de datos.',
+            [
+                'codigo' => 'ERROR_CONEXION'
+            ],
+            500
+        );
+
+    }
+
 
     /*
-     * =====================================================
-     * OBTENER RACHAS DE LOS HÁBITOS DEL USUARIO
-     * =====================================================
-     */
+    =====================================================
+    USUARIO
+    =====================================================
+    */
 
-    $sql = "
+    $idUsuario = obtenerUsuarioSesion();
+
+
+    /*
+    =====================================================
+    1. OBTENER HÁBITOS ACTIVOS
+    =====================================================
+    */
+
+    $sqlHabitos = "
         SELECT
 
             h.id_habito,
+            h.id_categoria,
             h.nombre_habito,
+            h.objetivo,
+            h.frecuencia,
+            h.fecha_inicio,
+            h.fecha_fin,
+            h.activo,
 
-            c.id_categoria,
-            c.nombre_categoria,
-
-            COALESCE(r.racha_actual, 0)
-                AS racha_actual,
-
-            COALESCE(r.mejor_racha, 0)
-                AS mejor_racha,
-
-            COALESCE(r.total_completados, 0)
-                AS total_completados,
-
-            r.ultima_fecha
+            c.nombre_categoria
 
         FROM habitos h
 
         LEFT JOIN categorias c
             ON c.id_categoria = h.id_categoria
 
-        LEFT JOIN rachas r
-            ON r.id_habito = h.id_habito
-
         WHERE h.id_usuario = :id_usuario
+
         AND h.activo = 1
 
+        AND h.fecha_inicio <= CURDATE()
+
+        AND (
+            h.fecha_fin IS NULL
+            OR h.fecha_fin >= CURDATE()
+        )
+
         ORDER BY
-            COALESCE(r.racha_actual, 0) DESC,
-            h.nombre_habito ASC
+            h.id_categoria,
+            h.id_habito
     ";
 
+    $stmtHabitos = $conexion->prepare($sqlHabitos);
 
-    $stmt =
-        $conexion->prepare($sql);
-
-
-    $stmt->execute([
-        ":id_usuario" => $idUsuario
+    $stmtHabitos->execute([
+        ':id_usuario' => $idUsuario
     ]);
 
-
-    $habitos =
-        $stmt->fetchAll();
+    $habitos = $stmtHabitos->fetchAll(PDO::FETCH_ASSOC);
 
 
     /*
-     * =====================================================
-     * CALCULAR RESUMEN
-     * =====================================================
-     */
+    =====================================================
+    SI NO HAY HÁBITOS
+    =====================================================
+    */
 
-    $rachaActual = 0;
+    if (!$habitos) {
 
-    $mejorRacha = 0;
-
-    $totalCompletados = 0;
-
-
-    foreach ($habitos as &$habito) {
-
-        $actual =
-            (int) $habito["racha_actual"];
-
-        $mejor =
-            (int) $habito["mejor_racha"];
-
-        $completados =
-            (int) $habito["total_completados"];
-
-
-        if ($actual > $rachaActual) {
-
-            $rachaActual = $actual;
-
-        }
-
-
-        if ($mejor > $mejorRacha) {
-
-            $mejorRacha = $mejor;
-
-        }
-
-
-        $totalCompletados +=
-            $completados;
+        responder(
+            true,
+            'No hay hábitos activos todavía.',
+            [
+                'racha_actual' => 0,
+                'mejor_racha' => 0,
+                'habitos_completados' => 0,
+                'dias_registrados' => 0,
+                'constelacion_actual' => [],
+                'categorias' => [],
+                'historial_constelaciones' => []
+            ]
+        );
 
     }
 
 
-    unset($habito);
+    /*
+    =====================================================
+    2. PREPARAR IDS
+    =====================================================
+    */
+
+    $idsHabitos = [];
+
+    foreach ($habitos as $habito) {
+
+        $idsHabitos[] =
+            (int)$habito['id_habito'];
+
+    }
+
+    $placeholders = implode(
+        ',',
+        array_fill(
+            0,
+            count($idsHabitos),
+            '?'
+        )
+    );
 
 
     /*
-     * =====================================================
-     * CATEGORÍAS
-     * =====================================================
-     */
+    =====================================================
+    3. OBTENER REGISTROS DE HÁBITOS
+    =====================================================
+
+    Los PHP futuros de:
+
+    - Hidratación
+    - Alimentación
+    - Salud Mental
+    - Actividad Física
+    - Académico
+    - Personalizado
+
+    solamente tendrán que registrar datos en:
+
+        registros_habitos
+
+    Rachas podrá utilizarlos automáticamente.
+    =====================================================
+    */
+
+    $sqlRegistros = "
+        SELECT
+
+            rh.id_registro,
+            rh.id_habito,
+            DATE(rh.fecha_registro) AS fecha,
+            rh.valor_registrado,
+            rh.observaciones
+
+        FROM registros_habitos rh
+
+        WHERE rh.id_habito IN ($placeholders)
+
+        ORDER BY
+            rh.fecha_registro ASC
+    ";
+
+    $stmtRegistros =
+        $conexion->prepare($sqlRegistros);
+
+    $stmtRegistros->execute(
+        $idsHabitos
+    );
+
+    $registros =
+        $stmtRegistros->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+
+
+    /*
+    =====================================================
+    4. OBTENER ESTADÍSTICAS SI EXISTEN
+    =====================================================
+
+    Se utiliza como complemento.
+
+    Si los PHP futuros llenan
+    estadisticas_habitos, también funcionará.
+
+    =====================================================
+    */
+
+    $sqlEstadisticas = "
+        SELECT
+
+            e.id_habito,
+            e.fecha,
+            e.objetivo,
+            e.progreso,
+            e.porcentaje,
+            e.completado
+
+        FROM estadisticas_habitos e
+
+        WHERE e.id_habito IN ($placeholders)
+
+        ORDER BY
+            e.fecha ASC
+    ";
+
+    $stmtEstadisticas =
+        $conexion->prepare(
+            $sqlEstadisticas
+        );
+
+    $stmtEstadisticas->execute(
+        $idsHabitos
+    );
+
+    $estadisticas =
+        $stmtEstadisticas->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+
+
+    /*
+    =====================================================
+    5. OBJETIVOS DE LOS HÁBITOS
+    =====================================================
+    */
+
+    $objetivos = [];
+
+    foreach ($habitos as $habito) {
+
+        $objetivos[
+            (int)$habito['id_habito']
+        ] =
+            (float)$habito['objetivo'];
+
+    }
+
+
+    /*
+    =====================================================
+    6. DÍAS COMPLETADOS POR HÁBITO
+    =====================================================
+    */
+
+    $diasPorHabito = [];
+
+
+    /*
+    -----------------------------------------------------
+    REGISTROS NORMALES
+    -----------------------------------------------------
+    */
+
+    foreach ($registros as $registro) {
+
+        $idHabito =
+            (int)$registro['id_habito'];
+
+        $fecha =
+            (string)$registro['fecha'];
+
+        $valor =
+            (float)$registro['valor_registrado'];
+
+        $objetivo =
+            $objetivos[$idHabito] ?? 1;
+
+
+        if (
+            $objetivo <= 0
+        ) {
+
+            $objetivo = 1;
+
+        }
+
+
+        /*
+        Un día queda completado cuando
+        el valor registrado alcanza el objetivo.
+        */
+
+        if ($valor >= $objetivo) {
+
+            if (
+                !isset(
+                    $diasPorHabito[$idHabito]
+                )
+            ) {
+
+                $diasPorHabito[$idHabito] = [];
+
+            }
+
+            $diasPorHabito[$idHabito][$fecha] = true;
+
+        }
+
+    }
+
+
+    /*
+    -----------------------------------------------------
+    ESTADÍSTICAS
+    -----------------------------------------------------
+    */
+
+    foreach ($estadisticas as $registro) {
+
+        $idHabito =
+            (int)$registro['id_habito'];
+
+        $fecha =
+            (string)$registro['fecha'];
+
+        $completado =
+            (int)$registro['completado'] === 1;
+
+        $progreso =
+            (float)($registro['progreso'] ?? 0);
+
+        $objetivo =
+            (float)($registro['objetivo'] ?? 0);
+
+
+        if (
+            !$completado &&
+            $objetivo > 0 &&
+            $progreso >= $objetivo
+        ) {
+
+            $completado = true;
+
+        }
+
+
+        if ($completado) {
+
+            if (
+                !isset(
+                    $diasPorHabito[$idHabito]
+                )
+            ) {
+
+                $diasPorHabito[$idHabito] = [];
+
+            }
+
+            $diasPorHabito[$idHabito][$fecha] = true;
+
+        }
+
+    }
+
+
+    /*
+    =====================================================
+    7. DÍAS REGISTRADOS
+    =====================================================
+    */
+
+    $diasRegistradosSet = [];
+
+    foreach (
+        $diasPorHabito as $fechas
+    ) {
+
+        foreach (
+            $fechas as $fecha => $valor
+        ) {
+
+            $diasRegistradosSet[$fecha] = true;
+
+        }
+
+    }
+
+    $diasRegistrados =
+        count($diasRegistradosSet);
+
+
+    /*
+    =====================================================
+    8. DÍAS COMPLETOS
+    =====================================================
+
+    Un día es completo cuando TODOS los hábitos
+    activos del usuario fueron completados.
+
+    =====================================================
+    */
+
+    $cantidadHabitos =
+        count($habitos);
+
+    $completadosPorDia = [];
+
+
+    foreach (
+        $diasPorHabito as $idHabito => $fechas
+    ) {
+
+        foreach (
+            $fechas as $fecha => $valor
+        ) {
+
+            if (
+                !isset(
+                    $completadosPorDia[$fecha]
+                )
+            ) {
+
+                $completadosPorDia[$fecha] = 0;
+
+            }
+
+            $completadosPorDia[$fecha]++;
+
+        }
+
+    }
+
+
+    $diasCompletos = [];
+
+
+    foreach (
+        $completadosPorDia as $fecha => $cantidad
+    ) {
+
+        if (
+            $cantidad >= $cantidadHabitos
+        ) {
+
+            $diasCompletos[] =
+                $fecha;
+
+        }
+
+    }
+
+
+    sort($diasCompletos);
+
+
+    /*
+    =====================================================
+    9. MEJOR RACHA
+    =====================================================
+    */
+
+    $mejorRacha = 0;
+
+    $rachaTemporal = 0;
+
+    $ultimaFecha = null;
+
+
+    foreach (
+        $diasCompletos as $fecha
+    ) {
+
+        if ($ultimaFecha === null) {
+
+            $rachaTemporal = 1;
+
+        } else {
+
+            $fechaAnterior =
+                new DateTime(
+                    $ultimaFecha
+                );
+
+            $fechaActual =
+                new DateTime(
+                    $fecha
+                );
+
+            $diferencia =
+                (int)$fechaAnterior
+                    ->diff($fechaActual)
+                    ->format('%a');
+
+
+            if ($diferencia === 1) {
+
+                $rachaTemporal++;
+
+            } else {
+
+                $rachaTemporal = 1;
+
+            }
+
+        }
+
+
+        if (
+            $rachaTemporal >
+            $mejorRacha
+        ) {
+
+            $mejorRacha =
+                $rachaTemporal;
+
+        }
+
+
+        $ultimaFecha =
+            $fecha;
+
+    }
+
+
+    /*
+    =====================================================
+    10. RACHA ACTUAL
+    =====================================================
+    */
+
+    $rachaActual = 0;
+
+    $conjuntoDias =
+        array_flip(
+            $diasCompletos
+        );
+
+
+    $hoy =
+        new DateTime(
+            date('Y-m-d')
+        );
+
+
+    if (!empty($diasCompletos)) {
+
+        $ultimaFechaCompleta =
+            end($diasCompletos);
+
+        $fechaUltima =
+            new DateTime(
+                $ultimaFechaCompleta
+            );
+
+        $diferenciaHoy =
+            (int)$fechaUltima
+                ->diff($hoy)
+                ->format('%a');
+
+
+        /*
+        Hoy
+        */
+
+        if (
+            $diferenciaHoy === 0
+        ) {
+
+            $fechaBuscada =
+                clone $hoy;
+
+            while (
+                isset(
+                    $conjuntoDias[
+                        $fechaBuscada
+                            ->format('Y-m-d')
+                    ]
+                )
+            ) {
+
+                $rachaActual++;
+
+                $fechaBuscada
+                    ->modify('-1 day');
+
+            }
+
+        /*
+        Ayer
+        */
+
+        } elseif (
+            $diferenciaHoy === 1
+        ) {
+
+            $fechaBuscada =
+                clone $fechaUltima;
+
+            while (
+                isset(
+                    $conjuntoDias[
+                        $fechaBuscada
+                            ->format('Y-m-d')
+                    ]
+                )
+            ) {
+
+                $rachaActual++;
+
+                $fechaBuscada
+                    ->modify('-1 day');
+
+            }
+
+        }
+
+    }
+
+
+    /*
+    =====================================================
+    11. HÁBITOS COMPLETADOS
+    =====================================================
+    */
+
+    $habitosCompletados = 0;
+
+
+    foreach (
+        $diasPorHabito as $fechas
+    ) {
+
+        $habitosCompletados +=
+            count($fechas);
+
+    }
+
+
+    /*
+    =====================================================
+    12. CONSTELACIÓN ACTUAL
+    =====================================================
+    */
+
+    $primerDiaMes =
+        date('Y-m-01');
+
+    $ultimoDiaMes =
+        date('Y-m-t');
+
+    $constelacionActual = [];
+
+
+    foreach (
+        $diasCompletos as $fecha
+    ) {
+
+        if (
+            $fecha >= $primerDiaMes &&
+            $fecha <= $ultimoDiaMes
+        ) {
+
+            $constelacionActual[] =
+                $fecha;
+
+        }
+
+    }
+
+
+    /*
+    =====================================================
+    13. CATEGORÍAS
+    =====================================================
+    */
 
     $categorias = [];
 
@@ -160,176 +768,251 @@ try {
     foreach ($habitos as $habito) {
 
         $idCategoria =
-            $habito["id_categoria"];
+            $habito['id_categoria'] !== null
+                ? (int)$habito['id_categoria']
+                : null;
 
 
-        if (!$idCategoria) {
+        if ($idCategoria === null) {
+
             continue;
+
         }
 
 
-        if (!isset($categorias[$idCategoria])) {
+        if (
+            !isset(
+                $categorias[$idCategoria]
+            )
+        ) {
 
             $categorias[$idCategoria] = [
 
-                "id_categoria" =>
-                    (int) $idCategoria,
+                'id_categoria' =>
+                    $idCategoria,
 
-                "nombre_categoria" =>
-                    $habito["nombre_categoria"],
+                'nombre_categoria' =>
+                    $habito['nombre_categoria']
+                    ?? 'Categoría',
 
-                "racha_actual" => 0,
+                'total_habitos' =>
+                    0,
 
-                "mejor_racha" => 0,
-
-                "total_completados" => 0
+                'dias_completados' =>
+                    0
 
             ];
 
         }
 
 
-        if (
-            $habito["racha_actual"] >
-            $categorias[$idCategoria]["racha_actual"]
-        ) {
-
-            $categorias[$idCategoria]["racha_actual"] =
-                (int) $habito["racha_actual"];
-
-        }
+        $categorias[
+            $idCategoria
+        ]['total_habitos']++;
 
 
-        if (
-            $habito["mejor_racha"] >
-            $categorias[$idCategoria]["mejor_racha"]
-        ) {
-
-            $categorias[$idCategoria]["mejor_racha"] =
-                (int) $habito["mejor_racha"];
-
-        }
+        $idHabito =
+            (int)$habito['id_habito'];
 
 
-        $categorias[$idCategoria]["total_completados"] +=
-            (int) $habito["total_completados"];
+        $diasCategoria =
+            $diasPorHabito[
+                $idHabito
+            ] ?? [];
+
+
+        $categorias[
+            $idCategoria
+        ]['dias_completados'] +=
+            count($diasCategoria);
 
     }
 
 
-    $categorias =
-        array_values($categorias);
-
-
     /*
-     * =====================================================
-     * HISTORIAL DE LOS ÚLTIMOS 30 DÍAS
-     * =====================================================
-     */
+    =====================================================
+    14. PORCENTAJE DE CADA CATEGORÍA
+    =====================================================
+    */
 
-    $sqlHistorial = "
-        SELECT
+    foreach (
+        $categorias as &$categoria
+    ) {
 
-            DATE(rh.fecha_registro)
-                AS fecha,
+        $total =
+            (int)$categoria[
+                'total_habitos'
+            ];
 
-            COUNT(DISTINCT h.id_habito)
-                AS habitos_completados
-
-        FROM registros_habitos rh
-
-        INNER JOIN habitos h
-            ON h.id_habito = rh.id_habito
-
-        WHERE h.id_usuario = :id_usuario
-
-        AND rh.fecha_registro >=
-            DATE_SUB(
-                CURDATE(),
-                INTERVAL 29 DAY
-            )
-
-        GROUP BY
-            DATE(rh.fecha_registro)
-
-        ORDER BY
-            fecha DESC
-    ";
+        $dias =
+            (int)$categoria[
+                'dias_completados'
+            ];
 
 
-    $stmtHistorial =
-        $conexion->prepare(
-            $sqlHistorial
+        /*
+        Calculamos una constancia sencilla
+        basada en los últimos 30 días.
+
+        Máximo posible:
+        cantidad de hábitos × 30 días.
+        */
+
+        $maximo =
+            $total * 30;
+
+
+        if ($maximo > 0) {
+
+            $porcentaje =
+                ($dias / $maximo) * 100;
+
+        } else {
+
+            $porcentaje = 0;
+
+        }
+
+
+        $categoria['porcentaje'] =
+            round(
+                max(
+                    0,
+                    min(
+                        100,
+                        $porcentaje
+                    )
+                ),
+                2
+            );
+
+    }
+
+    unset($categoria);
+
+
+    $categorias =
+        array_values(
+            $categorias
         );
 
 
-    $stmtHistorial->execute([
-        ":id_usuario" => $idUsuario
-    ]);
+    /*
+    =====================================================
+    15. HISTORIAL MENSUAL
+    =====================================================
+    */
+
+    $historial = [];
+
+
+    foreach (
+        $diasRegistradosSet as $fecha => $valor
+    ) {
+
+        $mes =
+            substr(
+                $fecha,
+                0,
+                7
+            );
+
+
+        if (
+            !isset(
+                $historial[$mes]
+            )
+        ) {
+
+            $historial[$mes] = [
+
+                'mes' => $mes,
+
+                'dias_con_registro' => 0
+
+            ];
+
+        }
+
+
+        $historial[$mes][
+            'dias_con_registro'
+        ]++;
+
+    }
 
 
     $historial =
-        $stmtHistorial->fetchAll();
+        array_values(
+            $historial
+        );
+
+
+    usort(
+        $historial,
+        function ($a, $b) {
+
+            return strcmp(
+                $b['mes'],
+                $a['mes']
+            );
+
+        }
+    );
 
 
     /*
-     * =====================================================
-     * RESPUESTA
-     * =====================================================
-     */
+    =====================================================
+    16. RESPUESTA FINAL
+    =====================================================
+    */
 
-    echo json_encode(
+    responder(
+        true,
+        'Rachas cargadas correctamente.',
         [
-            "exito" => true,
 
-            "resumen" => [
+            'racha_actual' =>
+                $rachaActual,
 
-                "racha_actual" =>
-                    $rachaActual,
+            'mejor_racha' =>
+                $mejorRacha,
 
-                "mejor_racha" =>
-                    $mejorRacha,
+            'habitos_completados' =>
+                $habitosCompletados,
 
-                "total_completados" =>
-                    $totalCompletados,
+            'dias_registrados' =>
+                $diasRegistrados,
 
-                "habitos_activos" =>
-                    count($habitos)
+            'constelacion_actual' =>
+                $constelacionActual,
 
-            ],
-
-            "habitos" =>
-                $habitos,
-
-            "categorias" =>
+            'categorias' =>
                 $categorias,
 
-            "historial" =>
+            'historial_constelaciones' =>
                 $historial
 
-        ],
-        JSON_UNESCAPED_UNICODE
+        ]
     );
 
 
 } catch (Throwable $error) {
 
     error_log(
-        "Error en racha.php: " .
+        'Error en racha.php: ' .
         $error->getMessage()
     );
 
 
-    http_response_code(500);
-
-
-    echo json_encode(
+    responder(
+        false,
+        'Ocurrió un error interno al cargar las rachas.',
         [
-            "exito" => false,
-            "mensaje" =>
-                "No se pudieron cargar las rachas."
+            'codigo' =>
+                'ERROR_RACHAS'
         ],
-        JSON_UNESCAPED_UNICODE
+        500
     );
 
 }

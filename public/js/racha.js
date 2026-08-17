@@ -1,982 +1,933 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    /* =========================================================
-       ELEMENTOS DEL HTML
-       ========================================================= */
-
-    const elementoRachaActual =
-        document.getElementById("rachaActual");
-
-    const elementoMejorRacha =
-        document.getElementById("mejorRacha");
-
-    const elementoHabitosCompletados =
-        document.getElementById("habitosCompletados");
-
-    const elementoDiasRegistrados =
-        document.getElementById("diasRegistrados");
-
-    const elementoConstelacion =
-        document.getElementById("constelacionUsuario");
-
-    const elementoCategorias =
-        document.getElementById("listaCategorias");
-
-    const elementoHistorial =
-        document.getElementById("historialRachas");
-
-    const elementoHistorialConstelaciones =
-        document.getElementById("historialConstelaciones");
-
-    const botonAbrirHistorial =
-        document.getElementById("abrirHistorial");
-
-    const botonCerrarHistorial =
-        document.getElementById("cerrarHistorial");
-
-    const modal =
-        document.getElementById("modalConstelaciones");
+        "use strict";
 
 
-    /* =========================================================
-       TRADUCCIÓN
-       ========================================================= */
+        /* =====================================================
+           ELEMENTOS
+        ===================================================== */
 
-    function LS(clave, textoEspanol = "") {
+        const rachaActual =
+            document.getElementById(
+                "rachaActual"
+            );
 
-        if (
-            typeof window !== "undefined" &&
-            typeof window.traducirLifeSync === "function"
-        ) {
+        const mejorRacha =
+            document.getElementById(
+                "mejorRacha"
+            );
 
-            const resultado =
-                window.traducirLifeSync(clave);
+        const habitosCompletados =
+            document.getElementById(
+                "habitosCompletados"
+            );
 
-            /*
-             * Si la clave existe en idioma-global.js,
-             * utilizamos su traducción.
-             */
+        const diasRegistrados =
+            document.getElementById(
+                "diasRegistrados"
+            );
 
-            if (
-                resultado &&
-                resultado !== clave
-            ) {
+        const constelacion =
+            document.getElementById(
+                "constelacionUsuario"
+            );
 
-                return resultado;
+        const listaCategorias =
+            document.getElementById(
+                "listaCategorias"
+            );
 
-            }
+        const historialRachas =
+            document.getElementById(
+                "historialRachas"
+            );
 
-        }
+        const historialConstelaciones =
+            document.getElementById(
+                "historialConstelaciones"
+            );
 
-        /*
-         * Si la clave todavía no existe en el sistema global,
-         * utilizamos el texto español como respaldo.
-         */
+        const abrirHistorial =
+            document.getElementById(
+                "abrirHistorial"
+            );
 
-        return textoEspanol || clave;
+        const cerrarHistorial =
+            document.getElementById(
+                "cerrarHistorial"
+            );
 
-    }
-
-
-    function obtenerIdioma() {
-
-        const idiomaHTML =
-            document.documentElement.lang;
-
-        if (
-            idiomaHTML === "en" ||
-            idiomaHTML === "en-US"
-        ) {
-
-            return "en";
-
-        }
-
-        return "es";
-
-    }
-
-
-    function textoDias(cantidad) {
-
-        const numero =
-            Number(cantidad) || 0;
-
-        const idioma =
-            obtenerIdioma();
-
-
-        if (idioma === "en") {
-
-            return `${numero} ${numero === 1 ? "day" : "days"}`;
-
-        }
-
-
-        return `${numero} ${numero === 1 ? "día" : "días"}`;
-
-    }
-
-
-    function textoConstancia(porcentaje) {
-
-        const numero =
-            Math.round(
-                Number(porcentaje) || 0
+        const modal =
+            document.getElementById(
+                "modalConstelaciones"
             );
 
 
-        const idioma =
-            obtenerIdioma();
+        /* =====================================================
+           IDIOMA
+        ===================================================== */
+
+        function texto(clave) {
+
+            if (
+                typeof window.traducirLifeSync ===
+                "function"
+            ) {
+
+                const resultado =
+                    window.traducirLifeSync(
+                        clave
+                    );
+
+                /*
+                Si el idioma global todavía no tiene
+                esa clave, devolvemos una versión normal.
+                */
+
+                if (
+                    resultado &&
+                    resultado !== clave
+                ) {
+
+                    return resultado;
+
+                }
+
+            }
+
+            const textosBase = {
+
+                dia: "día",
+
+                dias: "días",
+
+                constancia: "constancia",
+
+                errorCargarRachas:
+                    "No se pudieron cargar las rachas.",
+
+                sinDatosCategorias:
+                    "No hay categorías con datos todavía.",
+
+                sinHistorialRachas:
+                    "Todavía no hay historial de rachas.",
+
+                sinConstelacionesAnteriores:
+                    "Todavía no hay constelaciones anteriores."
+
+            };
 
 
-        if (idioma === "en") {
-
-            return `${numero}% consistency`;
+            return (
+                textosBase[clave] ||
+                clave
+            );
 
         }
 
 
-        return `${numero}% de constancia`;
+        /* =====================================================
+           FORMATO DE DÍAS
+        ===================================================== */
 
-    }
+        function dias(valor) {
 
-
-    function textoDiasRegistrados(cantidad) {
-
-        const numero =
-            Number(cantidad) || 0;
-
-        const idioma =
-            obtenerIdioma();
+            const numero =
+                Number(valor) || 0;
 
 
-        if (idioma === "en") {
-
-            return `${numero} ${numero === 1 ? "registered day" : "registered days"}`;
-
-        }
-
-
-        return `${numero} ${numero === 1 ? "día registrado" : "días registrados"}`;
-
-    }
-
-
-    function textoDiasConRegistros(cantidad) {
-
-        const numero =
-            Number(cantidad) || 0;
-
-        const idioma =
-            obtenerIdioma();
-
-
-        if (idioma === "en") {
-
-            return `${numero} ${numero === 1 ? "day with records" : "days with records"}`;
+            return (
+                `${numero} ` +
+                (
+                    numero === 1
+                        ? texto("dia")
+                        : texto("dias")
+                )
+            );
 
         }
 
 
-        return `${numero} ${numero === 1 ? "día con registros" : "días con registros"}`;
+        /* =====================================================
+           ICONOS
+        ===================================================== */
 
-    }
-
-
-    function nombreCategoria(nombre) {
-
-        const traducciones = {
+        const iconosCategorias = {
 
             "Hidratación":
-                LS("categorias.hidratacion", "Hidratación"),
+                "img/Hidrat.png",
 
             "Alimentación":
-                LS("categorias.alimentacion", "Alimentación"),
+                "img/Alimentacion.png",
 
             "Salud Mental":
-                LS("categorias.saludMental", "Salud Mental"),
+                "img/SaludMental.png",
 
             "Actividad Física":
-                LS("categorias.actividadFisica", "Actividad Física"),
+                "img/ActividadFisica.png",
 
             "Registro Académico":
-                LS("categorias.registroAcademico", "Registro Académico"),
+                "img/Academico.png",
 
             "Hábito Personalizado":
-                LS("categorias.habitoPersonalizado", "Hábito Personalizado")
+                "img/H-Perzona.png"
 
         };
 
 
-        return traducciones[nombre] || nombre;
+        /* =====================================================
+           CARGAR RACHAS
+        ===================================================== */
 
-    }
+        async function cargarRachas() {
 
+            try {
 
-    /* =========================================================
-       ICONOS
-       ========================================================= */
+                const respuesta =
+                    await fetch(
+                        "auth/racha.php",
+                        {
+                            method:
+                                "GET",
 
-    const iconosCategorias = {
+                            credentials:
+                                "same-origin",
 
-        "Hidratación":
-            "img/Hidrat.png",
+                            cache:
+                                "no-store",
 
-        "Alimentación":
-            "img/Alimentacion.png",
-
-        "Salud Mental":
-            "img/SaludMental.png",
-
-        "Actividad Física":
-            "img/ActividadFisica.png",
-
-        "Registro Académico":
-            "img/Academico.png",
-
-        "Hábito Personalizado":
-            "img/H-Perzona.png"
-
-    };
-
-
-    /* =========================================================
-       CARGAR RACHAS
-       ========================================================= */
-
-    async function cargarRachas() {
-
-        try {
-
-            const respuesta =
-                await fetch(
-                    "auth/racha.php",
-                    {
-                        method: "GET",
-
-                        credentials:
-                            "same-origin",
-
-                        cache:
-                            "no-store",
-
-                        headers: {
-                            "Accept":
-                                "application/json"
+                            headers: {
+                                "Accept":
+                                    "application/json"
+                            }
                         }
+                    );
+
+
+                /*
+                Primero comprobamos el tipo de respuesta.
+                Esto evita que aparezca:
+                Unexpected token '<'
+                */
+
+                const contenido =
+                    respuesta.headers.get(
+                        "content-type"
+                    ) || "";
+
+
+                if (
+                    !contenido.includes(
+                        "application/json"
+                    )
+                ) {
+
+                    const textoServidor =
+                        await respuesta.text();
+
+                    console.error(
+                        "El servidor no devolvió JSON:",
+                        textoServidor
+                    );
+
+                    throw new Error(
+                        texto(
+                            "errorCargarRachas"
+                        )
+                    );
+
+                }
+
+
+                const datos =
+                    await respuesta.json();
+
+
+                if (
+                    !respuesta.ok ||
+                    !datos.exito
+                ) {
+
+                    /*
+                    Si simplemente no hay hábitos,
+                    no lo mostramos como error.
+                    */
+
+                    if (
+                        datos.codigo ===
+                        "SIN_HABITOS"
+                    ) {
+
+                        mostrarEstadoVacio();
+
+                        return;
+
                     }
+
+
+                    throw new Error(
+                        datos.codigo ===
+                            "SESION_INVALIDA"
+                            ? texto(
+                                "sesionNoValida"
+                            )
+                            : texto(
+                                "errorCargarRachas"
+                            )
+                    );
+
+                }
+
+
+                /* =================================================
+                   RESUMEN
+                ================================================= */
+
+                if (rachaActual) {
+
+                    rachaActual.textContent =
+                        dias(
+                            datos.racha_actual
+                        );
+
+                }
+
+
+                if (mejorRacha) {
+
+                    mejorRacha.textContent =
+                        dias(
+                            datos.mejor_racha
+                        );
+
+                }
+
+
+                if (habitosCompletados) {
+
+                    habitosCompletados.textContent =
+                        Number(
+                            datos.habitos_completados
+                        ) || 0;
+
+                }
+
+
+                if (diasRegistrados) {
+
+                    diasRegistrados.textContent =
+                        Number(
+                            datos.dias_registrados
+                        ) || 0;
+
+                }
+
+
+                /* =================================================
+                   CONSTELACIÓN
+                ================================================= */
+
+                crearConstelacionActual(
+                    datos.constelacion_actual ||
+                    []
                 );
 
 
-            const datos =
-                await respuesta.json();
+                /* =================================================
+                   CATEGORÍAS
+                ================================================= */
+
+                crearCategorias(
+                    datos.categorias ||
+                    []
+                );
 
 
-            if (
-                !respuesta.ok ||
-                !datos.exito
-            ) {
+                /* =================================================
+                   HISTORIAL
+                ================================================= */
 
-                throw new Error(
-                    datos.mensaje ||
-                    LS(
-                        "racha.errorCarga",
-                        "No se pudieron cargar las rachas."
+                crearHistorial(
+                    datos.historial_constelaciones ||
+                    []
+                );
+
+
+                crearHistorialConstelaciones(
+                    datos.historial_constelaciones ||
+                    []
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error en rachas.js:",
+                    error
+                );
+
+
+                mostrarError(
+                    texto(
+                        "errorCargarRachas"
                     )
                 );
 
             }
 
-
-            const resumen =
-                datos.resumen || {};
-
-
-            /* =================================================
-               RESUMEN
-               ================================================= */
-
-            actualizarTexto(
-                elementoRachaActual,
-                textoDias(
-                    resumen.racha_actual
-                )
-            );
-
-
-            actualizarTexto(
-                elementoMejorRacha,
-                textoDias(
-                    resumen.mejor_racha
-                )
-            );
-
-
-            actualizarTexto(
-                elementoHabitosCompletados,
-                resumen.total_completados || 0
-            );
-
-
-            /*
-             * Días registrados.
-             *
-             * Si el PHP devuelve historial,
-             * contamos las fechas disponibles.
-             */
-
-            const historial =
-                datos.historial || [];
-
-
-            actualizarTexto(
-                elementoDiasRegistrados,
-                historial.length
-            );
-
-
-            /* =================================================
-               CONSTELACIÓN ACTUAL
-               ================================================= */
-
-            crearConstelacionActual(
-                historial
-            );
-
-
-            /* =================================================
-               CATEGORÍAS
-               ================================================= */
-
-            crearCategorias(
-                datos.categorias || []
-            );
-
-
-            /* =================================================
-               HISTORIAL
-               ================================================= */
-
-            crearHistorial(
-                historial
-            );
-
-
-            crearHistorialConstelaciones(
-                historial
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Error en racha.js:",
-                error
-            );
-
-
-            mostrarError(
-                error.message ||
-                LS(
-                    "racha.errorDatos",
-                    "No se pudieron cargar los datos."
-                )
-            );
-
-        }
-
-    }
-
-
-    /* =========================================================
-       ACTUALIZAR TEXTO
-       ========================================================= */
-
-    function actualizarTexto(
-        elemento,
-        valor
-    ) {
-
-        if (elemento) {
-
-            elemento.textContent =
-                valor;
-
-        }
-
-    }
-
-
-    /* =========================================================
-       CONSTELACIÓN ACTUAL
-       ========================================================= */
-
-    function crearConstelacionActual(
-        historial
-    ) {
-
-        if (!elementoConstelacion) {
-            return;
         }
 
 
-        elementoConstelacion.innerHTML = "";
+        /* =====================================================
+           ESTADO VACÍO
+        ===================================================== */
+
+        function mostrarEstadoVacio() {
+
+            if (rachaActual) {
+
+                rachaActual.textContent =
+                    dias(0);
+
+            }
 
 
-        const fechas =
-            new Set(
-                historial.map(
-                    registro =>
-                        registro.fecha
-                )
-            );
+            if (mejorRacha) {
+
+                mejorRacha.textContent =
+                    dias(0);
+
+            }
 
 
-        const fechaActual =
-            new Date();
+            if (habitosCompletados) {
+
+                habitosCompletados.textContent =
+                    "0";
+
+            }
 
 
-        const anio =
-            fechaActual.getFullYear();
+            if (diasRegistrados) {
+
+                diasRegistrados.textContent =
+                    "0";
+
+            }
 
 
-        const mes =
-            fechaActual.getMonth();
+            crearConstelacionActual([]);
+
+            crearCategorias([]);
+
+            crearHistorial([]);
+
+            crearHistorialConstelaciones([]);
+
+        }
 
 
-        const cantidadDias =
-            new Date(
-                anio,
-                mes + 1,
-                0
-            ).getDate();
+        /* =====================================================
+           CONSTELACIÓN ACTUAL
+        ===================================================== */
 
-
-        for (
-            let dia = 1;
-            dia <= cantidadDias;
-            dia++
+        function crearConstelacionActual(
+            fechasActivas
         ) {
 
-            const fecha =
-                `${anio}-${String(
-                    mes + 1
-                ).padStart(
-                    2,
-                    "0"
-                )}-${String(
-                    dia
-                ).padStart(
-                    2,
-                    "0"
-                )}`;
+            if (!constelacion) {
+
+                return;
+
+            }
 
 
-            const estrella =
-                document.createElement(
-                    "span"
+            constelacion.innerHTML =
+                "";
+
+
+            const fechas =
+                new Set(
+                    fechasActivas
                 );
 
 
-            estrella.className =
-                "estrella";
+            const fechaActual =
+                new Date();
 
 
-            estrella.textContent =
-                "★";
+            const anio =
+                fechaActual.getFullYear();
+
+            const mes =
+                fechaActual.getMonth();
 
 
-            const idioma =
-                obtenerIdioma();
+            const cantidadDias =
+                new Date(
+                    anio,
+                    mes + 1,
+                    0
+                ).getDate();
 
 
-            estrella.title =
-                idioma === "en"
-                    ? `Day ${dia}`
-                    : `Día ${dia}`;
-
-
-            if (
-                fechas.has(
-                    fecha
-                )
+            for (
+                let dia = 1;
+                dia <= cantidadDias;
+                dia++
             ) {
 
-                estrella.classList.add(
-                    "activa"
-                );
-
-            }
-
-
-            elementoConstelacion.appendChild(
-                estrella
-            );
-
-        }
-
-    }
+                const fecha =
+                    `${anio}-${String(
+                        mes + 1
+                    ).padStart(
+                        2,
+                        "0"
+                    )}-${String(
+                        dia
+                    ).padStart(
+                        2,
+                        "0"
+                    )}`;
 
 
-    /* =========================================================
-       CREAR CATEGORÍAS
-       ========================================================= */
-
-    function crearCategorias(
-        categorias
-    ) {
-
-        if (!elementoCategorias) {
-            return;
-        }
-
-
-        elementoCategorias.innerHTML = "";
-
-
-        if (
-            !Array.isArray(categorias) ||
-            categorias.length === 0
-        ) {
-
-            const mensaje =
-                document.createElement("p");
-
-
-            mensaje.textContent =
-                LS(
-                    "racha.sinCategorias",
-                    "Todavía no tienes datos de categorías."
-                );
-
-
-            elementoCategorias.appendChild(
-                mensaje
-            );
-
-
-            return;
-
-        }
-
-
-        categorias.forEach(
-            categoria => {
-
-                const tarjeta =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                tarjeta.className =
-                    "categoria-racha";
-
-
-                /* =========================================
-                   ICONO
-                   ========================================= */
-
-                const imagen =
-                    document.createElement(
-                        "img"
-                    );
-
-
-                imagen.src =
-                    iconosCategorias[
-                        categoria.nombre_categoria
-                    ] ||
-                    "img/H-Perzona.png";
-
-
-                imagen.alt =
-                    nombreCategoria(
-                        categoria.nombre_categoria
-                    );
-
-
-                /* =========================================
-                   INFORMACIÓN
-                   ========================================= */
-
-                const informacion =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                informacion.className =
-                    "info-categoria";
-
-
-                const titulo =
-                    document.createElement(
-                        "h3"
-                    );
-
-
-                titulo.textContent =
-                    nombreCategoria(
-                        categoria.nombre_categoria
-                    );
-
-
-                /* =========================================
-                   BARRA
-                   ========================================= */
-
-                const barra =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                barra.className =
-                    "barra";
-
-
-                const progreso =
+                const estrella =
                     document.createElement(
                         "span"
                     );
 
 
-                /*
-                 * El PHP nuevo puede no devolver porcentaje
-                 * directamente para categorías.
-                 *
-                 * Lo calculamos a partir de la racha actual
-                 * y la mejor racha.
-                 */
+                estrella.className =
+                    "estrella";
 
-                const mejor =
-                    Number(
-                        categoria.mejor_racha
-                    ) || 0;
 
+                estrella.textContent =
+                    "★";
 
-                const actual =
-                    Number(
-                        categoria.racha_actual
-                    ) || 0;
 
-
-                let porcentaje = 0;
-
-
-                if (mejor > 0) {
-
-                    porcentaje =
-                        (actual / mejor) * 100;
-
-                }
-
-
-                porcentaje =
-                    Math.min(
-                        100,
-                        Math.max(
-                            0,
-                            porcentaje
-                        )
-                    );
-
-
-                progreso.style.width =
-                    `${porcentaje}%`;
-
-
-                barra.appendChild(
-                    progreso
-                );
-
-
-                /* =========================================
-                   TEXTO
-                   ========================================= */
-
-                const texto =
-                    document.createElement(
-                        "p"
-                    );
-
-
-                texto.className =
-                    "porcentaje";
-
-
-                texto.textContent =
-                    textoConstancia(
-                        porcentaje
-                    );
-
-
-                informacion.appendChild(
-                    titulo
-                );
-
-
-                informacion.appendChild(
-                    barra
-                );
-
-
-                informacion.appendChild(
-                    texto
-                );
-
-
-                tarjeta.appendChild(
-                    imagen
-                );
-
-
-                tarjeta.appendChild(
-                    informacion
-                );
-
-
-                elementoCategorias.appendChild(
-                    tarjeta
-                );
-
-            }
-        );
-
-    }
-
-
-    /* =========================================================
-       HISTORIAL
-       ========================================================= */
-
-    function crearHistorial(
-        historial
-    ) {
-
-        if (!elementoHistorial) {
-            return;
-        }
-
-
-        elementoHistorial.innerHTML = "";
-
-
-        if (
-            !Array.isArray(historial) ||
-            historial.length === 0
-        ) {
-
-            const mensaje =
-                document.createElement(
-                    "p"
-                );
-
-
-            mensaje.textContent =
-                LS(
-                    "racha.sinHistorial",
-                    "Todavía no hay historial de rachas."
-                );
-
-
-            elementoHistorial.appendChild(
-                mensaje
-            );
-
-
-            return;
-
-        }
-
-
-        historial.forEach(
-            registro => {
-
-                const item =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                item.className =
-                    "historial-item";
-
-
-                const contenido =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                const titulo =
-                    document.createElement(
-                        "strong"
-                    );
-
-
-                titulo.textContent =
-                    formatearFecha(
-                        registro.fecha
-                    );
-
-
-                const descripcion =
-                    document.createElement(
-                        "p"
-                    );
-
-
-                descripcion.textContent =
-                    textoDiasRegistrados(
-                        registro.habitos_completados
-                    );
-
-
-                contenido.appendChild(
-                    titulo
-                );
-
-
-                contenido.appendChild(
-                    descripcion
-                );
-
-
-                const cantidad =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                cantidad.textContent =
-                    textoDias(
-                        registro.habitos_completados
-                    );
-
-
-                item.appendChild(
-                    contenido
-                );
-
-
-                item.appendChild(
-                    cantidad
-                );
-
-
-                elementoHistorial.appendChild(
-                    item
-                );
-
-            }
-        );
-
-    }
-
-
-    /* =========================================================
-       HISTORIAL DE CONSTELACIONES
-       ========================================================= */
-
-    function crearHistorialConstelaciones(
-        historial
-    ) {
-
-        if (
-            !elementoHistorialConstelaciones
-        ) {
-
-            return;
-
-        }
-
-
-        elementoHistorialConstelaciones.innerHTML =
-            "";
-
-
-        if (
-            !Array.isArray(historial) ||
-            historial.length === 0
-        ) {
-
-            const mensaje =
-                document.createElement(
-                    "p"
-                );
-
-
-            mensaje.textContent =
-                LS(
-                    "racha.sinConstelaciones",
-                    "Todavía no existen constelaciones anteriores."
-                );
-
-
-            elementoHistorialConstelaciones.appendChild(
-                mensaje
-            );
-
-
-            return;
-
-        }
-
-
-        /*
-         * Agrupamos el historial por mes.
-         */
-
-        const meses = {};
-
-
-        historial.forEach(
-            registro => {
-
-                if (!registro.fecha) {
-                    return;
-                }
-
-
-                const partes =
-                    registro.fecha.split("-");
+                estrella.title =
+                    `${texto("dia")} ${dia}`;
 
 
                 if (
-                    partes.length < 2
+                    fechas.has(
+                        fecha
+                    )
                 ) {
 
-                    return;
+                    estrella.classList.add(
+                        "activa"
+                    );
 
                 }
 
 
-                const clave =
-                    `${partes[0]}-${partes[1]}`;
-
-
-                if (!meses[clave]) {
-
-                    meses[clave] = [];
-
-                }
-
-
-                meses[clave].push(
-                    registro
+                constelacion.appendChild(
+                    estrella
                 );
 
             }
-        );
+
+        }
 
 
-        Object.keys(meses)
-            .sort()
-            .reverse()
-            .forEach(
-                mes => {
+        /* =====================================================
+           CATEGORÍAS
+        ===================================================== */
+
+        function crearCategorias(
+            categorias
+        ) {
+
+            if (!listaCategorias) {
+
+                return;
+
+            }
+
+
+            listaCategorias.innerHTML =
+                "";
+
+
+            if (
+                !Array.isArray(
+                    categorias
+                ) ||
+                categorias.length === 0
+            ) {
+
+                const mensaje =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                mensaje.textContent =
+                    texto(
+                        "sinDatosCategorias"
+                    );
+
+
+                listaCategorias.appendChild(
+                    mensaje
+                );
+
+
+                return;
+
+            }
+
+
+            categorias.forEach(
+                categoria => {
+
+                    const tarjeta =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    tarjeta.className =
+                        "categoria-racha";
+
+
+                    const imagen =
+                        document.createElement(
+                            "img"
+                        );
+
+
+                    imagen.src =
+                        iconosCategorias[
+                            categoria.nombre_categoria
+                        ] ||
+                        "img/H-Perzona.png";
+
+
+                    imagen.alt =
+                        categoria.nombre_categoria ||
+                        "Categoría";
+
+
+                    imagen.onerror =
+                        () => {
+
+                            imagen.onerror =
+                                null;
+
+                            imagen.src =
+                                "img/H-Perzona.png";
+
+                        };
+
+
+                    const informacion =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    informacion.className =
+                        "info-categoria";
+
+
+                    const titulo =
+                        document.createElement(
+                            "h3"
+                        );
+
+
+                    titulo.textContent =
+                        categoria.nombre_categoria ||
+                        "Categoría";
+
+
+                    const barra =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    barra.className =
+                        "barra";
+
+
+                    const progreso =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    const porcentaje =
+                        Number(
+                            categoria.porcentaje
+                        ) || 0;
+
+
+                    progreso.style.width =
+                        Math.min(
+                            100,
+                            Math.max(
+                                0,
+                                porcentaje
+                            )
+                        ) + "%";
+
+
+                    barra.appendChild(
+                        progreso
+                    );
+
+
+                    const porcentajeTexto =
+                        document.createElement(
+                            "p"
+                        );
+
+
+                    porcentajeTexto.className =
+                        "porcentaje";
+
+
+                    porcentajeTexto.textContent =
+                        `${Math.round(
+                            porcentaje
+                        )}% ${texto(
+                            "constancia"
+                        )}`;
+
+
+                    informacion.appendChild(
+                        titulo
+                    );
+
+
+                    informacion.appendChild(
+                        barra
+                    );
+
+
+                    informacion.appendChild(
+                        porcentajeTexto
+                    );
+
+
+                    tarjeta.appendChild(
+                        imagen
+                    );
+
+
+                    tarjeta.appendChild(
+                        informacion
+                    );
+
+
+                    listaCategorias.appendChild(
+                        tarjeta
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           HISTORIAL
+        ===================================================== */
+
+        function crearHistorial(
+            historial
+        ) {
+
+            if (!historialRachas) {
+
+                return;
+
+            }
+
+
+            historialRachas.innerHTML =
+                "";
+
+
+            if (
+                !Array.isArray(
+                    historial
+                ) ||
+                historial.length === 0
+            ) {
+
+                const mensaje =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                mensaje.textContent =
+                    texto(
+                        "sinHistorialRachas"
+                    );
+
+
+                historialRachas.appendChild(
+                    mensaje
+                );
+
+
+                return;
+
+            }
+
+
+            historial.forEach(
+                registro => {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "historial-item";
+
+
+                    const contenido =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    const titulo =
+                        document.createElement(
+                            "strong"
+                        );
+
+
+                    titulo.textContent =
+                        formatearMes(
+                            registro.mes
+                        );
+
+
+                    const descripcion =
+                        document.createElement(
+                            "p"
+                        );
+
+
+                    const cantidadDias =
+                        Number(
+                            registro.dias_con_registro
+                        ) || 0;
+
+
+                    descripcion.textContent =
+                        `${cantidadDias} ${
+                            cantidadDias === 1
+                                ? texto("dia")
+                                : texto("dias")
+                        }`;
+
+
+                    contenido.appendChild(
+                        titulo
+                    );
+
+
+                    contenido.appendChild(
+                        descripcion
+                    );
+
+
+                    const cantidad =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    cantidad.textContent =
+                        dias(
+                            registro.dias_con_registro
+                        );
+
+
+                    item.appendChild(
+                        contenido
+                    );
+
+
+                    item.appendChild(
+                        cantidad
+                    );
+
+
+                    historialRachas.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           HISTORIAL DE CONSTELACIONES
+        ===================================================== */
+
+        function crearHistorialConstelaciones(
+            historial
+        ) {
+
+            if (
+                !historialConstelaciones
+            ) {
+
+                return;
+
+            }
+
+
+            historialConstelaciones.innerHTML =
+                "";
+
+
+            if (
+                !Array.isArray(
+                    historial
+                ) ||
+                historial.length === 0
+            ) {
+
+                const mensaje =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                mensaje.textContent =
+                    texto(
+                        "sinConstelacionesAnteriores"
+                    );
+
+
+                historialConstelaciones.appendChild(
+                    mensaje
+                );
+
+
+                return;
+
+            }
+
+
+            historial.forEach(
+                registro => {
 
                     const contenedorMes =
                         document.createElement(
@@ -996,7 +947,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     titulo.textContent =
                         formatearMes(
-                            mes
+                            registro.mes
                         );
 
 
@@ -1007,13 +958,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     const cantidad =
-                        meses[mes].length;
+                        Number(
+                            registro.dias_con_registro
+                        ) || 0;
 
 
                     informacion.textContent =
-                        textoDiasConRegistros(
-                            cantidad
-                        );
+                        `${cantidad} ${
+                            cantidad === 1
+                                ? texto("dia")
+                                : texto("dias")
+                        }`;
 
 
                     contenedorMes.appendChild(
@@ -1026,161 +981,183 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
 
-                    elementoHistorialConstelaciones.appendChild(
+                    historialConstelaciones.appendChild(
                         contenedorMes
                     );
 
                 }
             );
 
-    }
-
-
-    /* =========================================================
-       FORMATEAR FECHA
-       ========================================================= */
-
-    function formatearFecha(
-        valor
-    ) {
-
-        if (!valor) {
-            return "";
         }
 
 
-        const partes =
-            valor.split("-");
+        /* =====================================================
+           FORMATEAR MES
+        ===================================================== */
 
-
-        if (
-            partes.length !== 3
+        function formatearMes(
+            valor
         ) {
 
-            return valor;
+            if (!valor) {
+
+                return "";
+
+            }
+
+
+            const partes =
+                String(valor).split("-");
+
+
+            if (
+                partes.length !== 2
+            ) {
+
+                return valor;
+
+            }
+
+
+            const anio =
+                Number(
+                    partes[0]
+                );
+
+
+            const mes =
+                Number(
+                    partes[1]
+                );
+
+
+            if (
+                !anio ||
+                !mes
+            ) {
+
+                return valor;
+
+            }
+
+
+            const fecha =
+                new Date(
+                    anio,
+                    mes - 1,
+                    1
+                );
+
+
+            const idiomaActual =
+                typeof window.obtenerIdiomaLifeSync ===
+                "function"
+                    ? window.obtenerIdiomaLifeSync()
+                    : "es";
+
+
+            return fecha.toLocaleDateString(
+                idiomaActual === "en"
+                    ? "en-US"
+                    : "es-SV",
+                {
+                    month:
+                        "long",
+
+                    year:
+                        "numeric"
+                }
+            );
 
         }
 
 
-        const fecha =
-            new Date(
-                Number(partes[0]),
-                Number(partes[1]) - 1,
-                Number(partes[2])
+        /* =====================================================
+           MODAL
+        ===================================================== */
+
+        function cerrarModal() {
+
+            if (!modal) {
+
+                return;
+
+            }
+
+
+            modal.classList.remove(
+                "activo"
             );
 
 
-        return fecha.toLocaleDateString(
-            obtenerIdioma() === "en"
-                ? "en-US"
-                : "es-SV",
-            {
-                day: "numeric",
-                month: "long",
-                year: "numeric"
-            }
-        );
-
-    }
-
-
-    /* =========================================================
-       FORMATEAR MES
-       ========================================================= */
-
-    function formatearMes(
-        valor
-    ) {
-
-        if (!valor) {
-            return "";
-        }
-
-
-        const partes =
-            valor.split("-");
-
-
-        if (
-            partes.length !== 2
-        ) {
-
-            return valor;
+            document.body.style.overflow =
+                "";
 
         }
 
 
-        const fecha =
-            new Date(
-                Number(partes[0]),
-                Number(partes[1]) - 1,
-                1
-            );
+        if (abrirHistorial) {
+
+            abrirHistorial.addEventListener(
+                "click",
+                () => {
+
+                    if (modal) {
+
+                        modal.classList.add(
+                            "activo"
+                        );
 
 
-        return fecha.toLocaleDateString(
-            obtenerIdioma() === "en"
-                ? "en-US"
-                : "es-SV",
-            {
-                month: "long",
-                year: "numeric"
-            }
-        );
+                        document.body.style.overflow =
+                            "hidden";
 
-    }
-
-
-    /* =========================================================
-       ABRIR MODAL
-       ========================================================= */
-
-    if (botonAbrirHistorial) {
-
-        botonAbrirHistorial.addEventListener(
-            "click",
-            () => {
-
-                if (modal) {
-
-                    modal.classList.add(
-                        "activo"
-                    );
-
-                    document.body.style.overflow =
-                        "hidden";
+                    }
 
                 }
+            );
 
-            }
-        );
-
-    }
+        }
 
 
-    /* =========================================================
-       CERRAR MODAL
-       ========================================================= */
+        if (cerrarHistorial) {
 
-    if (botonCerrarHistorial) {
+            cerrarHistorial.addEventListener(
+                "click",
+                cerrarModal
+            );
 
-        botonCerrarHistorial.addEventListener(
-            "click",
-            cerrarModal
-        );
-
-    }
+        }
 
 
-    if (modal) {
+        if (modal) {
 
-        modal.addEventListener(
-            "click",
+            modal.addEventListener(
+                "click",
+                evento => {
+
+                    if (
+                        evento.target ===
+                        modal
+                    ) {
+
+                        cerrarModal();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        document.addEventListener(
+            "keydown",
             evento => {
 
                 if (
-                    evento.target ===
-                    modal
+                    evento.key ===
+                    "Escape"
                 ) {
 
                     cerrarModal();
@@ -1190,100 +1167,65 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         );
 
-    }
 
+        /* =====================================================
+           ERROR
+        ===================================================== */
 
-    document.addEventListener(
-        "keydown",
-        evento => {
+        function mostrarError(
+            mensaje
+        ) {
 
-            if (
-                evento.key ===
-                "Escape"
-            ) {
+            if (!listaCategorias) {
 
-                cerrarModal();
+                return;
 
             }
 
+
+            listaCategorias.innerHTML =
+                "";
+
+
+            const error =
+                document.createElement(
+                    "p"
+                );
+
+
+            error.textContent =
+                mensaje ||
+                texto(
+                    "errorCargarRachas"
+                );
+
+
+            listaCategorias.appendChild(
+                error
+            );
+
         }
-    );
 
 
-    function cerrarModal() {
+        /* =====================================================
+           CAMBIO DE IDIOMA
+        ===================================================== */
 
-        if (!modal) {
-            return;
-        }
+        window.addEventListener(
+            "lifesyncIdiomaCambiado",
+            () => {
 
+                cargarRachas();
 
-        modal.classList.remove(
-            "activo"
+            }
         );
 
 
-        document.body.style.overflow =
-            "";
+        /* =====================================================
+           INICIAR
+        ===================================================== */
+
+        cargarRachas();
 
     }
-
-
-    /* =========================================================
-       ERROR
-       ========================================================= */
-
-    function mostrarError(
-        mensaje
-    ) {
-
-        if (!elementoCategorias) {
-            return;
-        }
-
-
-        elementoCategorias.innerHTML =
-            "";
-
-
-        const error =
-            document.createElement(
-                "p"
-            );
-
-
-        error.textContent =
-            mensaje ||
-            LS(
-                "racha.errorDatos",
-                "No se pudieron cargar los datos."
-            );
-
-
-        elementoCategorias.appendChild(
-            error
-        );
-
-    }
-
-
-    /* =========================================================
-       INICIAR
-       ========================================================= */
-
-    cargarRachas();
-
-
-    /* =========================================================
-       CAMBIO DE IDIOMA
-       ========================================================= */
-
-    window.addEventListener(
-        "lifesyncIdiomaCambiado",
-        () => {
-
-            cargarRachas();
-
-        }
-    );
-
-});
+);
