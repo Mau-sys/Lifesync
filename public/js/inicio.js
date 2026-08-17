@@ -370,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         titulo.textContent =
             notificacion.titulo ||
-            LS("Notificación");
+            LS("notificacion");
 
 
         encabezado.appendChild(
@@ -388,7 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             punto.setAttribute(
                 "aria-label",
-                LS("No leída")
+                LS("noLeida")
             );
 
             encabezado.appendChild(
@@ -458,21 +458,21 @@ document.addEventListener("DOMContentLoaded", () => {
             "img/Campana.png";
 
         imagen.alt =
-            "Sin notificaciones";
+            LS("sinNotificaciones");
 
 
         const titulo =
             document.createElement("h3");
 
         titulo.textContent =
-            LS("Todo está al día");
+            LS("todoAlDia");
 
 
         const texto =
             document.createElement("p");
 
         texto.textContent =
-            LS("Aquí aparecerán tus recordatorios, logros, rachas, hábitos completados y avisos de LifeSync.");
+            LS("descripcionSinNotificaciones");
 
 
         contenedor.appendChild(
@@ -516,7 +516,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.createElement("h3");
 
         titulo.textContent =
-            LS("No se pudieron cargar las notificaciones");
+            LS("errorNotificaciones");
 
 
         const texto =
@@ -524,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         texto.textContent =
             mensaje ||
-            LS("Intenta nuevamente más tarde.");
+            LS("intentaNuevamente");
 
 
         contenedor.appendChild(
@@ -618,7 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         fechaActual.textContent =
             ahora.toLocaleDateString(
-                "es-ES",
+                (window.LifeSyncIdioma && typeof window.LifeSyncIdioma.obtener === "function" && window.LifeSyncIdioma.obtener() === "en") ? "en-US" : "es-ES",
                 {
                     weekday: "long",
                     day: "numeric",
@@ -671,7 +671,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 nombreUsuario.textContent =
                     resultado.usuario.nombre ||
                     resultado.usuario.nombre_usuario ||
-                    "Usuario";
+                    LS("usuario");
 
 
                 if (
@@ -783,6 +783,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    function traducirCategoria(nombre) {
+        const claves = {
+            "Hidratación": "hidratacion",
+            "Alimentación": "alimentacion",
+            "Salud Mental": "saludMental",
+            "Actividad Física": "actividadFisica",
+            "Registro Académico": "registroAcademico",
+            "Hábito Personalizado": "categoriaPersonalizada"
+        };
+        return LS(claves[nombre] || nombre);
+    }
+
     function actualizarCategorias(habitos) {
 
         const contenedor =
@@ -811,7 +823,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 "categoria-vacia";
 
             mensaje.textContent =
-                LS("No tienes hábitos pendientes para hoy.");
+                LS("noHabitosPendientes");
 
             contenedor.appendChild(
                 mensaje
@@ -860,7 +872,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                 imagen.alt =
-                    grupo.nombre;
+                    traducirCategoria(grupo.nombre);
 
 
                 const texto =
@@ -878,7 +890,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     "nombre-categoria";
 
                 titulo.textContent =
-                    grupo.nombre;
+                    traducirCategoria(grupo.nombre);
 
 
                 const detalle =
@@ -890,7 +902,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     "detalle-categoria";
 
                 detalle.textContent =
-                    `${grupo.pendientes} ${LS("hábito(s) pendiente(s)")}`;
+                    `${grupo.pendientes} ${LS("habitoPendienteDetalle")}`;
 
 
                 texto.appendChild(
@@ -964,7 +976,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const nombre =
                     habito.categoria ||
-                    LS("Hábito Personalizado");
+                    LS("categoriaPersonalizada");
 
 
                 if (!grupos[nombre]) {
@@ -1067,7 +1079,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             elemento.textContent =
                 mensaje ||
-                LS("No se pudieron cargar tus hábitos.");
+                LS("noSePudieronCargarHabitos");
 
 
             contenedor.appendChild(
@@ -1098,6 +1110,11 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         30000
     );
+
+    window.addEventListener("lifesyncIdiomaCambiado", () => {
+        mostrarFechaActual();
+        cargarDatosInicio();
+    });
 
     if (panelNotificaciones) {
 

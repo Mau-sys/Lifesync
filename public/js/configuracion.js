@@ -1,14 +1,7 @@
-/* =========================================================
-   IDIOMA GLOBAL — textos dinámicos
-   ========================================================= */
-function LS(texto) {
-    if (typeof window !== "undefined" &&
-        typeof window.traducirLifeSync === "function") {
-        return window.traducirLifeSync(texto);
-    }
-    return texto;
-}
 
+function LS(clave) {
+    return typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(clave) : clave;
+}
 const ENDPOINT = "auth/configuracion.php";
 
 
@@ -133,8 +126,8 @@ function cambiarEstadoGuardado(cargando) {
 
     btnGuardar.textContent =
         cargando
-            ? LS("Guardando...")
-            : "Guardar cambios";
+            ? LS("guardando")
+            : LS("guardarCambios");
 }
 
 
@@ -224,8 +217,8 @@ function actualizarEstadoSincronizacion(activa) {
 
         textoEstadoSincronizacion.textContent =
             activa
-                ? "Tu información se encuentra respaldada correctamente."
-                : "La sincronización automática está desactivada.";
+                ? LS("textoSincronizada")
+                : LS("textoNoSincronizada");
     }
 
 
@@ -233,8 +226,8 @@ function actualizarEstadoSincronizacion(activa) {
 
         estadoSincronizacion.textContent =
             activa
-                ? "● Sincronizada"
-                : "● Desactivada";
+                ? LS("sincronizada")
+                : LS("noSincronizada");
 
 
         estadoSincronizacion.classList.toggle(
@@ -277,7 +270,7 @@ async function cargarConfiguracion() {
 
             mostrarMensaje(
                 datos.mensaje ||
-                "No se pudo cargar la configuración."
+                LS("noConfiguracion")
             );
 
             return;
@@ -288,7 +281,25 @@ async function cargarConfiguracion() {
             datos.configuracion;
 
 
-        if (modoOscuro) {
+        if (idioma) {
+
+    idioma.addEventListener("change", function () {
+
+        if (window.LifeSyncIdioma && typeof window.LifeSyncIdioma.cambiar === "function") {
+            window.LifeSyncIdioma.cambiar(idioma.value);
+        }
+
+        aplicarIdiomaGlobal();
+    });
+}
+
+function aplicarIdiomaGlobal() {
+    if (window.LifeSyncIdioma && typeof window.LifeSyncIdioma.aplicar === "function") {
+        window.LifeSyncIdioma.aplicar();
+    }
+}
+
+if (modoOscuro) {
 
             modoOscuro.checked =
                 configuracion.tema ===
@@ -381,7 +392,7 @@ async function cargarConfiguracion() {
 
 
         mostrarMensaje(
-            "No se pudo cargar la configuración."
+            LS("noConfiguracion")
         );
     }
 }
@@ -507,7 +518,7 @@ async function guardarConfiguracion(event) {
 
             mostrarMensaje(
                 resultado.mensaje ||
-                "No se pudieron guardar los cambios."
+                LS("noGuardarConfiguracion")
             );
 
             return;
@@ -533,7 +544,7 @@ async function guardarConfiguracion(event) {
 
         mostrarMensaje(
             resultado.mensaje ||
-            "Configuración guardada correctamente."
+            LS("configuracionGuardada")
         );
 
 
@@ -546,7 +557,7 @@ async function guardarConfiguracion(event) {
 
 
         mostrarMensaje(
-            "No se pudieron guardar los cambios."
+            LS("noGuardarConfiguracion")
         );
 
 
@@ -647,7 +658,7 @@ async function cambiarContrasena() {
     ) {
 
         mostrarMensajeContrasena(
-            LS("Completa todos los campos.")
+            "Completa todos los campos."
         );
 
         return;
@@ -657,7 +668,7 @@ async function cambiarContrasena() {
     if (nueva.length < 8) {
 
         mostrarMensajeContrasena(
-            LS("La nueva contraseña debe tener al menos 8 caracteres.")
+            LS("contrasenaMinima")
         );
 
         return;
@@ -667,7 +678,7 @@ async function cambiarContrasena() {
     if (nueva !== confirmar) {
 
         mostrarMensajeContrasena(
-            LS("Las nuevas contraseñas no coinciden.")
+            LS("contrasenasNoCoinciden")
         );
 
         return;
@@ -680,7 +691,7 @@ async function cambiarContrasena() {
             true;
 
         btnGuardarContrasena.textContent =
-            LS("Guardando...");
+            LS("guardando");
     }
 
 
@@ -742,7 +753,7 @@ async function cambiarContrasena() {
 
             mostrarMensajeContrasena(
                 resultado.mensaje ||
-                LS("No se pudo cambiar la contraseña.")
+                LS("noCambiarContrasena")
             );
 
             return;
@@ -751,7 +762,7 @@ async function cambiarContrasena() {
 
         mostrarMensajeContrasena(
             resultado.mensaje ||
-            LS("Contraseña actualizada correctamente.")
+            LS("contrasenaActualizada")
         );
 
 
@@ -779,7 +790,7 @@ async function cambiarContrasena() {
 
 
         mostrarMensajeContrasena(
-            LS("No se pudo cambiar la contraseña.")
+            LS("noCambiarContrasena")
         );
 
 
@@ -791,7 +802,7 @@ async function cambiarContrasena() {
                 false;
 
             btnGuardarContrasena.textContent =
-                LS("Guardar");
+                LS("guardar");
         }
     }
 }
@@ -808,7 +819,7 @@ async function cargarSesiones() {
 
 
     listaSesiones.innerHTML =
-        LS("Cargando sesiones...");
+        LS("cargandoSesiones");
 
 
     try {
@@ -845,7 +856,7 @@ async function cargarSesiones() {
 
             mostrarMensajeSesiones(
                 resultado.mensaje ||
-                LS("No se pudieron cargar las sesiones.")
+                LS("noCargarSesiones")
             );
 
             return;
@@ -867,7 +878,7 @@ async function cargarSesiones() {
         if (sesiones.length === 0) {
 
             listaSesiones.textContent =
-                LS("No hay sesiones activas registradas.");
+                LS("sinSesionesActivas");
 
             return;
         }
@@ -894,7 +905,7 @@ async function cargarSesiones() {
 
                 dispositivo.textContent =
                     sesion.dispositivo ||
-                    LS("Dispositivo desconocido");
+                    "Dispositivo desconocido";
 
 
                 const fechaInicio =
@@ -906,7 +917,7 @@ async function cargarSesiones() {
                 fechaInicio.textContent =
                     `Inicio: ${
                         sesion.fecha_inicio ||
-                        LS("Sin información")
+                        LS("sinInformacionSesion")
                     }`;
 
 
@@ -919,7 +930,7 @@ async function cargarSesiones() {
                 ultimoAcceso.textContent =
                     `Último acceso: ${
                         sesion.ultimo_acceso ||
-                        LS("Sin información")
+                        LS("sinInformacionSesion")
                     }`;
 
 
@@ -938,7 +949,7 @@ async function cargarSesiones() {
 
 
                 boton.textContent =
-                    LS("Cerrar sesión");
+                    LS("cerrarSesion");
 
 
                 boton.addEventListener(
@@ -992,7 +1003,7 @@ async function cargarSesiones() {
 
 
         mostrarMensajeSesiones(
-            LS("No se pudieron cargar las sesiones.")
+            LS("noCargarSesiones")
         );
     }
 }
@@ -1057,7 +1068,7 @@ async function cerrarSesion(idSesion) {
 
             mostrarMensajeSesiones(
                 resultado.mensaje ||
-                "No se pudo cerrar la sesión."
+                LS("noCerrarSesion")
             );
 
             return;
@@ -1092,7 +1103,7 @@ async function cerrarSesion(idSesion) {
 
 
         mostrarMensajeSesiones(
-            "No se pudo cerrar la sesión."
+            LS("noCerrarSesion")
         );
     }
 }

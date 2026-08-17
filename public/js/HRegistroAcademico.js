@@ -1,3 +1,7 @@
+function LS(clave) {
+    return typeof window !== "undefined" && typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(clave) : clave;
+}
+
 let estadoApp = {
     sesionesCompletadas: 0,
     metaSesiones: 5,
@@ -102,9 +106,9 @@ function formatearMinutosAHoras(minutosTotales) {
 }
 
 function obtenerEtiquetaFrecuencia() {
-    if (estadoApp.frecuencia === 'diario') return 'Meta diaria';
-    if (estadoApp.frecuencia === 'mensual') return 'Meta mensual';
-    return 'Meta del periodo';
+    if (estadoApp.frecuencia === 'diario') return LS("metaDiaria");
+    if (estadoApp.frecuencia === 'mensual') return LS("metaMensual");
+    return LS("metaPeriodo");
 }
 
 function actualizarInterfaz() {
@@ -118,7 +122,7 @@ function actualizarInterfaz() {
     if (labelMeta) labelMeta.textContent = obtenerEtiquetaFrecuencia();
 
     contadorSesiones.textContent = `${estadoApp.sesionesCompletadas}/${estadoApp.metaSesiones}`;
-    metaSesionesTexto.textContent = `${estadoApp.metaSesiones} sesiones (${estadoApp.duracionPorSesion} min/sesión)`;
+    metaSesionesTexto.textContent = `${estadoApp.metaSesiones} ${LS("sesiones")} (${estadoApp.duracionPorSesion} ${LS("min")}/${LS("sesion")})`;
     tiempoAcumuladoTexto.textContent = `${formatearMinutosAHoras(tiempoActualMin)} / ${formatearMinutosAHoras(tiempoMetaTotalMin)}`;
 
     ringSesiones.style.background = `conic-gradient(var(--ls-pink) ${porcentaje}%, rgba(236, 72, 153, 0.15) ${porcentaje}%)`;
@@ -127,13 +131,13 @@ function actualizarInterfaz() {
     const esDiaInactivo = estadoApp.frecuencia === 'personalizada' && !estadoApp.diasActivos.includes(hoyDiaSemana);
 
     if (estadoApp.sesionesCompletadas >= estadoApp.metaSesiones) {
-        btnAddSesion.textContent = '¡Meta completada!';
+        btnAddSesion.textContent = LS("metaCompletada");
         btnAddSesion.disabled = true;
     } else if (esDiaInactivo) {
-        btnAddSesion.textContent = 'Día de descanso (Meta inactiva hoy)';
+        btnAddSesion.textContent = LS("diaDescansoMeta");
         btnAddSesion.disabled = true;
     } else {
-        btnAddSesion.textContent = '+1 sesión de estudio';
+        btnAddSesion.textContent = LS("registrarSesionEstudio");
         btnAddSesion.disabled = false;
     }
 }
@@ -198,14 +202,14 @@ function gestionarCambioFrecuencia() {
     const frec = selectFrecuencia.value;
     if (frec === 'personalizada') {
         contenedorDiasSemana.classList.remove('d-none');
-        labelNumSesiones.textContent = 'Cantidad de sesiones por periodo (Máx. 100)';
+        labelNumSesiones.textContent = LS("sesionesPorPeriodo");
         renderizarBotonesDias();
     } else if (frec === 'mensual') {
         contenedorDiasSemana.classList.add('d-none');
-        labelNumSesiones.textContent = 'Cantidad de sesiones al mes (Máx. 100)';
+        labelNumSesiones.textContent = LS("sesionesAlMes");
     } else {
         contenedorDiasSemana.classList.add('d-none');
-        labelNumSesiones.textContent = 'Cantidad de sesiones diarias (Máx. 50)';
+        labelNumSesiones.textContent = LS("sesionesDiarias");
     }
 }
 
@@ -218,7 +222,7 @@ document.querySelectorAll('.btn-dia-semana').forEach(btn => {
             if (diasSeleccionadosTemp.length > 1) {
                 diasSeleccionadosTemp = diasSeleccionadosTemp.filter(d => d !== dia);
             } else {
-                alert('Debes seleccionar al menos un día activo.');
+                alert(LS("seleccionarDiaActivo"));
             }
         } else {
             diasSeleccionadosTemp.push(dia);
@@ -231,7 +235,7 @@ inputNumSesiones.addEventListener('input', actualizarPreviewModal);
 inputDuracionSesion.addEventListener('input', actualizarPreviewModal);
 
 btnReiniciarMeta.addEventListener('click', () => {
-    if (confirm('¿Quieres reiniciar las sesiones de este periodo a 0?')) {
+    if (confirm(LS("confirmarReinicioAcademico"))) {
         estadoApp.sesionesCompletadas = 0;
         guardarDatosStorage();
         actualizarInterfaz();
@@ -245,17 +249,17 @@ btnGuardarMeta.addEventListener('click', () => {
     const nuevaFrecuencia = selectFrecuencia.value;
 
     if (isNaN(nuevasSesiones) || nuevasSesiones < 1 || nuevasSesiones > 100) {
-        alert('Ingresa un número de sesiones válido (1 a 100).');
+        alert(LS("numeroSesionesValido"));
         return;
     }
 
     if (isNaN(nuevaDuracion) || nuevaDuracion < 5 || nuevaDuracion > 240) {
-        alert('Ingresa una duración válida por sesión (5 a 240 minutos).');
+        alert(LS("duracionSesionValida"));
         return;
     }
 
     if (nuevaFrecuencia === 'personalizada' && diasSeleccionadosTemp.length === 0) {
-        alert('Selecciona al menos un día de la semana para la meta personalizada.');
+        alert(LS("diaSemanaMetaPersonalizada"));
         return;
     }
 
@@ -284,3 +288,5 @@ btnAddSesion.addEventListener('click', () => {
 
 cargarDatosStorage();
 actualizarInterfaz();
+
+    window.addEventListener("lifesyncIdiomaCambiado", actualizarInterfaz);

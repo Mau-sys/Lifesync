@@ -1,3 +1,7 @@
+function LS(clave) {
+    return typeof window !== "undefined" && typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(clave) : clave;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
     cargarHabitos();
@@ -234,7 +238,7 @@ async function cargarHabitos() {
 
             console.error(
                 datos.mensaje ||
-                "No se pudieron cargar los hábitos."
+                LS("noSePudoCargarHabitos")
             );
 
 

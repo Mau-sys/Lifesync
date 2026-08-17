@@ -10,6 +10,10 @@ document.addEventListener(
 );
 
 
+/* =========================================================
+   TRADUCCIÓN
+   ========================================================= */
+
 function texto(clave) {
 
     if (
@@ -26,6 +30,10 @@ function texto(clave) {
     return clave;
 }
 
+
+/* =========================================================
+   CARGAR PERFIL
+   ========================================================= */
 
 async function cargarPerfil() {
 
@@ -46,7 +54,6 @@ async function cargarPerfil() {
     ) {
 
         return;
-
     }
 
 
@@ -56,11 +63,15 @@ async function cargarPerfil() {
             await fetch(
                 "../auth/perfil.php",
                 {
-                    method:
-                        "GET",
+                    method: "GET",
 
                     credentials:
-                        "include"
+                        "include",
+
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    }
                 }
             );
 
@@ -76,11 +87,12 @@ async function cargarPerfil() {
 
             console.error(
                 datos.mensaje ||
-                "No se pudo cargar el perfil."
+                texto(
+                    "noCargarPerfil"
+                )
             );
 
             return;
-
         }
 
 
@@ -89,10 +101,13 @@ async function cargarPerfil() {
 
 
         nombreUsuario.textContent =
-            usuario.nombre_usuario;
+            usuario.nombre_usuario ||
+            texto("usuario");
 
 
-        if (usuario.foto_perfil) {
+        if (
+            usuario.foto_perfil
+        ) {
 
             fotoPerfil.src =
                 usuario.foto_perfil;
@@ -124,6 +139,10 @@ async function cargarPerfil() {
 }
 
 
+/* =========================================================
+   CERRAR SESIÓN
+   ========================================================= */
+
 function configurarCerrarSesion() {
 
     const botonCerrarSesion =
@@ -135,7 +154,6 @@ function configurarCerrarSesion() {
     if (!botonCerrarSesion) {
 
         return;
-
     }
 
 
@@ -154,12 +172,12 @@ function configurarCerrarSesion() {
             if (!confirmar) {
 
                 return;
-
             }
 
 
             botonCerrarSesion.disabled =
                 true;
+
 
             botonCerrarSesion.textContent =
                 texto(
@@ -177,7 +195,12 @@ function configurarCerrarSesion() {
                                 "POST",
 
                             credentials:
-                                "include"
+                                "include",
+
+                            headers: {
+                                "Accept":
+                                    "application/json"
+                            }
                         }
                     );
 
@@ -193,7 +216,9 @@ function configurarCerrarSesion() {
 
                     throw new Error(
                         datos.mensaje ||
-                        "No se pudo cerrar la sesión."
+                        texto(
+                            "noCerrarSesion"
+                        )
                     );
 
                 }
@@ -214,6 +239,7 @@ function configurarCerrarSesion() {
                 botonCerrarSesion.disabled =
                     false;
 
+
                 botonCerrarSesion.textContent =
                     texto(
                         "cerrarSesion"
@@ -221,7 +247,9 @@ function configurarCerrarSesion() {
 
 
                 alert(
-                    "No se pudo cerrar la sesión. Inténtalo nuevamente."
+                    texto(
+                        "noSePudoCerrarSesion"
+                    )
                 );
 
             }
@@ -230,3 +258,33 @@ function configurarCerrarSesion() {
     );
 
 }
+
+
+/* =========================================================
+   ACTUALIZAR BOTÓN SI CAMBIA EL IDIOMA
+   ========================================================= */
+
+window.addEventListener(
+    "lifesyncIdiomaCambiado",
+    () => {
+
+        const botonCerrarSesion =
+            document.getElementById(
+                "btnCerrarSesion"
+            );
+
+
+        if (
+            botonCerrarSesion &&
+            !botonCerrarSesion.disabled
+        ) {
+
+            botonCerrarSesion.textContent =
+                texto(
+                    "cerrarSesion"
+                );
+
+        }
+
+    }
+);

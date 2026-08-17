@@ -1,3 +1,7 @@
+function LS(clave) {
+    return typeof window !== "undefined" && typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(clave) : clave;
+}
+
 const btnOptions = document.getElementById('btn-options-saludmental');
 const kebabMenu = document.getElementById('kebab-menu-saludmental');
 const btnRegresar = document.getElementById('btn-regresar');
@@ -131,7 +135,7 @@ function renderizarListaPausas() {
     listaPausas.innerHTML = '';
 
     if (historialPausas.length === 0) {
-        listaPausas.innerHTML = '<span class="text-subtle small d-block text-center py-2">Sin pausas registradas en este periodo</span>';
+        listaPausas.innerHTML = '<span class="text-subtle small d-block text-center py-2">${LS("sinPausasRegistradas")}</span>';
         return;
     }
 
@@ -160,7 +164,7 @@ function actualizarInterfaz() {
     }
 
     if (metaElement) {
-        const textoPausas = pausasTotales === 1 ? '1 pausa' : `${pausasTotales} pausas`;
+        const textoPausas = pausasTotales === 1 ? LS("unaPausa") : `${pausasTotales} ${LS("pausas")}`;
         metaElement.textContent = `${textoPausas} (${duracionPausa} min/pausa)`;
     }
 
@@ -173,15 +177,15 @@ function actualizarInterfaz() {
         const diaHabilitado = esDiaActivo();
 
         if (!diaHabilitado) {
-            btnAddPausa.textContent = 'Día de descanso';
+            btnAddPausa.textContent = LS("diaDescanso");
             btnAddPausa.disabled = true;
             btnAddPausa.classList.add('opacity-75');
         } else if (pausasCompletadas >= pausasTotales) {
-            btnAddPausa.textContent = '¡Meta completada!';
+            btnAddPausa.textContent = LS("metaCompletada");
             btnAddPausa.disabled = true;
             btnAddPausa.classList.add('opacity-75');
         } else {
-            btnAddPausa.textContent = '+1 pausa';
+            btnAddPausa.textContent = "+1 " + LS("unaPausa").replace("1 ", "").trim();
             btnAddPausa.disabled = false;
             btnAddPausa.classList.remove('opacity-75');
         }
@@ -195,12 +199,12 @@ function actualizarVisibilidadDias() {
 
     if (selectFrecuencia.value === 'personalizada') {
         contenedorDias.classList.remove('d-none');
-        labelPausas.textContent = 'Pausas por día activo (Máx. 50)';
+        labelPausas.textContent = LS("pausasPorDiaActivo");
     } else {
         contenedorDias.classList.add('d-none');
         labelPausas.textContent = selectFrecuencia.value === 'semanal' 
-            ? 'Pausas semanales (Máx. 50)' 
-            : 'Pausas diarias (Máx. 50)';
+            ? LS("pausasSemanales") 
+            : LS("pausasDiarias");
     }
 
     botonesDias.forEach(btn => {
@@ -225,7 +229,7 @@ botonesDias.forEach(btn => {
                 diasSeleccionados = diasSeleccionados.filter(d => d !== valDia);
                 btn.classList.remove('active');
             } else {
-                alert('Debes mantener al menos 1 día seleccionado.');
+                alert(LS("mantenerDiaSeleccionado"));
             }
         } else {
             diasSeleccionados.push(valDia);
@@ -256,7 +260,7 @@ if (btnAddPausa) {
 
 if (btnReiniciar) {
     btnReiniciar.addEventListener('click', () => {
-        const confirmar = confirm('¿Estás seguro de que deseas reiniciar el progreso de este periodo a 0?');
+        const confirmar = confirm(LS("confirmarReinicioSalud"));
         if (confirmar) {
             pausasCompletadas = 0;
             historialPausas = [];
@@ -282,17 +286,17 @@ if (btnGuardar) {
         const nuevaFrecuencia = selectFrecuencia.value;
 
         if (isNaN(nuevasPausas) || nuevasPausas < 1 || nuevasPausas > 50) {
-            alert('Por favor ingresa una cantidad de pausas válida (entre 1 y 50).');
+            alert(LS("cantidadPausasValida"));
             return;
         }
 
         if (isNaN(nuevaDuracion) || nuevaDuracion < 1 || nuevaDuracion > 240) {
-            alert('Por favor ingresa una duración válida (máximo 4 horas / 240 minutos).');
+            alert(LS("duracionPausaValida"));
             return;
         }
 
         if (nuevaFrecuencia === 'personalizada' && diasSeleccionados.length === 0) {
-            alert('Por favor selecciona al menos un día para la meta personalizada.');
+            alert(LS("diaMetaPersonalizada"));
             return;
         }
 
@@ -321,3 +325,5 @@ if (btnGuardar) {
 
 cargarDatos();
 actualizarInterfaz();
+
+    window.addEventListener("lifesyncIdiomaCambiado", actualizarInterfaz);

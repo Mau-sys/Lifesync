@@ -23,6 +23,10 @@ document.addEventListener(
             );
 
 
+        /* =================================================
+           TRADUCCIÓN
+           ================================================= */
+
         function texto(clave) {
 
             if (
@@ -40,6 +44,10 @@ document.addEventListener(
         }
 
 
+        /* =================================================
+           MENSAJES
+           ================================================= */
+
         function mostrarMensaje(textoMensaje) {
 
             if (mensaje) {
@@ -48,7 +56,6 @@ document.addEventListener(
                     textoMensaje;
 
             }
-
         }
 
 
@@ -60,11 +67,18 @@ document.addEventListener(
                     "";
 
             }
-
         }
 
 
+        /* =================================================
+           BOTÓN
+           ================================================= */
+
         function cambiarEstadoBoton(cargando) {
+
+            if (!boton) {
+                return;
+            }
 
             boton.disabled =
                 cargando;
@@ -73,9 +87,12 @@ document.addEventListener(
                 cargando
                     ? texto("guardando")
                     : texto("guardar");
-
         }
 
+
+        /* =================================================
+           CHECKBOXES
+           ================================================= */
 
         checkboxes.forEach(
             (checkbox) => {
@@ -88,6 +105,15 @@ document.addEventListener(
             }
         );
 
+
+        if (!form) {
+            return;
+        }
+
+
+        /* =================================================
+           FORMULARIO
+           ================================================= */
 
         form.addEventListener(
             "submit",
@@ -103,11 +129,11 @@ document.addEventListener(
                         checkboxes
                     )
                     .filter(
-                        checkbox =>
+                        (checkbox) =>
                             checkbox.checked
                     )
                     .map(
-                        checkbox =>
+                        (checkbox) =>
                             checkbox.value
                     );
 
@@ -118,7 +144,7 @@ document.addEventListener(
 
                     mostrarMensaje(
                         texto(
-                            "Selecciona al menos una categoría."
+                            "seleccionaCategoria"
                         )
                     );
 
@@ -126,15 +152,19 @@ document.addEventListener(
                 }
 
 
-                const tienePersonalizado =
+                const checkboxPersonalizado =
                     document.getElementById(
                         "habitoPersonalizado"
-                    ).checked;
+                    );
 
 
-                cambiarEstadoBoton(
-                    true
-                );
+                const tienePersonalizado =
+                    checkboxPersonalizado
+                        ? checkboxPersonalizado.checked
+                        : false;
+
+
+                cambiarEstadoBoton(true);
 
 
                 try {
@@ -143,11 +173,13 @@ document.addEventListener(
                         await fetch(
                             "../auth/preferencias.php",
                             {
-                                method:
-                                    "POST",
+                                method: "POST",
 
                                 headers: {
                                     "Content-Type":
+                                        "application/json",
+
+                                    "Accept":
                                         "application/json"
                                 },
 
@@ -186,13 +218,11 @@ document.addEventListener(
 
                         mostrarMensaje(
                             texto(
-                                "El servidor devolvió una respuesta inesperada."
+                                "errorRespuestaServidor"
                             )
                         );
 
-                        cambiarEstadoBoton(
-                            false
-                        );
+                        cambiarEstadoBoton(false);
 
                         return;
                     }
@@ -207,19 +237,19 @@ document.addEventListener(
                             datos.detalle ||
                             datos.mensaje ||
                             texto(
-                                "No se pudieron guardar las preferencias."
+                                "noGuardarPreferencias"
                             )
                         );
 
-                        cambiarEstadoBoton(
-                            false
-                        );
+                        cambiarEstadoBoton(false);
 
                         return;
                     }
 
 
-                    if (tienePersonalizado) {
+                    if (
+                        tienePersonalizado
+                    ) {
 
                         window.location.href =
                             "Crear-habito.html";
@@ -240,13 +270,33 @@ document.addEventListener(
 
                     mostrarMensaje(
                         texto(
-                            "No se pudo conectar con el servidor. Inténtalo nuevamente."
+                            "errorConexion"
                         )
                     );
 
-                    cambiarEstadoBoton(
-                        false
-                    );
+                    cambiarEstadoBoton(false);
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           CAMBIO DE IDIOMA
+           ================================================= */
+
+        window.addEventListener(
+            "lifesyncIdiomaCambiado",
+            () => {
+
+                if (
+                    boton &&
+                    !boton.disabled
+                ) {
+
+                    boton.textContent =
+                        texto("guardar");
 
                 }
 

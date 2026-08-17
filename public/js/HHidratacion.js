@@ -1,83 +1,115 @@
-document.addEventListener("DOMContentLoaded", () => {
+/* =========================================================
+   HIDRATACIÓN — LifeSync
+   ========================================================= */
+
+(function () {
+
+    "use strict";
+
+
+    function LS(texto) {
+
+        if (
+            typeof window !== "undefined" &&
+            typeof window.traducirLifeSync === "function"
+        ) {
+            return window.traducirLifeSync(texto);
+        }
+
+        return texto;
+    }
+
 
     const btnOptions =
-        document.getElementById("btn-options-hidratacion");
+        document.getElementById(
+            "btn-options-hidratacion"
+        );
 
     const kebabMenu =
-        document.getElementById("kebab-menu-hidratacion");
+        document.getElementById(
+            "kebab-menu-hidratacion"
+        );
 
     const btnRegresar =
-        document.getElementById("btn-regresar");
+        document.getElementById(
+            "btn-regresar"
+        );
 
 
-    /*
-     * MENÚ DE OPCIONES
-     */
-    if (btnOptions && kebabMenu) {
+    if (
+        btnOptions &&
+        kebabMenu
+    ) {
 
-        btnOptions.addEventListener("click", (e) => {
+        btnOptions.addEventListener(
+            "click",
+            (e) => {
 
-            e.stopPropagation();
+                e.stopPropagation();
 
-            kebabMenu.classList.toggle("show");
-
-        });
-
-
-        document.addEventListener("click", (e) => {
-
-            if (
-                !kebabMenu.contains(e.target) &&
-                e.target !== btnOptions
-            ) {
-
-                kebabMenu.classList.remove("show");
-
-            }
-
-        });
-
-    }
-
-
-    /*
-     * BOTÓN REGRESAR
-     */
-    if (btnRegresar) {
-
-        btnRegresar.addEventListener("click", (e) => {
-
-            e.preventDefault();
-
-            const paginaAnterior =
-                document.referrer;
-
-            const mismoDominio =
-                paginaAnterior &&
-                paginaAnterior.includes(
-                    window.location.host
+                kebabMenu.classList.toggle(
+                    "show"
                 );
 
+            }
+        );
 
-            if (mismoDominio) {
 
-                window.history.back();
+        document.addEventListener(
+            "click",
+            (e) => {
 
-            } else {
+                if (
+                    !kebabMenu.contains(
+                        e.target
+                    )
+                ) {
 
-                window.location.href =
-                    "inicio.html";
+                    kebabMenu.classList.remove(
+                        "show"
+                    );
+
+                }
 
             }
-
-        });
+        );
 
     }
 
 
-    /*
-     * VARIABLES
-     */
+    if (btnRegresar) {
+
+        btnRegresar.addEventListener(
+            "click",
+            () => {
+
+                const paginaAnterior =
+                    document.referrer;
+
+                const mismoDominio =
+                    paginaAnterior &&
+                    paginaAnterior.includes(
+                        window.location.host
+                    );
+
+
+                if (mismoDominio) {
+
+                    window.history.back();
+
+                } else {
+
+                    window.location.href =
+                        "inicio.html";
+
+                }
+
+            }
+        );
+
+    }
+
+
     let vasosTomados = 0;
 
     let vasosTotales = 8;
@@ -137,13 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-    /*
-     * FECHA LOCAL
-     *
-     * No usamos toISOString()
-     * porque puede cambiar el día
-     * dependiendo de la zona horaria.
-     */
     function obtenerFechaHoy() {
 
         const fecha =
@@ -155,22 +180,24 @@ document.addEventListener("DOMContentLoaded", () => {
         const mes =
             String(
                 fecha.getMonth() + 1
-            ).padStart(2, "0");
+            ).padStart(
+                2,
+                "0"
+            );
 
         const dia =
             String(
                 fecha.getDate()
-            ).padStart(2, "0");
-
+            ).padStart(
+                2,
+                "0"
+            );
 
         return `${anio}-${mes}-${dia}`;
 
     }
 
 
-    /*
-     * REINICIO DIARIO
-     */
     function verificarReinicioDiario() {
 
         const hoy =
@@ -186,7 +213,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ultimaFecha !== hoy
         ) {
 
-            vasosTomados = 0;
+            vasosTomados =
+                0;
+
 
             localStorage.setItem(
                 "ls_hidratacion_fecha",
@@ -194,19 +223,13 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            localStorage.setItem(
-                "ls_hidratacion_vasos",
-                "0"
-            );
+            guardarDatos();
 
         }
 
     }
 
 
-    /*
-     * CARGAR DATOS
-     */
     function cargarDatos() {
 
         const configuracionGuardada =
@@ -226,20 +249,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 vasosTotales =
-                    Number(
-                        config.vasosTotales
-                    ) || 8;
+                    config.vasosTotales ||
+                    8;
 
 
                 capacidadVaso =
-                    Number(
-                        config.capacidadVaso
-                    ) || 250;
+                    config.capacidadVaso ||
+                    250;
 
             } catch (error) {
 
                 console.error(
-                    "Error al leer la configuración de hidratación:",
+                    "Error al cargar la configuración de hidratación:",
                     error
                 );
 
@@ -263,22 +284,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             vasosTomados =
                 parseInt(
-                    vasosGuardados,
-                    10
+                    vasosGuardados
                 ) || 0;
 
         }
-
-
-        /*
-         * Evita que un valor guardado
-         * sea mayor que la nueva meta.
-         */
-        vasosTomados =
-            Math.min(
-                vasosTomados,
-                vasosTotales
-            );
 
 
         if (inputVasos) {
@@ -302,42 +311,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /*
-     * GUARDAR DATOS
-     */
     function guardarDatos() {
 
         localStorage.setItem(
             "ls_hidratacion_vasos",
-            String(vasosTomados)
-        );
-
-
-        localStorage.setItem(
-            "ls_hidratacion_fecha",
-            obtenerFechaHoy()
+            vasosTomados
         );
 
 
         localStorage.setItem(
             "ls_hidratacion_config",
+
             JSON.stringify({
-
-                vasosTotales:
-                    vasosTotales,
-
-                capacidadVaso:
-                    capacidadVaso
-
+                vasosTotales,
+                capacidadVaso
             })
         );
 
     }
 
 
-    /*
-     * ICONOS DE VASOS
-     */
     function renderizarVasos() {
 
         if (!contenedorVasos) {
@@ -356,7 +349,9 @@ document.addEventListener("DOMContentLoaded", () => {
         ) {
 
             const vasoIcono =
-                document.createElement("i");
+                document.createElement(
+                    "i"
+                );
 
 
             vasoIcono.className =
@@ -389,9 +384,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /*
-     * ACTUALIZAR INTERFAZ
-     */
     function actualizarInterfaz() {
 
         verificarReinicioDiario();
@@ -409,13 +401,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const litrosTotales =
                 (
-                    vasosTotales *
-                    capacidadVaso
-                ) / 1000;
+                    (
+                        vasosTotales *
+                        capacidadVaso
+                    ) /
+                    1000
+                ).toFixed(1);
 
 
             metaElement.textContent =
-                `${vasosTotales} vasos al día (${litrosTotales.toFixed(1)}L - ${capacidadVaso}ml/vaso)`;
+                `${vasosTotales} ${
+                    LS("vasosAlDia")
+                } (${litrosTotales}L - ${
+                    capacidadVaso
+                }ml/${
+                    LS("vaso")
+                })`;
 
         }
 
@@ -436,8 +437,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             ringElement.style.background =
                 `conic-gradient(
-                    var(--ls-cyan) ${porcentaje}%,
-                    rgba(6, 182, 212, 0.15) ${porcentaje}%
+                    var(--ls-cyan)
+                    ${porcentaje}%,
+                    rgba(6, 182, 212, 0.15)
+                    ${porcentaje}%
                 )`;
 
         }
@@ -451,10 +454,10 @@ document.addEventListener("DOMContentLoaded", () => {
             ) {
 
                 btnAddVaso.textContent =
-                    "¡Meta alcanzada!";
+                    LS(
+                        LS("metaAlcanzada")
+                    );
 
-                btnAddVaso.disabled =
-                    true;
 
                 btnAddVaso.classList.add(
                     "opacity-75"
@@ -463,10 +466,8 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
 
                 btnAddVaso.textContent =
-                    "+1 vaso";
+                    LS("sumarVaso");
 
-                btnAddVaso.disabled =
-                    false;
 
                 btnAddVaso.classList.remove(
                     "opacity-75"
@@ -482,9 +483,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /*
-     * PREVISUALIZACIÓN DEL MODAL
-     */
     function actualizarPreviewModal() {
 
         if (
@@ -498,29 +496,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        const vasos =
+        const v =
             parseInt(
-                inputVasos.value,
-                10
+                inputVasos.value
             ) || 0;
 
 
-        const capacidad =
+        const c =
             parseInt(
-                inputCapacidad.value,
-                10
+                inputCapacidad.value
             ) || 0;
 
 
         const totalLitros =
             (
-                vasos *
-                capacidad
-            ) / 1000;
+                (v * c) /
+                1000
+            ).toFixed(1);
 
 
         previewMetaTotal.textContent =
-            `${totalLitros.toFixed(1)} Litros / día`;
+            `${totalLitros} ${
+                LS("litrosDia")
+            }`;
 
     }
 
@@ -545,9 +543,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /*
-     * AGREGAR VASO
-     */
     if (btnAddVaso) {
 
         btnAddVaso.addEventListener(
@@ -558,18 +553,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 if (
-                    vasosTomados >=
+                    vasosTomados <
                     vasosTotales
                 ) {
 
-                    actualizarInterfaz();
-
-                    return;
+                    vasosTomados++;
 
                 }
-
-
-                vasosTomados++;
 
 
                 guardarDatos();
@@ -582,63 +572,63 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /*
-     * REINICIAR
-     */
     if (btnReiniciar) {
 
         btnReiniciar.addEventListener(
             "click",
             () => {
 
-                const confirmar =
-                    confirm(
-                        "¿Quieres reiniciar la cuenta a 0?"
-                    );
-
-
-                if (!confirmar) {
-                    return;
-                }
-
-
-                vasosTomados = 0;
-
-                guardarDatos();
-
-                actualizarInterfaz();
-
-
-                const modalElement =
-                    document.getElementById(
-                        "modalEditarHidratacion"
-                    );
-
-
                 if (
-                    modalElement &&
-                    typeof bootstrap !==
-                        "undefined"
+                    confirm(
+                        LS(
+                            LS("confirmarReinicioHidratacion")
+                        )
+                    )
                 ) {
 
-                    const modalInstance =
-                        bootstrap.Modal.getInstance(
-                            modalElement
+                    vasosTomados =
+                        0;
+
+
+                    guardarDatos();
+
+                    actualizarInterfaz();
+
+
+                    const modalElement =
+                        document.getElementById(
+                            "modalEditarHidratacion"
                         );
 
 
-                    if (modalInstance) {
-                        modalInstance.hide();
+                    if (
+                        typeof bootstrap !==
+                        "undefined" &&
+                        modalElement
+                    ) {
+
+                        const modalInstance =
+                            bootstrap.Modal.getInstance(
+                                modalElement
+                            );
+
+
+                        if (modalInstance) {
+
+                            modalInstance.hide();
+
+                        }
+
                     }
 
-                }
 
+                    if (kebabMenu) {
 
-                if (kebabMenu) {
+                        kebabMenu.classList.remove(
+                            "show"
+                        );
 
-                    kebabMenu.classList.remove(
-                        "show"
-                    );
+                    }
 
                 }
 
@@ -648,49 +638,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /*
-     * GUARDAR CONFIGURACIÓN
-     */
     if (btnGuardar) {
 
         btnGuardar.addEventListener(
             "click",
             () => {
 
-                if (
-                    !inputVasos ||
-                    !inputCapacidad
-                ) {
-
-                    return;
-
-                }
-
-
                 const nuevosVasos =
                     parseInt(
-                        inputVasos.value,
-                        10
+                        inputVasos.value
                     );
 
 
                 const nuevaCapacidad =
                     parseInt(
-                        inputCapacidad.value,
-                        10
+                        inputCapacidad.value
                     );
 
 
                 if (
-                    Number.isNaN(
-                        nuevosVasos
-                    ) ||
+                    isNaN(nuevosVasos) ||
                     nuevosVasos < 1 ||
                     nuevosVasos > 30
                 ) {
 
                     alert(
-                        "Por favor ingresa una cantidad de vasos válida (1 a 30)."
+                        LS(
+                            "Por favor ingresa una cantidad de vasos válida (1 a 30)."
+                        )
                     );
 
                     return;
@@ -699,15 +674,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 if (
-                    Number.isNaN(
-                        nuevaCapacidad
-                    ) ||
+                    isNaN(nuevaCapacidad) ||
                     nuevaCapacidad < 100 ||
                     nuevaCapacidad > 1000
                 ) {
 
                     alert(
-                        "Por favor ingresa una capacidad de vaso válida (100 a 1000 ml)."
+                        LS(
+                            LS("capacidadVasoValida")
+                        )
                     );
 
                     return;
@@ -724,14 +699,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 /*
-                 * Si la nueva meta es menor
-                 * que lo tomado, ajustamos.
+                 * Si se reduce la meta,
+                 * evitamos que el contador quede
+                 * por encima de ella.
                  */
-                vasosTomados =
-                    Math.min(
-                        vasosTomados,
-                        vasosTotales
-                    );
+                if (
+                    vasosTomados >
+                    vasosTotales
+                ) {
+
+                    vasosTomados =
+                        vasosTotales;
+
+                }
 
 
                 guardarDatos();
@@ -746,9 +726,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 if (
-                    modalElement &&
                     typeof bootstrap !==
-                        "undefined"
+                    "undefined" &&
+                    modalElement
                 ) {
 
                     const modalInstance =
@@ -758,7 +738,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     if (modalInstance) {
+
                         modalInstance.hide();
+
                     }
 
                 }
@@ -778,8 +760,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    /*
+     * Cuando cambia el idioma,
+     * actualizamos todos los textos dinámicos.
+     */
+    window.addEventListener(
+        "lifesyncIdiomaCambiado",
+        () => {
+
+            actualizarPreviewModal();
+
+            actualizarInterfaz();
+
+        }
+    );
+
+
     cargarDatos();
 
     actualizarInterfaz();
 
-});
+
+    window.addEventListener("lifesyncIdiomaCambiado", actualizarInterfaz);
+
+})();

@@ -1,21 +1,16 @@
-
-document.addEventListener("load", async (e) => {
-    e.preventDefault();
-
+document.addEventListener("DOMContentLoaded", async () => {
     try {
-            const response = await fetch('../config/conexion.php', {
-                method: 'GET'
-            });
- 
-            const result = await response.json();
+        const response = await fetch("../config/conexion.php", {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        });
 
-            alert(result);
- 
-            
-        } catch (error) {
-            alert('Ocurrió un error de conexión');
-        }
+        const result = await response.json();
+        console.log("Resultado de conexión:", result);
 
-
-}
-)
+    } catch (error) {
+        console.error("Ocurrió un error de conexión:", error);
+    }
+});

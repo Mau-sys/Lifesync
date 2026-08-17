@@ -1,3 +1,7 @@
+function LS(clave) {
+    return typeof window !== "undefined" && typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(clave) : clave;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const DEFAULT_CONFIG = {
         tipoMeta: 'semanal',
@@ -73,11 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const horas = Math.floor(minutosTotales / 60);
             const minsRestantes = minutosTotales % 60;
             if (minsRestantes === 0) {
-                return `${horas} ${horas === 1 ? 'hora' : 'horas'}`;
+                return `${horas} ${horas === 1 ? LS("hora") : LS("horas")}`;
             }
-            return `${horas} ${horas === 1 ? 'hora' : 'horas'} y ${minsRestantes} min`;
+            return `${horas} ${horas === 1 ? LS("hora") : LS("horas")} y ${minsRestantes} ${LS("min")}`;
         }
-        return `${minutosTotales} min`;
+        return `${minutosTotales} ${LS("min")}`;
     }
 
     function renderizarProgreso() {
@@ -85,45 +89,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalMinutos = registrosFisica.minutosTotales || 0;
 
         let objetivoSesiones = configFisica.metaSesiones;
-        let textoLabel = 'Meta semanal';
+        let textoLabel = LS("metaSemanal");
         let textoMetaDetail = '';
 
         const textoTiempoObjetivo = formatearTiempo(configFisica.metaMinutos);
 
         if (configFisica.tipoMeta === 'diaria') {
-            textoLabel = 'Meta diaria';
-            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? 'sesión' : 'sesiones'} (${textoTiempoObjetivo})`;
+            textoLabel = LS("metaDiaria");
+            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? LS("sesion") : LS("sesiones")} (${textoTiempoObjetivo})`;
         } else if (configFisica.tipoMeta === 'semanal') {
-            textoLabel = 'Meta semanal';
-            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? 'sesión' : 'sesiones'} (${textoTiempoObjetivo})`;
+            textoLabel = LS("metaSemanal");
+            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? LS("sesion") : LS("sesiones")} (${textoTiempoObjetivo})`;
         } else if (configFisica.tipoMeta === 'mensual') {
-            textoLabel = 'Meta mensual';
-            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? 'sesión' : 'sesiones'} (${textoTiempoObjetivo})`;
+            textoLabel = LS("metaMensual");
+            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? LS("sesion") : LS("sesiones")} (${textoTiempoObjetivo})`;
         } else if (configFisica.tipoMeta === 'personalizado') {
             const numDias = (configFisica.diasSeleccionados || []).length;
-            textoLabel = `Meta de ${numDias} ${numDias === 1 ? 'día' : 'días'}`;
-            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? 'sesión' : 'sesiones'} (${textoTiempoObjetivo})`;
+            textoLabel = LS("metaDeDias").replace("{n}", numDias).replace("{unidad}", numDias === 1 ? LS("dia") : LS("dias"));
+            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? LS("sesion") : LS("sesiones")} (${textoTiempoObjetivo})`;
         }
 
         labelTipoMeta.textContent = textoLabel;
         metaFisica.textContent = textoMetaDetail;
         contadorSesiones.textContent = `${numSesiones}/${objetivoSesiones}`;
-        labelProgresoUnidad.textContent = numSesiones === 1 ? 'sesión' : 'sesiones';
+        labelProgresoUnidad.textContent = numSesiones === 1 ? LS("sesion") : LS("sesiones");
 
-        tiempoAcumulado.textContent = `${totalMinutos} min / ${configFisica.metaMinutos} min`;
+        tiempoAcumulado.textContent = `${totalMinutos} ${LS("min")} / ${configFisica.metaMinutos} ${LS("min")}`;
 
         const porcentajeSesiones = objetivoSesiones > 0 ? Math.min((numSesiones / objetivoSesiones) * 100, 100) : 0;
         ringFisica.style.background = `conic-gradient(var(--ls-amber) ${porcentajeSesiones}%, rgba(255, 159, 28, 0.15) ${porcentajeSesiones}%)`;
 
         if (objetivoSesiones > 0 && numSesiones >= objetivoSesiones && totalMinutos >= configFisica.metaMinutos) {
-            btnAddSesion.textContent = '¡Meta completada!';
+            btnAddSesion.textContent = LS("metaCompletada");
         } else {
-            btnAddSesion.textContent = '+ Registrar sesión';
+            btnAddSesion.textContent = LS("registrarSesion");
         }
     }
 
     function reiniciarProgreso() {
-        if (confirm('¿Estás seguro de que deseas reiniciar tu progreso actual? Los minutos y sesiones volverán a cero.')) {
+        if (confirm(LS("confirmarReinicioFisica"))) {
             registrosFisica = { sesiones: [], minutosTotales: 0 };
             localStorage.setItem('lifesync_registros_fisica', JSON.stringify(registrosFisica));
             renderizarProgreso();
@@ -144,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const duracion = parseInt(document.getElementById('input-duracion-minutos').value, 10);
 
         if (!duracion || duracion <= 0 || duracion > 360) {
-            alert('Por favor ingresa un tiempo válido de sesión (entre 1 y 360 minutos).');
+            alert(LS("tiempoSesionValido"));
             return;
         }
 
@@ -166,10 +170,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (valor === 'personalizado') {
             contenedorDiasSemana.classList.remove('d-none');
-            labelMetaCantidad.childNodes[0].nodeValue = 'Sesiones ';
+            labelMetaCantidad.childNodes[0].nodeValue = LS("sesionesLabel") + " ";
         } else {
             contenedorDiasSemana.classList.add('d-none');
-            labelMetaCantidad.childNodes[0].nodeValue = 'Sesiones ';
+            labelMetaCantidad.childNodes[0].nodeValue = LS("sesionesLabel") + " ";
         }
 
         const maxPermitido = LIMITES_FRECUENCIA[valor] || 30;
@@ -222,18 +226,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const metaSesiones = parseInt(inputMetaCantidad.value, 10);
 
         if (!metaMinutos || metaMinutos <= 0 || metaMinutos > 3000) {
-            alert('Por favor establece una meta de tiempo válida (entre 10 y 3000 minutos).');
+            alert(LS("metaTiempoValida"));
             return;
         }
 
         const maxPermitido = LIMITES_FRECUENCIA[tipoMeta] || 30;
         if (!metaSesiones || metaSesiones < 1 || metaSesiones > maxPermitido) {
-            alert(`El número de sesiones debe estar entre 1 y ${maxPermitido}.`);
+            alert(LS("numeroSesionesFisicaValido").replace("{max}", maxPermitido));
             return;
         }
 
         if (tipoMeta === 'personalizado' && diasTemporal.length === 0) {
-            alert('Por favor selecciona al menos un día de la semana.');
+            alert(LS("seleccionarDiaSemana"));
             return;
         }
 
@@ -250,4 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     renderizarProgreso();
+
+    window.addEventListener("lifesyncIdiomaCambiado", renderizarProgreso);
 });
