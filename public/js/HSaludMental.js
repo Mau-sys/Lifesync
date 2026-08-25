@@ -1,3 +1,119 @@
+document.addEventListener("DOMContentLoaded", () => {
+    let currentHabitoId = null;
+
+    // Inicializar carga de datos al abrir la página
+    cargarDatos();
+
+    // Evento para agregar pausa al hacer clic en el botón "+1 pausa"
+    const btnAddPausa = document.getElementById("btn-add-pausa");
+    if (btnAddPausa) {
+        btnAddPausa.addEventListener("click", () => {
+            agregarPausa();
+        });
+    }
+
+    /**
+     * Consulta los datos actuales del hábito de Salud Mental y sus registros del día
+     */
+    async function cargarDatos() {
+        try {
+            const response = await fetch("../salud_mental/read.php");
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+
+            const res = await response.json();
+
+            if (res.success) {
+                const { id_habito, objetivo, duracion_minutos, total_pausas, registros } = res.data;
+                currentHabitoId = id_habito;
+
+                // Actualizar contador visual principal
+                const contadorElem = document.getElementById("contador-saludmental");
+                if (contadorElem) {
+                    contadorElem.textContent = `${total_pausas}/${objetivo}`;
+                }
+
+                // Actualizar texto de meta diaria
+                const metaElem = document.getElementById("meta-saludmental");
+                if (metaElem) {
+                    metaElem.textContent = `${objetivo} pausas (${duracion_minutos} min/pausa)`;
+                }
+
+                // Renderizar historial de pausas del día
+                renderizarListaPausas(registros);
+            } else {
+                console.error("Error al cargar datos:", res.message);
+            }
+        } catch (error) {
+            console.error("Error en Fetch (cargarDatos):", error);
+        }
+    }
+
+    /**
+     * Registra una nueva pausa en la base de datos
+     */
+    async function agregarPausa() {
+        try {
+            const response = await fetch("../salud_mental/create.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ id_habito: currentHabitoId })
+            });
+
+            if (!response.ok) {
+                throw new Error("Error en la solicitud HTTP");
+            }
+
+            const res = await response.json();
+
+            if (res.success) {
+                // Recargar los datos para refrescar contadores y lista
+                await cargarDatos();
+            } else {
+                alert(res.message || "No se pudo guardar la pausa.");
+            }
+        } catch (error) {
+            console.error("Error en Fetch (agregarPausa):", error);
+            alert("Ocurrió un error de conexión al guardar la pausa.");
+        }
+    }
+
+    /**
+     * Pinta en el HTML la lista de descansos registrados en la fecha actual
+     */
+    function renderizarListaPausas(registros) {
+        const listaContenedor = document.getElementById("lista-pausas");
+        if (!listaContenedor) return;
+
+        listaContenedor.innerHTML = "";
+
+        if (!registros || registros.length === 0) {
+            listaContenedor.innerHTML = `
+                <div class="text-subtle text-center py-2 small">
+                    No has registrado pausas el día de hoy.
+                </div>
+            `;
+            return;
+        }
+
+        registros.forEach((reg, index) => {
+            const itemHtml = `
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
+                    <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-circle-check text-purple me-2"></i>
+                        <span class="text-white fw-medium">Pausa #${registros.length - index}</span>
+                    </div>
+                    <span class="text-subtle small">${reg.hora}</span>
+                </div>
+            `;
+            listaContenedor.innerHTML += itemHtml;
+        });
+    }
+});
+
 function LS(clave) {
     return typeof window !== "undefined" && typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(clave) : clave;
 }
@@ -327,3 +443,4 @@ cargarDatos();
 actualizarInterfaz();
 
     window.addEventListener("lifesyncIdiomaCambiado", actualizarInterfaz);
+    
