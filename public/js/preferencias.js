@@ -91,7 +91,97 @@ document.addEventListener(
 
 
         /* =================================================
-           CHECKBOXES
+           CARGAR PREFERENCIAS
+           ================================================= */
+
+        async function cargarPreferencias() {
+
+            try {
+
+                const respuesta =
+                    await fetch(
+                        "../auth/preferencias.php",
+                        {
+                            method: "GET",
+
+                            credentials:
+                                "include",
+
+                            headers: {
+                                "Accept":
+                                    "application/json"
+                            }
+                        }
+                    );
+
+
+                const datos =
+                    await respuesta.json();
+
+
+                if (
+                    !respuesta.ok ||
+                    !datos.exito
+                ) {
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        texto(
+                            "noCargarPreferencias"
+                        )
+                    );
+
+                    return;
+                }
+
+
+                const categoriasActivas =
+                    datos.categorias_activas || [];
+
+
+                /*
+                 * Marcar los switches que el usuario
+                 * ya tiene activos.
+                 */
+
+                checkboxes.forEach(
+                    (checkbox) => {
+
+                        const idCategoria =
+                            parseInt(
+                                checkbox.value
+                            );
+
+
+                        checkbox.checked =
+                            categoriasActivas.includes(
+                                idCategoria
+                            );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error al cargar preferencias:",
+                    error
+                );
+
+                mostrarMensaje(
+                    texto(
+                        "errorConexion"
+                    )
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
+           CAMBIOS EN CHECKBOXES
            ================================================= */
 
         checkboxes.forEach(
@@ -128,14 +218,16 @@ document.addEventListener(
                     Array.from(
                         checkboxes
                     )
-                    .filter(
-                        (checkbox) =>
-                            checkbox.checked
-                    )
-                    .map(
-                        (checkbox) =>
-                            checkbox.value
-                    );
+                        .filter(
+                            (checkbox) =>
+                                checkbox.checked
+                        )
+                        .map(
+                            (checkbox) =>
+                                parseInt(
+                                    checkbox.value
+                                )
+                        );
 
 
                 if (
@@ -150,18 +242,6 @@ document.addEventListener(
 
                     return;
                 }
-
-
-                const checkboxPersonalizado =
-                    document.getElementById(
-                        "habitoPersonalizado"
-                    );
-
-
-                const tienePersonalizado =
-                    checkboxPersonalizado
-                        ? checkboxPersonalizado.checked
-                        : false;
 
 
                 cambiarEstadoBoton(true);
@@ -188,44 +268,17 @@ document.addEventListener(
 
                                 body:
                                     JSON.stringify({
+
                                         categorias:
                                             seleccionadas
+
                                     })
                             }
                         );
 
 
-                    const textoRespuesta =
-                        await respuesta.text();
-
-
-                    let datos;
-
-
-                    try {
-
-                        datos =
-                            JSON.parse(
-                                textoRespuesta
-                            );
-
-                    } catch (error) {
-
-                        console.error(
-                            "La respuesta no es JSON válido:",
-                            textoRespuesta
-                        );
-
-                        mostrarMensaje(
-                            texto(
-                                "errorRespuestaServidor"
-                            )
-                        );
-
-                        cambiarEstadoBoton(false);
-
-                        return;
-                    }
+                    const datos =
+                        await respuesta.json();
 
 
                     if (
@@ -247,19 +300,13 @@ document.addEventListener(
                     }
 
 
-                    if (
-                        tienePersonalizado
-                    ) {
+                    /*
+                     * Preferencias guardadas.
+                     */
 
-                        window.location.href =
-                            "Crear-habito.html";
+                    window.location.href =
+                        "inicio.html";
 
-                    } else {
-
-                        window.location.href =
-                            "Inicio.html";
-
-                    }
 
                 } catch (error) {
 
@@ -268,11 +315,13 @@ document.addEventListener(
                         error
                     );
 
+
                     mostrarMensaje(
                         texto(
                             "errorConexion"
                         )
                     );
+
 
                     cambiarEstadoBoton(false);
 
@@ -302,6 +351,13 @@ document.addEventListener(
 
             }
         );
+
+
+        /* =================================================
+           INICIAR
+           ================================================= */
+
+        cargarPreferencias();
 
     }
 );
