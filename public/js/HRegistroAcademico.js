@@ -1,292 +1,321 @@
-function LS(clave) {
-    return typeof window !== "undefined" && typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(clave) : clave;
-}
+(function () {
+    "use strict";
 
-let estadoApp = {
-    sesionesCompletadas: 0,
-    metaSesiones: 5,
-    duracionPorSesion: 45,
-    frecuencia: 'diario',
-    diasActivos: [1, 2, 3, 4, 5]
-};
+    const LS = t =>
+        typeof window.traducirLifeSync === "function"
+            ? window.traducirLifeSync(t)
+            : t;
 
-const btnOptions = document.getElementById('btn-options-academico');
-const kebabMenu = document.getElementById('kebab-menu-academico');
-const btnEditarMeta = document.getElementById('btn-editar-meta');
-const btnRegresar = document.getElementById('btn-regresar');
-const btnAddSesion = document.getElementById('btn-add-sesion');
+    const API = "../auth/";
+    const CATEGORIA = "Académico";
 
-const contadorSesiones = document.getElementById('contador-sesiones');
-const metaSesionesTexto = document.getElementById('meta-sesiones');
-const tiempoAcumuladoTexto = document.getElementById('tiempo-acumulado');
-const ringSesiones = document.getElementById('ring-sesiones');
+    let id = Number(
+        new URLSearchParams(location.search).get("id_habito_usuario")
+    ) || 0;
 
-const modalElement = document.getElementById('modalConfiguracion');
-const modalConfiguracion = new bootstrap.Modal(modalElement);
-const inputNumSesiones = document.getElementById('input-num-sesiones');
-const inputDuracionSesion = document.getElementById('input-duracion-sesion');
-const selectFrecuencia = document.getElementById('select-frecuencia');
-const contenedorDiasSemana = document.getElementById('contenedor-dias-semana');
-const labelNumSesiones = document.getElementById('label-num-sesiones');
-const previewMetaTotal = document.getElementById('preview-meta-total');
-const btnGuardarMeta = document.getElementById('btn-guardar-meta');
-const btnReiniciarMeta = document.getElementById('btn-reiniciar-meta');
+    let objetivo = 3;
+    let progreso = 0;
 
-let diasSeleccionadosTemp = [];
+    const $ = id => document.getElementById(id);
 
-function obtenerFechaHoy() {
-    return new Date().toISOString().split('T')[0];
-}
+    const menu = $("kebab-menu-academico");
+    const ring = $("ring-academico");
+    const contador = $("contador-academico");
+    const meta = $("meta-academico");
+    const lista = $("lista-registros");
+    const btn = $("btn-add-registro");
 
-function esNuevoPeriodo() {
-    const hoy = new Date();
-    const hoyFechaStr = hoy.toISOString().split('T')[0];
-    const ultimaFechaStr = localStorage.getItem('ls_academico_fecha');
+    const btnOptions = $("btn-options-academico");
+    const btnRegresar = $("btn-regresar");
+    const btnEditarMeta = $("btn-editar-meta");
+    const btnGuardarConfig = $("btn-guardar-config");
+    const btnReiniciarMeta = $("btn-reiniciar-meta");
+    const inputRegistros = $("input-registros");
 
-    if (!ultimaFechaStr) return true;
-    if (ultimaFechaStr === hoyFechaStr) return false;
+    const modalEditar = $("modalEditarAcademico");
 
-    const ultimaFecha = new Date(ultimaFechaStr + 'T00:00:00');
+    btnOptions?.addEventListener("click", e => {
+        e.stopPropagation();
+        menu?.classList.toggle("show");
+    });
 
-    if (estadoApp.frecuencia === 'diario') {
-        return true;
-    } else if (estadoApp.frecuencia === 'mensual') {
-        return hoy.getMonth() !== ultimaFecha.getMonth() || hoy.getFullYear() !== ultimaFecha.getFullYear();
-    } else if (estadoApp.frecuencia === 'personalizada') {
-        const diaSemanaHoy = hoy.getDay();
-        if (estadoApp.diasActivos.includes(diaSemanaHoy)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function verificarReinicioPeriodo() {
-    const hoyStr = obtenerFechaHoy();
-    if (esNuevoPeriodo()) {
-        estadoApp.sesionesCompletadas = 0;
-        localStorage.setItem('ls_academico_fecha', hoyStr);
-        guardarDatosStorage();
-    }
-}
-
-function cargarDatosStorage() {
-    const configGuardada = localStorage.getItem('ls_academico_config');
-    if (configGuardada) {
-        const config = JSON.parse(configGuardada);
-        estadoApp.metaSesiones = config.metaSesiones || 5;
-        estadoApp.duracionPorSesion = config.duracionPorSesion || 45;
-        estadoApp.frecuencia = config.frecuencia || 'diario';
-        estadoApp.diasActivos = config.diasActivos || [1, 2, 3, 4, 5];
-    }
-
-    verificarReinicioPeriodo();
-
-    const progresoGuardado = localStorage.getItem('ls_academico_sesiones');
-    if (progresoGuardado !== null) {
-        estadoApp.sesionesCompletadas = parseInt(progresoGuardado) || 0;
-    }
-}
-
-function guardarDatosStorage() {
-    localStorage.setItem('ls_academico_sesiones', estadoApp.sesionesCompletadas);
-    localStorage.setItem('ls_academico_config', JSON.stringify({
-        metaSesiones: estadoApp.metaSesiones,
-        duracionPorSesion: estadoApp.duracionPorSesion,
-        frecuencia: estadoApp.frecuencia,
-        diasActivos: estadoApp.diasActivos
-    }));
-}
-
-function formatearMinutosAHoras(minutosTotales) {
-    if (minutosTotales < 60) return `${minutosTotales} min`;
-    const horas = Math.floor(minutosTotales / 60);
-    const minsRestantes = minutosTotales % 60;
-    return minsRestantes > 0 ? `${horas}h ${minsRestantes}m` : `${horas}h`;
-}
-
-function obtenerEtiquetaFrecuencia() {
-    if (estadoApp.frecuencia === 'diario') return LS("metaDiaria");
-    if (estadoApp.frecuencia === 'mensual') return LS("metaMensual");
-    return LS("metaPeriodo");
-}
-
-function actualizarInterfaz() {
-    verificarReinicioPeriodo();
-
-    const tiempoActualMin = estadoApp.sesionesCompletadas * estadoApp.duracionPorSesion;
-    const tiempoMetaTotalMin = estadoApp.metaSesiones * estadoApp.duracionPorSesion;
-    const porcentaje = Math.min(Math.round((estadoApp.sesionesCompletadas / estadoApp.metaSesiones) * 100), 100);
-
-    const labelMeta = document.querySelector('.label-fluido');
-    if (labelMeta) labelMeta.textContent = obtenerEtiquetaFrecuencia();
-
-    contadorSesiones.textContent = `${estadoApp.sesionesCompletadas}/${estadoApp.metaSesiones}`;
-    metaSesionesTexto.textContent = `${estadoApp.metaSesiones} ${LS("sesiones")} (${estadoApp.duracionPorSesion} ${LS("min")}/${LS("sesion")})`;
-    tiempoAcumuladoTexto.textContent = `${formatearMinutosAHoras(tiempoActualMin)} / ${formatearMinutosAHoras(tiempoMetaTotalMin)}`;
-
-    ringSesiones.style.background = `conic-gradient(var(--ls-pink) ${porcentaje}%, rgba(236, 72, 153, 0.15) ${porcentaje}%)`;
-
-    const hoyDiaSemana = new Date().getDay();
-    const esDiaInactivo = estadoApp.frecuencia === 'personalizada' && !estadoApp.diasActivos.includes(hoyDiaSemana);
-
-    if (estadoApp.sesionesCompletadas >= estadoApp.metaSesiones) {
-        btnAddSesion.textContent = LS("metaCompletada");
-        btnAddSesion.disabled = true;
-    } else if (esDiaInactivo) {
-        btnAddSesion.textContent = LS("diaDescansoMeta");
-        btnAddSesion.disabled = true;
-    } else {
-        btnAddSesion.textContent = LS("registrarSesionEstudio");
-        btnAddSesion.disabled = false;
-    }
-}
-
-function actualizarPreviewModal() {
-    const s = parseInt(inputNumSesiones.value) || 0;
-    const d = parseInt(inputDuracionSesion.value) || 0;
-    const totalMin = s * d;
-    previewMetaTotal.textContent = `${totalMin} min (${formatearMinutosAHoras(totalMin)})`;
-}
-
-function renderizarBotonesDias() {
-    const botones = document.querySelectorAll('.btn-dia-semana');
-    botones.forEach(btn => {
-        const dia = parseInt(btn.getAttribute('data-dia'));
-        if (diasSeleccionadosTemp.includes(dia)) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
+    document.addEventListener("click", e => {
+        if (menu && !menu.contains(e.target)) {
+            menu.classList.remove("show");
         }
     });
-}
 
-btnOptions.addEventListener('click', (e) => {
-    e.stopPropagation();
-    kebabMenu.classList.toggle('show');
-});
+    btnRegresar?.addEventListener("click", e => {
+        e.preventDefault();
 
-document.addEventListener('click', (e) => {
-    if (kebabMenu && !kebabMenu.contains(e.target)) {
-        kebabMenu.classList.remove('show');
-    }
-});
-
-if (btnRegresar) {
-    btnRegresar.addEventListener('click', () => {
-        const paginaAnterior = document.referrer;
-        if (paginaAnterior && paginaAnterior.includes(window.location.host)) {
-            window.history.back();
+        if (history.length > 1) {
+            history.back();
         } else {
-            window.location.href = 'inicio.html';
+            location.href = "inicio.html";
         }
     });
-}
 
-btnEditarMeta.addEventListener('click', (e) => {
-    e.preventDefault();
-    kebabMenu.classList.remove('show');
-    
-    inputNumSesiones.value = estadoApp.metaSesiones;
-    inputDuracionSesion.value = estadoApp.duracionPorSesion;
-    selectFrecuencia.value = estadoApp.frecuencia;
-    diasSeleccionadosTemp = [...estadoApp.diasActivos];
-    
-    gestionarCambioFrecuencia();
-    actualizarPreviewModal();
-    
-    modalConfiguracion.show();
-});
+    async function cargar() {
+        const query = id
+            ? `?id_habito_usuario=${id}`
+            : `?categoria=${encodeURIComponent(CATEGORIA)}`;
 
-function gestionarCambioFrecuencia() {
-    const frec = selectFrecuencia.value;
-    if (frec === 'personalizada') {
-        contenedorDiasSemana.classList.remove('d-none');
-        labelNumSesiones.textContent = LS("sesionesPorPeriodo");
-        renderizarBotonesDias();
-    } else if (frec === 'mensual') {
-        contenedorDiasSemana.classList.add('d-none');
-        labelNumSesiones.textContent = LS("sesionesAlMes");
-    } else {
-        contenedorDiasSemana.classList.add('d-none');
-        labelNumSesiones.textContent = LS("sesionesDiarias");
-    }
-}
-
-selectFrecuencia.addEventListener('change', gestionarCambioFrecuencia);
-
-document.querySelectorAll('.btn-dia-semana').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const dia = parseInt(btn.getAttribute('data-dia'));
-        if (diasSeleccionadosTemp.includes(dia)) {
-            if (diasSeleccionadosTemp.length > 1) {
-                diasSeleccionadosTemp = diasSeleccionadosTemp.filter(d => d !== dia);
-            } else {
-                alert(LS("seleccionarDiaActivo"));
+        const respuesta = await fetch(
+            `${API}obtener-habito.php${query}`,
+            {
+                credentials: "include",
+                cache: "no-store"
             }
-        } else {
-            diasSeleccionadosTemp.push(dia);
+        );
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok || !datos.exito || !datos.habito) {
+            throw new Error(
+                datos.mensaje || LS("No se pudieron cargar los datos.")
+            );
         }
-        renderizarBotonesDias();
+
+        id = Number(datos.habito.id_habito_usuario);
+
+        objetivo = Number(datos.habito.objetivo) || 3;
+        progreso = Number(datos.habito.progreso_hoy) || 0;
+
+        if (progreso > objetivo) {
+            progreso = objetivo;
+        }
+    }
+
+    function render() {
+        if (!contador || !meta || !ring || !lista || !btn) {
+            return;
+        }
+
+        contador.textContent = `${progreso}/${objetivo}`;
+
+        meta.textContent =
+            `${objetivo} ${objetivo === 1
+                ? LS("registroAcademico")
+                : LS("registrosAcademicos")}`;
+
+        const porcentaje = objetivo > 0
+            ? Math.min(100, (progreso / objetivo) * 100)
+            : 0;
+
+        ring.style.background =
+            `conic-gradient(
+                var(--ls-pink) ${porcentaje}%,
+                rgba(236, 72, 153, 0.15) ${porcentaje}%
+            )`;
+
+        lista
+            .querySelectorAll(".registro-progreso")
+            .forEach(elemento => elemento.remove());
+
+        for (let i = 0; i < objetivo; i++) {
+            const elemento = document.createElement("span");
+
+            elemento.className =
+                `registro-progreso badge rounded-pill m-1 ${
+                    i < progreso ? "bg-pink" : "bg-secondary"
+                }`;
+
+            elemento.textContent = i + 1;
+
+            lista.appendChild(elemento);
+        }
+
+        btn.disabled = progreso >= objetivo;
+
+        btn.innerHTML =
+            `<span>${
+                progreso >= objetivo
+                    ? LS("metaCompletada")
+                    : LS("agregarRegistro")
+            }</span>`;
+    }
+
+    async function registrar() {
+        if (!id || btn?.disabled) {
+            return;
+        }
+
+        try {
+            const respuesta = await fetch(
+                `${API}registrar-habito.php`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        id_habito_usuario: id,
+                        valor: 1,
+                        observaciones: "registro académico"
+                    })
+                }
+            );
+
+            const datos = await respuesta.json();
+
+            if (!respuesta.ok || !datos.exito) {
+                throw new Error(
+                    datos.mensaje || LS("No se pudo registrar.")
+                );
+            }
+
+            if (datos.registro) {
+                progreso = Number(datos.registro.progreso_hoy) || progreso + 1;
+            } else {
+                progreso++;
+            }
+
+            progreso = Math.min(progreso, objetivo);
+
+            render();
+
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    btn?.addEventListener("click", registrar);
+
+    btnEditarMeta?.addEventListener("click", e => {
+        e.preventDefault();
+
+        menu?.classList.remove("show");
+
+        if (inputRegistros) {
+            inputRegistros.value = objetivo;
+        }
+
+        if (modalEditar && typeof bootstrap !== "undefined") {
+            bootstrap.Modal
+                .getOrCreateInstance(modalEditar)
+                .show();
+        }
     });
-});
 
-inputNumSesiones.addEventListener('input', actualizarPreviewModal);
-inputDuracionSesion.addEventListener('input', actualizarPreviewModal);
+    btnGuardarConfig?.addEventListener("click", async () => {
+        const nuevaMeta = Number(inputRegistros?.value);
 
-btnReiniciarMeta.addEventListener('click', () => {
-    if (confirm(LS("confirmarReinicioAcademico"))) {
-        estadoApp.sesionesCompletadas = 0;
-        guardarDatosStorage();
-        actualizarInterfaz();
-        modalConfiguracion.hide();
-    }
-});
+        if (
+            !Number.isInteger(nuevaMeta) ||
+            nuevaMeta < 1 ||
+            nuevaMeta > 20
+        ) {
+            alert(LS("numeroRegistrosValido"));
+            return;
+        }
 
-btnGuardarMeta.addEventListener('click', () => {
-    const nuevasSesiones = parseInt(inputNumSesiones.value);
-    const nuevaDuracion = parseInt(inputDuracionSesion.value);
-    const nuevaFrecuencia = selectFrecuencia.value;
+        if (!id) {
+            alert(LS("sinInformacionDisponible"));
+            return;
+        }
 
-    if (isNaN(nuevasSesiones) || nuevasSesiones < 1 || nuevasSesiones > 100) {
-        alert(LS("numeroSesionesValido"));
-        return;
-    }
+        try {
+            const respuesta = await fetch(
+                `${API}actualizar-habito.php`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        id_habito_usuario: id,
+                        objetivo: nuevaMeta,
+                        unidad: "registros",
+                        frecuencia: "diaria"
+                    })
+                }
+            );
 
-    if (isNaN(nuevaDuracion) || nuevaDuracion < 5 || nuevaDuracion > 240) {
-        alert(LS("duracionSesionValida"));
-        return;
-    }
+            const datos = await respuesta.json();
 
-    if (nuevaFrecuencia === 'personalizada' && diasSeleccionadosTemp.length === 0) {
-        alert(LS("diaSemanaMetaPersonalizada"));
-        return;
-    }
+            if (!respuesta.ok || !datos.exito) {
+                throw new Error(
+                    datos.mensaje ||
+                    LS("No se pudieron guardar los cambios.")
+                );
+            }
 
-    estadoApp.metaSesiones = nuevasSesiones;
-    estadoApp.duracionPorSesion = nuevaDuracion;
-    estadoApp.frecuencia = nuevaFrecuencia;
-    estadoApp.diasActivos = [...diasSeleccionadosTemp];
+            objetivo = nuevaMeta;
 
-    if (estadoApp.sesionesCompletadas > estadoApp.metaSesiones) {
-        estadoApp.sesionesCompletadas = estadoApp.metaSesiones;
-    }
+            if (progreso > objetivo) {
+                progreso = objetivo;
+            }
 
-    guardarDatosStorage();
-    actualizarInterfaz();
-    modalConfiguracion.hide();
-});
+            render();
 
-btnAddSesion.addEventListener('click', () => {
-    verificarReinicioPeriodo();
-    if (estadoApp.sesionesCompletadas < estadoApp.metaSesiones) {
-        estadoApp.sesionesCompletadas++;
-        guardarDatosStorage();
-        actualizarInterfaz();
-    }
-});
+            if (modalEditar && typeof bootstrap !== "undefined") {
+                bootstrap.Modal
+                    .getOrCreateInstance(modalEditar)
+                    .hide();
+            }
 
-cargarDatosStorage();
-actualizarInterfaz();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
 
-    window.addEventListener("lifesyncIdiomaCambiado", actualizarInterfaz);
+    btnReiniciarMeta?.addEventListener("click", async () => {
+        if (
+            !confirm(
+                LS("¿Quieres reiniciar la cuenta a 0?")
+            )
+        ) {
+            return;
+        }
+
+        if (!id) {
+            return;
+        }
+
+        try {
+            const respuesta = await fetch(
+                `${API}eliminar-registros-hoy.php`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        id_habito_usuario: id
+                    })
+                }
+            );
+
+            const datos = await respuesta.json();
+
+            if (!respuesta.ok || !datos.exito) {
+                throw new Error(
+                    datos.mensaje ||
+                    LS("No se pudo reiniciar.")
+                );
+            }
+
+            progreso = 0;
+
+            render();
+
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    window.addEventListener(
+        "lifesyncIdiomaCambiado",
+        render
+    );
+
+    cargar()
+        .then(render)
+        .catch(error => {
+            console.error("LifeSync Académico:", error);
+            alert(error.message);
+        });
+})();

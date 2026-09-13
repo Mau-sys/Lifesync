@@ -84,11 +84,10 @@ try {
 
     $foto = $usuario["foto_perfil"];
 
-
     if (empty($foto)) {
-
         $foto = "img/Perfil.png";
-
+    } elseif (!preg_match("~^(https?:)?//|^data:|^/|^\.\./~i", $foto)) {
+        $foto = "../" . ltrim($foto, "/");
     }
 
 

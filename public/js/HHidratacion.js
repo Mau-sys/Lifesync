@@ -1,786 +1,162 @@
-/* =========================================================
-   HIDRATACIÓN — LifeSync
-   ========================================================= */
-
 (function () {
-
     "use strict";
 
+    const LS = texto => typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(texto) : texto;
+    const API = "../auth/";
+    const CATEGORIA = "Hidratación";
+    const params = new URLSearchParams(location.search);
+    const $ = id => document.getElementById(id);
 
-    function LS(texto) {
-
-        if (
-            typeof window !== "undefined" &&
-            typeof window.traducirLifeSync === "function"
-        ) {
-            return window.traducirLifeSync(texto);
-        }
-
-        return texto;
-    }
-
-
-    const btnOptions =
-        document.getElementById(
-            "btn-options-hidratacion"
-        );
-
-    const kebabMenu =
-        document.getElementById(
-            "kebab-menu-hidratacion"
-        );
-
-    const btnRegresar =
-        document.getElementById(
-            "btn-regresar"
-        );
-
-
-    if (
-        btnOptions &&
-        kebabMenu
-    ) {
-
-        btnOptions.addEventListener(
-            "click",
-            (e) => {
-
-                e.stopPropagation();
-
-                kebabMenu.classList.toggle(
-                    "show"
-                );
-
-            }
-        );
-
-
-        document.addEventListener(
-            "click",
-            (e) => {
-
-                if (
-                    !kebabMenu.contains(
-                        e.target
-                    )
-                ) {
-
-                    kebabMenu.classList.remove(
-                        "show"
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    if (btnRegresar) {
-
-        btnRegresar.addEventListener(
-            "click",
-            () => {
-
-                const paginaAnterior =
-                    document.referrer;
-
-                const mismoDominio =
-                    paginaAnterior &&
-                    paginaAnterior.includes(
-                        window.location.host
-                    );
-
-
-                if (mismoDominio) {
-
-                    window.history.back();
-
-                } else {
-
-                    window.location.href =
-                        "inicio.html";
-
-                }
-
-            }
-        );
-
-    }
-
-
+    let id = Number(params.get("id_habito_usuario")) || 0;
     let vasosTomados = 0;
-
     let vasosTotales = 8;
+    let capacidadVaso = Number(localStorage.getItem("lifesync_hidratacion_capacidad")) || 250;
+    let cargando = false;
 
-    let capacidadVaso = 250;
+    const btnOptions = $("btn-options-hidratacion");
+    const kebabMenu = $("kebab-menu-hidratacion");
+    const ring = $("ring-hidratacion");
+    const contador = $("contador-vasos");
+    const meta = $("meta-vasos");
+    const btnAdd = $("btn-add-vaso");
+    const contenedor = $("contenedor-vasos-iconos");
+    const inputVasos = $("input-vasos");
+    const inputCapacidad = $("input-capacidad");
+    const preview = $("preview-meta-total");
 
+    btnOptions?.addEventListener("click", e => {
+        e.stopPropagation();
+        kebabMenu?.classList.toggle("show");
+    });
 
-    const ringElement =
-        document.getElementById(
-            "ring-hidratacion"
-        );
+    document.addEventListener("click", e => {
+        if (kebabMenu && !kebabMenu.contains(e.target)) kebabMenu.classList.remove("show");
+    });
 
-    const contadorElement =
-        document.getElementById(
-            "contador-vasos"
-        );
+    $("btn-regresar")?.addEventListener("click", e => {
+        e.preventDefault();
+        history.length > 1 ? history.back() : location.href = "inicio.html";
+    });
 
-    const metaElement =
-        document.getElementById(
-            "meta-vasos"
-        );
-
-    const btnAddVaso =
-        document.getElementById(
-            "btn-add-vaso"
-        );
-
-    const contenedorVasos =
-        document.getElementById(
-            "contenedor-vasos-iconos"
-        );
-
-
-    const btnGuardar =
-        document.getElementById(
-            "btn-guardar-config"
-        );
-
-    const btnReiniciar =
-        document.getElementById(
-            "btn-reiniciar-meta"
-        );
-
-    const inputVasos =
-        document.getElementById(
-            "input-vasos"
-        );
-
-    const inputCapacidad =
-        document.getElementById(
-            "input-capacidad"
-        );
-
-    const previewMetaTotal =
-        document.getElementById(
-            "preview-meta-total"
-        );
-
-
-    function obtenerFechaHoy() {
-
-        const fecha =
-            new Date();
-
-        const anio =
-            fecha.getFullYear();
-
-        const mes =
-            String(
-                fecha.getMonth() + 1
-            ).padStart(
-                2,
-                "0"
-            );
-
-        const dia =
-            String(
-                fecha.getDate()
-            ).padStart(
-                2,
-                "0"
-            );
-
-        return `${anio}-${mes}-${dia}`;
-
+    async function cargar() {
+        const q = id ? `?id_habito_usuario=${id}` : `?categoria=${encodeURIComponent(CATEGORIA)}`;
+        const r = await fetch(`${API}obtener-habito.php${q}`, { credentials: "include", cache: "no-store" });
+        const d = await r.json();
+        if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
+        id = Number(d.habito.id_habito_usuario);
+        vasosTotales = Number(d.habito.objetivo) || 8;
+        vasosTomados = Number(d.habito.progreso_hoy) || 0;
     }
 
-
-    function verificarReinicioDiario() {
-
-        const hoy =
-            obtenerFechaHoy();
-
-        const ultimaFecha =
-            localStorage.getItem(
-                "ls_hidratacion_fecha"
-            );
-
-
-        if (
-            ultimaFecha !== hoy
-        ) {
-
-            vasosTomados =
-                0;
-
-
-            localStorage.setItem(
-                "ls_hidratacion_fecha",
-                hoy
-            );
-
-
-            guardarDatos();
-
-        }
-
+    function actualizarPreview() {
+        if (!preview) return;
+        const vasos = Number(inputVasos?.value) || 0;
+        const capacidad = Number(inputCapacidad?.value) || 0;
+        preview.textContent = `${((vasos * capacidad) / 1000).toFixed(1)} ${LS("Litros / día")}`;
     }
 
+    function render() {
+        if (!contador || !meta || !ring || !btnAdd || !contenedor) return;
+        contador.textContent = `${vasosTomados}/${vasosTotales}`;
+        const litros = ((vasosTotales * capacidadVaso) / 1000).toFixed(1);
+        meta.textContent = `${vasosTotales} ${LS("vasos al día")} (${litros}L - ${capacidadVaso}ml/${LS("vaso")})`;
 
-    function cargarDatos() {
+        const porcentaje = vasosTotales ? Math.min(100, vasosTomados / vasosTotales * 100) : 0;
+        ring.style.background = `conic-gradient(var(--ls-cyan) ${porcentaje}%, rgba(6,182,212,.15) ${porcentaje}%)`;
+        btnAdd.disabled = vasosTomados >= vasosTotales || cargando;
+        btnAdd.innerHTML = `<span>${vasosTomados >= vasosTotales ? LS("¡Meta alcanzada!") : LS("+1 vaso")}</span>`;
 
-        const configuracionGuardada =
-            localStorage.getItem(
-                "ls_hidratacion_config"
-            );
-
-
-        if (configuracionGuardada) {
-
-            try {
-
-                const config =
-                    JSON.parse(
-                        configuracionGuardada
-                    );
-
-
-                vasosTotales =
-                    config.vasosTotales ||
-                    8;
-
-
-                capacidadVaso =
-                    config.capacidadVaso ||
-                    250;
-
-            } catch (error) {
-
-                console.error(
-                    "Error al cargar la configuración de hidratación:",
-                    error
-                );
-
-            }
-
+        contenedor.innerHTML = "";
+        for (let i = 0; i < vasosTotales; i++) {
+            const icono = document.createElement("i");
+            icono.className = `fa-solid fa-glass-water ${i < vasosTomados ? "text-cyan" : "text-muted-glass"}`;
+            contenedor.appendChild(icono);
         }
 
-
-        verificarReinicioDiario();
-
-
-        const vasosGuardados =
-            localStorage.getItem(
-                "ls_hidratacion_vasos"
-            );
-
-
-        if (
-            vasosGuardados !== null
-        ) {
-
-            vasosTomados =
-                parseInt(
-                    vasosGuardados
-                ) || 0;
-
-        }
-
-
-        if (inputVasos) {
-
-            inputVasos.value =
-                vasosTotales;
-
-        }
-
-
-        if (inputCapacidad) {
-
-            inputCapacidad.value =
-                capacidadVaso;
-
-        }
-
-
-        actualizarPreviewModal();
-
+        if (inputVasos) inputVasos.value = vasosTotales;
+        if (inputCapacidad) inputCapacidad.value = capacidadVaso;
+        actualizarPreview();
     }
 
-
-    function guardarDatos() {
-
-        localStorage.setItem(
-            "ls_hidratacion_vasos",
-            vasosTomados
-        );
-
-
-        localStorage.setItem(
-            "ls_hidratacion_config",
-
-            JSON.stringify({
-                vasosTotales,
-                capacidadVaso
-            })
-        );
-
-    }
-
-
-    function renderizarVasos() {
-
-        if (!contenedorVasos) {
-            return;
+    async function registrar() {
+        if (cargando || !id || vasosTomados >= vasosTotales) return;
+        cargando = true;
+        render();
+        try {
+            const r = await fetch(`${API}registrar-habito.php`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id_habito_usuario: id, valor: 1, observaciones: "vaso" })
+            });
+            const d = await r.json();
+            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo registrar el vaso."));
+            vasosTomados = Number(d.registro.progreso_hoy) || vasosTomados + 1;
+        } catch (e) {
+            alert(e.message);
+        } finally {
+            cargando = false;
+            render();
         }
+    }
 
+    async function guardarConfiguracion() {
+        const vasos = Number(inputVasos?.value);
+        const capacidad = Number(inputCapacidad?.value);
+        if (!Number.isInteger(vasos) || vasos < 1 || vasos > 30) return alert(LS("Por favor ingresa una cantidad de vasos válida (1 a 30)."));
+        if (!Number.isInteger(capacidad) || capacidad < 100 || capacidad > 1000) return alert(LS("Por favor ingresa una capacidad de vaso válida (100 a 1000 ml)."));
 
-        contenedorVasos.innerHTML =
-            "";
-
-
-        for (
-            let i = 0;
-            i < vasosTotales;
-            i++
-        ) {
-
-            const vasoIcono =
-                document.createElement(
-                    "i"
-                );
-
-
-            vasoIcono.className =
-                "fa-solid fa-glass-water";
-
-
-            if (
-                i < vasosTomados
-            ) {
-
-                vasoIcono.classList.add(
-                    "text-cyan"
-                );
-
-            } else {
-
-                vasoIcono.classList.add(
-                    "text-muted-glass"
-                );
-
-            }
-
-
-            contenedorVasos.appendChild(
-                vasoIcono
-            );
-
+        try {
+            const r = await fetch(`${API}actualizar-habito.php`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id_habito_usuario: id, objetivo: vasos, unidad: "vasos" })
+            });
+            const d = await r.json();
+            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron guardar los cambios."));
+            vasosTotales = vasos;
+            capacidadVaso = capacidad;
+            vasosTomados = Math.min(vasosTomados, vasosTotales);
+            localStorage.setItem("lifesync_hidratacion_capacidad", String(capacidadVaso));
+            render();
+            bootstrap.Modal.getInstance($("modalEditarHidratacion"))?.hide();
+            kebabMenu?.classList.remove("show");
+        } catch (e) {
+            alert(e.message);
         }
-
     }
 
-
-    function actualizarInterfaz() {
-
-        verificarReinicioDiario();
-
-
-        if (contadorElement) {
-
-            contadorElement.textContent =
-                `${vasosTomados}/${vasosTotales}`;
-
+    async function reiniciar() {
+        if (!confirm(LS("¿Quieres reiniciar la cuenta a 0?"))) return;
+        try {
+            const r = await fetch(`${API}eliminar-registros-hoy.php`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id_habito_usuario: id })
+            });
+            const d = await r.json();
+            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo reiniciar."));
+            vasosTomados = 0;
+            render();
+            bootstrap.Modal.getInstance($("modalEditarHidratacion"))?.hide();
+        } catch (e) {
+            alert(e.message);
         }
-
-
-        if (metaElement) {
-
-            const litrosTotales =
-                (
-                    (
-                        vasosTotales *
-                        capacidadVaso
-                    ) /
-                    1000
-                ).toFixed(1);
-
-
-            metaElement.textContent =
-                `${vasosTotales} ${
-                    LS("vasosAlDia")
-                } (${litrosTotales}L - ${
-                    capacidadVaso
-                }ml/${
-                    LS("vaso")
-                })`;
-
-        }
-
-
-        if (ringElement) {
-
-            const porcentaje =
-                vasosTotales > 0
-                    ? Math.min(
-                        (
-                            vasosTomados /
-                            vasosTotales
-                        ) * 100,
-                        100
-                    )
-                    : 0;
-
-
-            ringElement.style.background =
-                `conic-gradient(
-                    var(--ls-cyan)
-                    ${porcentaje}%,
-                    rgba(6, 182, 212, 0.15)
-                    ${porcentaje}%
-                )`;
-
-        }
-
-
-        if (btnAddVaso) {
-
-            if (
-                vasosTomados >=
-                vasosTotales
-            ) {
-
-                btnAddVaso.textContent =
-                    LS(
-                        LS("metaAlcanzada")
-                    );
-
-
-                btnAddVaso.classList.add(
-                    "opacity-75"
-                );
-
-            } else {
-
-                btnAddVaso.textContent =
-                    LS("sumarVaso");
-
-
-                btnAddVaso.classList.remove(
-                    "opacity-75"
-                );
-
-            }
-
-        }
-
-
-        renderizarVasos();
-
     }
 
-
-    function actualizarPreviewModal() {
-
-        if (
-            !inputVasos ||
-            !inputCapacidad ||
-            !previewMetaTotal
-        ) {
-
-            return;
-
-        }
-
-
-        const v =
-            parseInt(
-                inputVasos.value
-            ) || 0;
-
-
-        const c =
-            parseInt(
-                inputCapacidad.value
-            ) || 0;
-
-
-        const totalLitros =
-            (
-                (v * c) /
-                1000
-            ).toFixed(1);
-
-
-        previewMetaTotal.textContent =
-            `${totalLitros} ${
-                LS("litrosDia")
-            }`;
-
-    }
-
-
-    if (inputVasos) {
-
-        inputVasos.addEventListener(
-            "input",
-            actualizarPreviewModal
-        );
-
-    }
-
-
-    if (inputCapacidad) {
-
-        inputCapacidad.addEventListener(
-            "input",
-            actualizarPreviewModal
-        );
-
-    }
-
-
-    if (btnAddVaso) {
-
-        btnAddVaso.addEventListener(
-            "click",
-            () => {
-
-                verificarReinicioDiario();
-
-
-                if (
-                    vasosTomados <
-                    vasosTotales
-                ) {
-
-                    vasosTomados++;
-
-                }
-
-
-                guardarDatos();
-
-                actualizarInterfaz();
-
-            }
-        );
-
-    }
-
-
-    if (btnReiniciar) {
-
-        btnReiniciar.addEventListener(
-            "click",
-            () => {
-
-                if (
-                    confirm(
-                        LS(
-                            LS("confirmarReinicioHidratacion")
-                        )
-                    )
-                ) {
-
-                    vasosTomados =
-                        0;
-
-
-                    guardarDatos();
-
-                    actualizarInterfaz();
-
-
-                    const modalElement =
-                        document.getElementById(
-                            "modalEditarHidratacion"
-                        );
-
-
-                    if (
-                        typeof bootstrap !==
-                        "undefined" &&
-                        modalElement
-                    ) {
-
-                        const modalInstance =
-                            bootstrap.Modal.getInstance(
-                                modalElement
-                            );
-
-
-                        if (modalInstance) {
-
-                            modalInstance.hide();
-
-                        }
-
-                    }
-
-
-                    if (kebabMenu) {
-
-                        kebabMenu.classList.remove(
-                            "show"
-                        );
-
-                    }
-
-                }
-
-            }
-        );
-
-    }
-
-
-    if (btnGuardar) {
-
-        btnGuardar.addEventListener(
-            "click",
-            () => {
-
-                const nuevosVasos =
-                    parseInt(
-                        inputVasos.value
-                    );
-
-
-                const nuevaCapacidad =
-                    parseInt(
-                        inputCapacidad.value
-                    );
-
-
-                if (
-                    isNaN(nuevosVasos) ||
-                    nuevosVasos < 1 ||
-                    nuevosVasos > 30
-                ) {
-
-                    alert(
-                        LS(
-                            "Por favor ingresa una cantidad de vasos válida (1 a 30)."
-                        )
-                    );
-
-                    return;
-
-                }
-
-
-                if (
-                    isNaN(nuevaCapacidad) ||
-                    nuevaCapacidad < 100 ||
-                    nuevaCapacidad > 1000
-                ) {
-
-                    alert(
-                        LS(
-                            LS("capacidadVasoValida")
-                        )
-                    );
-
-                    return;
-
-                }
-
-
-                vasosTotales =
-                    nuevosVasos;
-
-
-                capacidadVaso =
-                    nuevaCapacidad;
-
-
-                /*
-                 * Si se reduce la meta,
-                 * evitamos que el contador quede
-                 * por encima de ella.
-                 */
-                if (
-                    vasosTomados >
-                    vasosTotales
-                ) {
-
-                    vasosTomados =
-                        vasosTotales;
-
-                }
-
-
-                guardarDatos();
-
-                actualizarInterfaz();
-
-
-                const modalElement =
-                    document.getElementById(
-                        "modalEditarHidratacion"
-                    );
-
-
-                if (
-                    typeof bootstrap !==
-                    "undefined" &&
-                    modalElement
-                ) {
-
-                    const modalInstance =
-                        bootstrap.Modal.getInstance(
-                            modalElement
-                        );
-
-
-                    if (modalInstance) {
-
-                        modalInstance.hide();
-
-                    }
-
-                }
-
-
-                if (kebabMenu) {
-
-                    kebabMenu.classList.remove(
-                        "show"
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /*
-     * Cuando cambia el idioma,
-     * actualizamos todos los textos dinámicos.
-     */
-    window.addEventListener(
-        "lifesyncIdiomaCambiado",
-        () => {
-
-            actualizarPreviewModal();
-
-            actualizarInterfaz();
-
-        }
-    );
-
-
-    cargarDatos();
-
-    actualizarInterfaz();
-
-
-    window.addEventListener("lifesyncIdiomaCambiado", actualizarInterfaz);
-
+    $("btn-editar-meta")?.addEventListener("click", e => {
+        e.preventDefault();
+        kebabMenu?.classList.remove("show");
+        render();
+    });
+    inputVasos?.addEventListener("input", actualizarPreview);
+    inputCapacidad?.addEventListener("input", actualizarPreview);
+    btnAdd?.addEventListener("click", registrar);
+    $("btn-guardar-config")?.addEventListener("click", guardarConfiguracion);
+    $("btn-reiniciar-meta")?.addEventListener("click", reiniciar);
+    window.addEventListener("lifesyncIdiomaCambiado", render);
+
+    cargar().then(render).catch(e => alert(e.message));
 })();

@@ -1,1142 +1,417 @@
-/* =========================================================
-   IDIOMA GLOBAL — textos dinámicos
-   ========================================================= */
-function LS(texto) {
-    if (typeof window !== "undefined" &&
-        typeof window.traducirLifeSync === "function") {
-        return window.traducirLifeSync(texto);
-    }
-    return texto;
-}
+(function () {
+    "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
+    const LS = texto =>
+        typeof window.traducirLifeSync === "function"
+            ? window.traducirLifeSync(texto)
+            : texto;
 
-    const btnNotificaciones =
-        document.getElementById("btnNotificaciones");
+    const RUTAS = {
+        "Hidratación": "Hhidratacion.html",
+        "Alimentación": "HAlimentacion.html",
+        "Salud Mental": "HSaludMental.html",
+        "Actividad Física": "HActividadFisica.html",
+        "Académico": "HRegistroAcademico.html",
+        "Hábito Personalizado": "HHabitoPersonalizado.html"
+    };
 
-    const panelNotificaciones =
-        document.getElementById("panelNotificaciones");
+    const ICONOS = {
+        "Hidratación": "img/Hidrat.png",
+        "Alimentación": "img/Alimen.png",
+        "Salud Mental": "img/S-Mental.png",
+        "Actividad Física": "img/A-Fisica.png",
+        "Académico": "img/R-Academ.png",
+        "Hábito Personalizado": "img/H-Perzona.png"
+    };
 
-    const overlayNotificaciones =
-        document.getElementById("overlayNotificaciones");
+    document.addEventListener("DOMContentLoaded", () => {
+        const btnNotificaciones = document.getElementById("btnNotificaciones");
+        const panelNotificaciones = document.getElementById("panelNotificaciones");
+        const overlayNotificaciones = document.getElementById("overlayNotificaciones");
+        const cerrarPanel = document.getElementById("cerrarPanel");
+        const listaNotificaciones = document.getElementById("listaNotificaciones");
+        const contadorNotificaciones = document.getElementById("contadorNotificaciones");
+        const nombreUsuario = document.getElementById("nombreUsuario");
+        const fechaActual = document.getElementById("fechaActual");
+        const fotoPerfil = document.getElementById("fotoPerfil");
+        const contenedorCategorias = document.getElementById("contenedorCategorias");
 
-    const cerrarPanel =
-        document.getElementById("cerrarPanel");
+        function abrirNotificaciones() {
+            if (!panelNotificaciones) return;
 
-    const listaNotificaciones =
-        document.getElementById("listaNotificaciones");
-
-    const contadorNotificaciones =
-        document.getElementById("contadorNotificaciones");
-
-    const nombreUsuario =
-        document.getElementById("nombreUsuario");
-
-    const fechaActual =
-        document.getElementById("fechaActual");
-
-    const fotoPerfil =
-        document.getElementById("fotoPerfil");
-
-    function abrirNotificaciones() {
-
-        if (!panelNotificaciones) {
-            return;
+            panelNotificaciones.classList.remove("oculto");
+            overlayNotificaciones?.classList.remove("oculto");
+            panelNotificaciones.setAttribute("aria-hidden", "false");
+            btnNotificaciones?.setAttribute("aria-expanded", "true");
+            document.body.classList.add("panel-notificaciones-abierto");
+            cargarDatosInicio();
         }
 
-        panelNotificaciones.classList.remove("oculto");
+        function cerrarNotificaciones() {
+            if (!panelNotificaciones) return;
 
-        if (overlayNotificaciones) {
-            overlayNotificaciones.classList.remove("oculto");
+            panelNotificaciones.classList.add("oculto");
+            overlayNotificaciones?.classList.add("oculto");
+            panelNotificaciones.setAttribute("aria-hidden", "true");
+            btnNotificaciones?.setAttribute("aria-expanded", "false");
+            document.body.classList.remove("panel-notificaciones-abierto");
         }
 
-        panelNotificaciones.setAttribute(
-            "aria-hidden",
-            "false"
-        );
-
-        if (btnNotificaciones) {
-            btnNotificaciones.setAttribute(
-                "aria-expanded",
-                "true"
-            );
-        }
-
-        document.body.classList.add(
-            "panel-notificaciones-abierto"
-        );
-
-        cargarDatosInicio();
-
-    }
-
-
-    function cerrarNotificaciones() {
-
-        if (!panelNotificaciones) {
-            return;
-        }
-
-        panelNotificaciones.classList.add("oculto");
-
-        if (overlayNotificaciones) {
-            overlayNotificaciones.classList.add("oculto");
-        }
-
-        panelNotificaciones.setAttribute(
-            "aria-hidden",
-            "true"
-        );
-
-        if (btnNotificaciones) {
-            btnNotificaciones.setAttribute(
-                "aria-expanded",
-                "false"
-            );
-        }
-
-        document.body.classList.remove(
-            "panel-notificaciones-abierto"
-        );
-
-    }
-
-
-    if (btnNotificaciones) {
-
-        btnNotificaciones.addEventListener(
-            "click",
-            () => {
-
-                const estaOculto =
-                    !panelNotificaciones ||
-                    panelNotificaciones.classList.contains(
-                        "oculto"
-                    );
-
-                if (estaOculto) {
-
-                    abrirNotificaciones();
-
-                } else {
-
-                    cerrarNotificaciones();
-
-                }
-
+        btnNotificaciones?.addEventListener("click", () => {
+            if (panelNotificaciones?.classList.contains("oculto")) {
+                abrirNotificaciones();
+            } else {
+                cerrarNotificaciones();
             }
-        );
+        });
 
-    }
+        cerrarPanel?.addEventListener("click", cerrarNotificaciones);
+        overlayNotificaciones?.addEventListener("click", cerrarNotificaciones);
 
-
-    if (cerrarPanel) {
-
-        cerrarPanel.addEventListener(
-            "click",
-            cerrarNotificaciones
-        );
-
-    }
-
-
-    if (overlayNotificaciones) {
-
-        overlayNotificaciones.addEventListener(
-            "click",
-            cerrarNotificaciones
-        );
-
-    }
-
-
-    document.addEventListener(
-        "keydown",
-        (evento) => {
-
+        document.addEventListener("keydown", evento => {
             if (
                 evento.key === "Escape" &&
                 panelNotificaciones &&
-                !panelNotificaciones.classList.contains(
-                    "oculto"
-                )
+                !panelNotificaciones.classList.contains("oculto")
             ) {
-
                 cerrarNotificaciones();
-
             }
-
-        }
-    );
-
-
-    async function cargarDatosInicio() {
-
-        try {
-
-            const respuesta =
-                await fetch(
-                    "auth/inicio.php",
-                    {
-                        method: "GET",
-                        cache: "no-cache",
-                        credentials: "same-origin",
-                        headers: {
-                            "Accept":
-                                "application/json"
-                        }
-                    }
-                );
-
-
-            const resultado =
-                await respuesta.json();
-
-
-            if (!respuesta.ok || !resultado.exito) {
-
-                mostrarErrorInicio(
-                    resultado.mensaje
-                );
-
-                return;
-
-            }
-
-
-            actualizarContador(
-                resultado.notificaciones_no_leidas
-            );
-
-
-            mostrarNotificaciones(
-                resultado.notificaciones
-            );
-
-            actualizarRacha(
-                resultado.racha
-            );
-
-            actualizarProgreso(
-                resultado.progreso
-            );
-
-            actualizarCategorias(
-                resultado.habitos_pendientes
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Error al cargar los datos de Inicio:",
-                error
-            );
-
-            mostrarErrorInicio();
-
-        }
-
-    }
-
-    function actualizarContador(cantidad) {
-
-        const numero =
-            Number(cantidad) || 0;
-
-
-        if (!contadorNotificaciones) {
-            return;
-        }
-
-
-        contadorNotificaciones.textContent =
-            numero > 99
-                ? "99+"
-                : numero;
-
-
-        if (numero > 0) {
-
-            contadorNotificaciones.classList.add(
-                "activo"
-            );
-
-            if (btnNotificaciones) {
-
-                btnNotificaciones.classList.add(
-                    "tiene-notificaciones"
-                );
-
-            }
-
-        } else {
-
-            contadorNotificaciones.classList.remove(
-                "activo"
-            );
-
-            if (btnNotificaciones) {
-
-                btnNotificaciones.classList.remove(
-                    "tiene-notificaciones"
-                );
-
-            }
-
-        }
-
-    }
-
-    function mostrarNotificaciones(notificaciones) {
-
-        if (!listaNotificaciones) {
-            return;
-        }
-
-
-        listaNotificaciones.innerHTML = "";
-
-
-        if (
-            !Array.isArray(notificaciones) ||
-            notificaciones.length === 0
-        ) {
-
-            mostrarSinNotificaciones();
-
-            return;
-
-        }
-
-
-        notificaciones.forEach(
-            (notificacion) => {
-
-                const tarjeta =
-                    crearNotificacion(
-                        notificacion
-                    );
-
-                listaNotificaciones.appendChild(
-                    tarjeta
-                );
-
-            }
-        );
-
-    }
-
-
-    function crearNotificacion(notificacion) {
-
-        const articulo =
-            document.createElement("article");
-
-        articulo.className =
-            "notificacion-item";
-
-
-        const estaLeida =
-            notificacion.leida === true ||
-            Number(notificacion.leida) === 1;
-
-
-        if (!estaLeida) {
-
-            articulo.classList.add(
-                "notificacion-no-leida"
-            );
-
-        }
-
-
-        const contenido =
-            document.createElement("div");
-
-        contenido.className =
-            "notificacion-contenido";
-
-
-        const encabezado =
-            document.createElement("div");
-
-        encabezado.className =
-            "notificacion-titulo";
-
-
-        const titulo =
-            document.createElement("h3");
-
-        titulo.textContent =
-            notificacion.titulo ||
-            LS("notificacion");
-
-
-        encabezado.appendChild(
-            titulo
-        );
-
-
-        if (!estaLeida) {
-
-            const punto =
-                document.createElement("span");
-
-            punto.className =
-                "punto-notificacion";
-
-            punto.setAttribute(
-                "aria-label",
-                LS("noLeida")
-            );
-
-            encabezado.appendChild(
-                punto
-            );
-
-        }
-
-
-        const mensaje =
-            document.createElement("p");
-
-        mensaje.textContent =
-            notificacion.mensaje ||
-            "";
-
-
-        const fecha =
-            document.createElement("time");
-
-        fecha.textContent =
-            notificacion.fecha_formateada ||
-            "";
-
-
-        contenido.appendChild(
-            encabezado
-        );
-
-        contenido.appendChild(
-            mensaje
-        );
-
-        contenido.appendChild(
-            fecha
-        );
-
-
-        articulo.appendChild(
-            contenido
-        );
-
-
-        return articulo;
-
-    }
-
-
-    function mostrarSinNotificaciones() {
-
-        if (!listaNotificaciones) {
-            return;
-        }
-
-
-        const contenedor =
-            document.createElement("div");
-
-        contenedor.className =
-            "sin-notificaciones";
-
-
-        const imagen =
-            document.createElement("img");
-
-        imagen.src =
-            "img/Campana.png";
-
-        imagen.alt =
-            LS("sinNotificaciones");
-
-
-        const titulo =
-            document.createElement("h3");
-
-        titulo.textContent =
-            LS("todoAlDia");
-
-
-        const texto =
-            document.createElement("p");
-
-        texto.textContent =
-            LS("descripcionSinNotificaciones");
-
-
-        contenedor.appendChild(
-            imagen
-        );
-
-        contenedor.appendChild(
-            titulo
-        );
-
-        contenedor.appendChild(
-            texto
-        );
-
-
-        listaNotificaciones.appendChild(
-            contenedor
-        );
-
-    }
-
-
-    function mostrarErrorNotificaciones(mensaje) {
-
-        if (!listaNotificaciones) {
-            return;
-        }
-
-
-        listaNotificaciones.innerHTML = "";
-
-
-        const contenedor =
-            document.createElement("div");
-
-        contenedor.className =
-            "sin-notificaciones";
-
-
-        const titulo =
-            document.createElement("h3");
-
-        titulo.textContent =
-            LS("errorNotificaciones");
-
-
-        const texto =
-            document.createElement("p");
-
-        texto.textContent =
-            mensaje ||
-            LS("intentaNuevamente");
-
-
-        contenedor.appendChild(
-            titulo
-        );
-
-        contenedor.appendChild(
-            texto
-        );
-
-
-        listaNotificaciones.appendChild(
-            contenedor
-        );
-
-    }
-
-    async function marcarNotificacionesLeidas() {
-
-        try {
-
-            const respuesta =
-                await fetch(
-                    "auth/notificaciones-leer.php",
-                    {
-                        method: "POST",
-                        credentials: "same-origin",
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                            "Accept":
-                                "application/json"
-                        }
-                    }
-                );
-
-
-            if (!respuesta.ok) {
-                return;
-            }
-
-
-            const resultado =
-                await respuesta.json();
-
-
-            if (!resultado.exito) {
-
-                console.error(
-                    resultado.mensaje
-                );
-
-                return;
-
-            }
-
-
-            actualizarContador(0);
-
-
-            setTimeout(
-                () => {
-                    cargarDatosInicio();
-                },
-                300
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Error al marcar notificaciones:",
-                error
-            );
-
-        }
-
-    }
-
-
-    function mostrarFechaActual() {
-
-        if (!fechaActual) {
-            return;
-        }
-
-
-        const ahora =
-            new Date();
-
-
-        fechaActual.textContent =
-            ahora.toLocaleDateString(
-                (window.LifeSyncIdioma && typeof window.LifeSyncIdioma.obtener === "function" && window.LifeSyncIdioma.obtener() === "en") ? "en-US" : "es-ES",
-                {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
-                }
-            );
-
-    }
-
-
-    async function cargarDatosUsuario() {
-
-        if (!nombreUsuario) {
-            return;
-        }
-
-
-        try {
-
-            const respuesta =
-                await fetch(
-                    "auth/usuario.php",
-                    {
-                        method: "GET",
-                        cache: "no-cache",
-                        credentials: "same-origin",
-                        headers: {
-                            "Accept":
-                                "application/json"
-                        }
-                    }
-                );
-
-
-            if (!respuesta.ok) {
-                return;
-            }
-
-
-            const resultado =
-                await respuesta.json();
-
-
-            if (
-                resultado.exito &&
-                resultado.usuario
-            ) {
-
-                nombreUsuario.textContent =
-                    resultado.usuario.nombre ||
-                    resultado.usuario.nombre_usuario ||
-                    LS("usuario");
-
-
-                if (
-                    fotoPerfil &&
-                    resultado.usuario.foto
-                ) {
-
-                    fotoPerfil.src =
-                        resultado.usuario.foto;
-
+        });
+
+        async function cargarDatosInicio() {
+            try {
+                const respuesta = await fetch("../auth/inicio.php", {
+                    method: "GET",
+                    cache: "no-store",
+                    credentials: "include",
+                    headers: { "Accept": "application/json" }
+                });
+
+                const resultado = await respuesta.json();
+
+                if (!respuesta.ok || !resultado.exito) {
+                    throw new Error(resultado.mensaje || LS("noSePudieronCargarHabitos"));
                 }
 
+                actualizarUsuario(resultado.usuario);
+                actualizarContador(resultado.notificaciones_no_leidas);
+                mostrarNotificaciones(resultado.notificaciones);
+                actualizarRacha(resultado.racha);
+                actualizarProgreso(resultado.progreso);
+                actualizarCategorias(resultado.habitos_hoy);
+            } catch (error) {
+                console.error("Error al cargar Inicio:", error);
+                mostrarErrorInicio(error.message);
+            }
+        }
+
+        function actualizarUsuario(usuario) {
+            if (!usuario) return;
+
+            if (nombreUsuario) {
+                nombreUsuario.textContent = usuario.nombre || LS("usuario");
             }
 
-        } catch (error) {
-
-            console.error(
-                "No se pudo cargar el usuario:",
-                error
-            );
-
-        }
-
-    }
-
-
-    function actualizarRacha(racha) {
-
-        const diasRacha =
-            document.getElementById(
-                "diasRacha"
-            );
-
-
-        if (!diasRacha) {
-            return;
-        }
-
-
-        const valor =
-            Number(racha) || 0;
-
-
-        diasRacha.textContent =
-            valor;
-
-    }
-
-
-    function actualizarProgreso(progreso) {
-
-        const porcentajeGeneral =
-            document.getElementById(
-                "porcentajeGeneral"
-            );
-
-        const barraProgreso =
-            document.getElementById(
-                "barraProgreso"
-            );
-
-
-        let valor = 0;
-
-
-        if (
-            progreso &&
-            typeof progreso === "object"
-        ) {
-
-            valor =
-                Number(
-                    progreso.porcentaje
-                ) || 0;
-
-        } else {
-
-            valor =
-                Number(progreso) || 0;
-
-        }
-
-
-        valor =
-            Math.max(
-                0,
-                Math.min(
-                    100,
-                    valor
-                )
-            );
-
-
-        if (porcentajeGeneral) {
-
-            porcentajeGeneral.textContent =
-                `${valor}%`;
-
-        }
-
-
-        if (barraProgreso) {
-
-            barraProgreso.style.width =
-                `${valor}%`;
-
-        }
-
-    }
-
-
-    function traducirCategoria(nombre) {
-        const claves = {
-            "Hidratación": "hidratacion",
-            "Alimentación": "alimentacion",
-            "Salud Mental": "saludMental",
-            "Actividad Física": "actividadFisica",
-            "Registro Académico": "registroAcademico",
-            "Hábito Personalizado": "categoriaPersonalizada"
-        };
-        return LS(claves[nombre] || nombre);
-    }
-
-    function actualizarCategorias(habitos) {
-
-        const contenedor =
-            document.getElementById(
-                "contenedorCategorias"
-            );
-
-
-        if (!contenedor) {
-            return;
-        }
-
-
-        contenedor.innerHTML = "";
-
-
-        if (
-            !Array.isArray(habitos) ||
-            habitos.length === 0
-        ) {
-
-            const mensaje =
-                document.createElement("p");
-
-            mensaje.className =
-                "categoria-vacia";
-
-            mensaje.textContent =
-                LS("noHabitosPendientes");
-
-            contenedor.appendChild(
-                mensaje
-            );
-
-            return;
-
-        }
-
-
-        const grupos =
-            agruparHabitosPorCategoria(
-                habitos
-            );
-
-
-        Object.values(grupos).forEach(
-            (grupo) => {
-
-                const articulo =
-                    document.createElement(
-                        "article"
-                    );
-
-                articulo.className =
-                    "categoria";
-
-
-                const info =
-                    document.createElement(
-                        "div"
-                    );
-
-                info.className =
-                    "categoria-info";
-
-
-                const imagen =
-                    document.createElement(
-                        "img"
-                    );
-
-                imagen.src =
-                    obtenerIconoCategoria(
-                        grupo.nombre
-                    );
-
-                imagen.alt =
-                    traducirCategoria(grupo.nombre);
-
-
-                const texto =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                const titulo =
-                    document.createElement(
-                        "h3"
-                    );
-
-                titulo.className =
-                    "nombre-categoria";
-
-                titulo.textContent =
-                    traducirCategoria(grupo.nombre);
-
-
-                const detalle =
-                    document.createElement(
-                        "p"
-                    );
-
-                detalle.className =
-                    "detalle-categoria";
-
-                detalle.textContent =
-                    `${grupo.pendientes} ${LS("habitoPendienteDetalle")}`;
-
-
-                texto.appendChild(
-                    titulo
-                );
-
-                texto.appendChild(
-                    detalle
-                );
-
-
-                info.appendChild(
-                    imagen
-                );
-
-                info.appendChild(
-                    texto
-                );
-
-
-                const circulo =
-                    document.createElement(
-                        "div"
-                    );
-
-                circulo.className =
-                    "circulo";
-
-
-                const porcentaje =
-                    grupo.total > 0
-                        ? Math.round(
-                            (
-                                grupo.completados /
-                                grupo.total
-                            ) * 100
-                        )
-                        : 0;
-
-
-                circulo.textContent =
-                    `${porcentaje}%`;
-
-
-                articulo.appendChild(
-                    info
-                );
-
-                articulo.appendChild(
-                    circulo
-                );
-
-
-                contenedor.appendChild(
-                    articulo
-                );
-
+            if (fotoPerfil && usuario.foto) {
+                fotoPerfil.src = usuario.foto;
             }
-        );
+        }
 
-    }
+        function actualizarContador(cantidad) {
+            if (!contadorNotificaciones) return;
 
+            const numero = Math.max(0, Number(cantidad) || 0);
+            contadorNotificaciones.textContent = numero > 99 ? "99+" : numero;
+            contadorNotificaciones.classList.toggle("activo", numero > 0);
+            btnNotificaciones?.classList.toggle("tiene-notificaciones", numero > 0);
+        }
 
-    function agruparHabitosPorCategoria(habitos) {
+        function mostrarNotificaciones(notificaciones) {
+            if (!listaNotificaciones) return;
 
-        const grupos = {};
+            listaNotificaciones.innerHTML = "";
 
+            if (!Array.isArray(notificaciones) || notificaciones.length === 0) {
+                mostrarSinNotificaciones();
+                return;
+            }
 
-        habitos.forEach(
-            (habito) => {
+            notificaciones.forEach(notificacion => {
+                listaNotificaciones.appendChild(crearNotificacion(notificacion));
+            });
+        }
 
-                const nombre =
-                    habito.categoria ||
-                    LS("categoriaPersonalizada");
+        function crearNotificacion(notificacion) {
+            const articulo = document.createElement("article");
+            articulo.className = "notificacion-item";
 
+            const leida = notificacion.leida === true || Number(notificacion.leida) === 1;
+            if (!leida) articulo.classList.add("notificacion-no-leida");
+
+            const contenido = document.createElement("div");
+            contenido.className = "notificacion-contenido";
+
+            const encabezado = document.createElement("div");
+            encabezado.className = "notificacion-titulo";
+
+            const titulo = document.createElement("h3");
+            titulo.textContent = notificacion.titulo || LS("notificacion");
+            encabezado.appendChild(titulo);
+
+            if (!leida) {
+                const punto = document.createElement("span");
+                punto.className = "punto-notificacion";
+                punto.setAttribute("aria-label", LS("noLeida"));
+                encabezado.appendChild(punto);
+            }
+
+            const mensaje = document.createElement("p");
+            mensaje.textContent = notificacion.mensaje || "";
+
+            const fecha = document.createElement("time");
+            fecha.textContent = notificacion.fecha_formateada || "";
+
+            contenido.append(encabezado, mensaje, fecha);
+            articulo.appendChild(contenido);
+
+            return articulo;
+        }
+
+        function mostrarSinNotificaciones() {
+            if (!listaNotificaciones) return;
+
+            const contenedor = document.createElement("div");
+            contenedor.className = "sin-notificaciones";
+
+            const imagen = document.createElement("img");
+            imagen.src = "img/Campana.png";
+            imagen.alt = LS("sinNotificaciones");
+
+            const titulo = document.createElement("h3");
+            titulo.textContent = LS("todoAlDia");
+
+            const texto = document.createElement("p");
+            texto.textContent = LS("descripcionSinNotificaciones");
+
+            contenedor.append(imagen, titulo, texto);
+            listaNotificaciones.appendChild(contenedor);
+        }
+
+        function mostrarErrorNotificaciones(mensaje) {
+            if (!listaNotificaciones) return;
+
+            listaNotificaciones.innerHTML = "";
+
+            const contenedor = document.createElement("div");
+            contenedor.className = "sin-notificaciones";
+
+            const titulo = document.createElement("h3");
+            titulo.textContent = LS("errorNotificaciones");
+
+            const texto = document.createElement("p");
+            texto.textContent = mensaje || LS("intentaNuevamente");
+
+            contenedor.append(titulo, texto);
+            listaNotificaciones.appendChild(contenedor);
+        }
+
+        async function marcarNotificacionesLeidas() {
+            try {
+                const respuesta = await fetch("../auth/notificaciones-leer.php", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    }
+                });
+
+                if (!respuesta.ok) return;
+
+                const resultado = await respuesta.json();
+                if (!resultado.exito) return;
+
+                actualizarContador(0);
+            } catch (error) {
+                console.error("Error al marcar notificaciones:", error);
+            }
+        }
+
+        function mostrarFechaActual() {
+            if (!fechaActual) return;
+
+            const idioma =
+                window.LifeSyncIdioma &&
+                typeof window.LifeSyncIdioma.obtener === "function" &&
+                window.LifeSyncIdioma.obtener() === "en"
+                    ? "en-US"
+                    : "es-ES";
+
+            fechaActual.textContent = new Date().toLocaleDateString(idioma, {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+        }
+
+        function actualizarRacha(racha) {
+            const elemento = document.getElementById("diasRacha");
+            if (elemento) elemento.textContent = Number(racha) || 0;
+        }
+
+        function actualizarProgreso(progreso) {
+            const porcentaje = document.getElementById("porcentajeGeneral");
+            const barra = document.getElementById("barraProgreso");
+            const valor = Math.max(0, Math.min(100, Number(progreso?.porcentaje) || 0));
+
+            if (porcentaje) porcentaje.textContent = `${Math.round(valor)}%`;
+            if (barra) barra.style.width = `${valor}%`;
+        }
+
+        function nombreCategoria(nombre) {
+            const claves = {
+                "Hidratación": "categorias.hidratacion",
+                "Alimentación": "categorias.alimentacion",
+                "Salud Mental": "categorias.saludMental",
+                "Actividad Física": "categorias.actividadFisica",
+                "Académico": "categorias.registroAcademico",
+                "Hábito Personalizado": "categoriaPersonalizada"
+            };
+
+            return LS(claves[nombre] || nombre);
+        }
+
+        function actualizarCategorias(habitos) {
+            if (!contenedorCategorias) return;
+
+            contenedorCategorias.innerHTML = "";
+
+            if (!Array.isArray(habitos) || habitos.length === 0) {
+                const mensaje = document.createElement("p");
+                mensaje.className = "categoria-vacia";
+                mensaje.textContent = LS("noHabitosPendientes");
+                contenedorCategorias.appendChild(mensaje);
+                return;
+            }
+
+            const grupos = {};
+
+            habitos.forEach(habito => {
+                const nombre = habito.categoria || "Hábito Personalizado";
 
                 if (!grupos[nombre]) {
-
                     grupos[nombre] = {
-                        nombre: nombre,
+                        nombre,
                         total: 0,
                         completados: 0,
-                        pendientes: 0
+                        pendientes: 0,
+                        ids: []
                     };
-
                 }
-
 
                 grupos[nombre].total++;
+                grupos[nombre].ids.push(Number(habito.id_habito_usuario));
 
-
-                const progreso =
-                    Number(
-                        habito.progreso
-                    ) || 0;
-
-                const objetivo =
-                    Number(
-                        habito.objetivo
-                    ) || 0;
-
-
-                if (
-                    objetivo > 0 &&
-                    progreso >= objetivo
-                ) {
-
+                if (habito.completado) {
                     grupos[nombre].completados++;
-
                 } else {
-
                     grupos[nombre].pendientes++;
+                }
+            });
 
+            Object.values(grupos).forEach(grupo => {
+                const articulo = document.createElement("article");
+                articulo.className = "categoria";
+
+                const info = document.createElement("div");
+                info.className = "categoria-info";
+
+                const imagen = document.createElement("img");
+                imagen.src = ICONOS[grupo.nombre] || "img/H-Perzona.png";
+                imagen.alt = nombreCategoria(grupo.nombre);
+
+                const texto = document.createElement("div");
+
+                const titulo = document.createElement("h3");
+                titulo.className = "nombre-categoria";
+                titulo.textContent = nombreCategoria(grupo.nombre);
+
+                const detalle = document.createElement("p");
+                detalle.className = "detalle-categoria";
+                detalle.textContent = `${grupo.completados}/${grupo.total} ${LS("habitosCompletados")}`;
+
+                texto.append(titulo, detalle);
+                info.append(imagen, texto);
+
+                const circulo = document.createElement("div");
+                circulo.className = "circulo";
+                const porcentaje = grupo.total > 0
+                    ? Math.round((grupo.completados / grupo.total) * 100)
+                    : 0;
+                circulo.textContent = `${porcentaje}%`;
+
+                articulo.append(info, circulo);
+
+                articulo.tabIndex = 0;
+                articulo.setAttribute("role", "link");
+
+                const ruta = RUTAS[grupo.nombre];
+                if (ruta) {
+                    const id = grupo.ids.length === 1 ? grupo.ids[0] : null;
+                    const destino =
+                        grupo.nombre === "Hábito Personalizado" && id
+                            ? `${ruta}?id_habito_usuario=${id}`
+                            : id
+                                ? `${ruta}?id_habito_usuario=${id}`
+                                : grupo.nombre === "Hábito Personalizado"
+                                    ? "Personalizados.html"
+                                    : ruta;
+
+                    articulo.addEventListener("click", () => {
+                        window.location.href = destino;
+                    });
+
+                    articulo.addEventListener("keydown", evento => {
+                        if (evento.key === "Enter" || evento.key === " ") {
+                            evento.preventDefault();
+                            window.location.href = destino;
+                        }
+                    });
                 }
 
-            }
-        );
-
-
-        return grupos;
-
-    }
-
-    function obtenerIconoCategoria(nombre) {
-
-        const iconos = {
-
-            "Hidratación":
-                "img/Hidrat.png",
-
-            "Alimentación":
-                "img/Alimentacion.png",
-
-            "Salud Mental":
-                "img/SaludMental.png",
-
-            "Actividad Física":
-                "img/ActividadFisica.png",
-
-            "Registro Académico":
-                "img/Academico.png",
-
-            "Hábito Personalizado":
-                "img/H-Perzona.png"
-
-        };
-
-
-        return (
-            iconos[nombre] ||
-            "img/H-Perzona.png"
-        );
-
-    }
-
-    function mostrarErrorInicio(mensaje) {
-
-        const contenedor =
-            document.getElementById(
-                "contenedorCategorias"
-            );
-
-
-        if (contenedor) {
-
-            contenedor.innerHTML = "";
-
-
-            const elemento =
-                document.createElement("p");
-
-            elemento.className =
-                "categoria-vacia";
-
-            elemento.textContent =
-                mensaje ||
-                LS("noSePudieronCargarHabitos");
-
-
-            contenedor.appendChild(
-                elemento
-            );
-
+                contenedorCategorias.appendChild(articulo);
+            });
         }
 
+        function mostrarErrorInicio(mensaje) {
+            if (contenedorCategorias) {
+                contenedorCategorias.innerHTML = "";
+                const elemento = document.createElement("p");
+                elemento.className = "categoria-vacia";
+                elemento.textContent = mensaje || LS("noSePudieronCargarHabitos");
+                contenedorCategorias.appendChild(elemento);
+            }
 
-        mostrarErrorNotificaciones(
-            mensaje
-        );
+            mostrarErrorNotificaciones(mensaje);
+        }
 
-    }
-
-
-    mostrarFechaActual();
-
-    cargarDatosUsuario();
-
-    cargarDatosInicio();
-
-    setInterval(
-        () => {
-
-            cargarDatosInicio();
-
-        },
-        30000
-    );
-
-    window.addEventListener("lifesyncIdiomaCambiado", () => {
         mostrarFechaActual();
         cargarDatosInicio();
-    });
 
-    if (panelNotificaciones) {
+        setInterval(cargarDatosInicio, 30000);
 
-        panelNotificaciones.addEventListener(
-            "transitionend",
-            () => {
+        window.addEventListener("lifesyncIdiomaCambiado", () => {
+            mostrarFechaActual();
+            cargarDatosInicio();
+        });
 
-                const estaAbierto =
-                    !panelNotificaciones.classList.contains(
-                        "oculto"
-                    );
-
-
-                if (estaAbierto) {
-
+        if (panelNotificaciones) {
+            panelNotificaciones.addEventListener("transitionend", () => {
+                if (!panelNotificaciones.classList.contains("oculto")) {
                     marcarNotificacionesLeidas();
-
                 }
-
-            }
-        );
-
-    }
-
-});
+            });
+        }
+    });
+})();

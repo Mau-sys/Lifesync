@@ -1,259 +1,220 @@
-function LS(clave) {
-    return typeof window !== "undefined" && typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(clave) : clave;
-}
+(function () {
+    "use strict";
 
-document.addEventListener('DOMContentLoaded', () => {
-    const DEFAULT_CONFIG = {
-        tipoMeta: 'semanal',
-        metaSesiones: 5,
-        metaMinutos: 150,
-        diasSeleccionados: [0, 2, 4]
-    };
+    const LS = texto => typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(texto) : texto;
+    const API = "../auth/";
+    const CATEGORIA = "Actividad Física";
+    const params = new URLSearchParams(location.search);
+    const $ = id => document.getElementById(id);
 
-    const LIMITES_FRECUENCIA = {
-        diaria: 10,
-        semanal: 14,
-        mensual: 30,
-        personalizado: 50
-    };
+    let id = Number(params.get("id_habito_usuario")) || 0;
+    let tipoMeta = "semanal";
+    let metaSesiones = 5;
+    let metaMinutos = 150;
+    let dias = [0, 2, 4];
+    let sesiones = 0;
+    let minutos = 0;
+    let cargando = false;
 
-    let configFisica = JSON.parse(localStorage.getItem('lifesync_config_fisica')) || DEFAULT_CONFIG;
-    let registrosFisica = JSON.parse(localStorage.getItem('lifesync_registros_fisica')) || { sesiones: [], minutosTotales: 0 };
+    const menu = $("kebab-menu-actividad-fisica");
+    const ring = $("ring-sesiones-fisica");
+    const contador = $("contador-sesiones-fisica");
+    const meta = $("meta-fisica");
+    const tiempo = $("tiempo-acumulado-fisica");
+    const btn = $("btn-add-sesion-fisica");
+    const modalSesion = typeof bootstrap !== "undefined" && $("modalRegistrarSesion") ? new bootstrap.Modal($("modalRegistrarSesion")) : null;
+    const modalMeta = typeof bootstrap !== "undefined" && $("modalEditarMetaFisica") ? new bootstrap.Modal($("modalEditarMetaFisica")) : null;
 
-    const btnOptions = document.getElementById('btn-options-academico');
-    const kebabMenu = document.getElementById('kebab-menu-academico');
-    const btnRegresar = document.getElementById('btn-regresar');
-    const btnAddSesion = document.getElementById('btn-add-sesion-fisica');
-    const btnGuardarSesion = document.getElementById('btn-guardar-sesion');
-    const btnGuardarMeta = document.getElementById('btn-guardar-meta');
-    const btnReiniciarModal = document.getElementById('btn-reiniciar-habito-modal');
-
-    const contadorSesiones = document.getElementById('contador-sesiones-fisica');
-    const labelProgresoUnidad = document.getElementById('label-progreso-unidad');
-    const labelTipoMeta = document.getElementById('label-tipo-meta');
-    const metaFisica = document.getElementById('meta-fisica');
-    const ringFisica = document.getElementById('ring-sesiones-fisica');
-    const tiempoAcumulado = document.getElementById('tiempo-acumulado-fisica');
-
-    const selectTipoMeta = document.getElementById('select-tipo-meta');
-    const contenedorDiasSemana = document.getElementById('contenedor-dias-semana');
-    const labelMetaCantidad = document.getElementById('label-meta-cantidad');
-    const inputMetaCantidad = document.getElementById('input-meta-cantidad');
-    const helpLimiteSesiones = document.getElementById('help-limite-sesiones');
-    const btnsDias = document.querySelectorAll('.btn-dia-pill');
-
-    const modalSesionBootstrap = new bootstrap.Modal(document.getElementById('modalRegistrarSesion'));
-    const modalMetaBootstrap = new bootstrap.Modal(document.getElementById('modalEditarMetaFisica'));
-
-    let diasTemporal = [...(configFisica.diasSeleccionados || [])];
-
-    if (btnOptions && kebabMenu) {
-        btnOptions.addEventListener('click', (e) => {
-            e.stopPropagation();
-            kebabMenu.classList.toggle('show');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!kebabMenu.contains(e.target)) {
-                kebabMenu.classList.remove('show');
-            }
-        });
-    }
-
-    if (btnRegresar) {
-        btnRegresar.addEventListener('click', (e) => {
-            e.preventDefault();
-            const paginaAnterior = document.referrer;
-            if (paginaAnterior && paginaAnterior.includes(window.location.host)) {
-                window.history.back();
-            } else {
-                window.location.href = 'inicio.html';
-            }
-        });
-    }
-
-    function formatearTiempo(minutosTotales) {
-        if (minutosTotales >= 60) {
-            const horas = Math.floor(minutosTotales / 60);
-            const minsRestantes = minutosTotales % 60;
-            if (minsRestantes === 0) {
-                return `${horas} ${horas === 1 ? LS("hora") : LS("horas")}`;
-            }
-            return `${horas} ${horas === 1 ? LS("hora") : LS("horas")} y ${minsRestantes} ${LS("min")}`;
-        }
-        return `${minutosTotales} ${LS("min")}`;
-    }
-
-    function renderizarProgreso() {
-        const numSesiones = registrosFisica.sesiones.length;
-        const totalMinutos = registrosFisica.minutosTotales || 0;
-
-        let objetivoSesiones = configFisica.metaSesiones;
-        let textoLabel = LS("metaSemanal");
-        let textoMetaDetail = '';
-
-        const textoTiempoObjetivo = formatearTiempo(configFisica.metaMinutos);
-
-        if (configFisica.tipoMeta === 'diaria') {
-            textoLabel = LS("metaDiaria");
-            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? LS("sesion") : LS("sesiones")} (${textoTiempoObjetivo})`;
-        } else if (configFisica.tipoMeta === 'semanal') {
-            textoLabel = LS("metaSemanal");
-            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? LS("sesion") : LS("sesiones")} (${textoTiempoObjetivo})`;
-        } else if (configFisica.tipoMeta === 'mensual') {
-            textoLabel = LS("metaMensual");
-            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? LS("sesion") : LS("sesiones")} (${textoTiempoObjetivo})`;
-        } else if (configFisica.tipoMeta === 'personalizado') {
-            const numDias = (configFisica.diasSeleccionados || []).length;
-            textoLabel = LS("metaDeDias").replace("{n}", numDias).replace("{unidad}", numDias === 1 ? LS("dia") : LS("dias"));
-            textoMetaDetail = `${objetivoSesiones} ${objetivoSesiones === 1 ? LS("sesion") : LS("sesiones")} (${textoTiempoObjetivo})`;
-        }
-
-        labelTipoMeta.textContent = textoLabel;
-        metaFisica.textContent = textoMetaDetail;
-        contadorSesiones.textContent = `${numSesiones}/${objetivoSesiones}`;
-        labelProgresoUnidad.textContent = numSesiones === 1 ? LS("sesion") : LS("sesiones");
-
-        tiempoAcumulado.textContent = `${totalMinutos} ${LS("min")} / ${configFisica.metaMinutos} ${LS("min")}`;
-
-        const porcentajeSesiones = objetivoSesiones > 0 ? Math.min((numSesiones / objetivoSesiones) * 100, 100) : 0;
-        ringFisica.style.background = `conic-gradient(var(--ls-amber) ${porcentajeSesiones}%, rgba(255, 159, 28, 0.15) ${porcentajeSesiones}%)`;
-
-        if (objetivoSesiones > 0 && numSesiones >= objetivoSesiones && totalMinutos >= configFisica.metaMinutos) {
-            btnAddSesion.textContent = LS("metaCompletada");
-        } else {
-            btnAddSesion.textContent = LS("registrarSesion");
-        }
-    }
-
-    function reiniciarProgreso() {
-        if (confirm(LS("confirmarReinicioFisica"))) {
-            registrosFisica = { sesiones: [], minutosTotales: 0 };
-            localStorage.setItem('lifesync_registros_fisica', JSON.stringify(registrosFisica));
-            renderizarProgreso();
-            modalMetaBootstrap.hide();
-        }
-    }
-
-    btnReiniciarModal.addEventListener('click', () => {
-        reiniciarProgreso();
+    $("btn-options-actividad-fisica")?.addEventListener("click", e => {
+        e.stopPropagation();
+        menu?.classList.toggle("show");
     });
 
-    btnAddSesion.addEventListener('click', () => {
-        modalSesionBootstrap.show();
+    document.addEventListener("click", e => {
+        if (menu && !menu.contains(e.target)) menu.classList.remove("show");
     });
 
-    btnGuardarSesion.addEventListener('click', () => {
-        const actividad = document.getElementById('select-tipo-actividad').value;
-        const duracion = parseInt(document.getElementById('input-duracion-minutos').value, 10);
+    $("btn-regresar")?.addEventListener("click", e => {
+        e.preventDefault();
+        history.length > 1 ? history.back() : location.href = "inicio.html";
+    });
 
-        if (!duracion || duracion <= 0 || duracion > 360) {
+    function normalizarFrecuencia(valor) {
+        return valor === "personalizada" ? "personalizado" : (valor || "semanal");
+    }
+
+    function frecuenciaBD(valor) {
+        return valor === "personalizado" ? "personalizada" : valor;
+    }
+
+    function formatMin(valor) {
+        const n = Number(valor) || 0;
+        if (n < 60) return `${n} ${LS("min")}`;
+        const h = Math.floor(n / 60);
+        const m = n % 60;
+        if (!m) return `${h} ${h === 1 ? LS("hora") : LS("horas")}`;
+        return `${h} ${h === 1 ? LS("hora") : LS("horas")} ${LS("y")} ${m} ${LS("min")}`;
+    }
+
+    function aplicarDiasServidor(diasServidor) {
+        if (Array.isArray(diasServidor) && diasServidor.length) {
+            dias = diasServidor.map(Number).filter(n => n >= 1 && n <= 7).map(n => n - 1);
+        }
+    }
+
+    async function cargar() {
+        const q = id ? `?id_habito_usuario=${id}` : `?categoria=${encodeURIComponent(CATEGORIA)}`;
+        const r = await fetch(`${API}obtener-habito.php${q}`, { credentials: "include", cache: "no-store" });
+        const d = await r.json();
+        if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
+
+        id = Number(d.habito.id_habito_usuario);
+        metaSesiones = Number(d.habito.objetivo) || 5;
+        metaMinutos = Number(d.habito.duracion_minutos) || 150;
+        tipoMeta = normalizarFrecuencia(d.habito.frecuencia);
+        sesiones = Number(d.habito.progreso_hoy) || 0;
+        minutos = Number(d.habito.suma_hoy) || 0;
+        aplicarDiasServidor(d.habito.dias_activos);
+    }
+
+    function render() {
+        if (!contador || !meta || !ring || !btn || !tiempo) return;
+
+        contador.textContent = `${sesiones}/${metaSesiones}`;
+        meta.textContent = `${metaSesiones} ${metaSesiones === 1 ? LS("sesion") : LS("sesiones")} (${formatMin(metaMinutos)})`;
+        tiempo.textContent = `${formatMin(minutos)} / ${formatMin(metaMinutos)}`;
+
+        const porcentaje = metaSesiones ? Math.min(100, sesiones / metaSesiones * 100) : 0;
+        ring.style.background = `conic-gradient(var(--ls-amber) ${porcentaje}%, rgba(255,159,28,.15) ${porcentaje}%)`;
+
+        const completada = sesiones >= metaSesiones;
+        btn.disabled = completada || cargando;
+        btn.innerHTML = `<span>${completada ? LS("metaCompletada") : LS("registrarSesion")}</span>`;
+
+        const label = $("label-tipo-meta");
+        if (label) {
+            label.textContent = tipoMeta === "diaria" ? LS("metaDiaria") : tipoMeta === "mensual" ? LS("metaMensual") : tipoMeta === "personalizado" ? LS("metaDeDias").replace("{n}", dias.length).replace("{unidad}", dias.length === 1 ? LS("dia") : LS("dias")) : LS("metaSemanal");
+        }
+    }
+
+    $("btn-add-sesion-fisica")?.addEventListener("click", () => modalSesion?.show());
+
+    $("btn-guardar-sesion")?.addEventListener("click", async () => {
+        if (cargando || !id) return;
+        const duracion = Number($("input-duracion-minutos")?.value);
+        if (!Number.isInteger(duracion) || duracion < 1 || duracion > 360) {
             alert(LS("tiempoSesionValido"));
             return;
         }
 
-        registrosFisica.sesiones.push({
-            actividad,
-            duracion,
-            fecha: new Date().toISOString()
-        });
+        cargando = true;
+        render();
+        try {
+            const r = await fetch(`${API}registrar-habito.php`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id_habito_usuario: id,
+                    valor: duracion,
+                    observaciones: $("select-tipo-actividad")?.value || "Actividad"
+                })
+            });
+            const d = await r.json();
+            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo registrar la sesión."));
 
-        registrosFisica.minutosTotales = (registrosFisica.minutosTotales || 0) + duracion;
-
-        localStorage.setItem('lifesync_registros_fisica', JSON.stringify(registrosFisica));
-        modalSesionBootstrap.hide();
-        renderizarProgreso();
+            sesiones = Number(d.registro.progreso_hoy) || sesiones + 1;
+            minutos = Number(d.registro.suma_hoy) || minutos + duracion;
+            render();
+            modalSesion?.hide();
+            $("form-registrar-sesion")?.reset();
+        } catch (e) {
+            alert(e.message);
+        } finally {
+            cargando = false;
+            render();
+        }
     });
 
-    function actualizarInterfazModalMeta() {
-        const valor = selectTipoMeta.value;
-        
-        if (valor === 'personalizado') {
-            contenedorDiasSemana.classList.remove('d-none');
-            labelMetaCantidad.childNodes[0].nodeValue = LS("sesionesLabel") + " ";
-        } else {
-            contenedorDiasSemana.classList.add('d-none');
-            labelMetaCantidad.childNodes[0].nodeValue = LS("sesionesLabel") + " ";
-        }
-
-        const maxPermitido = LIMITES_FRECUENCIA[valor] || 30;
-        inputMetaCantidad.max = maxPermitido;
-        helpLimiteSesiones.textContent = `(Máx. ${maxPermitido})`;
-
-        if (parseInt(inputMetaCantidad.value, 10) > maxPermitido) {
-            inputMetaCantidad.value = maxPermitido;
-        }
-    }
-
-    selectTipoMeta.addEventListener('change', actualizarInterfazModalMeta);
-
-    btnsDias.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const diaNum = parseInt(btn.getAttribute('data-dia'), 10);
-            if (diasTemporal.includes(diaNum)) {
-                diasTemporal = diasTemporal.filter(d => d !== diaNum);
-                btn.classList.remove('selected');
-            } else {
-                diasTemporal.push(diaNum);
-                btn.classList.add('selected');
-            }
-        });
+    $("btn-editar-meta")?.addEventListener("click", e => {
+        e.preventDefault();
+        menu?.classList.remove("show");
+        if ($("select-tipo-meta")) $("select-tipo-meta").value = tipoMeta;
+        if ($("input-meta-cantidad")) $("input-meta-cantidad").value = metaSesiones;
+        if ($("input-meta-minutos")) $("input-meta-minutos").value = metaMinutos;
+        document.querySelectorAll(".btn-dia-pill").forEach(b => b.classList.toggle("active", dias.includes(Number(b.dataset.dia))));
+        $("contenedor-dias-semana")?.classList.toggle("d-none", tipoMeta !== "personalizado");
+        modalMeta?.show();
     });
 
-    document.getElementById('btn-editar-meta').addEventListener('click', () => {
-        if (kebabMenu) kebabMenu.classList.remove('show');
-        
-        selectTipoMeta.value = configFisica.tipoMeta;
-        inputMetaCantidad.value = configFisica.metaSesiones;
-        document.getElementById('input-meta-minutos').value = configFisica.metaMinutos;
-        
-        diasTemporal = [...(configFisica.diasSeleccionados || [])];
-        btnsDias.forEach(btn => {
-            const diaNum = parseInt(btn.getAttribute('data-dia'), 10);
-            if (diasTemporal.includes(diaNum)) {
-                btn.classList.add('selected');
-            } else {
-                btn.classList.remove('selected');
-            }
-        });
-
-        actualizarInterfazModalMeta();
+    $("select-tipo-meta")?.addEventListener("change", e => {
+        tipoMeta = e.target.value;
+        $("contenedor-dias-semana")?.classList.toggle("d-none", tipoMeta !== "personalizado");
     });
 
-    btnGuardarMeta.addEventListener('click', () => {
-        const tipoMeta = selectTipoMeta.value;
-        const metaMinutos = parseInt(document.getElementById('input-meta-minutos').value, 10);
-        const metaSesiones = parseInt(inputMetaCantidad.value, 10);
+    document.querySelectorAll(".btn-dia-pill").forEach(b => b.addEventListener("click", () => {
+        const dia = Number(b.dataset.dia);
+        if (dias.includes(dia)) dias = dias.filter(x => x !== dia);
+        else dias.push(dia);
+        b.classList.toggle("active", dias.includes(dia));
+    }));
 
-        if (!metaMinutos || metaMinutos <= 0 || metaMinutos > 3000) {
-            alert(LS("metaTiempoValida"));
-            return;
+    $("btn-guardar-meta")?.addEventListener("click", async () => {
+        const n = Number($("input-meta-cantidad")?.value);
+        const m = Number($("input-meta-minutos")?.value);
+        if (!Number.isInteger(n) || n < 1 || n > 50) return alert(LS("numeroSesionesValido"));
+        if (!Number.isInteger(m) || m < 10 || m > 3000) return alert(LS("duracionSesionValida"));
+        if (tipoMeta === "personalizado" && dias.length === 0) return alert(LS("seleccionarDiaSemana"));
+
+        try {
+            const r = await fetch(`${API}actualizar-habito.php`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id_habito_usuario: id,
+                    objetivo: n,
+                    unidad: "sesiones",
+                    frecuencia: frecuenciaBD(tipoMeta),
+                    duracion_minutos: m,
+                    dias: tipoMeta === "personalizado" ? dias.map(x => x + 1) : []
+                })
+            });
+            const d = await r.json();
+            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron guardar los cambios."));
+
+            metaSesiones = n;
+            metaMinutos = m;
+            sesiones = Math.min(sesiones, n);
+            minutos = Math.min(minutos, m);
+            render();
+            modalMeta?.hide();
+            menu?.classList.remove("show");
+        } catch (e) {
+            alert(e.message);
         }
-
-        const maxPermitido = LIMITES_FRECUENCIA[tipoMeta] || 30;
-        if (!metaSesiones || metaSesiones < 1 || metaSesiones > maxPermitido) {
-            alert(LS("numeroSesionesFisicaValido").replace("{max}", maxPermitido));
-            return;
-        }
-
-        if (tipoMeta === 'personalizado' && diasTemporal.length === 0) {
-            alert(LS("seleccionarDiaSemana"));
-            return;
-        }
-
-        configFisica = {
-            tipoMeta,
-            metaSesiones,
-            metaMinutos,
-            diasSeleccionados: diasTemporal
-        };
-
-        localStorage.setItem('lifesync_config_fisica', JSON.stringify(configFisica));
-        modalMetaBootstrap.hide();
-        renderizarProgreso();
     });
 
-    renderizarProgreso();
+    $("btn-reiniciar-habito-modal")?.addEventListener("click", async () => {
+        if (!confirm(LS("¿Quieres reiniciar la cuenta a 0?"))) return;
+        try {
+            const r = await fetch(`${API}eliminar-registros-hoy.php`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id_habito_usuario: id })
+            });
+            const d = await r.json();
+            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo reiniciar."));
+            sesiones = 0;
+            minutos = 0;
+            render();
+            modalMeta?.hide();
+        } catch (e) {
+            alert(e.message);
+        }
+    });
 
-    window.addEventListener("lifesyncIdiomaCambiado", renderizarProgreso);
-});
+    window.addEventListener("lifesyncIdiomaCambiado", render);
+    cargar().then(render).catch(e => alert(e.message));
+})();

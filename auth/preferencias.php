@@ -4,75 +4,57 @@ session_start();
 
 header("Content-Type: application/json; charset=UTF-8");
 
-require_once "../config/conexion.php";
+require_once __DIR__ . "/../config/conexion.php";
 
+function responder(array $datos, int $codigo = 200): void
+{
+    http_response_code($codigo);
 
-/* =========================================================
-   VERIFICAR SESIÓN
-   ========================================================= */
-
-if (!isset($_SESSION["usuario_id"])) {
-
-    http_response_code(401);
-
-    echo json_encode([
-        "exito" => false,
-        "mensaje" => "La sesión ha expirado."
-    ]);
+    echo json_encode(
+        $datos,
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    );
 
     exit;
 }
 
+if (!isset($_SESSION["usuario_id"])) {
+    responder([
+        "exito" => false,
+        "mensaje" => "La sesión ha expirado."
+    ], 401);
+}
 
 $usuarioId = (int) $_SESSION["usuario_id"];
 
-
-/* =========================================================
-   CONEXIÓN
-   ========================================================= */
-
 try {
-
     $database = new Database();
-
     $db = $database->getConnection();
 
-
-    if ($db === null) {
-
-        http_response_code(500);
-
-        echo json_encode([
-            "exito" => false,
-            "mensaje" => "No se pudo conectar con la base de datos."
-        ]);
-
-        exit;
+    if (!$db instanceof PDO) {
+        throw new Exception("No se pudo conectar con la base de datos.");
     }
-
-
-    /* =====================================================
-       MÉTODO HTTP
-       ===================================================== */
 
     $metodo = $_SERVER["REQUEST_METHOD"];
 
-
-    /* =====================================================
-       GET
-       Obtener preferencias actuales
-       ===================================================== */
-
     if ($metodo === "GET") {
-
         $consulta = $db->prepare(
             "SELECT
                 h.id_habito,
                 h.id_categoria,
                 h.nombre_habito,
+                h.descripcion,
+                h.color,
+                h.imagen_url,
                 hu.id_habito_usuario,
-                hu.activo
-             
+                hu.activo,
+                hu.objetivo,
+                hu.unidad,
+                hu.frecuencia,
+                hu.duracion_minutos,
+                hu.fecha_inicio,
+                hu.fecha_fin
+
              FROM habitos h
 
              LEFT JOIN habitos_usuario hu
@@ -81,183 +63,92 @@ try {
 
              WHERE h.es_base = TRUE
 
-             ORDER BY h.id_habito"
+             ORDER BY h.id_habito ASC"
         );
-
 
         $consulta->execute([
             ":id_usuario" => $usuarioId
         ]);
 
-
         $habitos = $consulta->fetchAll(PDO::FETCH_ASSOC);
-
 
         $categoriasActivas = [];
 
-
         foreach ($habitos as $habito) {
-
             if (
                 $habito["activo"] !== null &&
                 (int) $habito["activo"] === 1
             ) {
-
                 $categoriasActivas[] =
                     (int) $habito["id_categoria"];
             }
         }
 
-
-        echo json_encode([
-
+        responder([
             "exito" => true,
-
-            "categorias_activas" =>
-                $categoriasActivas,
-
-            "habitos" =>
-                $habitos
-
+            "categorias_activas" => array_values(
+                array_unique($categoriasActivas)
+            ),
+            "habitos" => $habitos
         ]);
-
-        exit;
     }
 
-
-    /* =====================================================
-       POST
-       Guardar / sincronizar preferencias
-       ===================================================== */
-
     if ($metodo === "POST") {
-
-
         $datos = json_decode(
             file_get_contents("php://input"),
             true
         );
 
-
         if (!is_array($datos)) {
-
-            http_response_code(400);
-
-            echo json_encode([
+            responder([
                 "exito" => false,
                 "mensaje" => "Los datos enviados no son válidos."
-            ]);
-
-            exit;
+            ], 400);
         }
 
-
-        $categorias =
-            $datos["categorias"] ?? [];
-
+        $categorias = $datos["categorias"] ?? [];
 
         if (!is_array($categorias)) {
-
-            http_response_code(400);
-
-            echo json_encode([
+            responder([
                 "exito" => false,
                 "mensaje" => "Las categorías no son válidas."
-            ]);
-
-            exit;
+            ], 400);
         }
 
-
-        /*
-         * Convertimos todos los valores a enteros
-         * y eliminamos duplicados.
-         */
-
-        $categorias = array_unique(
-            array_map("intval", $categorias)
+        $categorias = array_values(
+            array_unique(
+                array_map("intval", $categorias)
+            )
         );
 
-
-        /*
-         * Solo permitimos las 5 categorías existentes.
-         */
-
-        $categoriasPermitidas = [1, 2, 3, 4, 5];
-
-
-        foreach ($categorias as $idCategoria) {
-
-            if (
-                !in_array(
-                    $idCategoria,
-                    $categoriasPermitidas,
-                    true
-                )
-            ) {
-
-                http_response_code(400);
-
-                echo json_encode([
-                    "exito" => false,
-                    "mensaje" => "Se recibió una categoría no válida."
-                ]);
-
-                exit;
-            }
-        }
-
-
-        /* =================================================
-           TRANSACCIÓN
-           ================================================= */
-
-        $db->beginTransaction();
-
-
-        /*
-         * Obtenemos los hábitos base correspondientes
-         * a las categorías seleccionadas.
-         */
-
-        $consulta = $db->prepare(
+        $consultaCategorias = $db->prepare(
             "SELECT
-                id_habito,
-                id_categoria,
-                nombre_habito
+                h.id_habito,
+                h.id_categoria,
+                h.nombre_habito
 
-             FROM habitos
+             FROM habitos h
 
-             WHERE es_base = TRUE
-             AND id_categoria = :id_categoria
+             WHERE h.es_base = TRUE
+             AND h.id_categoria = :id_categoria
 
              LIMIT 1"
         );
-
-
-        /*
-         * Consulta para comprobar si el hábito
-         * ya está asignado al usuario.
-         */
 
         $consultaExistente = $db->prepare(
             "SELECT
-                id_habito_usuario
+                hu.id_habito_usuario,
+                hu.activo
 
-             FROM habitos_usuario
+             FROM habitos_usuario hu
 
-             WHERE id_usuario = :id_usuario
-             AND id_habito = :id_habito
+             WHERE hu.id_usuario = :id_usuario
+             AND hu.id_habito = :id_habito
 
              LIMIT 1"
         );
 
-
-        /*
-         * Insertar un hábito nuevo.
-         */
-
-        $insertar = $db->prepare(
+        $insertarHabitoUsuario = $db->prepare(
             "INSERT INTO habitos_usuario
             (
                 id_usuario,
@@ -266,7 +157,9 @@ try {
                 objetivo,
                 unidad,
                 frecuencia,
-                duracion_minutos
+                duracion_minutos,
+                fecha_inicio,
+                fecha_fin
             )
             VALUES
             (
@@ -276,16 +169,13 @@ try {
                 :objetivo,
                 :unidad,
                 :frecuencia,
-                :duracion_minutos
+                :duracion_minutos,
+                CURDATE(),
+                NULL
             )"
         );
 
-
-        /*
-         * Reactivar un hábito existente.
-         */
-
-        $activar = $db->prepare(
+        $activarHabito = $db->prepare(
             "UPDATE habitos_usuario
 
              SET activo = TRUE
@@ -294,12 +184,7 @@ try {
              AND id_usuario = :id_usuario"
         );
 
-
-        /*
-         * Desactivar hábitos base que NO fueron seleccionados.
-         */
-
-        $desactivarTodos = $db->prepare(
+        $desactivarHabitosBase = $db->prepare(
             "UPDATE habitos_usuario hu
 
              INNER JOIN habitos h
@@ -311,298 +196,220 @@ try {
              AND h.es_base = TRUE"
         );
 
+        $crearRacha = $db->prepare(
+            "INSERT INTO rachas
+            (
+                id_habito_usuario,
+                racha_actual,
+                mejor_racha,
+                total_completados,
+                ultima_fecha
+            )
+            VALUES
+            (
+                :id_habito_usuario,
+                0,
+                0,
+                0,
+                NULL
+            )"
+        );
 
-        $desactivarTodos->execute([
+        $buscarRacha = $db->prepare(
+            "SELECT id_racha
+             FROM rachas
+             WHERE id_habito_usuario = :id_habito_usuario
+             LIMIT 1"
+        );
+
+        $insertarDia = $db->prepare(
+            "INSERT IGNORE INTO habito_dias
+            (
+                id_habito_usuario,
+                dia_semana
+            )
+            VALUES
+            (
+                :id_habito_usuario,
+                :dia_semana
+            )"
+        );
+
+        $db->beginTransaction();
+
+        $desactivarHabitosBase->execute([
             ":id_usuario" => $usuarioId
         ]);
 
-
-        /*
-         * Procesamos cada categoría seleccionada.
-         */
-
         foreach ($categorias as $idCategoria) {
-
-
-            $consulta->execute([
+            $consultaCategorias->execute([
                 ":id_categoria" => $idCategoria
             ]);
 
-
-            $habito = $consulta->fetch(
+            $habito = $consultaCategorias->fetch(
                 PDO::FETCH_ASSOC
             );
 
-
             if (!$habito) {
-
                 throw new Exception(
-                    "No se encontró el hábito base de la categoría."
+                    "No se encontró el hábito correspondiente a una categoría seleccionada."
                 );
             }
 
-
-            $idHabito =
-                (int) $habito["id_habito"];
-
-
-            /*
-             * Comprobar si ya existe.
-             */
+            $idHabito = (int) $habito["id_habito"];
+            $nombreHabito = $habito["nombre_habito"];
 
             $consultaExistente->execute([
-
-                ":id_usuario" =>
-                    $usuarioId,
-
-                ":id_habito" =>
-                    $idHabito
-
+                ":id_usuario" => $usuarioId,
+                ":id_habito" => $idHabito
             ]);
 
-
-            $existente =
-                $consultaExistente->fetch(
-                    PDO::FETCH_ASSOC
-                );
-
+            $existente = $consultaExistente->fetch(
+                PDO::FETCH_ASSOC
+            );
 
             if ($existente) {
+                $idHabitoUsuario =
+                    (int) $existente["id_habito_usuario"];
 
-
-                /*
-                 * Ya existe:
-                 * simplemente lo activamos.
-                 */
-
-                $activar->execute([
-
+                $activarHabito->execute([
                     ":id_habito_usuario" =>
-                        $existente["id_habito_usuario"],
-
+                        $idHabitoUsuario,
                     ":id_usuario" =>
                         $usuarioId
-
                 ]);
-
-
             } else {
-
-
-                /*
-                 * Valores predeterminados
-                 * para cada hábito base.
-                 */
-
                 $objetivo = 1;
                 $unidad = "sesiones";
                 $frecuencia = "diaria";
                 $duracion = null;
 
-
-                switch ($idCategoria) {
-
-
-                    /* HIDRATACIÓN */
-
-                    case 1:
-
+                switch ($nombreHabito) {
+                    case "Hidratación":
                         $objetivo = 8;
                         $unidad = "vasos";
                         $frecuencia = "diaria";
-
                         break;
 
+                    case "Alimentación":
+                        $objetivo = 3;
+                        $unidad = "comidas";
+                        $frecuencia = "diaria";
+                        break;
 
-                    /* SALUD MENTAL */
-
-                    case 2:
-
+                    case "Salud Mental":
                         $objetivo = 2;
                         $unidad = "sesiones";
                         $frecuencia = "diaria";
                         $duracion = 15;
-
                         break;
 
+                    case "Actividad Física":
+                        $objetivo = 1;
+                        $unidad = "sesiones";
+                        $frecuencia = "diaria";
+                        $duracion = 30;
+                        break;
 
-                    /* ACADÉMICO */
-
-                    case 3:
-
+                    case "Registro Académico":
                         $objetivo = 1;
                         $unidad = "sesiones";
                         $frecuencia = "dias específicos";
                         $duracion = 30;
-
                         break;
-
-
-                    /* ACTIVIDAD FÍSICA */
-
-                    case 4:
-
-                        $objetivo = 1;
-                        $unidad = "sesiones";
-                        $frecuencia = "diaria";
-                        $duracion = 30;
-
-                        break;
-
-
-                    /* ALIMENTACIÓN */
-
-                    case 5:
-
-                        $objetivo = 3;
-                        $unidad = "comidas";
-                        $frecuencia = "diaria";
-
-                        break;
-
                 }
 
-
-                $insertar->execute([
-
-                    ":id_usuario" =>
-                        $usuarioId,
-
-                    ":id_habito" =>
-                        $idHabito,
-
-                    ":objetivo" =>
-                        $objetivo,
-
-                    ":unidad" =>
-                        $unidad,
-
-                    ":frecuencia" =>
-                        $frecuencia,
-
-                    ":duracion_minutos" =>
-                        $duracion
-
+                $insertarHabitoUsuario->execute([
+                    ":id_usuario" => $usuarioId,
+                    ":id_habito" => $idHabito,
+                    ":objetivo" => $objetivo,
+                    ":unidad" => $unidad,
+                    ":frecuencia" => $frecuencia,
+                    ":duracion_minutos" => $duracion
                 ]);
 
-
-                /*
-                 * Si el hábito académico se crea por primera vez,
-                 * asignamos martes y jueves.
-                 *
-                 * 1 = lunes
-                 * 2 = martes
-                 * 3 = miércoles
-                 * 4 = jueves
-                 * 5 = viernes
-                 * 6 = sábado
-                 * 7 = domingo
-                 */
-
-                if ($idCategoria === 3) {
-
-                    $idHabitoUsuario =
-                        $db->lastInsertId();
-
-
-                    $insertarDia =
-                        $db->prepare(
-                            "INSERT INTO habito_dias
-                            (
-                                id_habito_usuario,
-                                dia_semana
-                            )
-                            VALUES
-                            (
-                                :id_habito_usuario,
-                                :dia_semana
-                            )"
-                        );
-
-
-                    $insertarDia->execute([
-
-                        ":id_habito_usuario" =>
-                            $idHabitoUsuario,
-
-                        ":dia_semana" =>
-                            2
-
-                    ]);
-
-
-                    $insertarDia->execute([
-
-                        ":id_habito_usuario" =>
-                            $idHabitoUsuario,
-
-                        ":dia_semana" =>
-                            4
-
-                    ]);
-
-                }
-
+                $idHabitoUsuario =
+                    (int) $db->lastInsertId();
             }
 
-        }
+            $buscarRacha->execute([
+                ":id_habito_usuario" =>
+                    $idHabitoUsuario
+            ]);
 
+            $racha = $buscarRacha->fetch(
+                PDO::FETCH_ASSOC
+            );
+
+            if (!$racha) {
+                $crearRacha->execute([
+                    ":id_habito_usuario" =>
+                        $idHabitoUsuario
+                ]);
+            }
+
+            if ($nombreHabito === "Registro Académico") {
+                $insertarDia->execute([
+                    ":id_habito_usuario" =>
+                        $idHabitoUsuario,
+                    ":dia_semana" => 2
+                ]);
+
+                $insertarDia->execute([
+                    ":id_habito_usuario" =>
+                        $idHabitoUsuario,
+                    ":dia_semana" => 4
+                ]);
+            }
+        }
 
         $db->commit();
 
-
-        echo json_encode([
-
+        responder([
             "exito" => true,
-
-            "mensaje" =>
-                "Preferencias guardadas correctamente."
-
+            "mensaje" => "Preferencias guardadas correctamente.",
+            "categorias_activas" => $categorias
         ]);
-
-        exit;
     }
 
-
-    /* =====================================================
-       PUT
-       Activar / desactivar un hábito
-       ===================================================== */
-
     if ($metodo === "PUT") {
-
-
         $datos = json_decode(
             file_get_contents("php://input"),
             true
         );
 
+        if (!is_array($datos)) {
+            responder([
+                "exito" => false,
+                "mensaje" => "Los datos enviados no son válidos."
+            ], 400);
+        }
 
         $idHabitoUsuario =
             (int) ($datos["id_habito_usuario"] ?? 0);
 
-
-        $activo =
-            isset($datos["activo"])
-                ? (bool) $datos["activo"]
-                : null;
-
-
         if (
-            $idHabitoUsuario <= 0 ||
-            $activo === null
+            !array_key_exists("activo", $datos) ||
+            $idHabitoUsuario <= 0
         ) {
-
-            http_response_code(400);
-
-            echo json_encode([
+            responder([
                 "exito" => false,
                 "mensaje" => "Datos inválidos."
-            ]);
-
-            exit;
+            ], 400);
         }
 
+        $activo = filter_var(
+            $datos["activo"],
+            FILTER_VALIDATE_BOOLEAN,
+            FILTER_NULL_ON_FAILURE
+        );
+
+        if ($activo === null) {
+            responder([
+                "exito" => false,
+                "mensaje" => "El estado del hábito no es válido."
+            ], 400);
+        }
 
         $consulta = $db->prepare(
             "UPDATE habitos_usuario
@@ -613,142 +420,80 @@ try {
              AND id_usuario = :id_usuario"
         );
 
-
         $consulta->execute([
-
-            ":activo" =>
-                $activo ? 1 : 0,
-
-            ":id_habito_usuario" =>
-                $idHabitoUsuario,
-
-            ":id_usuario" =>
-                $usuarioId
-
+            ":activo" => $activo ? 1 : 0,
+            ":id_habito_usuario" => $idHabitoUsuario,
+            ":id_usuario" => $usuarioId
         ]);
 
-
-        echo json_encode([
-
+        responder([
             "exito" => true,
-
-            "mensaje" =>
-                "Estado del hábito actualizado."
-
+            "mensaje" => "Estado del hábito actualizado."
         ]);
-
-        exit;
     }
 
-
-    /* =====================================================
-       DELETE
-       Eliminar asignación del usuario
-       ===================================================== */
-
     if ($metodo === "DELETE") {
-
-
         $datos = json_decode(
             file_get_contents("php://input"),
             true
         );
 
+        if (!is_array($datos)) {
+            responder([
+                "exito" => false,
+                "mensaje" => "Los datos enviados no son válidos."
+            ], 400);
+        }
 
         $idHabitoUsuario =
             (int) ($datos["id_habito_usuario"] ?? 0);
 
-
         if ($idHabitoUsuario <= 0) {
-
-            http_response_code(400);
-
-            echo json_encode([
+            responder([
                 "exito" => false,
                 "mensaje" => "Hábito inválido."
-            ]);
-
-            exit;
+            ], 400);
         }
-
 
         $consulta = $db->prepare(
             "DELETE FROM habitos_usuario
 
              WHERE id_habito_usuario = :id_habito_usuario
-
              AND id_usuario = :id_usuario"
         );
 
-
         $consulta->execute([
-
-            ":id_habito_usuario" =>
-                $idHabitoUsuario,
-
-            ":id_usuario" =>
-                $usuarioId
-
+            ":id_habito_usuario" => $idHabitoUsuario,
+            ":id_usuario" => $usuarioId
         ]);
 
-
-        echo json_encode([
-
+        responder([
             "exito" => true,
-
-            "mensaje" =>
-                "Hábito eliminado correctamente."
-
+            "mensaje" => "Hábito eliminado correctamente."
         ]);
-
-        exit;
     }
 
-
-    /* =====================================================
-       MÉTODO NO SOPORTADO
-       ===================================================== */
-
-    http_response_code(405);
-
-    echo json_encode([
-
+    responder([
         "exito" => false,
+        "mensaje" => "Método HTTP no permitido."
+    ], 405);
 
-        "mensaje" =>
-            "Método HTTP no permitido."
-
-    ]);
-
-
-} catch (Exception $error) {
-
-
+} catch (Throwable $error) {
     if (
         isset($db) &&
+        $db instanceof PDO &&
         $db->inTransaction()
     ) {
-
         $db->rollBack();
-
     }
 
+    error_log(
+        "LifeSync preferencias.php: " .
+        $error->getMessage()
+    );
 
-    http_response_code(500);
-
-
-    echo json_encode([
-
+    responder([
         "exito" => false,
-
-        "mensaje" =>
-            "Ocurrió un error al guardar las preferencias.",
-
-        "detalle" =>
-            $error->getMessage()
-
-    ]);
-
+        "mensaje" => "Ocurrió un error al guardar las preferencias."
+    ], 500);
 }
-
-?>

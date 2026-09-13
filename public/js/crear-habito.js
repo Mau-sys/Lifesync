@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     const form = document.getElementById("habitoForm");
     const nombreHabito = document.getElementById("nombreHabito");
     const objetivo = document.getElementById("objetivo");
@@ -9,7 +8,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const mensaje = document.getElementById("mensajeHabito");
     const boton = document.getElementById("guardarHabito");
 
-    if (!form || !nombreHabito || !objetivo || !frecuencia || !fechaInicio || !fechaFin || !mensaje || !boton) {
+    if (
+        !form ||
+        !nombreHabito ||
+        !objetivo ||
+        !frecuencia ||
+        !fechaInicio ||
+        !fechaFin ||
+        !mensaje ||
+        !boton
+    ) {
         return;
     }
 
@@ -39,26 +47,37 @@ document.addEventListener("DOMContentLoaded", () => {
         const anio = fecha.getFullYear();
         const mes = String(fecha.getMonth() + 1).padStart(2, "0");
         const dia = String(fecha.getDate()).padStart(2, "0");
+
         return `${anio}-${mes}-${dia}`;
     }
 
-    fechaInicio.value = obtenerFechaLocal();
-    fechaInicio.min = obtenerFechaLocal();
-    fechaFin.min = obtenerFechaLocal();
+    const hoy = obtenerFechaLocal();
+
+    if (!fechaInicio.value) {
+        fechaInicio.value = hoy;
+    }
+
+    fechaInicio.min = hoy;
+    fechaFin.min = fechaInicio.value;
 
     fechaInicio.addEventListener("change", () => {
         limpiarMensaje();
+
         fechaFin.min = fechaInicio.value;
 
-        if (fechaFin.value && fechaFin.value < fechaInicio.value) {
+        if (
+            fechaFin.value &&
+            fechaFin.value < fechaInicio.value
+        ) {
             fechaFin.value = "";
         }
     });
 
-    [nombreHabito, objetivo, frecuencia, fechaInicio, fechaFin].forEach((campo) => {
-        campo.addEventListener("input", limpiarMensaje);
-        campo.addEventListener("change", limpiarMensaje);
-    });
+    [nombreHabito, objetivo, frecuencia, fechaInicio, fechaFin]
+        .forEach((campo) => {
+            campo.addEventListener("input", limpiarMensaje);
+            campo.addEventListener("change", limpiarMensaje);
+        });
 
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -70,7 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const inicio = fechaInicio.value;
         const fin = fechaFin.value;
 
-        if (!nombre || !descripcion || !frecuenciaSeleccionada || !inicio) {
+        if (
+            !nombre ||
+            !descripcion ||
+            !frecuenciaSeleccionada ||
+            !inicio
+        ) {
             mostrarMensaje(texto("camposIncompletos"));
             return;
         }
@@ -98,20 +122,22 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const respuesta = await fetch("../auth/crear-habito.php", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
                 credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json"
+                },
                 body: JSON.stringify({
                     nombre,
                     descripcion,
                     frecuencia: frecuenciaSeleccionada,
                     fechaInicio: inicio,
-                    fechaFin: fin
+                    fechaFin: fin || null
                 })
             });
 
             let datos;
+
             try {
                 datos = await respuesta.json();
             } catch (error) {
@@ -121,13 +147,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (!respuesta.ok || !datos.exito) {
-                mostrarMensaje(datos.mensaje || texto("noSePudoCrearHabito"));
+                mostrarMensaje(
+                    datos.mensaje || texto("noSePudoCrearHabito")
+                );
                 cambiarEstadoBoton(false);
                 return;
             }
 
-            window.location.href = "Inicio.html";
-
+            window.location.href = "inicio.html";
         } catch (error) {
             console.error("Error al crear hábito:", error);
             mostrarMensaje(texto("errorConexion"));
