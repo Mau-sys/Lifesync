@@ -1,75 +1,61 @@
 <?php
-header("Content-Type: application/json; charset=UTF-8");
 session_start();
+header("Content-Type: application/json; charset=UTF-8");
+require_once "../config/conexion.php";
 
-require_once("../config/conexion.php");
+if (!isset($_SESSION["usuario_id"])) {
+    http_response_code(401);
+    echo json_encode(["success" => false, "message" => "La sesión ha expirado."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
 try {
     $database = new Database();
     $db = $database->getConnection();
+    $usuarioId = (int) $_SESSION["usuario_id"];
 
-    // Obtener id de usuario en sesión o utilizar 1 por defecto para pruebas
-    $id_usuario = $_SESSION['id_usuario'] ?? 1;
+    $consulta = $db->prepare("SELECT hu.id_habito_usuario, hu.id_habito, hu.objetivo, hu.unidad, hu.frecuencia, hu.duracion_minutos, hu.fecha_inicio, hu.fecha_fin FROM habitos_usuario hu INNER JOIN habitos h ON h.id_habito = hu.id_habito INNER JOIN categorias c ON c.id_categoria = h.id_categoria WHERE hu.id_usuario = :id_usuario AND hu.activo = TRUE AND c.nombre = 'Salud Mental' ORDER BY hu.id_habito_usuario DESC LIMIT 1");
+    $consulta->execute([":id_usuario" => $usuarioId]);
+    $habito = $consulta->fetch(PDO::FETCH_ASSOC);
 
-    // 1. Obtener o consultar el hábito activo de Salud Mental para el usuario
-    $queryHabito = "SELECT id_habito, objetivo, unidad_medida 
-                    FROM habitos 
-                    WHERE id_usuario = :id_usuario 
-                      AND (id_categoria = 3 OR nombre_habito = 'Salud Mental') 
-                      AND activo = TRUE 
-                    LIMIT 1";
-                    
-    $stmtHabito = $db->prepare($queryHabito);
-    $stmtHabito->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
-    $stmtHabito->execute();
-
-    $habito = $stmtHabito->fetch(PDO::FETCH_ASSOC);
-
-    // Si no existe un hábito de Salud Mental para este usuario, lo creamos dinámicamente
     if (!$habito) {
-        $queryInsertHabito = "INSERT INTO habitos (id_usuario, id_categoria, nombre_habito, descripcion, tipo_medicion, objetivo, unidad_medida, frecuencia, fecha_inicio, activo) 
-                              VALUES (:id_usuario, 3, 'Salud Mental', 'Pausas activas y descansos', 'cantidad', 2.00, '15', 'diaria', CURDATE(), TRUE)";
-        $stmtInsert = $db->prepare($queryInsertHabito);
-        $stmtInsert->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
-        $stmtInsert->execute();
-
-        $id_habito = $db->lastInsertId();
-        $objetivo = 2;
-        $duracion = 15;
-    } else {
-        $id_habito = (int)$habito['id_habito'];
-        $objetivo = (int)$habito['objetivo'];
-        $duracion = !empty($habito['unidad_medida']) ? (int)$habito['unidad_medida'] : 15;
+        echo json_encode(["success" => false, "message" => "No tienes activo el hábito de Salud Mental."], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
-    // 2. Obtener los registros de pausas realizadas el día de hoy
-    $queryRegistros = "SELECT id_registro, valor_registrado, DATE_FORMAT(fecha_registro, '%h:%i %p') AS hora 
-                       FROM registros_habitos 
-                       WHERE id_habito = :id_habito 
-                         AND DATE(fecha_registro) = CURDATE() 
-                       ORDER BY fecha_registro DESC";
+    $idHu = (int) $habito["id_habito_usuario"];
 
-    $stmtRegistros = $db->prepare($queryRegistros);
-    $stmtRegistros->bindParam(":id_habito", $id_habito, PDO::PARAM_INT);
-    $stmtRegistros->execute();
+    $consultaDias = $db->prepare("SELECT dia_semana FROM habito_dias WHERE id_habito_usuario = :id_habito_usuario ORDER BY dia_semana");
+    $consultaDias->execute([":id_habito_usuario" => $idHu]);
+    $diasBD = array_map("intval", $consultaDias->fetchAll(PDO::FETCH_COLUMN));
+    $diasActivos = array_map(fn($dia) => $dia === 7 ? 0 : $dia, $diasBD);
 
-    $registros = $stmtRegistros->fetchAll(PDO::FETCH_ASSOC);
-    $total_pausas = count($registros);
+    $condicionPeriodo = $habito["frecuencia"] === "semanal"
+        ? "YEARWEEK(fecha_registro, 1) = YEARWEEK(CURDATE(), 1)"
+        : "DATE(fecha_registro) = CURDATE()";
+
+    $registros = $db->prepare("SELECT id_registro, valor_registrado, DATE_FORMAT(fecha_registro, '%h:%i %p') AS hora, fecha_registro FROM registros_habitos WHERE id_habito_usuario = :id_habito_usuario AND {$condicionPeriodo} ORDER BY fecha_registro DESC");
+    $registros->execute([":id_habito_usuario" => $idHu]);
+    $lista = $registros->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
         "success" => true,
         "data" => [
-            "id_habito" => $id_habito,
-            "objetivo" => $objetivo,
-            "duracion_minutos" => $duracion,
-            "total_pausas" => $total_pausas,
-            "registros" => $registros
+            "id_habito" => (int) $habito["id_habito"],
+            "id_habito_usuario" => $idHu,
+            "objetivo" => (float) $habito["objetivo"],
+            "unidad" => $habito["unidad"],
+            "duracion_minutos" => $habito["duracion_minutos"] !== null ? (int) $habito["duracion_minutos"] : 15,
+            "frecuencia" => $habito["frecuencia"],
+            "fecha_inicio" => $habito["fecha_inicio"],
+            "fecha_fin" => $habito["fecha_fin"],
+            "dias_activos" => $diasActivos,
+            "total_pausas" => count($lista),
+            "registros" => $lista
         ]
-    ], JSON_UNESCAPED_UNICODE);
-
-} catch (PDOException $e) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Error de conexión o consulta: " . $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+} catch (Throwable $error) {
+    http_response_code(500);
+    error_log("LifeSync salud_mental/read.php: " . $error->getMessage());
+    echo json_encode(["success" => false, "message" => "No se pudieron cargar los datos de Salud Mental."], JSON_UNESCAPED_UNICODE);
 }

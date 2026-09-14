@@ -12,13 +12,6 @@ document.addEventListener(
                 "mensajeCategorias"
             );
 
-
-        /*
-        =====================================================
-        CONFIGURACIÓN DE CATEGORÍAS
-        =====================================================
-        */
-
         const configuracion = {
 
             "Hidratación": {
@@ -28,26 +21,26 @@ document.addEventListener(
             },
 
             "Alimentación": {
-                icono: "img/Alimentacion.png",
-                enlace: "Halimentacion.html",
+                icono: "img/Alimen.png",
+                enlace: "HAlimentacion.html",
                 clase: "alimentacion"
             },
 
             "Salud Mental": {
-                icono: "img/SaludMental.png",
-                enlace: "HsaludMental.html",
+                icono: "img/S-Mental.png",
+                enlace: "HSaludMental.html",
                 clase: "salud-mental"
             },
 
             "Actividad Física": {
-                icono: "img/ActividadFisica.png",
-                enlace: "HactividadFisica.html",
+                icono: "img/A-Fisica.png",
+                enlace: "HActividadFisica.html",
                 clase: "actividad-fisica"
             },
 
-            "Registro Académico": {
-                icono: "img/Academico.png",
-                enlace: "HregistroAcademico.html",
+            "Académico": {
+                icono: "img/R-Academ.png",
+                enlace: "HRegistroAcademico.html",
                 clase: "academico"
             },
 
@@ -58,13 +51,6 @@ document.addEventListener(
             }
 
         };
-
-
-        /*
-        =====================================================
-        TRADUCCIÓN
-        =====================================================
-        */
 
         function traducir(
             clave,
@@ -82,7 +68,6 @@ document.addEventListener(
                         clave
                     );
 
-
                 if (
                     resultado &&
                     resultado !== clave
@@ -94,17 +79,9 @@ document.addEventListener(
 
             }
 
-
             return textoPredeterminado;
 
         }
-
-
-        /*
-        =====================================================
-        ESCAPAR HTML
-        =====================================================
-        */
 
         function escaparHTML(
             texto
@@ -122,13 +99,6 @@ document.addEventListener(
 
         }
 
-
-        /*
-        =====================================================
-        CREAR TARJETA
-        =====================================================
-        */
-
         function crearTarjeta(
             categoria
         ) {
@@ -136,10 +106,8 @@ document.addEventListener(
             const nombre =
                 categoria.nombre_categoria;
 
-
             const config =
                 configuracion[nombre];
-
 
             if (!config) {
 
@@ -147,106 +115,80 @@ document.addEventListener(
 
             }
 
-
             const articulo =
                 document.createElement(
                     "article"
                 );
 
-
             articulo.className =
                 "categoria";
 
-
             articulo.dataset.color =
                 config.clase;
-
-
-            /*
-            ---------------------------------------------
-            PARTE SUPERIOR
-            ---------------------------------------------
-            */
 
             const superior =
                 document.createElement(
                     "div"
                 );
 
-
             superior.className =
                 "categoria-superior";
-
 
             const contenedorIcono =
                 document.createElement(
                     "div"
                 );
 
-
             contenedorIcono.className =
                 "categoria-icono";
-
 
             const imagen =
                 document.createElement(
                     "img"
                 );
 
-
             imagen.src =
                 config.icono;
-
 
             imagen.alt =
                 nombre;
 
-
             contenedorIcono.appendChild(
                 imagen
             );
-
 
             const informacion =
                 document.createElement(
                     "div"
                 );
 
-
             informacion.className =
                 "categoria-info";
-
 
             const titulo =
                 document.createElement(
                     "h2"
                 );
 
-
             titulo.textContent =
                 nombre;
-
 
             const descripcion =
                 document.createElement(
                     "p"
                 );
 
-
             descripcion.textContent =
                 categoria.descripcion ||
                 "Administra tus hábitos de esta categoría.";
-
 
             const estado =
                 document.createElement(
                     "span"
                 );
 
-
             estado.className =
                 "estado-categoria";
-
 
             if (
                 categoria.seleccionada
@@ -262,7 +204,6 @@ document.addEventListener(
 
             }
 
-
             informacion.appendChild(
                 titulo
             );
@@ -275,7 +216,6 @@ document.addEventListener(
                 estado
             );
 
-
             superior.appendChild(
                 contenedorIcono
             );
@@ -284,52 +224,37 @@ document.addEventListener(
                 informacion
             );
 
-
-            /*
-            ---------------------------------------------
-            PROGRESO
-            ---------------------------------------------
-            */
-
             const progreso =
                 document.createElement(
                     "div"
                 );
 
-
             progreso.className =
                 "categoria-progreso";
-
 
             const progresoInfo =
                 document.createElement(
                     "div"
                 );
 
-
             progresoInfo.className =
                 "progreso-info";
-
 
             const textoProgreso =
                 document.createElement(
                     "span"
                 );
 
-
             textoProgreso.textContent =
                 "Progreso diario";
-
 
             const porcentaje =
                 document.createElement(
                     "span"
                 );
 
-
             porcentaje.className =
                 "porcentaje";
-
 
             porcentaje.textContent =
                 Math.round(
@@ -337,7 +262,6 @@ document.addEventListener(
                         categoria.porcentaje
                     ) || 0
                 ) + "%";
-
 
             progresoInfo.appendChild(
                 textoProgreso
@@ -347,27 +271,22 @@ document.addEventListener(
                 porcentaje
             );
 
-
             const barraProgreso =
                 document.createElement(
                     "div"
                 );
 
-
             barraProgreso.className =
                 "barra-progreso";
-
 
             const barra =
                 document.createElement(
                     "div"
                 );
 
-
             barra.className =
                 "barra " +
                 config.clase;
-
 
             barra.style.width =
                 (
@@ -376,11 +295,9 @@ document.addEventListener(
                     ) || 0
                 ) + "%";
 
-
             barraProgreso.appendChild(
                 barra
             );
-
 
             progreso.appendChild(
                 progresoInfo
@@ -390,60 +307,44 @@ document.addEventListener(
                 barraProgreso
             );
 
-
-            /*
-            ---------------------------------------------
-            PARTE INFERIOR
-            ---------------------------------------------
-            */
-
             const inferior =
                 document.createElement(
                     "div"
                 );
 
-
             inferior.className =
                 "categoria-inferior";
-
 
             const resumen =
                 document.createElement(
                     "div"
                 );
 
-
             resumen.className =
                 "resumen";
-
 
             const registro =
                 document.createElement(
                     "span"
                 );
 
-
             registro.textContent =
                 "Registro";
-
 
             const datos =
                 document.createElement(
                     "span"
                 );
 
-
             const total =
                 Number(
                     categoria.total_habitos
                 ) || 0;
 
-
             const completados =
                 Number(
                     categoria.completados_hoy
                 ) || 0;
-
 
             if (total > 0) {
 
@@ -457,7 +358,6 @@ document.addEventListener(
 
             }
 
-
             resumen.appendChild(
                 registro
             );
@@ -466,24 +366,19 @@ document.addEventListener(
                 datos
             );
 
-
             const boton =
                 document.createElement(
                     "a"
                 );
 
-
             boton.href =
                 config.enlace;
-
 
             boton.className =
                 "btn-categoria";
 
-
             boton.textContent =
                 "Abrir categoría";
-
 
             inferior.appendChild(
                 resumen
@@ -492,13 +387,6 @@ document.addEventListener(
             inferior.appendChild(
                 boton
             );
-
-
-            /*
-            ---------------------------------------------
-            ARMAR TARJETA
-            ---------------------------------------------
-            */
 
             articulo.appendChild(
                 superior
@@ -512,17 +400,9 @@ document.addEventListener(
                 inferior
             );
 
-
             return articulo;
 
         }
-
-
-        /*
-        =====================================================
-        CARGAR CATEGORÍAS
-        =====================================================
-        */
 
         async function cargarCategorias() {
 
@@ -530,7 +410,6 @@ document.addEventListener(
 
                 listaCategorias.innerHTML =
                     "";
-
 
                 if (
                     mensajeCategorias
@@ -541,10 +420,9 @@ document.addEventListener(
 
                 }
 
-
                 const respuesta =
                     await fetch(
-                        "auth/categorias.php",
+                        "../auth/categorias.php",
                         {
                             method: "GET",
 
@@ -561,10 +439,8 @@ document.addEventListener(
                         }
                     );
 
-
                 const datos =
                     await respuesta.json();
-
 
                 if (
                     !respuesta.ok ||
@@ -578,10 +454,8 @@ document.addEventListener(
 
                 }
 
-
                 const categorias =
                     datos.categorias || [];
-
 
                 if (
                     categorias.length === 0
@@ -595,7 +469,6 @@ document.addEventListener(
 
                 }
 
-
                 categorias.forEach(
                     (categoria) => {
 
@@ -603,7 +476,6 @@ document.addEventListener(
                             crearTarjeta(
                                 categoria
                             );
-
 
                         if (tarjeta) {
 
@@ -616,14 +488,12 @@ document.addEventListener(
                     }
                 );
 
-
             } catch (error) {
 
                 console.error(
                     "Error al cargar categorías:",
                     error
                 );
-
 
                 mostrarMensaje(
                     error.message ||
@@ -633,7 +503,6 @@ document.addEventListener(
             }
 
         }
-
 
         function mostrarMensaje(
             mensaje
@@ -647,20 +516,12 @@ document.addEventListener(
 
             }
 
-
             mensajeCategorias.textContent =
                 mensaje;
 
         }
 
-
         cargarCategorias();
-
-
-        /*
-        Si cambia el idioma,
-        volvemos a cargar la información.
-        */
 
         window.addEventListener(
             "lifesyncIdiomaCambiado",

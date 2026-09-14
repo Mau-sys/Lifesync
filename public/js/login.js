@@ -1,15 +1,6 @@
-/* =========================================================
-   LOGIN — LifeSync
-   ========================================================= */
-
 (function () {
 
     "use strict";
-
-
-    /* =====================================================
-       TRADUCCIÓN
-       ===================================================== */
 
     function texto(clave) {
 
@@ -26,11 +17,6 @@
 
         return clave;
     }
-
-
-    /* =====================================================
-       ELEMENTOS
-       ===================================================== */
 
     const loginForm =
         document.getElementById(
@@ -67,14 +53,8 @@
             "appleLogin"
         );
 
-
     const ENDPOINT_LOGIN =
-        "auth/login.php";
-
-
-    /* =====================================================
-       MENSAJES
-       ===================================================== */
+        "../auth/login.php";
 
     function mostrarMensaje(mensaje) {
 
@@ -86,7 +66,6 @@
             mensaje;
     }
 
-
     function limpiarMensaje() {
 
         if (!mensajeError) {
@@ -96,11 +75,6 @@
         mensajeError.textContent =
             "";
     }
-
-
-    /* =====================================================
-       BOTÓN
-       ===================================================== */
 
     function cambiarEstadoBoton(cargando) {
 
@@ -117,11 +91,6 @@
                 : texto("iniciarSesion");
     }
 
-
-    /* =====================================================
-       FORMULARIO
-       ===================================================== */
-
     if (loginForm) {
 
         loginForm.addEventListener(
@@ -132,13 +101,11 @@
 
                 limpiarMensaje();
 
-
                 const correo =
                     correoInput.value.trim();
 
                 const password =
                     passwordInput.value;
-
 
                 if (
                     !correo ||
@@ -154,7 +121,6 @@
                     return;
                 }
 
-
                 if (
                     !correoInput.checkValidity()
                 ) {
@@ -168,9 +134,7 @@
                     return;
                 }
 
-
                 cambiarEstadoBoton(true);
-
 
                 try {
 
@@ -203,9 +167,7 @@
                             }
                         );
 
-
                     let datos;
-
 
                     try {
 
@@ -225,7 +187,6 @@
                         return;
                     }
 
-
                     if (
                         !respuesta.ok ||
                         !datos.exito
@@ -243,7 +204,6 @@
                         return;
                     }
 
-
                     if (
                         datos.usuario
                     ) {
@@ -257,10 +217,8 @@
 
                     }
 
-
                     window.location.href =
                         "inicio.html";
-
 
                 } catch (error) {
 
@@ -269,13 +227,11 @@
                         error
                     );
 
-
                     mostrarMensaje(
                         texto(
                             "errorConexion"
                         )
                     );
-
 
                     cambiarEstadoBoton(false);
 
@@ -285,11 +241,6 @@
         );
 
     }
-
-
-    /* =====================================================
-       GOOGLE
-       ===================================================== */
 
     if (googleLogin) {
 
@@ -308,11 +259,6 @@
 
     }
 
-
-    /* =====================================================
-       APPLE
-       ===================================================== */
-
     if (appleLogin) {
 
         appleLogin.addEventListener(
@@ -330,11 +276,6 @@
 
     }
 
-
-    /* =====================================================
-       LIMPIAR MENSAJE AL ESCRIBIR
-       ===================================================== */
-
     if (correoInput) {
 
         correoInput.addEventListener(
@@ -344,7 +285,6 @@
 
     }
 
-
     if (passwordInput) {
 
         passwordInput.addEventListener(
@@ -353,11 +293,6 @@
         );
 
     }
-
-
-    /* =====================================================
-       ACTUALIZAR BOTÓN SI CAMBIA EL IDIOMA
-       ===================================================== */
 
     window.addEventListener(
         "lifesyncIdiomaCambiado",

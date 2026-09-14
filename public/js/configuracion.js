@@ -1,15 +1,6 @@
 "use strict";
 
-/* =========================================================
-   CONFIGURACIÓN — LifeSync
-   ========================================================= */
-
-const ENDPOINT = "auth/configuracion.php";
-
-
-/* =========================================================
-   ELEMENTOS
-   ========================================================= */
+const ENDPOINT = "../auth/configuracion.php";
 
 const modoOscuro =
     document.getElementById("modoOscuro");
@@ -87,11 +78,6 @@ const estadoSincronizacion =
         "estadoSincronizacion"
     );
 
-
-/* =========================================================
-   TRADUCCIÓN
-   ========================================================= */
-
 function texto(clave) {
 
     if (
@@ -104,11 +90,6 @@ function texto(clave) {
     return clave;
 }
 
-
-/* =========================================================
-   MENSAJES
-   ========================================================= */
-
 function mostrarMensaje(valor) {
 
     if (mensaje) {
@@ -116,7 +97,6 @@ function mostrarMensaje(valor) {
     }
 
 }
-
 
 function mostrarMensajeContrasena(valor) {
 
@@ -126,7 +106,6 @@ function mostrarMensajeContrasena(valor) {
 
 }
 
-
 function mostrarMensajeSesiones(valor) {
 
     if (mensajeSesiones) {
@@ -134,11 +113,6 @@ function mostrarMensajeSesiones(valor) {
     }
 
 }
-
-
-/* =========================================================
-   BOTÓN GUARDAR
-   ========================================================= */
 
 function cambiarEstadoGuardado(cargando) {
 
@@ -154,18 +128,12 @@ function cambiarEstadoGuardado(cargando) {
             : texto("comun.guardarCambios");
 }
 
-
-/* =========================================================
-   TEMA
-   ========================================================= */
-
 function aplicarTema(tema) {
 
     const temaValido =
         tema === "claro"
             ? "claro"
             : "oscuro";
-
 
     if (
         typeof window.aplicarTemaGlobal ===
@@ -178,7 +146,6 @@ function aplicarTema(tema) {
 
         return;
     }
-
 
     document.documentElement.setAttribute(
         "data-tema",
@@ -194,7 +161,6 @@ function aplicarTema(tema) {
         "tema-oscuro",
         temaValido === "oscuro"
     );
-
 
     if (document.body) {
 
@@ -215,13 +181,11 @@ function aplicarTema(tema) {
 
     }
 
-
     localStorage.setItem(
         "lifesync_tema",
         temaValido
     );
 }
-
 
 function actualizarTemaDesdeCheckbox() {
 
@@ -235,11 +199,6 @@ function actualizarTemaDesdeCheckbox() {
             : "claro"
     );
 }
-
-
-/* =========================================================
-   SINCRONIZACIÓN
-   ========================================================= */
 
 function actualizarEstadoSincronizacion(activa) {
 
@@ -255,7 +214,6 @@ function actualizarEstadoSincronizacion(activa) {
                 );
 
     }
-
 
     if (estadoSincronizacion) {
 
@@ -275,11 +233,6 @@ function actualizarEstadoSincronizacion(activa) {
 
     }
 }
-
-
-/* =========================================================
-   CARGAR CONFIGURACIÓN
-   ========================================================= */
 
 async function cargarConfiguracion() {
 
@@ -301,10 +254,8 @@ async function cargarConfiguracion() {
                 }
             );
 
-
         const datos =
             await respuesta.json();
-
 
         if (
             !respuesta.ok ||
@@ -322,10 +273,8 @@ async function cargarConfiguracion() {
             return;
         }
 
-
         const configuracion =
             datos.configuracion;
-
 
         if (modoOscuro) {
 
@@ -334,7 +283,6 @@ async function cargarConfiguracion() {
                 "oscuro";
 
         }
-
 
         if (idioma) {
 
@@ -346,7 +294,6 @@ async function cargarConfiguracion() {
 
         }
 
-
         if (notificaciones) {
 
             notificaciones.checked =
@@ -357,7 +304,6 @@ async function cargarConfiguracion() {
 
         }
 
-
         if (sonidos) {
 
             sonidos.checked =
@@ -367,7 +313,6 @@ async function cargarConfiguracion() {
                 ) === 1;
 
         }
-
 
         if (correo) {
 
@@ -388,7 +333,6 @@ async function cargarConfiguracion() {
                 logros;
         }
 
-
         if (sincronizacion) {
 
             sincronizacion.checked =
@@ -399,14 +343,12 @@ async function cargarConfiguracion() {
 
         }
 
-
         aplicarTema(
             configuracion.tema ===
             "claro"
                 ? "claro"
                 : "oscuro"
         );
-
 
         if (
             typeof window.cambiarIdiomaLifeSync ===
@@ -421,13 +363,11 @@ async function cargarConfiguracion() {
 
         }
 
-
         actualizarEstadoSincronizacion(
             sincronizacion
                 ? sincronizacion.checked
                 : false
         );
-
 
     } catch (error) {
 
@@ -446,11 +386,6 @@ async function cargarConfiguracion() {
 
 }
 
-
-/* =========================================================
-   GUARDAR CONFIGURACIÓN
-   ========================================================= */
-
 async function guardarConfiguracion(event) {
 
     event.preventDefault();
@@ -459,16 +394,13 @@ async function guardarConfiguracion(event) {
 
     cambiarEstadoGuardado(true);
 
-
     const idiomaSeleccionado =
         idioma
             ? idioma.value
             : "es";
 
-
     const datos =
         new URLSearchParams();
-
 
     datos.append(
         "accion",
@@ -504,13 +436,11 @@ async function guardarConfiguracion(event) {
             : "0"
     );
 
-
     const correoActivo =
         correo &&
         correo.checked
             ? "1"
             : "0";
-
 
     datos.append(
         "correo_recordatorios",
@@ -530,7 +460,6 @@ async function guardarConfiguracion(event) {
             : "0"
     );
 
-
     try {
 
         const respuesta =
@@ -555,10 +484,8 @@ async function guardarConfiguracion(event) {
                 }
             );
 
-
         const resultado =
             await respuesta.json();
-
 
         if (
             !respuesta.ok ||
@@ -575,14 +502,12 @@ async function guardarConfiguracion(event) {
             return;
         }
 
-
         aplicarTema(
             modoOscuro &&
             modoOscuro.checked
                 ? "oscuro"
                 : "claro"
         );
-
 
         if (
             typeof window.cambiarIdiomaLifeSync ===
@@ -595,20 +520,17 @@ async function guardarConfiguracion(event) {
 
         }
 
-
         actualizarEstadoSincronizacion(
             sincronizacion
                 ? sincronizacion.checked
                 : false
         );
 
-
         mostrarMensaje(
             texto(
                 "configuracion.guardadaCorrectamente"
             )
         );
-
 
     } catch (error) {
 
@@ -617,13 +539,11 @@ async function guardarConfiguracion(event) {
             error
         );
 
-
         mostrarMensaje(
             texto(
                 "configuracion.errorGuardar"
             )
         );
-
 
     } finally {
 
@@ -632,11 +552,6 @@ async function guardarConfiguracion(event) {
     }
 
 }
-
-
-/* =========================================================
-   CONTRASEÑA
-   ========================================================= */
 
 function abrirModalContrasena() {
 
@@ -650,7 +565,6 @@ function abrirModalContrasena() {
 
     mostrarMensajeContrasena("");
 
-
     if (contrasenaActual) {
         contrasenaActual.value = "";
     }
@@ -662,7 +576,6 @@ function abrirModalContrasena() {
     if (contrasenaConfirmar) {
         contrasenaConfirmar.value = "";
     }
-
 
     if (contrasenaActual) {
 
@@ -676,7 +589,6 @@ function abrirModalContrasena() {
     }
 
 }
-
 
 function cerrarModalContrasena() {
 
@@ -692,11 +604,9 @@ function cerrarModalContrasena() {
 
 }
 
-
 async function cambiarContrasena() {
 
     mostrarMensajeContrasena("");
-
 
     const actual =
         contrasenaActual
@@ -713,7 +623,6 @@ async function cambiarContrasena() {
             ? contrasenaConfirmar.value
             : "";
 
-
     if (
         !actual ||
         !nueva ||
@@ -729,7 +638,6 @@ async function cambiarContrasena() {
         return;
     }
 
-
     if (nueva.length < 8) {
 
         mostrarMensajeContrasena(
@@ -740,7 +648,6 @@ async function cambiarContrasena() {
 
         return;
     }
-
 
     if (nueva !== confirmar) {
 
@@ -753,7 +660,6 @@ async function cambiarContrasena() {
         return;
     }
 
-
     if (btnGuardarContrasena) {
 
         btnGuardarContrasena.disabled =
@@ -764,10 +670,8 @@ async function cambiarContrasena() {
 
     }
 
-
     const datos =
         new URLSearchParams();
-
 
     datos.append(
         "accion",
@@ -783,7 +687,6 @@ async function cambiarContrasena() {
         "nueva",
         nueva
     );
-
 
     try {
 
@@ -809,10 +712,8 @@ async function cambiarContrasena() {
                 }
             );
 
-
         const resultado =
             await respuesta.json();
-
 
         if (
             !respuesta.ok ||
@@ -829,13 +730,11 @@ async function cambiarContrasena() {
             return;
         }
 
-
         mostrarMensajeContrasena(
             texto(
                 "configuracion.contrasenaActualizada"
             )
         );
-
 
         if (contrasenaActual) {
             contrasenaActual.value = "";
@@ -849,7 +748,6 @@ async function cambiarContrasena() {
             contrasenaConfirmar.value = "";
         }
 
-
     } catch (error) {
 
         console.error(
@@ -857,13 +755,11 @@ async function cambiarContrasena() {
             error
         );
 
-
         mostrarMensajeContrasena(
             texto(
                 "configuracion.errorCambiarContrasena"
             )
         );
-
 
     } finally {
 
@@ -881,26 +777,18 @@ async function cambiarContrasena() {
 
 }
 
-
-/* =========================================================
-   SESIONES
-   ========================================================= */
-
 async function cargarSesiones() {
 
     mostrarMensajeSesiones("");
-
 
     if (!listaSesiones) {
         return;
     }
 
-
     listaSesiones.textContent =
         texto(
             "configuracion.cargandoSesiones"
         );
-
 
     try {
 
@@ -920,10 +808,8 @@ async function cargarSesiones() {
                 }
             );
 
-
         const resultado =
             await respuesta.json();
-
 
         if (
             !respuesta.ok ||
@@ -942,7 +828,6 @@ async function cargarSesiones() {
             return;
         }
 
-
         const sesiones =
             Array.isArray(
                 resultado.sesiones
@@ -950,9 +835,7 @@ async function cargarSesiones() {
                 ? resultado.sesiones
                 : [];
 
-
         listaSesiones.innerHTML = "";
-
 
         if (sesiones.length === 0) {
 
@@ -963,7 +846,6 @@ async function cargarSesiones() {
 
             return;
         }
-
 
         sesiones.forEach(
             (sesion) => {
@@ -976,7 +858,6 @@ async function cargarSesiones() {
                 contenedor.className =
                     "sesion-item";
 
-
                 const dispositivo =
                     document.createElement(
                         "p"
@@ -987,7 +868,6 @@ async function cargarSesiones() {
                     texto(
                         "configuracion.dispositivoDesconocido"
                     );
-
 
                 const fechaInicio =
                     document.createElement(
@@ -1004,7 +884,6 @@ async function cargarSesiones() {
                         )
                     }`;
 
-
                 const ultimoAcceso =
                     document.createElement(
                         "p"
@@ -1019,7 +898,6 @@ async function cargarSesiones() {
                             "sinInformacion"
                         )
                     }`;
-
 
                 const boton =
                     document.createElement(
@@ -1037,7 +915,6 @@ async function cargarSesiones() {
                         "configuracion.cerrarSesion"
                     );
 
-
                 boton.addEventListener(
                     "click",
                     () => {
@@ -1048,7 +925,6 @@ async function cargarSesiones() {
 
                     }
                 );
-
 
                 contenedor.appendChild(
                     dispositivo
@@ -1066,7 +942,6 @@ async function cargarSesiones() {
                     boton
                 );
 
-
                 listaSesiones.appendChild(
                     contenedor
                 );
@@ -1074,14 +949,12 @@ async function cargarSesiones() {
             }
         );
 
-
     } catch (error) {
 
         console.error(
             "Error al cargar sesiones:",
             error
         );
-
 
         listaSesiones.innerHTML = "";
 
@@ -1095,21 +968,14 @@ async function cargarSesiones() {
 
 }
 
-
-/* =========================================================
-   CERRAR SESIÓN INDIVIDUAL
-   ========================================================= */
-
 async function cerrarSesion(idSesion) {
 
     if (!idSesion) {
         return;
     }
 
-
     const datos =
         new URLSearchParams();
-
 
     datos.append(
         "accion",
@@ -1120,7 +986,6 @@ async function cerrarSesion(idSesion) {
         "id_sesion",
         idSesion
     );
-
 
     try {
 
@@ -1146,10 +1011,8 @@ async function cerrarSesion(idSesion) {
                 }
             );
 
-
         const resultado =
             await respuesta.json();
-
 
         if (
             !respuesta.ok ||
@@ -1166,7 +1029,6 @@ async function cerrarSesion(idSesion) {
             return;
         }
 
-
         if (
             resultado.sesion_actual
         ) {
@@ -1181,9 +1043,7 @@ async function cerrarSesion(idSesion) {
             return;
         }
 
-
         await cargarSesiones();
-
 
     } catch (error) {
 
@@ -1191,7 +1051,6 @@ async function cerrarSesion(idSesion) {
             "Error al cerrar la sesión:",
             error
         );
-
 
         mostrarMensajeSesiones(
             texto(
@@ -1203,11 +1062,6 @@ async function cerrarSesion(idSesion) {
 
 }
 
-
-/* =========================================================
-   EVENTOS
-   ========================================================= */
-
 if (formulario) {
 
     formulario.addEventListener(
@@ -1217,7 +1071,6 @@ if (formulario) {
 
 }
 
-
 if (modoOscuro) {
 
     modoOscuro.addEventListener(
@@ -1226,7 +1079,6 @@ if (modoOscuro) {
     );
 
 }
-
 
 if (sincronizacion) {
 
@@ -1243,7 +1095,6 @@ if (sincronizacion) {
 
 }
 
-
 if (btnCambiarContrasena) {
 
     btnCambiarContrasena.addEventListener(
@@ -1252,7 +1103,6 @@ if (btnCambiarContrasena) {
     );
 
 }
-
 
 if (btnCancelarContrasena) {
 
@@ -1263,7 +1113,6 @@ if (btnCancelarContrasena) {
 
 }
 
-
 if (btnGuardarContrasena) {
 
     btnGuardarContrasena.addEventListener(
@@ -1272,7 +1121,6 @@ if (btnGuardarContrasena) {
     );
 
 }
-
 
 if (btnSesiones) {
 
@@ -1295,7 +1143,6 @@ if (btnSesiones) {
 
 }
 
-
 if (btnCerrarModalSesiones) {
 
     btnCerrarModalSesiones.addEventListener(
@@ -1315,7 +1162,6 @@ if (btnCerrarModalSesiones) {
 
 }
 
-
 document.addEventListener(
     "keydown",
     (event) => {
@@ -1323,7 +1169,6 @@ document.addEventListener(
         if (event.key !== "Escape") {
             return;
         }
-
 
         if (
             modalContrasena &&
@@ -1335,7 +1180,6 @@ document.addEventListener(
             cerrarModalContrasena();
 
         }
-
 
         if (
             modalSesiones &&
@@ -1353,11 +1197,6 @@ document.addEventListener(
     }
 );
 
-
-/* =========================================================
-   CAMBIO DE IDIOMA
-   ========================================================= */
-
 window.addEventListener(
     "lifesyncIdiomaCambiado",
     () => {
@@ -1366,13 +1205,11 @@ window.addEventListener(
             false
         );
 
-
         actualizarEstadoSincronizacion(
             sincronizacion
                 ? sincronizacion.checked
                 : false
         );
-
 
         if (
             listaSesiones &&
@@ -1388,10 +1225,5 @@ window.addEventListener(
 
     }
 );
-
-
-/* =========================================================
-   INICIAR
-   ========================================================= */
 
 cargarConfiguracion();

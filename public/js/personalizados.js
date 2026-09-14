@@ -217,7 +217,7 @@ async function cargarHabitos() {
 
         const respuesta =
             await fetch(
-                "auth/obtener-personalizados.php",
+                "../auth/obtener-personalizados.php",
                 {
                     method: "GET",
 
@@ -668,7 +668,7 @@ async function crearHabito(
 
         const respuesta =
             await fetch(
-                "auth/crear-personalizado.php",
+                "../auth/crear-personalizado.php",
                 {
                     method: "POST",
 
@@ -785,7 +785,7 @@ async function eliminarHabito() {
 
         const respuesta =
             await fetch(
-                "auth/eliminar-personalizado.php",
+                "../auth/eliminar-personalizado.php",
                 {
                     method: "POST",
 

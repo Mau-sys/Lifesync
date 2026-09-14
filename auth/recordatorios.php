@@ -62,7 +62,7 @@ try {
                     r.fecha_recordatorio,
                     r.mensaje,
                     r.activo,
-                    c.nombre_categoria
+                    c.nombre
                 FROM recordatorios r
                 LEFT JOIN categorias c
                     ON c.id_categoria = r.id_categoria

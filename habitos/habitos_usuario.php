@@ -1,136 +1,187 @@
 <?php
-// api/habitos_usuario.php
 session_start();
 header("Content-Type: application/json; charset=UTF-8");
+require_once "../config/conexion.php";
 
-require_once "../config/conexion.php"; // Ajusta la ruta a tu conexión
-
-// Verificar sesión de usuario
-if (!isset($_SESSION['id_usuario'])) {
-    http_response_code(401);
-    echo json_encode(["exito" => false, "mensaje" => "Sesión no iniciada"]);
+function responderHabitos(array $datos, int $codigo = 200): void
+{
+    http_response_code($codigo);
+    echo json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 
-$id_usuario = $_SESSION['id_usuario'];
-$metodo = $_SERVER['REQUEST_METHOD'];
+if (!isset($_SESSION["usuario_id"])) {
+    responderHabitos(["exito" => false, "mensaje" => "La sesión ha expirado."], 401);
+}
 
-switch ($metodo) {
+$usuarioId = (int) $_SESSION["usuario_id"];
+$metodo = $_SERVER["REQUEST_METHOD"];
 
-    // ==========================================
-    // READ (GET): Listar hábitos del usuario
-    // ==========================================
-    case 'GET':
-        try {
-            $sql = "SELECT 
-                        hu.id_habito_usuario,
-                        hu.id_habito,
-                        h.nombre_habito,
-                        h.descripcion,
-                        c.nombre AS categoria,
-                        hu.activo,
-                        hu.objetivo,
-                        hu.unidad,
-                        hu.frecuencia,
-                        hu.duracion_minutos,
-                        hu.fecha_inicio,
-                        hu.fecha_fin
-                    FROM habitos_usuario hu
-                    INNER JOIN habitos h ON hu.id_habito = h.id_habito
-                    LEFT JOIN categorias c ON h.id_categoria = c.id_categoria
-                    WHERE hu.id_usuario = :id_usuario
-                    ORDER BY hu.activo DESC, hu.id_habito_usuario DESC";
+try {
+    $database = new Database();
+    $db = $database->getConnection();
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([':id_usuario' => $id_usuario]);
-            $habitos = $stmt->fetchAll();
+    if ($metodo === "GET") {
+        $consulta = $db->prepare("SELECT hu.id_habito_usuario, hu.id_habito, h.nombre_habito, h.descripcion, h.imagen_url, h.es_base, c.nombre AS categoria, hu.activo, hu.objetivo, hu.unidad, hu.frecuencia, hu.duracion_minutos, hu.fecha_inicio, hu.fecha_fin, COALESCE(SUM(CASE WHEN DATE(r.fecha_registro) = CURDATE() THEN r.valor_registrado ELSE 0 END), 0) AS progreso_hoy FROM habitos_usuario hu INNER JOIN habitos h ON h.id_habito = hu.id_habito LEFT JOIN categorias c ON c.id_categoria = h.id_categoria LEFT JOIN registros_habitos r ON r.id_habito_usuario = hu.id_habito_usuario WHERE hu.id_usuario = :id_usuario GROUP BY hu.id_habito_usuario, hu.id_habito, h.nombre_habito, h.descripcion, h.imagen_url, h.es_base, c.nombre, hu.activo, hu.objetivo, hu.unidad, hu.frecuencia, hu.duracion_minutos, hu.fecha_inicio, hu.fecha_fin ORDER BY hu.activo DESC, hu.id_habito_usuario DESC");
+        $consulta->execute([":id_usuario" => $usuarioId]);
+        $habitos = $consulta->fetchAll(PDO::FETCH_ASSOC);
 
-            // Cargar los días específicos si la frecuencia es 'dias específicos'
-            foreach ($habitos as &$habito) {
-                if ($habito['frecuencia'] === 'dias específicos') {
-                    $stmtDias = $pdo->prepare("SELECT dia_semana FROM habito_dias WHERE id_habito_usuario = :id_hu");
-                    $stmtDias->execute([':id_hu' => $habito['id_habito_usuario']]);
-                    $habito['dias'] = $stmtDias->fetchAll(PDO::FETCH_COLUMN);
-                } else {
-                    $habito['dias'] = [];
-                }
+        $consultaDias = $db->prepare("SELECT dia_semana FROM habito_dias WHERE id_habito_usuario = :id_habito_usuario ORDER BY dia_semana");
+
+        foreach ($habitos as &$habito) {
+            $idHu = (int) $habito["id_habito_usuario"];
+            $consultaDias->execute([":id_habito_usuario" => $idHu]);
+            $habito["dias"] = array_map("intval", $consultaDias->fetchAll(PDO::FETCH_COLUMN));
+            $habito["id_habito_usuario"] = $idHu;
+            $habito["id_habito"] = (int) $habito["id_habito"];
+            $habito["activo"] = (bool) $habito["activo"];
+            $habito["objetivo"] = (float) $habito["objetivo"];
+            $habito["progreso"] = (float) $habito["progreso_hoy"];
+            $habito["icono"] = $habito["imagen_url"] ?: "img/Categoria.png";
+            unset($habito["progreso_hoy"]);
+        }
+        unset($habito);
+
+        responderHabitos(["exito" => true, "datos" => $habitos]);
+    }
+
+    if ($metodo === "POST") {
+        $datos = json_decode(file_get_contents("php://input"), true);
+        if (!is_array($datos)) {
+            responderHabitos(["exito" => false, "mensaje" => "Los datos enviados no son válidos."], 400);
+        }
+
+        $idHabito = (int) ($datos["id_habito"] ?? 0);
+        $objetivo = (float) ($datos["objetivo"] ?? 0);
+        $unidad = trim($datos["unidad"] ?? "");
+        $frecuencia = trim($datos["frecuencia"] ?? "diaria");
+        $duracion = isset($datos["duracion_minutos"]) && $datos["duracion_minutos"] !== "" ? (int) $datos["duracion_minutos"] : null;
+        $fechaInicio = trim($datos["fecha_inicio"] ?? date("Y-m-d"));
+        $fechaFin = trim($datos["fecha_fin"] ?? "");
+        $dias = $datos["dias"] ?? [];
+
+        if ($idHabito <= 0 || $objetivo <= 0 || $unidad === "") {
+            responderHabitos(["exito" => false, "mensaje" => "Completa los datos obligatorios del hábito."], 400);
+        }
+
+        $frecuencia = $frecuencia === "diario" ? "diaria" : ($frecuencia === "personalizado" ? "personalizada" : $frecuencia);
+        $permitidas = ["diaria", "semanal", "personalizada", "mensual"];
+        if (!in_array($frecuencia, $permitidas, true)) {
+            responderHabitos(["exito" => false, "mensaje" => "La frecuencia seleccionada no es válida."], 400);
+        }
+
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fechaInicio)) {
+            responderHabitos(["exito" => false, "mensaje" => "La fecha de inicio no es válida."], 400);
+        }
+        $fechaFin = $fechaFin !== "" ? $fechaFin : null;
+        if ($fechaFin !== null && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $fechaFin)) {
+            responderHabitos(["exito" => false, "mensaje" => "La fecha de finalización no es válida."], 400);
+        }
+        if ($duracion !== null && $duracion <= 0) {
+            responderHabitos(["exito" => false, "mensaje" => "La duración debe ser mayor que cero."], 400);
+        }
+        if (!is_array($dias)) {
+            responderHabitos(["exito" => false, "mensaje" => "Los días seleccionados no son válidos."], 400);
+        }
+
+        $dias = array_values(array_unique(array_map("intval", $dias)));
+        foreach ($dias as $dia) {
+            if ($dia < 0 || $dia > 6) {
+                responderHabitos(["exito" => false, "mensaje" => "Los días seleccionados no son válidos."], 400);
             }
-
-            echo json_encode(["exito" => true, "datos" => $habitos]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["exito" => false, "mensaje" => "Error al obtener hábitos: " . $e->getMessage()]);
-        }
-        break;
-
-    // ==========================================
-    // CREATE (POST): Asignar/Registrar hábito
-    // ==========================================
-    case 'POST':
-        $data = json_decode(file_get_contents("php://input"), true);
-
-        if (!$data || !isset($data['id_habito'], $data['objetivo'], $data['unidad'], $data['frecuencia'])) {
-            http_response_code(400);
-            echo json_encode(["exito" => false, "mensaje" => "Datos incompletos"]);
-            exit;
         }
 
-        try {
-            $pdo->beginTransaction();
+        $db->beginTransaction();
 
-            $sql = "INSERT INTO habitos_usuario 
-                    (id_usuario, id_habito, objetivo, unidad, frecuencia, duracion_minutos, fecha_inicio, fecha_fin) 
-                    VALUES 
-                    (:id_usuario, :id_habito, :objetivo, :unidad, :frecuencia, :duracion_minutos, :fecha_inicio, :fecha_fin)";
+        $comprobar = $db->prepare("SELECT id_habito_usuario FROM habitos_usuario WHERE id_usuario = :id_usuario AND id_habito = :id_habito LIMIT 1");
+        $comprobar->execute([":id_usuario" => $usuarioId, ":id_habito" => $idHabito]);
+        $existente = $comprobar->fetch(PDO::FETCH_ASSOC);
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                ':id_usuario'       => $id_usuario,
-                ':id_habito'        => $data['id_habito'],
-                ':objetivo'         => $data['objetivo'],
-                ':unidad'           => $data['unidad'],
-                ':frecuencia'       => $data['frecuencia'],
-                ':duracion_minutos' => !empty($data['duracion_minutos']) ? $data['duracion_minutos'] : NULL,
-                ':fecha_inicio'     => !empty($data['fecha_inicio']) ? $data['fecha_inicio'] : date('Y-m-d'),
-                ':fecha_fin'        => !empty($data['fecha_fin']) ? $data['fecha_fin'] : NULL
+        if ($existente) {
+            $actualizar = $db->prepare("UPDATE habitos_usuario SET activo = TRUE, objetivo = :objetivo, unidad = :unidad, frecuencia = :frecuencia, duracion_minutos = :duracion, fecha_inicio = :fecha_inicio, fecha_fin = :fecha_fin WHERE id_habito_usuario = :id_habito_usuario AND id_usuario = :id_usuario");
+            $actualizar->execute([
+                ":objetivo" => $objetivo,
+                ":unidad" => $unidad,
+                ":frecuencia" => $frecuencia,
+                ":duracion" => $duracion,
+                ":fecha_inicio" => $fechaInicio,
+                ":fecha_fin" => $fechaFin,
+                ":id_habito_usuario" => (int) $existente["id_habito_usuario"],
+                ":id_usuario" => $usuarioId
             ]);
+            $idHu = (int) $existente["id_habito_usuario"];
+        } else {
+            $insertar = $db->prepare("INSERT INTO habitos_usuario (id_usuario, id_habito, activo, objetivo, unidad, frecuencia, duracion_minutos, fecha_inicio, fecha_fin) VALUES (:id_usuario, :id_habito, TRUE, :objetivo, :unidad, :frecuencia, :duracion, :fecha_inicio, :fecha_fin)");
+            $insertar->execute([
+                ":id_usuario" => $usuarioId,
+                ":id_habito" => $idHabito,
+                ":objetivo" => $objetivo,
+                ":unidad" => $unidad,
+                ":frecuencia" => $frecuencia,
+                ":duracion" => $duracion,
+                ":fecha_inicio" => $fechaInicio,
+                ":fecha_fin" => $fechaFin
+            ]);
+            $idHu = (int) $db->lastInsertId();
 
-            $id_habito_usuario = $pdo->lastInsertId();
+            $racha = $db->prepare("INSERT INTO rachas (id_habito_usuario, racha_actual, mejor_racha, total_completados, ultima_fecha) VALUES (:id_habito_usuario, 0, 0, 0, NULL)");
+            $racha->execute([":id_habito_usuario" => $idHu]);
+        }
 
-            // Si es frecuencia de días específicos, guardar en habito_dias
-            if ($data['frecuencia'] === 'dias específicos' && isset($data['dias']) && is_array($data['dias'])) {
-                $sqlDias = "INSERT INTO habito_dias (id_habito_usuario, dia_semana) VALUES (:id_hu, :dia)";
-                $stmtDias = $pdo->prepare($sqlDias);
-                foreach ($data['dias'] as $dia) {
-                    $stmtDias->execute([
-                        ':id_hu' => $id_habito_usuario,
-                        ':dia'  => $dia
-                    ]);
-                }
+        $db->prepare("DELETE FROM habito_dias WHERE id_habito_usuario = :id_habito_usuario")->execute([":id_habito_usuario" => $idHu]);
+
+        if ($frecuencia === "personalizada") {
+            if (count($dias) === 0) {
+                $db->rollBack();
+                responderHabitos(["exito" => false, "mensaje" => "Selecciona al menos un día para la frecuencia personalizada."], 400);
             }
 
-            // Opcional: Inicializar la racha del hábito
-            $sqlRacha = "INSERT INTO rachas (id_habito_usuario) VALUES (:id_hu)";
-            $stmtRacha = $pdo->prepare($sqlRacha);
-            $stmtRacha->execute([':id_hu' => $id_habito_usuario]);
-
-            $pdo->commit();
-            echo json_encode(["exito" => true, "mensaje" => "Hábito registrado correctamente"]);
-
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-            // Controlar duplicados (uq_usuario_habito)
-            if ($e->getCode() == 23000) {
-                echo json_encode(["exito" => false, "mensaje" => "Ya tienes asignado este hábito"]);
-            } else {
-                http_response_code(500);
-                echo json_encode(["exito" => false, "mensaje" => "Error al guardar el hábito: " . $e->getMessage()]);
+            $insertarDia = $db->prepare("INSERT INTO habito_dias (id_habito_usuario, dia_semana) VALUES (:id_habito_usuario, :dia_semana)");
+            foreach ($dias as $dia) {
+                $diaBD = $dia === 0 ? 7 : $dia;
+                $insertarDia->execute([":id_habito_usuario" => $idHu, ":dia_semana" => $diaBD]);
             }
         }
-        break;
 
-    default:
-        http_response_code(405);
-        echo json_encode(["exito" => false, "mensaje" => "Método no permitido"]);
-        break;
+        $db->commit();
+        responderHabitos(["exito" => true, "mensaje" => "Hábito registrado correctamente.", "id_habito_usuario" => $idHu]);
+    }
+
+    if ($metodo === "PUT") {
+        $datos = json_decode(file_get_contents("php://input"), true);
+        $idHu = (int) ($datos["id_habito_usuario"] ?? 0);
+        $activo = isset($datos["activo"]) ? (bool) $datos["activo"] : null;
+        if ($idHu <= 0 || $activo === null) {
+            responderHabitos(["exito" => false, "mensaje" => "Datos inválidos."], 400);
+        }
+        $consulta = $db->prepare("UPDATE habitos_usuario SET activo = :activo WHERE id_habito_usuario = :id_habito_usuario AND id_usuario = :id_usuario");
+        $consulta->execute([
+            ":activo" => $activo ? 1 : 0,
+            ":id_habito_usuario" => $idHu,
+            ":id_usuario" => $usuarioId
+        ]);
+        responderHabitos(["exito" => true, "mensaje" => "Estado del hábito actualizado."]);
+    }
+
+    if ($metodo === "DELETE") {
+        $datos = json_decode(file_get_contents("php://input"), true);
+        $idHu = (int) ($datos["id_habito_usuario"] ?? 0);
+        if ($idHu <= 0) {
+            responderHabitos(["exito" => false, "mensaje" => "Hábito inválido."], 400);
+        }
+        $consulta = $db->prepare("DELETE FROM habitos_usuario WHERE id_habito_usuario = :id_habito_usuario AND id_usuario = :id_usuario");
+        $consulta->execute([
+            ":id_habito_usuario" => $idHu,
+            ":id_usuario" => $usuarioId
+        ]);
+        responderHabitos(["exito" => true, "mensaje" => "Hábito eliminado correctamente."]);
+    }
+
+    responderHabitos(["exito" => false, "mensaje" => "Método HTTP no permitido."], 405);
+} catch (Throwable $error) {
+    if (isset($db) && $db instanceof PDO && $db->inTransaction()) {
+        $db->rollBack();
+    }
+    error_log("LifeSync habitos/habitos_usuario.php: " . $error->getMessage());
+    responderHabitos(["exito" => false, "mensaje" => "Ocurrió un error al gestionar los hábitos."], 500);
 }

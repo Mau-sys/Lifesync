@@ -1,68 +1,74 @@
 <?php
-header("Content-Type: application/json; charset=UTF-8");
 session_start();
+header("Content-Type: application/json; charset=UTF-8");
+require_once "../config/conexion.php";
 
-require_once("../config/conexion.php");
+function responderSalud(array $datos, int $codigo = 200): void
+{
+    http_response_code($codigo);
+    echo json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+if (!isset($_SESSION["usuario_id"])) {
+    responderSalud(["success" => false, "message" => "La sesión ha expirado."], 401);
+}
+
+$datos = json_decode(file_get_contents("php://input"), true);
+$idHu = (int) ($datos["id_habito_usuario"] ?? 0);
 
 try {
     $database = new Database();
     $db = $database->getConnection();
+    $usuarioId = (int) $_SESSION["usuario_id"];
 
-    $id_usuario = $_SESSION['id_usuario'] ?? 1;
-
-    // Obtener los datos JSON enviados en la petición
-    $input = json_decode(file_get_contents("php://input"), true);
-    $id_habito = isset($input['id_habito']) ? intval($input['id_habito']) : null;
-
-    // Validar ID del hábito o buscarlo en la base de datos
-    if (!$id_habito) {
-        $queryHabito = "SELECT id_habito FROM habitos 
-                        WHERE id_usuario = :id_usuario 
-                          AND (id_categoria = 3 OR nombre_habito = 'Salud Mental') 
-                          AND activo = TRUE 
-                        LIMIT 1";
-        $stmtHabito = $db->prepare($queryHabito);
-        $stmtHabito->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
-        $stmtHabito->execute();
-        $row = $stmtHabito->fetch(PDO::FETCH_ASSOC);
-
-        if (!$row) {
-            echo json_encode([
-                "success" => false,
-                "message" => "No se encontró el hábito de Salud Mental para este usuario."
-            ], JSON_UNESCAPED_UNICODE);
-            exit;
-        }
-        $id_habito = (int)$row['id_habito'];
+    if ($idHu <= 0) {
+        $consulta = $db->prepare("SELECT hu.id_habito_usuario FROM habitos_usuario hu INNER JOIN habitos h ON h.id_habito = hu.id_habito INNER JOIN categorias c ON c.id_categoria = h.id_categoria WHERE hu.id_usuario = :id_usuario AND hu.activo = TRUE AND c.nombre = 'Salud Mental' LIMIT 1");
+        $consulta->execute([":id_usuario" => $usuarioId]);
+        $idHu = (int) ($consulta->fetchColumn() ?: 0);
     }
 
-    // Insertar la nueva pausa en la tabla registros_habitos
-    $valor = 1.00;
-    $observacion = "Pausa registrada desde la interfaz";
-
-    $queryInsert = "INSERT INTO registros_habitos (id_habito, valor_registrado, fecha_registro, observaciones) 
-                    VALUES (:id_habito, :valor, NOW(), :observacion)";
-    
-    $stmtInsert = $db->prepare($queryInsert);
-    $stmtInsert->bindParam(":id_habito", $id_habito, PDO::PARAM_INT);
-    $stmtInsert->bindParam(":valor", $valor);
-    $stmtInsert->bindParam(":observacion", $observacion, PDO::PARAM_STR);
-
-    if ($stmtInsert->execute()) {
-        echo json_encode([
-            "success" => true,
-            "message" => "¡Pausa registrada con éxito!"
-        ], JSON_UNESCAPED_UNICODE);
-    } else {
-        echo json_encode([
-            "success" => false,
-            "message" => "No se pudo registrar la pausa."
-        ], JSON_UNESCAPED_UNICODE);
+    if ($idHu <= 0) {
+        responderSalud(["success" => false, "message" => "No tienes activo el hábito de Salud Mental."], 404);
     }
 
-} catch (PDOException $e) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Error de base de datos: " . $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    $consulta = $db->prepare("SELECT hu.objetivo, hu.frecuencia FROM habitos_usuario hu INNER JOIN habitos h ON h.id_habito = hu.id_habito INNER JOIN categorias c ON c.id_categoria = h.id_categoria WHERE hu.id_habito_usuario = :id_habito_usuario AND hu.id_usuario = :id_usuario AND hu.activo = TRUE AND c.nombre = 'Salud Mental' LIMIT 1");
+    $consulta->execute([":id_habito_usuario" => $idHu, ":id_usuario" => $usuarioId]);
+    $habito = $consulta->fetch(PDO::FETCH_ASSOC);
+
+    if (!$habito) {
+        responderSalud(["success" => false, "message" => "El hábito de Salud Mental no está disponible."], 404);
+    }
+
+    $condicionPeriodo = $habito["frecuencia"] === "semanal"
+        ? "YEARWEEK(fecha_registro, 1) = YEARWEEK(CURDATE(), 1)"
+        : "DATE(fecha_registro) = CURDATE()";
+
+    $consultaHoy = $db->prepare("SELECT COALESCE(SUM(valor_registrado), 0) FROM registros_habitos WHERE id_habito_usuario = :id_habito_usuario AND {$condicionPeriodo}");
+    $consultaHoy->execute([":id_habito_usuario" => $idHu]);
+    $progresoHoy = (float) $consultaHoy->fetchColumn();
+
+    if ($progresoHoy >= (float) $habito["objetivo"]) {
+        responderSalud(["success" => true, "message" => "La meta del periodo ya fue completada.", "completado" => true]);
+    }
+
+    $insertar = $db->prepare("INSERT INTO registros_habitos (id_habito, id_habito_usuario, valor_registrado, fecha_registro, observaciones) SELECT hu.id_habito, hu.id_habito_usuario, 1, NOW(), 'Pausa registrada desde Salud Mental' FROM habitos_usuario hu WHERE hu.id_habito_usuario = :id_habito_usuario AND hu.id_usuario = :id_usuario");
+    $insertar->execute([":id_habito_usuario" => $idHu, ":id_usuario" => $usuarioId]);
+
+    $nuevoProgreso = $progresoHoy + 1;
+    $completado = $nuevoProgreso >= (float) $habito["objetivo"];
+
+    $actualizarRacha = $db->prepare("UPDATE rachas SET total_completados = total_completados + 1, ultima_fecha = CURDATE() WHERE id_habito_usuario = :id_habito_usuario");
+    $actualizarRacha->execute([":id_habito_usuario" => $idHu]);
+
+    responderSalud([
+        "success" => true,
+        "message" => "¡Pausa registrada con éxito!",
+        "id_habito_usuario" => $idHu,
+        "progreso" => $nuevoProgreso,
+        "completado" => $completado
+    ]);
+} catch (Throwable $error) {
+    error_log("LifeSync salud_mental/create.php: " . $error->getMessage());
+    responderSalud(["success" => false, "message" => "No se pudo registrar la pausa."], 500);
 }

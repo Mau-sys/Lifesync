@@ -27,11 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const appleRegister =
         document.getElementById("appleRegister");
 
-
-    /* =====================================================
-       TRADUCCIÓN
-       ===================================================== */
-
     function texto(clave) {
 
         if (
@@ -46,11 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return clave;
     }
 
-
-    /* =====================================================
-       MENSAJES
-       ===================================================== */
-
     function mostrarMensaje(mensaje) {
 
         if (mensajeError) {
@@ -61,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
     function limpiarMensaje() {
 
         if (mensajeError) {
@@ -71,11 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
     }
-
-
-    /* =====================================================
-       BOTÓN
-       ===================================================== */
 
     function cambiarEstadoBoton(cargando) {
 
@@ -92,15 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 : texto("registrarse");
     }
 
-
     if (!form) {
         return;
     }
-
-
-    /* =====================================================
-       REGISTRO
-       ===================================================== */
 
     form.addEventListener(
         "submit",
@@ -109,7 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
             event.preventDefault();
 
             limpiarMensaje();
-
 
             const nombre =
                 nombreInput.value.trim();
@@ -122,7 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const confirmarPassword =
                 confirmarPasswordInput.value;
-
 
             if (
                 !nombre ||
@@ -138,7 +114,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-
             if (
                 !correoInput.checkValidity()
             ) {
@@ -149,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 return;
             }
-
 
             if (
                 nombre.length > 50
@@ -162,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-
             if (
                 password.length < 8
             ) {
@@ -173,7 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 return;
             }
-
 
             if (
                 password !==
@@ -187,15 +159,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-
             cambiarEstadoBoton(true);
-
 
             try {
 
                 const respuesta =
                     await fetch(
-                        "/LifeSync/auth/registro.php",
+                        "../auth/registro.php",
                         {
                             method: "POST",
 
@@ -224,13 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     );
 
-
                 const textoRespuesta =
                     await respuesta.text();
 
-
                 let datos;
-
 
                 try {
 
@@ -257,7 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-
                 if (
                     !respuesta.ok ||
                     !datos.exito
@@ -275,10 +241,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-
                 window.location.href =
-                    "Preferencias.html";
-
+                    "preferencias.html";
 
             } catch (error) {
 
@@ -298,11 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     );
 
-
-    /* =====================================================
-       GOOGLE
-       ===================================================== */
-
     if (googleRegister) {
 
         googleRegister.addEventListener(
@@ -320,11 +279,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    /* =====================================================
-       APPLE
-       ===================================================== */
-
     if (appleRegister) {
 
         appleRegister.addEventListener(
@@ -341,11 +295,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
     }
-
-
-    /* =====================================================
-       LIMPIAR MENSAJES
-       ===================================================== */
 
     [
         nombreInput,
@@ -365,11 +314,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
     });
-
-
-    /* =====================================================
-       ACTUALIZAR SI CAMBIA EL IDIOMA
-       ===================================================== */
 
     window.addEventListener(
         "lifesyncIdiomaCambiado",

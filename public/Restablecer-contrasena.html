@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Restablece tu contraseña de LifeSync" data-i18n="restablecer.metaDescripcion">
+    <title data-i18n="restablecer.tituloPagina">LifeSync | Restablecer contraseña</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/recuperar-contrasena.css">
+</head>
+<body>
+    <main class="recovery-page">
+        <section class="recovery-card">
+            <a href="Inicio-sesion.html" class="btn-back" data-i18n="general.volver">← Volver</a>
+            <header class="recovery-header">
+                <h1 data-i18n="restablecer.titulo">Nueva contraseña</h1>
+                <p data-i18n="restablecer.descripcion">Crea una nueva contraseña para recuperar el acceso a tu cuenta.</p>
+            </header>
+            <form id="restablecerForm" class="recovery-form">
+                <div class="input-group">
+                    <label for="nuevaPassword" data-i18n="restablecer.nueva">Nueva contraseña</label>
+                    <input type="password" id="nuevaPassword" autocomplete="new-password" minlength="8" required data-i18n-placeholder="restablecer.nuevaPlaceholder" placeholder="Crea una nueva contraseña">
+                </div>
+                <div class="input-group">
+                    <label for="confirmarPassword" data-i18n="restablecer.confirmar">Confirmar contraseña</label>
+                    <input type="password" id="confirmarPassword" autocomplete="new-password" minlength="8" required data-i18n-placeholder="restablecer.confirmarPlaceholder" placeholder="Confirma tu nueva contraseña">
+                </div>
+                <p id="mensajeRestablecer" class="mensaje"></p>
+                <button type="submit" id="btnRestablecer" class="btn-primary" data-i18n="restablecer.boton">Cambiar contraseña</button>
+            </form>
+        </section>
+    </main>
+    <script src="js/idioma-global.js"></script>
+    <script src="js/tema-global.js"></script>
+    <script src="js/restablecer-contrasena.js"></script>
+</body>
+</html>

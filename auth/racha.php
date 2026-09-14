@@ -3,1016 +3,297 @@
 declare(strict_types=1);
 
 session_start();
-
-header('Content-Type: application/json; charset=utf-8');
-
+header('Content-Type: application/json; charset=UTF-8');
 require_once __DIR__ . '/../config/conexion.php';
 
-
-/*
-=========================================================
-RESPUESTA JSON
-=========================================================
-*/
-
-function responder(
-    bool $exito,
-    string $mensaje = '',
-    array $datos = [],
-    int $codigo = 200
-): never {
-
+function responderRacha(bool $exito, string $mensaje = '', array $datos = [], int $codigo = 200): never
+{
     http_response_code($codigo);
-
-    echo json_encode(
-        array_merge(
-            [
-                'exito' => $exito,
-                'mensaje' => $mensaje
-            ],
-            $datos
-        ),
-        JSON_UNESCAPED_UNICODE
-    );
-
+    echo json_encode(array_merge(['exito' => $exito, 'mensaje' => $mensaje], $datos), JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-
-/*
-=========================================================
-USUARIO DE LA SESIÓN
-=========================================================
-*/
-
-function obtenerUsuarioSesion(): int
-{
-    $ids = [
-        $_SESSION['id_usuario'] ?? null,
-        $_SESSION['usuario_id'] ?? null,
-        $_SESSION['id'] ?? null
-    ];
-
-    foreach ($ids as $id) {
-
-        if (
-            is_numeric($id) &&
-            (int)$id > 0
-        ) {
-
-            return (int)$id;
-
-        }
-
-    }
-
-    responder(
-        false,
-        'La sesión del usuario no es válida.',
-        [
-            'codigo' => 'SESION_INVALIDA'
-        ],
-        401
-    );
+if (!isset($_SESSION['usuario_id'])) {
+    responderRacha(false, 'La sesión ha expirado.', ['codigo' => 'SESION_INVALIDA'], 401);
 }
 
-
-/*
-=========================================================
-CONEXIÓN
-=========================================================
-*/
+$idUsuario = (int) $_SESSION['usuario_id'];
 
 try {
-
-    /*
-    IMPORTANTE:
-    Tu conexion.php devuelve la conexión mediante
-    Database->getConnection().
-    */
-
     $database = new Database();
+    $db = $database->getConnection();
 
-    $conexion = $database->getConnection();
-
-    if (!$conexion instanceof PDO) {
-
-        responder(
-            false,
-            'No se pudo establecer la conexión con la base de datos.',
-            [
-                'codigo' => 'ERROR_CONEXION'
-            ],
-            500
-        );
-
-    }
-
-
-    /*
-    =====================================================
-    USUARIO
-    =====================================================
-    */
-
-    $idUsuario = obtenerUsuarioSesion();
-
-
-    /*
-    =====================================================
-    1. OBTENER HÁBITOS ACTIVOS
-    =====================================================
-    */
-
-    $sqlHabitos = "
-        SELECT
-
+    $consulta = $db->prepare(
+        "SELECT
+            hu.id_habito_usuario,
             h.id_habito,
             h.id_categoria,
             h.nombre_habito,
-            h.objetivo,
-            h.frecuencia,
-            h.fecha_inicio,
-            h.fecha_fin,
-            h.activo,
-
-            c.nombre_categoria
-
-        FROM habitos h
-
-        LEFT JOIN categorias c
-            ON c.id_categoria = h.id_categoria
-
-        WHERE h.id_usuario = :id_usuario
-
-        AND h.activo = 1
-
-        AND h.fecha_inicio <= CURDATE()
-
-        AND (
-            h.fecha_fin IS NULL
-            OR h.fecha_fin >= CURDATE()
-        )
-
-        ORDER BY
-            h.id_categoria,
-            h.id_habito
-    ";
-
-    $stmtHabitos = $conexion->prepare($sqlHabitos);
-
-    $stmtHabitos->execute([
-        ':id_usuario' => $idUsuario
-    ]);
-
-    $habitos = $stmtHabitos->fetchAll(PDO::FETCH_ASSOC);
-
-
-    /*
-    =====================================================
-    SI NO HAY HÁBITOS
-    =====================================================
-    */
+            c.nombre AS nombre_categoria,
+            hu.objetivo,
+            hu.unidad,
+            hu.frecuencia,
+            hu.fecha_inicio,
+            hu.fecha_fin,
+            ra.racha_actual,
+            ra.mejor_racha,
+            ra.total_completados
+         FROM habitos_usuario hu
+         INNER JOIN habitos h ON h.id_habito = hu.id_habito
+         LEFT JOIN categorias c ON c.id_categoria = h.id_categoria
+         LEFT JOIN rachas ra ON ra.id_habito_usuario = hu.id_habito_usuario
+         WHERE hu.id_usuario = :id_usuario
+         AND hu.activo = TRUE
+         AND hu.fecha_inicio <= CURDATE()
+         AND (hu.fecha_fin IS NULL OR hu.fecha_fin >= CURDATE())
+         ORDER BY h.id_categoria, h.id_habito"
+    );
+    $consulta->execute([':id_usuario' => $idUsuario]);
+    $habitos = $consulta->fetchAll(PDO::FETCH_ASSOC);
 
     if (!$habitos) {
-
-        responder(
-            true,
-            'No hay hábitos activos todavía.',
-            [
-                'racha_actual' => 0,
-                'mejor_racha' => 0,
-                'habitos_completados' => 0,
-                'dias_registrados' => 0,
-                'constelacion_actual' => [],
-                'categorias' => [],
-                'historial_constelaciones' => []
-            ]
-        );
-
+        responderRacha(true, 'No hay hábitos activos todavía.', [
+            'codigo' => 'SIN_HABITOS',
+            'racha_actual' => 0,
+            'mejor_racha' => 0,
+            'habitos_completados' => 0,
+            'dias_registrados' => 0,
+            'constelacion_actual' => [],
+            'categorias' => [],
+            'historial_constelaciones' => []
+        ]);
     }
 
+    $hoy = new DateTimeImmutable('today');
+    $diaSemana = (int) $hoy->format('N');
 
-    /*
-    =====================================================
-    2. PREPARAR IDS
-    =====================================================
-    */
-
-    $idsHabitos = [];
-
+    $programados = [];
     foreach ($habitos as $habito) {
+        $frecuencia = $habito['frecuencia'];
+        $programadoHoy = $frecuencia === 'diaria';
 
-        $idsHabitos[] =
-            (int)$habito['id_habito'];
-
-    }
-
-    $placeholders = implode(
-        ',',
-        array_fill(
-            0,
-            count($idsHabitos),
-            '?'
-        )
-    );
-
-
-    /*
-    =====================================================
-    3. OBTENER REGISTROS DE HÁBITOS
-    =====================================================
-
-    Los PHP futuros de:
-
-    - Hidratación
-    - Alimentación
-    - Salud Mental
-    - Actividad Física
-    - Académico
-    - Personalizado
-
-    solamente tendrán que registrar datos en:
-
-        registros_habitos
-
-    Rachas podrá utilizarlos automáticamente.
-    =====================================================
-    */
-
-    $sqlRegistros = "
-        SELECT
-
-            rh.id_registro,
-            rh.id_habito,
-            DATE(rh.fecha_registro) AS fecha,
-            rh.valor_registrado,
-            rh.observaciones
-
-        FROM registros_habitos rh
-
-        WHERE rh.id_habito IN ($placeholders)
-
-        ORDER BY
-            rh.fecha_registro ASC
-    ";
-
-    $stmtRegistros =
-        $conexion->prepare($sqlRegistros);
-
-    $stmtRegistros->execute(
-        $idsHabitos
-    );
-
-    $registros =
-        $stmtRegistros->fetchAll(
-            PDO::FETCH_ASSOC
-        );
-
-
-    /*
-    =====================================================
-    4. OBTENER ESTADÍSTICAS SI EXISTEN
-    =====================================================
-
-    Se utiliza como complemento.
-
-    Si los PHP futuros llenan
-    estadisticas_habitos, también funcionará.
-
-    =====================================================
-    */
-
-    $sqlEstadisticas = "
-        SELECT
-
-            e.id_habito,
-            e.fecha,
-            e.objetivo,
-            e.progreso,
-            e.porcentaje,
-            e.completado
-
-        FROM estadisticas_habitos e
-
-        WHERE e.id_habito IN ($placeholders)
-
-        ORDER BY
-            e.fecha ASC
-    ";
-
-    $stmtEstadisticas =
-        $conexion->prepare(
-            $sqlEstadisticas
-        );
-
-    $stmtEstadisticas->execute(
-        $idsHabitos
-    );
-
-    $estadisticas =
-        $stmtEstadisticas->fetchAll(
-            PDO::FETCH_ASSOC
-        );
-
-
-    /*
-    =====================================================
-    5. OBJETIVOS DE LOS HÁBITOS
-    =====================================================
-    */
-
-    $objetivos = [];
-
-    foreach ($habitos as $habito) {
-
-        $objetivos[
-            (int)$habito['id_habito']
-        ] =
-            (float)$habito['objetivo'];
-
-    }
-
-
-    /*
-    =====================================================
-    6. DÍAS COMPLETADOS POR HÁBITO
-    =====================================================
-    */
-
-    $diasPorHabito = [];
-
-
-    /*
-    -----------------------------------------------------
-    REGISTROS NORMALES
-    -----------------------------------------------------
-    */
-
-    foreach ($registros as $registro) {
-
-        $idHabito =
-            (int)$registro['id_habito'];
-
-        $fecha =
-            (string)$registro['fecha'];
-
-        $valor =
-            (float)$registro['valor_registrado'];
-
-        $objetivo =
-            $objetivos[$idHabito] ?? 1;
-
-
-        if (
-            $objetivo <= 0
-        ) {
-
-            $objetivo = 1;
-
+        if ($frecuencia === 'personalizada') {
+            $dias = $db->prepare(
+                "SELECT dia_semana FROM habito_dias WHERE id_habito_usuario = :id_habito_usuario"
+            );
+            $dias->execute([':id_habito_usuario' => (int) $habito['id_habito_usuario']]);
+            $programadoHoy = in_array($diaSemana, array_map('intval', $dias->fetchAll(PDO::FETCH_COLUMN)), true);
         }
 
-
-        /*
-        Un día queda completado cuando
-        el valor registrado alcanza el objetivo.
-        */
-
-        if ($valor >= $objetivo) {
-
-            if (
-                !isset(
-                    $diasPorHabito[$idHabito]
-                )
-            ) {
-
-                $diasPorHabito[$idHabito] = [];
-
-            }
-
-            $diasPorHabito[$idHabito][$fecha] = true;
-
+        if ($programadoHoy) {
+            $programados[] = $habito;
         }
-
     }
 
-
-    /*
-    -----------------------------------------------------
-    ESTADÍSTICAS
-    -----------------------------------------------------
-    */
-
-    foreach ($estadisticas as $registro) {
-
-        $idHabito =
-            (int)$registro['id_habito'];
-
-        $fecha =
-            (string)$registro['fecha'];
-
-        $completado =
-            (int)$registro['completado'] === 1;
-
-        $progreso =
-            (float)($registro['progreso'] ?? 0);
-
-        $objetivo =
-            (float)($registro['objetivo'] ?? 0);
-
-
-        if (
-            !$completado &&
-            $objetivo > 0 &&
-            $progreso >= $objetivo
-        ) {
-
-            $completado = true;
-
-        }
-
-
+    $completadosHoy = 0;
+    $habitosPorCategoria = [];
+    foreach ($programados as $habito) {
+        $consultaProgreso = $db->prepare(
+            "SELECT COALESCE(SUM(valor_registrado), 0)
+             FROM registros_habitos
+             WHERE id_habito_usuario = :id_habito_usuario
+             AND DATE(fecha_registro) = CURDATE()"
+        );
+        $consultaProgreso->execute([':id_habito_usuario' => (int) $habito['id_habito_usuario']]);
+        $progreso = (float) $consultaProgreso->fetchColumn();
+        $completado = $progreso >= (float) $habito['objetivo'];
         if ($completado) {
-
-            if (
-                !isset(
-                    $diasPorHabito[$idHabito]
-                )
-            ) {
-
-                $diasPorHabito[$idHabito] = [];
-
-            }
-
-            $diasPorHabito[$idHabito][$fecha] = true;
-
+            $completadosHoy++;
         }
 
-    }
-
-
-    /*
-    =====================================================
-    7. DÍAS REGISTRADOS
-    =====================================================
-    */
-
-    $diasRegistradosSet = [];
-
-    foreach (
-        $diasPorHabito as $fechas
-    ) {
-
-        foreach (
-            $fechas as $fecha => $valor
-        ) {
-
-            $diasRegistradosSet[$fecha] = true;
-
+        $idCategoria = (int) $habito['id_categoria'];
+        if (!isset($habitosPorCategoria[$idCategoria])) {
+            $habitosPorCategoria[$idCategoria] = [];
         }
-
+        $habitosPorCategoria[$idCategoria][] = [
+            'id_habito_usuario' => (int) $habito['id_habito_usuario'],
+            'nombre_habito' => $habito['nombre_habito'],
+            'progreso' => $progreso,
+            'objetivo' => (float) $habito['objetivo'],
+            'completado' => $completado
+        ];
     }
-
-    $diasRegistrados =
-        count($diasRegistradosSet);
-
-
-    /*
-    =====================================================
-    8. DÍAS COMPLETOS
-    =====================================================
-
-    Un día es completo cuando TODOS los hábitos
-    activos del usuario fueron completados.
-
-    =====================================================
-    */
-
-    $cantidadHabitos =
-        count($habitos);
-
-    $completadosPorDia = [];
-
-
-    foreach (
-        $diasPorHabito as $idHabito => $fechas
-    ) {
-
-        foreach (
-            $fechas as $fecha => $valor
-        ) {
-
-            if (
-                !isset(
-                    $completadosPorDia[$fecha]
-                )
-            ) {
-
-                $completadosPorDia[$fecha] = 0;
-
-            }
-
-            $completadosPorDia[$fecha]++;
-
-        }
-
-    }
-
 
     $diasCompletos = [];
+    $consultaDias = $db->prepare(
+        "SELECT DISTINCT DATE(r.fecha_registro) AS fecha
+         FROM registros_habitos r
+         INNER JOIN habitos_usuario hu ON hu.id_habito_usuario = r.id_habito_usuario
+         WHERE hu.id_usuario = :id_usuario
+         AND hu.activo = TRUE
+         ORDER BY fecha DESC"
+    );
+    $consultaDias->execute([':id_usuario' => $idUsuario]);
+    $fechasConRegistro = $consultaDias->fetchAll(PDO::FETCH_COLUMN);
 
+    $fechasCompletas = [];
+    $consultaProgramados = $db->prepare(
+        "SELECT
+            hu.id_habito_usuario,
+            hu.frecuencia
+         FROM habitos_usuario hu
+         WHERE hu.id_usuario = :id_usuario
+         AND hu.activo = TRUE
+         AND hu.fecha_inicio <= :fecha
+         AND (hu.fecha_fin IS NULL OR hu.fecha_fin >= :fecha)"
+    );
 
-    foreach (
-        $completadosPorDia as $fecha => $cantidad
-    ) {
+    $consultaDiasHabito = $db->prepare(
+        "SELECT dia_semana FROM habito_dias WHERE id_habito_usuario = :id_habito_usuario"
+    );
 
-        if (
-            $cantidad >= $cantidadHabitos
-        ) {
+    $consultaRegistrosDia = $db->prepare(
+        "SELECT COALESCE(SUM(valor_registrado), 0)
+         FROM registros_habitos
+         WHERE id_habito_usuario = :id_habito_usuario
+         AND DATE(fecha_registro) = :fecha"
+    );
 
-            $diasCompletos[] =
-                $fecha;
+    $consultaObjetivo = $db->prepare(
+        "SELECT objetivo FROM habitos_usuario WHERE id_habito_usuario = :id_habito_usuario"
+    );
 
-        }
+    for ($offset = 0; $offset < 366; $offset++) {
+        $fecha = $hoy->modify("-$offset days");
+        $fechaTexto = $fecha->format('Y-m-d');
+        $dia = (int) $fecha->format('N');
 
-    }
+        $consultaProgramados->execute([
+            ':id_usuario' => $idUsuario,
+            ':fecha' => $fechaTexto
+        ]);
+        $habitosDia = $consultaProgramados->fetchAll(PDO::FETCH_ASSOC);
 
-
-    sort($diasCompletos);
-
-
-    /*
-    =====================================================
-    9. MEJOR RACHA
-    =====================================================
-    */
-
-    $mejorRacha = 0;
-
-    $rachaTemporal = 0;
-
-    $ultimaFecha = null;
-
-
-    foreach (
-        $diasCompletos as $fecha
-    ) {
-
-        if ($ultimaFecha === null) {
-
-            $rachaTemporal = 1;
-
-        } else {
-
-            $fechaAnterior =
-                new DateTime(
-                    $ultimaFecha
-                );
-
-            $fechaActual =
-                new DateTime(
-                    $fecha
-                );
-
-            $diferencia =
-                (int)$fechaAnterior
-                    ->diff($fechaActual)
-                    ->format('%a');
-
-
-            if ($diferencia === 1) {
-
-                $rachaTemporal++;
-
-            } else {
-
-                $rachaTemporal = 1;
-
+        $esperados = 0;
+        $completados = 0;
+        foreach ($habitosDia as $habitoDia) {
+            $programado = $habitoDia['frecuencia'] === 'diaria';
+            if ($habitoDia['frecuencia'] === 'personalizada') {
+                $consultaDiasHabito->execute([':id_habito_usuario' => (int) $habitoDia['id_habito_usuario']]);
+                $programado = in_array($dia, array_map('intval', $consultaDiasHabito->fetchAll(PDO::FETCH_COLUMN)), true);
+            }
+            if (!$programado) {
+                continue;
             }
 
+            $esperados++;
+            $consultaRegistrosDia->execute([
+                ':id_habito_usuario' => (int) $habitoDia['id_habito_usuario'],
+                ':fecha' => $fechaTexto
+            ]);
+            $progreso = (float) $consultaRegistrosDia->fetchColumn();
+            $consultaObjetivo->execute([':id_habito_usuario' => (int) $habitoDia['id_habito_usuario']]);
+            $objetivo = (float) $consultaObjetivo->fetchColumn();
+            if ($objetivo > 0 && $progreso >= $objetivo) {
+                $completados++;
+            }
         }
 
-
-        if (
-            $rachaTemporal >
-            $mejorRacha
-        ) {
-
-            $mejorRacha =
-                $rachaTemporal;
-
+        if ($esperados > 0 && $completados === $esperados) {
+            $fechasCompletas[] = $fechaTexto;
         }
 
-
-        $ultimaFecha =
-            $fecha;
-
+        if ($offset > 0 && $esperados === 0 && $fechaTexto < $habitos[0]['fecha_inicio']) {
+            break;
+        }
     }
-
-
-    /*
-    =====================================================
-    10. RACHA ACTUAL
-    =====================================================
-    */
 
     $rachaActual = 0;
-
-    $conjuntoDias =
-        array_flip(
-            $diasCompletos
-        );
-
-
-    $hoy =
-        new DateTime(
-            date('Y-m-d')
-        );
-
-
-    if (!empty($diasCompletos)) {
-
-        $ultimaFechaCompleta =
-            end($diasCompletos);
-
-        $fechaUltima =
-            new DateTime(
-                $ultimaFechaCompleta
-            );
-
-        $diferenciaHoy =
-            (int)$fechaUltima
-                ->diff($hoy)
-                ->format('%a');
-
-
-        /*
-        Hoy
-        */
-
-        if (
-            $diferenciaHoy === 0
-        ) {
-
-            $fechaBuscada =
-                clone $hoy;
-
-            while (
-                isset(
-                    $conjuntoDias[
-                        $fechaBuscada
-                            ->format('Y-m-d')
-                    ]
-                )
-            ) {
-
-                $rachaActual++;
-
-                $fechaBuscada
-                    ->modify('-1 day');
-
-            }
-
-        /*
-        Ayer
-        */
-
-        } elseif (
-            $diferenciaHoy === 1
-        ) {
-
-            $fechaBuscada =
-                clone $fechaUltima;
-
-            while (
-                isset(
-                    $conjuntoDias[
-                        $fechaBuscada
-                            ->format('Y-m-d')
-                    ]
-                )
-            ) {
-
-                $rachaActual++;
-
-                $fechaBuscada
-                    ->modify('-1 day');
-
-            }
-
+    foreach ($fechasCompletas as $fecha) {
+        $esperada = $hoy->modify("-$rachaActual days")->format('Y-m-d');
+        if ($fecha !== $esperada) {
+            break;
         }
-
+        $rachaActual++;
     }
 
-
-    /*
-    =====================================================
-    11. HÁBITOS COMPLETADOS
-    =====================================================
-    */
-
-    $habitosCompletados = 0;
-
-
-    foreach (
-        $diasPorHabito as $fechas
-    ) {
-
-        $habitosCompletados +=
-            count($fechas);
-
+    $mejorRacha = 0;
+    $rachaTemporal = 0;
+    $anterior = null;
+    foreach (array_reverse($fechasCompletas) as $fecha) {
+        if ($anterior === null || (new DateTimeImmutable($fecha))->modify('+1 day')->format('Y-m-d') === $anterior) {
+            $rachaTemporal++;
+        } else {
+            $rachaTemporal = 1;
+        }
+        $mejorRacha = max($mejorRacha, $rachaTemporal);
+        $anterior = $fecha;
     }
 
-
-    /*
-    =====================================================
-    12. CONSTELACIÓN ACTUAL
-    =====================================================
-    */
-
-    $primerDiaMes =
-        date('Y-m-01');
-
-    $ultimoDiaMes =
-        date('Y-m-t');
+    $habitosCompletados = $completadosHoy;
+    $diasRegistrados = count($fechasConRegistro);
 
     $constelacionActual = [];
-
-
-    foreach (
-        $diasCompletos as $fecha
-    ) {
-
-        if (
-            $fecha >= $primerDiaMes &&
-            $fecha <= $ultimoDiaMes
-        ) {
-
-            $constelacionActual[] =
-                $fecha;
-
+    foreach ($programados as $habito) {
+        $idCategoria = (int) $habito['id_categoria'];
+        $progresoCategoria = $habitosPorCategoria[$idCategoria] ?? [];
+        $completo = false;
+        foreach ($progresoCategoria as $item) {
+            if ($item['id_habito_usuario'] === (int) $habito['id_habito_usuario']) {
+                $completo = $item['completado'];
+                break;
+            }
         }
-
+        $constelacionActual[] = [
+            'id_habito_usuario' => (int) $habito['id_habito_usuario'],
+            'nombre_habito' => $habito['nombre_habito'],
+            'categoria' => $habito['nombre_categoria'],
+            'completado' => $completo
+        ];
     }
-
-
-    /*
-    =====================================================
-    13. CATEGORÍAS
-    =====================================================
-    */
 
     $categorias = [];
-
-
     foreach ($habitos as $habito) {
-
-        $idCategoria =
-            $habito['id_categoria'] !== null
-                ? (int)$habito['id_categoria']
-                : null;
-
-
-        if ($idCategoria === null) {
-
+        $idCategoria = (int) $habito['id_categoria'];
+        if (isset($categorias[$idCategoria])) {
             continue;
-
         }
-
-
-        if (
-            !isset(
-                $categorias[$idCategoria]
-            )
-        ) {
-
-            $categorias[$idCategoria] = [
-
-                'id_categoria' =>
-                    $idCategoria,
-
-                'nombre_categoria' =>
-                    $habito['nombre_categoria']
-                    ?? 'Categoría',
-
-                'total_habitos' =>
-                    0,
-
-                'dias_completados' =>
-                    0
-
-            ];
-
-        }
-
-
-        $categorias[
-            $idCategoria
-        ]['total_habitos']++;
-
-
-        $idHabito =
-            (int)$habito['id_habito'];
-
-
-        $diasCategoria =
-            $diasPorHabito[
-                $idHabito
-            ] ?? [];
-
-
-        $categorias[
-            $idCategoria
-        ]['dias_completados'] +=
-            count($diasCategoria);
-
+        $items = $habitosPorCategoria[$idCategoria] ?? [];
+        $total = count($items);
+        $completados = count(array_filter($items, fn($item) => $item['completado']));
+        $categorias[$idCategoria] = [
+            'id_categoria' => $idCategoria,
+            'nombre_categoria' => $habito['nombre_categoria'],
+            'total_habitos' => $total,
+            'completados_hoy' => $completados,
+            'porcentaje' => $total > 0 ? round(($completados / $total) * 100, 2) : 0
+        ];
     }
-
-
-    /*
-    =====================================================
-    14. PORCENTAJE DE CADA CATEGORÍA
-    =====================================================
-    */
-
-    foreach (
-        $categorias as &$categoria
-    ) {
-
-        $total =
-            (int)$categoria[
-                'total_habitos'
-            ];
-
-        $dias =
-            (int)$categoria[
-                'dias_completados'
-            ];
-
-
-        /*
-        Calculamos una constancia sencilla
-        basada en los últimos 30 días.
-
-        Máximo posible:
-        cantidad de hábitos × 30 días.
-        */
-
-        $maximo =
-            $total * 30;
-
-
-        if ($maximo > 0) {
-
-            $porcentaje =
-                ($dias / $maximo) * 100;
-
-        } else {
-
-            $porcentaje = 0;
-
-        }
-
-
-        $categoria['porcentaje'] =
-            round(
-                max(
-                    0,
-                    min(
-                        100,
-                        $porcentaje
-                    )
-                ),
-                2
-            );
-
-    }
-
-    unset($categoria);
-
-
-    $categorias =
-        array_values(
-            $categorias
-        );
-
-
-    /*
-    =====================================================
-    15. HISTORIAL MENSUAL
-    =====================================================
-    */
 
     $historial = [];
-
-
-    foreach (
-        $diasRegistradosSet as $fecha => $valor
-    ) {
-
-        $mes =
-            substr(
-                $fecha,
-                0,
-                7
-            );
-
-
-        if (
-            !isset(
-                $historial[$mes]
-            )
-        ) {
-
-            $historial[$mes] = [
-
-                'mes' => $mes,
-
-                'dias_con_registro' => 0
-
-            ];
-
-        }
-
-
-        $historial[$mes][
-            'dias_con_registro'
-        ]++;
-
+    for ($i = 0; $i < 12; $i++) {
+        $mes = $hoy->modify("-$i months");
+        $inicio = $mes->modify('first day of this month')->format('Y-m-d');
+        $fin = $mes->modify('last day of this month')->format('Y-m-d');
+        $consulta = $db->prepare(
+            "SELECT COUNT(DISTINCT DATE(r.fecha_registro))
+             FROM registros_habitos r
+             INNER JOIN habitos_usuario hu ON hu.id_habito_usuario = r.id_habito_usuario
+             WHERE hu.id_usuario = :id_usuario
+             AND DATE(r.fecha_registro) BETWEEN :inicio AND :fin"
+        );
+        $consulta->execute([
+            ':id_usuario' => $idUsuario,
+            ':inicio' => $inicio,
+            ':fin' => $fin
+        ]);
+        $historial[] = [
+            'mes' => $mes->format('Y-m'),
+            'dias_con_registro' => (int) $consulta->fetchColumn()
+        ];
     }
 
-
-    $historial =
-        array_values(
-            $historial
-        );
-
-
-    usort(
-        $historial,
-        function ($a, $b) {
-
-            return strcmp(
-                $b['mes'],
-                $a['mes']
-            );
-
-        }
-    );
-
-
-    /*
-    =====================================================
-    16. RESPUESTA FINAL
-    =====================================================
-    */
-
-    responder(
-        true,
-        'Rachas cargadas correctamente.',
-        [
-
-            'racha_actual' =>
-                $rachaActual,
-
-            'mejor_racha' =>
-                $mejorRacha,
-
-            'habitos_completados' =>
-                $habitosCompletados,
-
-            'dias_registrados' =>
-                $diasRegistrados,
-
-            'constelacion_actual' =>
-                $constelacionActual,
-
-            'categorias' =>
-                $categorias,
-
-            'historial_constelaciones' =>
-                $historial
-
-        ]
-    );
-
+    responderRacha(true, '', [
+        'racha_actual' => $rachaActual,
+        'mejor_racha' => $mejorRacha,
+        'habitos_completados' => $habitosCompletados,
+        'dias_registrados' => $diasRegistrados,
+        'constelacion_actual' => $constelacionActual,
+        'categorias' => array_values($categorias),
+        'historial_constelaciones' => $historial
+    ]);
 
 } catch (Throwable $error) {
-
-    error_log(
-        'Error en racha.php: ' .
-        $error->getMessage()
-    );
-
-
-    responder(
-        false,
-        'Ocurrió un error interno al cargar las rachas.',
-        [
-            'codigo' =>
-                'ERROR_RACHAS'
-        ],
-        500
-    );
-
+    error_log('LifeSync racha.php: ' . $error->getMessage());
+    responderRacha(false, 'No se pudieron cargar las rachas.', [], 500);
 }

@@ -1,7 +1,3 @@
-/* =========================================================
-   LifeSync — Sistema global de idioma
-   Español / English
-   ========================================================= */
 (function () {
     "use strict";
 
@@ -359,6 +355,20 @@
     "recuperar.recuerdas": "¿Recuerdas tu contraseña?",
     "recuperar.titulo": "¿Olvidaste tu contraseña?",
     "recuperar.tituloPagina": "LifeSync | Recuperar contraseña",
+    "enviando": "Enviando...",
+    "errorRecuperacion": "No se pudo procesar la recuperación. Inténtalo nuevamente.",
+    "recuperacionEnviada": "Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña.",
+    "enlaceRecuperacionInvalido": "El enlace de recuperación no es válido o ya expiró.",
+    "contrasenaActualizada": "Contraseña actualizada correctamente.",
+    "restablecer.boton": "Cambiar contraseña",
+    "restablecer.confirmar": "Confirmar contraseña",
+    "restablecer.confirmarPlaceholder": "Confirma tu nueva contraseña",
+    "restablecer.descripcion": "Crea una nueva contraseña para recuperar el acceso a tu cuenta.",
+    "restablecer.metaDescripcion": "Restablece tu contraseña de LifeSync",
+    "restablecer.nueva": "Nueva contraseña",
+    "restablecer.nuevaPlaceholder": "Crea una nueva contraseña",
+    "restablecer.titulo": "Nueva contraseña",
+    "restablecer.tituloPagina": "LifeSync | Restablecer contraseña",
     "registrando": "Registrando...",
     "registrarse": "Registrarse",
     "registro": "registro",
@@ -809,6 +819,20 @@
     "recuperar.recuerdas": "Remember your password?",
     "recuperar.titulo": "Forgot your password?",
     "recuperar.tituloPagina": "LifeSync | Recover password",
+    "enviando": "Sending...",
+    "errorRecuperacion": "Recovery could not be processed. Please try again.",
+    "recuperacionEnviada": "If the email is registered, you will receive instructions to recover your password.",
+    "enlaceRecuperacionInvalido": "The recovery link is invalid or has expired.",
+    "contrasenaActualizada": "Password updated successfully.",
+    "restablecer.boton": "Change password",
+    "restablecer.confirmar": "Confirm password",
+    "restablecer.confirmarPlaceholder": "Confirm your new password",
+    "restablecer.descripcion": "Create a new password to recover access to your account.",
+    "restablecer.metaDescripcion": "Reset your LifeSync password",
+    "restablecer.nueva": "New password",
+    "restablecer.nuevaPlaceholder": "Create a new password",
+    "restablecer.titulo": "New password",
+    "restablecer.tituloPagina": "LifeSync | Reset password",
     "registrando": "Signing up...",
     "registrarse": "Sign up",
     "registro": "entry",

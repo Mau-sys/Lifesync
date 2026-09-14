@@ -4,11 +4,6 @@ document.addEventListener(
 
         "use strict";
 
-
-        /* =====================================================
-           ELEMENTOS
-        ===================================================== */
-
         const rachaActual =
             document.getElementById(
                 "rachaActual"
@@ -64,11 +59,6 @@ document.addEventListener(
                 "modalConstelaciones"
             );
 
-
-        /* =====================================================
-           IDIOMA
-        ===================================================== */
-
         function texto(clave) {
 
             if (
@@ -80,11 +70,6 @@ document.addEventListener(
                     window.traducirLifeSync(
                         clave
                     );
-
-                /*
-                Si el idioma global todavía no tiene
-                esa clave, devolvemos una versión normal.
-                */
 
                 if (
                     resultado &&
@@ -119,7 +104,6 @@ document.addEventListener(
 
             };
 
-
             return (
                 textosBase[clave] ||
                 clave
@@ -127,16 +111,10 @@ document.addEventListener(
 
         }
 
-
-        /* =====================================================
-           FORMATO DE DÍAS
-        ===================================================== */
-
         function dias(valor) {
 
             const numero =
                 Number(valor) || 0;
-
 
             return (
                 `${numero} ` +
@@ -149,37 +127,27 @@ document.addEventListener(
 
         }
 
-
-        /* =====================================================
-           ICONOS
-        ===================================================== */
-
         const iconosCategorias = {
 
             "Hidratación":
                 "img/Hidrat.png",
 
             "Alimentación":
-                "img/Alimentacion.png",
+                "img/Alimen.png",
 
             "Salud Mental":
-                "img/SaludMental.png",
+                "img/S-Mental.png",
 
             "Actividad Física":
-                "img/ActividadFisica.png",
+                "img/A-Fisica.png",
 
-            "Registro Académico":
-                "img/Academico.png",
+            "Académico":
+                "img/R-Academ.png",
 
             "Hábito Personalizado":
                 "img/H-Perzona.png"
 
         };
-
-
-        /* =====================================================
-           CARGAR RACHAS
-        ===================================================== */
 
         async function cargarRachas() {
 
@@ -187,7 +155,7 @@ document.addEventListener(
 
                 const respuesta =
                     await fetch(
-                        "auth/racha.php",
+                        "../auth/racha.php",
                         {
                             method:
                                 "GET",
@@ -205,18 +173,10 @@ document.addEventListener(
                         }
                     );
 
-
-                /*
-                Primero comprobamos el tipo de respuesta.
-                Esto evita que aparezca:
-                Unexpected token '<'
-                */
-
                 const contenido =
                     respuesta.headers.get(
                         "content-type"
                     ) || "";
-
 
                 if (
                     !contenido.includes(
@@ -240,20 +200,13 @@ document.addEventListener(
 
                 }
 
-
                 const datos =
                     await respuesta.json();
-
 
                 if (
                     !respuesta.ok ||
                     !datos.exito
                 ) {
-
-                    /*
-                    Si simplemente no hay hábitos,
-                    no lo mostramos como error.
-                    */
 
                     if (
                         datos.codigo ===
@@ -265,7 +218,6 @@ document.addEventListener(
                         return;
 
                     }
-
 
                     throw new Error(
                         datos.codigo ===
@@ -280,11 +232,6 @@ document.addEventListener(
 
                 }
 
-
-                /* =================================================
-                   RESUMEN
-                ================================================= */
-
                 if (rachaActual) {
 
                     rachaActual.textContent =
@@ -293,7 +240,6 @@ document.addEventListener(
                         );
 
                 }
-
 
                 if (mejorRacha) {
 
@@ -304,7 +250,6 @@ document.addEventListener(
 
                 }
 
-
                 if (habitosCompletados) {
 
                     habitosCompletados.textContent =
@@ -313,7 +258,6 @@ document.addEventListener(
                         ) || 0;
 
                 }
-
 
                 if (diasRegistrados) {
 
@@ -324,42 +268,25 @@ document.addEventListener(
 
                 }
 
-
-                /* =================================================
-                   CONSTELACIÓN
-                ================================================= */
-
                 crearConstelacionActual(
                     datos.constelacion_actual ||
                     []
                 );
-
-
-                /* =================================================
-                   CATEGORÍAS
-                ================================================= */
 
                 crearCategorias(
                     datos.categorias ||
                     []
                 );
 
-
-                /* =================================================
-                   HISTORIAL
-                ================================================= */
-
                 crearHistorial(
                     datos.historial_constelaciones ||
                     []
                 );
 
-
                 crearHistorialConstelaciones(
                     datos.historial_constelaciones ||
                     []
                 );
-
 
             } catch (error) {
 
@@ -367,7 +294,6 @@ document.addEventListener(
                     "Error en rachas.js:",
                     error
                 );
-
 
                 mostrarError(
                     texto(
@@ -379,11 +305,6 @@ document.addEventListener(
 
         }
 
-
-        /* =====================================================
-           ESTADO VACÍO
-        ===================================================== */
-
         function mostrarEstadoVacio() {
 
             if (rachaActual) {
@@ -393,14 +314,12 @@ document.addEventListener(
 
             }
 
-
             if (mejorRacha) {
 
                 mejorRacha.textContent =
                     dias(0);
 
             }
-
 
             if (habitosCompletados) {
 
@@ -409,14 +328,12 @@ document.addEventListener(
 
             }
 
-
             if (diasRegistrados) {
 
                 diasRegistrados.textContent =
                     "0";
 
             }
-
 
             crearConstelacionActual([]);
 
@@ -428,11 +345,6 @@ document.addEventListener(
 
         }
 
-
-        /* =====================================================
-           CONSTELACIÓN ACTUAL
-        ===================================================== */
-
         function crearConstelacionActual(
             fechasActivas
         ) {
@@ -443,20 +355,16 @@ document.addEventListener(
 
             }
 
-
             constelacion.innerHTML =
                 "";
-
 
             const fechas =
                 new Set(
                     fechasActivas
                 );
 
-
             const fechaActual =
                 new Date();
-
 
             const anio =
                 fechaActual.getFullYear();
@@ -464,14 +372,12 @@ document.addEventListener(
             const mes =
                 fechaActual.getMonth();
 
-
             const cantidadDias =
                 new Date(
                     anio,
                     mes + 1,
                     0
                 ).getDate();
-
 
             for (
                 let dia = 1;
@@ -492,24 +398,19 @@ document.addEventListener(
                         "0"
                     )}`;
 
-
                 const estrella =
                     document.createElement(
                         "span"
                     );
 
-
                 estrella.className =
                     "estrella";
-
 
                 estrella.textContent =
                     "★";
 
-
                 estrella.title =
                     `${texto("dia")} ${dia}`;
-
 
                 if (
                     fechas.has(
@@ -523,7 +424,6 @@ document.addEventListener(
 
                 }
 
-
                 constelacion.appendChild(
                     estrella
                 );
@@ -531,11 +431,6 @@ document.addEventListener(
             }
 
         }
-
-
-        /* =====================================================
-           CATEGORÍAS
-        ===================================================== */
 
         function crearCategorias(
             categorias
@@ -547,10 +442,8 @@ document.addEventListener(
 
             }
 
-
             listaCategorias.innerHTML =
                 "";
-
 
             if (
                 !Array.isArray(
@@ -564,22 +457,18 @@ document.addEventListener(
                         "p"
                     );
 
-
                 mensaje.textContent =
                     texto(
                         "sinDatosCategorias"
                     );
 
-
                 listaCategorias.appendChild(
                     mensaje
                 );
 
-
                 return;
 
             }
-
 
             categorias.forEach(
                 categoria => {
@@ -589,16 +478,13 @@ document.addEventListener(
                             "div"
                         );
 
-
                     tarjeta.className =
                         "categoria-racha";
-
 
                     const imagen =
                         document.createElement(
                             "img"
                         );
-
 
                     imagen.src =
                         iconosCategorias[
@@ -606,11 +492,9 @@ document.addEventListener(
                         ] ||
                         "img/H-Perzona.png";
 
-
                     imagen.alt =
                         categoria.nombre_categoria ||
                         "Categoría";
-
 
                     imagen.onerror =
                         () => {
@@ -623,49 +507,40 @@ document.addEventListener(
 
                         };
 
-
                     const informacion =
                         document.createElement(
                             "div"
                         );
 
-
                     informacion.className =
                         "info-categoria";
-
 
                     const titulo =
                         document.createElement(
                             "h3"
                         );
 
-
                     titulo.textContent =
                         categoria.nombre_categoria ||
                         "Categoría";
-
 
                     const barra =
                         document.createElement(
                             "div"
                         );
 
-
                     barra.className =
                         "barra";
-
 
                     const progreso =
                         document.createElement(
                             "span"
                         );
 
-
                     const porcentaje =
                         Number(
                             categoria.porcentaje
                         ) || 0;
-
 
                     progreso.style.width =
                         Math.min(
@@ -676,21 +551,17 @@ document.addEventListener(
                             )
                         ) + "%";
 
-
                     barra.appendChild(
                         progreso
                     );
-
 
                     const porcentajeTexto =
                         document.createElement(
                             "p"
                         );
 
-
                     porcentajeTexto.className =
                         "porcentaje";
-
 
                     porcentajeTexto.textContent =
                         `${Math.round(
@@ -699,31 +570,25 @@ document.addEventListener(
                             "constancia"
                         )}`;
 
-
                     informacion.appendChild(
                         titulo
                     );
-
 
                     informacion.appendChild(
                         barra
                     );
 
-
                     informacion.appendChild(
                         porcentajeTexto
                     );
-
 
                     tarjeta.appendChild(
                         imagen
                     );
 
-
                     tarjeta.appendChild(
                         informacion
                     );
-
 
                     listaCategorias.appendChild(
                         tarjeta
@@ -733,11 +598,6 @@ document.addEventListener(
             );
 
         }
-
-
-        /* =====================================================
-           HISTORIAL
-        ===================================================== */
 
         function crearHistorial(
             historial
@@ -749,10 +609,8 @@ document.addEventListener(
 
             }
 
-
             historialRachas.innerHTML =
                 "";
-
 
             if (
                 !Array.isArray(
@@ -766,22 +624,18 @@ document.addEventListener(
                         "p"
                     );
 
-
                 mensaje.textContent =
                     texto(
                         "sinHistorialRachas"
                     );
 
-
                 historialRachas.appendChild(
                     mensaje
                 );
 
-
                 return;
 
             }
-
 
             historial.forEach(
                 registro => {
@@ -791,40 +645,33 @@ document.addEventListener(
                             "div"
                         );
 
-
                     item.className =
                         "historial-item";
-
 
                     const contenido =
                         document.createElement(
                             "div"
                         );
 
-
                     const titulo =
                         document.createElement(
                             "strong"
                         );
-
 
                     titulo.textContent =
                         formatearMes(
                             registro.mes
                         );
 
-
                     const descripcion =
                         document.createElement(
                             "p"
                         );
 
-
                     const cantidadDias =
                         Number(
                             registro.dias_con_registro
                         ) || 0;
-
 
                     descripcion.textContent =
                         `${cantidadDias} ${
@@ -833,38 +680,31 @@ document.addEventListener(
                                 : texto("dias")
                         }`;
 
-
                     contenido.appendChild(
                         titulo
                     );
 
-
                     contenido.appendChild(
                         descripcion
                     );
-
 
                     const cantidad =
                         document.createElement(
                             "span"
                         );
 
-
                     cantidad.textContent =
                         dias(
                             registro.dias_con_registro
                         );
 
-
                     item.appendChild(
                         contenido
                     );
 
-
                     item.appendChild(
                         cantidad
                     );
-
 
                     historialRachas.appendChild(
                         item
@@ -874,11 +714,6 @@ document.addEventListener(
             );
 
         }
-
-
-        /* =====================================================
-           HISTORIAL DE CONSTELACIONES
-        ===================================================== */
 
         function crearHistorialConstelaciones(
             historial
@@ -892,10 +727,8 @@ document.addEventListener(
 
             }
 
-
             historialConstelaciones.innerHTML =
                 "";
-
 
             if (
                 !Array.isArray(
@@ -909,22 +742,18 @@ document.addEventListener(
                         "p"
                     );
 
-
                 mensaje.textContent =
                     texto(
                         "sinConstelacionesAnteriores"
                     );
 
-
                 historialConstelaciones.appendChild(
                     mensaje
                 );
 
-
                 return;
 
             }
-
 
             historial.forEach(
                 registro => {
@@ -934,34 +763,28 @@ document.addEventListener(
                             "div"
                         );
 
-
                     contenedorMes.className =
                         "mes-constelacion";
-
 
                     const titulo =
                         document.createElement(
                             "h3"
                         );
 
-
                     titulo.textContent =
                         formatearMes(
                             registro.mes
                         );
-
 
                     const informacion =
                         document.createElement(
                             "p"
                         );
 
-
                     const cantidad =
                         Number(
                             registro.dias_con_registro
                         ) || 0;
-
 
                     informacion.textContent =
                         `${cantidad} ${
@@ -970,16 +793,13 @@ document.addEventListener(
                                 : texto("dias")
                         }`;
 
-
                     contenedorMes.appendChild(
                         titulo
                     );
 
-
                     contenedorMes.appendChild(
                         informacion
                     );
-
 
                     historialConstelaciones.appendChild(
                         contenedorMes
@@ -989,11 +809,6 @@ document.addEventListener(
             );
 
         }
-
-
-        /* =====================================================
-           FORMATEAR MES
-        ===================================================== */
 
         function formatearMes(
             valor
@@ -1005,10 +820,8 @@ document.addEventListener(
 
             }
 
-
             const partes =
                 String(valor).split("-");
-
 
             if (
                 partes.length !== 2
@@ -1018,18 +831,15 @@ document.addEventListener(
 
             }
 
-
             const anio =
                 Number(
                     partes[0]
                 );
 
-
             const mes =
                 Number(
                     partes[1]
                 );
-
 
             if (
                 !anio ||
@@ -1040,7 +850,6 @@ document.addEventListener(
 
             }
 
-
             const fecha =
                 new Date(
                     anio,
@@ -1048,13 +857,11 @@ document.addEventListener(
                     1
                 );
 
-
             const idiomaActual =
                 typeof window.obtenerIdiomaLifeSync ===
                 "function"
                     ? window.obtenerIdiomaLifeSync()
                     : "es";
-
 
             return fecha.toLocaleDateString(
                 idiomaActual === "en"
@@ -1071,11 +878,6 @@ document.addEventListener(
 
         }
 
-
-        /* =====================================================
-           MODAL
-        ===================================================== */
-
         function cerrarModal() {
 
             if (!modal) {
@@ -1084,17 +886,14 @@ document.addEventListener(
 
             }
 
-
             modal.classList.remove(
                 "activo"
             );
-
 
             document.body.style.overflow =
                 "";
 
         }
-
 
         if (abrirHistorial) {
 
@@ -1108,7 +907,6 @@ document.addEventListener(
                             "activo"
                         );
 
-
                         document.body.style.overflow =
                             "hidden";
 
@@ -1119,7 +917,6 @@ document.addEventListener(
 
         }
 
-
         if (cerrarHistorial) {
 
             cerrarHistorial.addEventListener(
@@ -1128,7 +925,6 @@ document.addEventListener(
             );
 
         }
-
 
         if (modal) {
 
@@ -1150,7 +946,6 @@ document.addEventListener(
 
         }
 
-
         document.addEventListener(
             "keydown",
             evento => {
@@ -1167,11 +962,6 @@ document.addEventListener(
             }
         );
 
-
-        /* =====================================================
-           ERROR
-        ===================================================== */
-
         function mostrarError(
             mensaje
         ) {
@@ -1182,16 +972,13 @@ document.addEventListener(
 
             }
 
-
             listaCategorias.innerHTML =
                 "";
-
 
             const error =
                 document.createElement(
                     "p"
                 );
-
 
             error.textContent =
                 mensaje ||
@@ -1199,17 +986,11 @@ document.addEventListener(
                     "errorCargarRachas"
                 );
 
-
             listaCategorias.appendChild(
                 error
             );
 
         }
-
-
-        /* =====================================================
-           CAMBIO DE IDIOMA
-        ===================================================== */
 
         window.addEventListener(
             "lifesyncIdiomaCambiado",
@@ -1219,11 +1000,6 @@ document.addEventListener(
 
             }
         );
-
-
-        /* =====================================================
-           INICIAR
-        ===================================================== */
 
         cargarRachas();
 
