@@ -54,16 +54,7 @@
         );
 
     const ENDPOINT_LOGIN =
-<<<<<<< Updated upstream
         "../auth/login.php";
-=======
-        "../../auth/login.php";
-
-
-    /* =====================================================
-       MENSAJES
-       ===================================================== */
->>>>>>> Stashed changes
 
     function mostrarMensaje(mensaje) {
 
@@ -149,7 +140,7 @@
 
                     const respuesta =
                         await fetch(
-                            "../auth/login.php",
+                            ENDPOINT_LOGIN,
                             {
                                 method:
                                     "POST",
