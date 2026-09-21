@@ -11,7 +11,7 @@
         "Alimentación": "HAlimentacion.html",
         "Salud Mental": "HSaludMental.html",
         "Actividad Física": "HActividadFisica.html",
-        "Académico": "HRegistroAcademico.html",
+        "Registro Académico": "HRegistroAcademico.html",
         "Hábito Personalizado": "HHabitoPersonalizado.html"
     };
 
