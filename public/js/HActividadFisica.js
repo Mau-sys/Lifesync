@@ -72,8 +72,11 @@
         metaSesiones = Number(d.habito.objetivo) || 5;
         metaMinutos = Number(d.habito.duracion_minutos) || 150;
         tipoMeta = normalizarFrecuencia(d.habito.frecuencia);
-        sesiones = Number(d.habito.progreso_hoy) || 0;
-        minutos = Number(d.habito.suma_hoy) || 0;
+        
+        // Asignación explícita desvinculando minutos de sesiones
+        minutos = Number(d.habito.suma_hoy ?? d.habito.valor_registrado) || 0;
+        sesiones = Number(d.habito.total_sesiones ?? d.habito.registros_hoy) || 0;
+        
         aplicarDiasServidor(d.habito.dias_activos);
     }
 
@@ -84,7 +87,7 @@
         meta.textContent = `${metaSesiones} ${metaSesiones === 1 ? LS("sesion") : LS("sesiones")} (${formatMin(metaMinutos)})`;
         tiempo.textContent = `${formatMin(minutos)} / ${formatMin(metaMinutos)}`;
 
-        const porcentaje = metaSesiones ? Math.min(100, sesiones / metaSesiones * 100) : 0;
+        const porcentaje = metaSesiones ? Math.min(100, (sesiones / metaSesiones) * 100) : 0;
         ring.style.background = `conic-gradient(var(--ls-amber) ${porcentaje}%, rgba(255,159,28,.15) ${porcentaje}%)`;
 
         const completada = sesiones >= metaSesiones;
@@ -123,8 +126,14 @@
             const d = await r.json();
             if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo registrar la sesión."));
 
-            sesiones = Number(d.registro.progreso_hoy) || sesiones + 1;
-            minutos = Number(d.registro.suma_hoy) || minutos + duracion;
+            if (d.registro) {
+                minutos = Number(d.registro.suma_hoy);
+                sesiones = Number(d.registro.total_sesiones ?? d.registro.registros_hoy);
+            } else {
+                sesiones += 1;
+                minutos += duracion;
+            }
+
             render();
             modalSesion?.hide();
             $("form-registrar-sesion")?.reset();
@@ -185,8 +194,6 @@
 
             metaSesiones = n;
             metaMinutos = m;
-            sesiones = Math.min(sesiones, n);
-            minutos = Math.min(minutos, m);
             render();
             modalMeta?.hide();
             menu?.classList.remove("show");

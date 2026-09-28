@@ -117,6 +117,7 @@ try {
             'valor' => $valor,
             'progreso_hoy' => $progresoHoy,
             'suma_hoy' => $sumaHoy,
+            'total_sesiones' => $registrosHoy,
             'registros_hoy' => $registrosHoy,
             'completado' => $completado
         ],
