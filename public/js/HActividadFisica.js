@@ -10,7 +10,7 @@
     let id = Number(params.get("id_habito_usuario")) || 0;
     let tipoMeta = "semanal";
     let metaSesiones = 5;
-    let metaMinutos = 150;
+    let metaMinutosTotal = 150; // Representa el objetivo TOTAL acumulado de minutos
     let dias = [0, 2, 4];
     let sesiones = 0;
     let minutos = 0;
@@ -70,10 +70,9 @@
 
         id = Number(d.habito.id_habito_usuario);
         metaSesiones = Number(d.habito.objetivo) || 5;
-        metaMinutos = Number(d.habito.duracion_minutos) || 150;
+        metaMinutosTotal = Number(d.habito.duracion_minutos) || 150; // Total acumulado
         tipoMeta = normalizarFrecuencia(d.habito.frecuencia);
         
-        // Asignación explícita desvinculando minutos de sesiones
         minutos = Number(d.habito.suma_hoy ?? d.habito.valor_registrado) || 0;
         sesiones = Number(d.habito.total_sesiones ?? d.habito.registros_hoy) || 0;
         
@@ -84,8 +83,9 @@
         if (!contador || !meta || !ring || !btn || !tiempo) return;
 
         contador.textContent = `${sesiones}/${metaSesiones}`;
-        meta.textContent = `${metaSesiones} ${metaSesiones === 1 ? LS("sesion") : LS("sesiones")} (${formatMin(metaMinutos)})`;
-        tiempo.textContent = `${formatMin(minutos)} / ${formatMin(metaMinutos)}`;
+        // Muestra el número de sesiones y la meta TOTAL de tiempo acumulado
+        meta.textContent = `${metaSesiones} ${metaSesiones === 1 ? LS("sesion") : LS("sesiones")} (${LS("Meta total:")} ${formatMin(metaMinutosTotal)})`;
+        tiempo.textContent = `${formatMin(minutos)} / ${formatMin(metaMinutosTotal)}`;
 
         const porcentaje = metaSesiones ? Math.min(100, (sesiones / metaSesiones) * 100) : 0;
         ring.style.background = `conic-gradient(var(--ls-amber) ${porcentaje}%, rgba(255,159,28,.15) ${porcentaje}%)`;
@@ -150,7 +150,7 @@
         menu?.classList.remove("show");
         if ($("select-tipo-meta")) $("select-tipo-meta").value = tipoMeta;
         if ($("input-meta-cantidad")) $("input-meta-cantidad").value = metaSesiones;
-        if ($("input-meta-minutos")) $("input-meta-minutos").value = metaMinutos;
+        if ($("input-meta-minutos")) $("input-meta-minutos").value = metaMinutosTotal; // Carga la meta total
         document.querySelectorAll(".btn-dia-pill").forEach(b => b.classList.toggle("active", dias.includes(Number(b.dataset.dia))));
         $("contenedor-dias-semana")?.classList.toggle("d-none", tipoMeta !== "personalizado");
         modalMeta?.show();
@@ -170,9 +170,9 @@
 
     $("btn-guardar-meta")?.addEventListener("click", async () => {
         const n = Number($("input-meta-cantidad")?.value);
-        const m = Number($("input-meta-minutos")?.value);
+        const m = Number($("input-meta-minutos")?.value); // Recibe el TOTAL de minutos
         if (!Number.isInteger(n) || n < 1 || n > 50) return alert(LS("numeroSesionesValido"));
-        if (!Number.isInteger(m) || m < 10 || m > 3000) return alert(LS("duracionSesionValida"));
+        if (!Number.isInteger(m) || m < 10 || m > 10000) return alert(LS("duracionSesionValida"));
         if (tipoMeta === "personalizado" && dias.length === 0) return alert(LS("seleccionarDiaSemana"));
 
         try {
@@ -185,7 +185,7 @@
                     objetivo: n,
                     unidad: "sesiones",
                     frecuencia: frecuenciaBD(tipoMeta),
-                    duracion_minutos: m,
+                    duracion_minutos: m, // Se guarda como meta global acumulada
                     dias: tipoMeta === "personalizado" ? dias.map(x => x + 1) : []
                 })
             });
@@ -193,7 +193,7 @@
             if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron guardar los cambios."));
 
             metaSesiones = n;
-            metaMinutos = m;
+            metaMinutosTotal = m;
             render();
             modalMeta?.hide();
             menu?.classList.remove("show");
