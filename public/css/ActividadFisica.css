@@ -39,12 +39,6 @@ html, body {
     color: var(--ls-amber) !important;
 }
 
-.btn-dia-pill.active {
-    background-color: var(--ls-amber, #ff9f1c);
-    color: #fff;
-    border-color: var(--ls-amber, #ff9f1c);
-}
-
 .card-full-screen {
     background-color: var(--ls-bg-dark);
     width: 100vw;
@@ -121,6 +115,7 @@ html, body {
     background: transparent;
     transition: color 0.2s ease;
 }
+
 .btn-options:hover {
     color: var(--ls-amber);
 }
@@ -131,6 +126,7 @@ html, body {
     padding: clamp(0.7rem, 1.8vh, 1.5rem) clamp(1rem, 2vw, 2rem);
 }
 
+/* Botón Acción Principal */
 .btn-action-amber {
     background-color: var(--ls-amber);
     color: #000219;
@@ -142,16 +138,29 @@ html, body {
     transition: all 0.2s ease;
 }
 
-.btn-action-amber:hover {
+.btn-action-amber:hover:not(:disabled) {
     background-color: #ffb143;
     color: #000219;
     box-shadow: 0 6px 25px rgba(255, 159, 28, 0.5);
 }
 
-.btn-action-amber:active {
+.btn-action-amber:active:not(:disabled) {
     transform: scale(0.98);
 }
 
+/* Estado deshabilitado / Día no activo */
+.btn-action-amber.btn-dia-inactivo,
+.btn-action-amber:disabled {
+    opacity: 0.55 !important;
+    background-color: #1e2548 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--ls-text-muted) !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Menú Kebab */
 .kebab-dropdown-menu {
     display: none;
     position: absolute;
@@ -198,6 +207,7 @@ html, body {
     background-color: rgba(255, 85, 85, 0.15);
 }
 
+/* Modales */
 .modal-custom-card {
     background-color: #070a21;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -240,10 +250,12 @@ html, body {
     font-size: 0.9rem;
 }
 
+/* Días de la semana (Pills) */
 .dias-pill-container {
     display: flex;
     justify-content: space-between;
     gap: 6px;
+    margin-top: 4px;
 }
 
 .btn-dia-pill {
@@ -257,19 +269,26 @@ html, body {
     font-size: 0.85rem;
     transition: all 0.2s ease;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-dia-pill:hover {
     border-color: var(--ls-amber);
+    color: #ffffff;
 }
 
+.btn-dia-pill.active,
 .btn-dia-pill.selected {
-    background-color: var(--ls-amber);
-    color: #000219;
-    border-color: var(--ls-amber);
+    background-color: var(--ls-amber) !important;
+    color: #000219 !important;
+    border-color: var(--ls-amber) !important;
+    font-weight: 700;
     box-shadow: 0 0 14px var(--ls-amber-glow);
 }
 
+/* Botones secundario / footer modales */
 .btn-pill-danger {
     background: transparent;
     border: 1px solid #ff3b30;

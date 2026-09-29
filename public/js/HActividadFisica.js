@@ -11,7 +11,7 @@
     let tipoMeta = "semanal";
     let metaSesiones = 5;
     let metaMinutosTotal = 150;
-    let dias = [0, 2, 4];
+    let dias = [0, 2, 4]; // Representa Lunes, Miércoles, Viernes (0-6)
     let sesiones = 0;
     let minutos = 0;
     let cargando = false;
@@ -24,6 +24,25 @@
     const btn = $("btn-add-sesion-fisica");
     const modalSesion = typeof bootstrap !== "undefined" && $("modalRegistrarSesion") ? new bootstrap.Modal($("modalRegistrarSesion")) : null;
     const modalMeta = typeof bootstrap !== "undefined" && $("modalEditarMetaFisica") ? new bootstrap.Modal($("modalEditarMetaFisica")) : null;
+
+    // Obtiene el día de hoy en formato 1 (Lunes) a 7 (Domingo)
+    function getDiaSemanaHoy() {
+        const diaJs = new Date().getDay(); // 0: Domingo, 1: Lunes...
+        return diaJs === 0 ? 7 : diaJs;
+    }
+
+    // Verifica si el hábito está programado para registrar el día de hoy
+    function esDiaActivoHoy() {
+        if (tipoMeta === "diaria" || tipoMeta === "semanal") {
+            return true;
+        }
+        if (tipoMeta === "personalizado" || tipoMeta === "dias específicos") {
+            const diaHoy1a7 = getDiaSemanaHoy(); // 1-7
+            const dias1a7 = dias.map(d => d + 1); // Convierte 0-6 en 1-7
+            return dias1a7.includes(diaHoy1a7);
+        }
+        return true;
+    }
 
     $("btn-options-actividad-fisica")?.addEventListener("click", e => {
         e.stopPropagation();
@@ -40,7 +59,7 @@
     });
 
     function normalizarFrecuencia(valor) {
-        return valor === "personalizada" ? "personalizado" : (valor || "semanal");
+        return valor === "personalizada" || valor === "dias específicos" ? "personalizado" : (valor || "semanal");
     }
 
     function frecuenciaBD(valor) {
@@ -76,7 +95,7 @@
         minutos = Number(d.habito.suma_hoy ?? d.habito.valor_registrado) || 0;
         sesiones = Number(d.habito.total_sesiones ?? d.habito.registros_hoy) || 0;
         
-        aplicarDiasServidor(d.habito.dias_activos);
+        aplicarDiasServidor(d.habito.dias_activos || d.habito.dias);
     }
 
     function render() {
@@ -90,20 +109,47 @@
         ring.style.background = `conic-gradient(var(--ls-amber) ${porcentaje}%, rgba(255,159,28,.15) ${porcentaje}%)`;
 
         const completada = sesiones >= metaSesiones;
-        btn.disabled = completada || cargando;
-        btn.innerHTML = `<span>${completada ? LS("metaCompletada") : LS("registrarSesion")}</span>`;
+        const activoHoy = esDiaActivoHoy();
+
+        // Deshabilitar botón si la meta está completada, si está cargando o si NO es un día activo
+        btn.disabled = completada || cargando || !activoHoy;
+
+        if (!activoHoy) {
+            btn.classList.add("btn-dia-inactivo");
+            btn.innerHTML = `<span><i class="fa-solid fa-calendar-xmark me-2"></i>${LS("Día no activo")}</span>`;
+        } else if (completada) {
+            btn.classList.remove("btn-dia-inactivo");
+            btn.innerHTML = `<span>${LS("metaCompletada")}</span>`;
+        } else {
+            btn.classList.remove("btn-dia-inactivo");
+            btn.innerHTML = `<span>+ ${LS("registrarSesion")}</span>`;
+        }
 
         const label = $("label-tipo-meta");
         if (label) {
-            // Se eliminó la evaluación de 'mensual'
-            label.textContent = tipoMeta === "diaria" ? LS("metaDiaria") : tipoMeta === "personalizado" ? LS("metaDeDias").replace("{n}", dias.length).replace("{unidad}", dias.length === 1 ? LS("dia") : LS("dias")) : LS("metaSemanal");
+            label.textContent = tipoMeta === "diaria" 
+                ? LS("metaDiaria") 
+                : tipoMeta === "personalizado" 
+                    ? LS("metaDeDias").replace("{n}", dias.length).replace("{unidad}", dias.length === 1 ? LS("dia") : LS("dias")) 
+                    : LS("metaSemanal");
         }
     }
 
-    $("btn-add-sesion-fisica")?.addEventListener("click", () => modalSesion?.show());
+    $("btn-add-sesion-fisica")?.addEventListener("click", () => {
+        if (!esDiaActivoHoy()) {
+            alert(LS("Hoy no es un día programado para realizar este hábito."));
+            return;
+        }
+        modalSesion?.show();
+    });
 
     $("btn-guardar-sesion")?.addEventListener("click", async () => {
         if (cargando || !id) return;
+        if (!esDiaActivoHoy()) {
+            alert(LS("Hoy no es un día programado para realizar este hábito."));
+            return;
+        }
+
         const duracion = Number($("input-duracion-minutos")?.value);
         if (!Number.isInteger(duracion) || duracion < 1 || duracion > 360) {
             alert(LS("tiempoSesionValido"));
@@ -119,6 +165,7 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     id_habito_usuario: id,
+                    valor_registrado: duracion,
                     valor: duracion,
                     observaciones: $("select-tipo-actividad")?.value || "Actividad"
                 })
@@ -195,9 +242,17 @@
     $("btn-guardar-meta")?.addEventListener("click", async () => {
         const n = Number($("input-meta-cantidad")?.value);
         const m = Number($("input-meta-minutos")?.value);
+
+        if (tipoMeta === "personalizado") {
+            dias = Array.from(document.querySelectorAll(".btn-dia-pill.active"))
+                        .map(b => Number(b.dataset.dia));
+        }
+
         if (!Number.isInteger(n) || n < 1 || n > 50) return alert(LS("numeroSesionesValido"));
         if (!Number.isInteger(m) || m < 10 || m > 10000) return alert(LS("duracionSesionValida"));
         if (tipoMeta === "personalizado" && dias.length === 0) return alert(LS("seleccionarDiaSemana"));
+
+        const dias1a7 = dias.map(x => x + 1);
 
         try {
             const r = await fetch(`${API}actualizar-habito.php`, {
@@ -210,7 +265,8 @@
                     unidad: "sesiones",
                     frecuencia: frecuenciaBD(tipoMeta),
                     duracion_minutos: m,
-                    dias: tipoMeta === "personalizado" ? dias.map(x => x + 1) : []
+                    dias: tipoMeta === "personalizado" ? dias1a7 : [],
+                    dias_activos: tipoMeta === "personalizado" ? dias1a7 : []
                 })
             });
             const d = await r.json();
