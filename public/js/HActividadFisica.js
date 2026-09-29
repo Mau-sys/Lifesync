@@ -10,7 +10,7 @@
     let id = Number(params.get("id_habito_usuario")) || 0;
     let tipoMeta = "semanal";
     let metaSesiones = 5;
-    let metaMinutosTotal = 150; // Representa el objetivo TOTAL acumulado de minutos
+    let metaMinutosTotal = 150;
     let dias = [0, 2, 4];
     let sesiones = 0;
     let minutos = 0;
@@ -70,7 +70,7 @@
 
         id = Number(d.habito.id_habito_usuario);
         metaSesiones = Number(d.habito.objetivo) || 5;
-        metaMinutosTotal = Number(d.habito.duracion_minutos) || 150; // Total acumulado
+        metaMinutosTotal = Number(d.habito.duracion_minutos) || 150;
         tipoMeta = normalizarFrecuencia(d.habito.frecuencia);
         
         minutos = Number(d.habito.suma_hoy ?? d.habito.valor_registrado) || 0;
@@ -83,7 +83,6 @@
         if (!contador || !meta || !ring || !btn || !tiempo) return;
 
         contador.textContent = `${sesiones}/${metaSesiones}`;
-        // Muestra el número de sesiones y la meta TOTAL de tiempo acumulado
         meta.textContent = `${metaSesiones} ${metaSesiones === 1 ? LS("sesion") : LS("sesiones")} (${LS("Meta total:")} ${formatMin(metaMinutosTotal)})`;
         tiempo.textContent = `${formatMin(minutos)} / ${formatMin(metaMinutosTotal)}`;
 
@@ -96,7 +95,8 @@
 
         const label = $("label-tipo-meta");
         if (label) {
-            label.textContent = tipoMeta === "diaria" ? LS("metaDiaria") : tipoMeta === "mensual" ? LS("metaMensual") : tipoMeta === "personalizado" ? LS("metaDeDias").replace("{n}", dias.length).replace("{unidad}", dias.length === 1 ? LS("dia") : LS("dias")) : LS("metaSemanal");
+            // Se eliminó la evaluación de 'mensual'
+            label.textContent = tipoMeta === "diaria" ? LS("metaDiaria") : tipoMeta === "personalizado" ? LS("metaDeDias").replace("{n}", dias.length).replace("{unidad}", dias.length === 1 ? LS("dia") : LS("dias")) : LS("metaSemanal");
         }
     }
 
@@ -148,29 +148,53 @@
     $("btn-editar-meta")?.addEventListener("click", e => {
         e.preventDefault();
         menu?.classList.remove("show");
-        if ($("select-tipo-meta")) $("select-tipo-meta").value = tipoMeta;
+
+        const selectMeta = $("select-tipo-meta");
+        if (selectMeta) {
+            selectMeta.value = tipoMeta;
+        }
+
         if ($("input-meta-cantidad")) $("input-meta-cantidad").value = metaSesiones;
-        if ($("input-meta-minutos")) $("input-meta-minutos").value = metaMinutosTotal; // Carga la meta total
-        document.querySelectorAll(".btn-dia-pill").forEach(b => b.classList.toggle("active", dias.includes(Number(b.dataset.dia))));
-        $("contenedor-dias-semana")?.classList.toggle("d-none", tipoMeta !== "personalizado");
+        if ($("input-meta-minutos")) $("input-meta-minutos").value = metaMinutosTotal;
+
+        document.querySelectorAll(".btn-dia-pill").forEach(b => {
+            const diaNum = Number(b.dataset.dia);
+            b.classList.toggle("active", dias.includes(diaNum));
+        });
+
+        const contenedorDias = $("contenedor-dias-semana");
+        if (contenedorDias) {
+            contenedorDias.classList.toggle("d-none", tipoMeta !== "personalizado");
+        }
+
         modalMeta?.show();
     });
 
     $("select-tipo-meta")?.addEventListener("change", e => {
         tipoMeta = e.target.value;
-        $("contenedor-dias-semana")?.classList.toggle("d-none", tipoMeta !== "personalizado");
+        const contenedorDias = $("contenedor-dias-semana");
+        if (contenedorDias) {
+            contenedorDias.classList.toggle("d-none", tipoMeta !== "personalizado");
+        }
     });
 
-    document.querySelectorAll(".btn-dia-pill").forEach(b => b.addEventListener("click", () => {
-        const dia = Number(b.dataset.dia);
-        if (dias.includes(dia)) dias = dias.filter(x => x !== dia);
-        else dias.push(dia);
-        b.classList.toggle("active", dias.includes(dia));
-    }));
+    document.querySelectorAll(".btn-dia-pill").forEach(b => {
+        b.addEventListener("click", e => {
+            e.preventDefault();
+            const dia = Number(b.dataset.dia);
+            
+            if (dias.includes(dia)) {
+                dias = dias.filter(x => x !== dia);
+            } else {
+                dias.push(dia);
+            }
+            b.classList.toggle("active", dias.includes(dia));
+        });
+    });
 
     $("btn-guardar-meta")?.addEventListener("click", async () => {
         const n = Number($("input-meta-cantidad")?.value);
-        const m = Number($("input-meta-minutos")?.value); // Recibe el TOTAL de minutos
+        const m = Number($("input-meta-minutos")?.value);
         if (!Number.isInteger(n) || n < 1 || n > 50) return alert(LS("numeroSesionesValido"));
         if (!Number.isInteger(m) || m < 10 || m > 10000) return alert(LS("duracionSesionValida"));
         if (tipoMeta === "personalizado" && dias.length === 0) return alert(LS("seleccionarDiaSemana"));
@@ -185,7 +209,7 @@
                     objetivo: n,
                     unidad: "sesiones",
                     frecuencia: frecuenciaBD(tipoMeta),
-                    duracion_minutos: m, // Se guarda como meta global acumulada
+                    duracion_minutos: m,
                     dias: tipoMeta === "personalizado" ? dias.map(x => x + 1) : []
                 })
             });

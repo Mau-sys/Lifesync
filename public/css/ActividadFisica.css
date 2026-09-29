@@ -39,6 +39,12 @@ html, body {
     color: var(--ls-amber) !important;
 }
 
+.btn-dia-pill.active {
+    background-color: var(--ls-amber, #ff9f1c);
+    color: #fff;
+    border-color: var(--ls-amber, #ff9f1c);
+}
+
 .card-full-screen {
     background-color: var(--ls-bg-dark);
     width: 100vw;

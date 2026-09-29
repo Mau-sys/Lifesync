@@ -30,6 +30,21 @@ try {
         throw new Exception('Hábito no encontrado.');
     }
 
+    // Normalización de la frecuencia para que coincida con el ENUM de MySQL:
+    // 'diaria', 'semanal', 'dias específicos', 'mensual'
+    if (isset($entrada['frecuencia'])) {
+        $frec = mb_strtolower(trim((string) $entrada['frecuencia']), 'UTF-8');
+        if ($frec === 'diario' || $frec === 'diaria') {
+            $entrada['frecuencia'] = 'diaria';
+        } elseif ($frec === 'personalizado' || $frec === 'personalizada' || $frec === 'dias específicos' || $frec === 'dias especificos') {
+            $entrada['frecuencia'] = 'dias específicos';
+        } elseif ($frec === 'semanal') {
+            $entrada['frecuencia'] = 'semanal';
+        } elseif ($frec === 'mensual') {
+            $entrada['frecuencia'] = 'mensual';
+        }
+    }
+
     $campos = [];
     $params = [':id' => $id];
 
@@ -50,34 +65,37 @@ try {
         }
     }
 
-    if (isset($entrada['frecuencia'])) {
-        if ($entrada['frecuencia'] === 'diario') $entrada['frecuencia'] = 'diaria';
-        if ($entrada['frecuencia'] === 'personalizado') $entrada['frecuencia'] = 'personalizada';
+    // Aceptar 'dias_activos' o 'dias' desde el JS
+    $diasEntrada = null;
+    if (array_key_exists('dias_activos', $entrada)) {
+        $diasEntrada = $entrada['dias_activos'];
+    } elseif (array_key_exists('dias', $entrada)) {
+        $diasEntrada = $entrada['dias'];
     }
 
-    if (isset($entrada['frecuencia'])) {
-        $params[':frecuencia'] = $entrada['frecuencia'];
-    }
-
-    if (!$campos) {
+    if (!$campos && $diasEntrada === null) {
         echo json_encode(['exito' => true, 'mensaje' => 'Sin cambios.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
     $db->beginTransaction();
 
-    $stmt = $db->prepare("UPDATE habitos_usuario SET " . implode(', ', $campos) . " WHERE id_habito_usuario = :id AND id_usuario = :usuario");
-    $params[':usuario'] = (int) $_SESSION['usuario_id'];
-    $stmt->execute($params);
+    if ($campos) {
+        $stmt = $db->prepare("UPDATE habitos_usuario SET " . implode(', ', $campos) . " WHERE id_habito_usuario = :id AND id_usuario = :usuario");
+        $params[':usuario'] = (int) $_SESSION['usuario_id'];
+        $stmt->execute($params);
+    }
 
-    if (array_key_exists('dias', $entrada)) {
+    // Actualización de la tabla auxiliar de días (habito_dias)
+    if ($diasEntrada !== null) {
         $db->prepare("DELETE FROM habito_dias WHERE id_habito_usuario = :id")->execute([':id' => $id]);
-        $dias = is_array($entrada['dias']) ? $entrada['dias'] : [];
+        
+        $dias = is_array($diasEntrada) ? $diasEntrada : [];
         $insert = $db->prepare("INSERT INTO habito_dias (id_habito_usuario, dia_semana) VALUES (:id, :dia)");
         foreach ($dias as $dia) {
-            $dia = (int) $dia;
-            if ($dia >= 1 && $dia <= 7) {
-                $insert->execute([':id' => $id, ':dia' => $dia]);
+            $diaInt = (int) $dia;
+            if ($diaInt >= 1 && $diaInt <= 7) {
+                $insert->execute([':id' => $id, ':dia' => $diaInt]);
             }
         }
     }
