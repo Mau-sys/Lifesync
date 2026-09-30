@@ -940,7 +940,8 @@
         "idioma"
     ];
 
-    let idiomaActual = "es";
+    // Se establece "en" como idioma inicial por defecto
+    let idiomaActual = "en";
 
     function leerIdiomaGuardado() {
         try {
@@ -959,11 +960,12 @@
             const valor = localStorage.getItem(key);
             if (valor === "es" || valor === "en") return valor;
         }
-        return "es";
+        // Idioma predeterminado cuando no hay registro guardado
+        return "en";
     }
 
     function guardarIdioma(idioma) {
-        const idiomaValido = idioma === "en" ? "en" : "es";
+        const idiomaValido = idioma === "es" ? "es" : "en";
 
         STORAGE_KEYS.slice(1).forEach(key => {
             localStorage.setItem(key, idiomaValido);
@@ -991,7 +993,6 @@
         let texto = String(clave).trim();
         if (!texto) return "";
 
-        // Si accidentalmente llega una clave interna, convertirla en un texto legible.
         texto = texto.replace(/^.*\./, "");
         texto = texto.replace(/([a-z])([A-Z])/g, "$1 $2");
         texto = texto.replace(/[_-]+/g, " ");
@@ -1003,13 +1004,13 @@
         if (clave === null || clave === undefined) return fallback || "";
 
         const texto = String(clave);
-        const diccionario = idiomas[idiomaActual] || ES;
+        // Usa EN como diccionario de reserva si no se encuentra
+        const diccionario = idiomas[idiomaActual] || EN;
 
         if (Object.prototype.hasOwnProperty.call(diccionario, texto)) {
             return diccionario[texto];
         }
 
-        // Nunca devolver la clave técnica como texto visible.
         if (fallback) return String(fallback);
         return humanizarClave(texto);
     }
@@ -1056,13 +1057,11 @@
             }
         }
 
-        // El <meta name="description"> también usa data-i18n.
         document.querySelectorAll('meta[data-i18n]').forEach(meta => {
             const valor = traducirLifeSync(meta.getAttribute("data-i18n"));
             if (valor !== "") meta.setAttribute("content", valor);
         });
 
-        // Si el <title> tiene data-i18n, se traduce.
         document.querySelectorAll("title[data-i18n]").forEach(title => {
             const valor = traducirLifeSync(title.getAttribute("data-i18n"));
             if (valor !== "") title.textContent = valor;
@@ -1075,14 +1074,14 @@
         if (!raiz || !raiz.querySelectorAll) return;
 
         const mapa = new Map();
-        for (const clave of Object.keys(ES)) {
+        for (const clave of Object.keys(EN)) {
             const espanol = ES[clave];
             const ingles = EN[clave];
             if (typeof espanol === "string" && typeof ingles === "string" && espanol !== ingles) {
-                if (idiomaActual === "en") {
-                    mapa.set(espanol.trim(), ingles);
-                } else {
+                if (idiomaActual === "es") {
                     mapa.set(ingles.trim(), espanol);
+                } else {
+                    mapa.set(espanol.trim(), ingles);
                 }
             }
         }
@@ -1108,7 +1107,7 @@
     }
 
     function cambiarIdiomaLifeSync(nuevoIdioma) {
-        const idioma = nuevoIdioma === "en" ? "en" : "es";
+        const idioma = nuevoIdioma === "es" ? "es" : "en";
 
         idiomaActual = idioma;
         guardarIdioma(idioma);
@@ -1155,14 +1154,12 @@
         return idiomaActual;
     }
 
-    // API pública usada por los demás JS de LifeSync.
     window.traducirLifeSync = traducirLifeSync;
     window.cambiarIdiomaLifeSync = cambiarIdiomaLifeSync;
     window.obtenerIdiomaLifeSync = () => idiomaActual;
     window.aplicarIdiomaGlobal = aplicarIdiomaGlobal;
     window.obtenerIdiomaGlobal = obtenerIdiomaGlobal;
 
-    // Compatibilidad con nombres que puedan existir en JS anteriores.
     window.traducir = traducirLifeSync;
     window.cambiarIdioma = cambiarIdiomaLifeSync;
 
@@ -1172,7 +1169,6 @@
         aplicar: function () { aplicarIdiomaGlobal(idiomaActual); }
     };
 
-    // Traducir alertas/confirmaciones de JS que todavía estén en español.
     const alertOriginal = window.alert.bind(window);
     const confirmOriginal = window.confirm.bind(window);
 
@@ -1208,7 +1204,6 @@
             });
         }
 
-        // Por si otro JS modifica el idioma mediante localStorage.
         window.addEventListener("storage", event => {
             if (STORAGE_KEYS.includes(event.key) &&
                 (event.newValue === "es" || event.newValue === "en")) {

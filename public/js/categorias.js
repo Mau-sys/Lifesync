@@ -11,6 +11,7 @@
         "Alimentación": "img/Alimen.png",
         "Salud Mental": "img/S-Mental.png",
         "Actividad Física": "img/A-Fisica.png",
+        "Registro Académico": "img/R-Academ.png",
         "Académico": "img/R-Academ.png",
         "Hábito Personalizado": "img/H-Perzona.png"
     };
@@ -20,6 +21,7 @@
         "Alimentación": "HAlimentacion.html",
         "Salud Mental": "HSaludMental.html",
         "Actividad Física": "HActividadFisica.html",
+        "Registro Académico": "HRegistroAcademico.html",
         "Académico": "HRegistroAcademico.html",
         "Hábito Personalizado": "HHabitoPersonalizado.html"
     };
@@ -34,6 +36,7 @@
                 "Alimentación": "categorias.alimentacion",
                 "Salud Mental": "categorias.saludMental",
                 "Actividad Física": "categorias.actividadFisica",
+                "Registro Académico": "categorias.registroAcademico",
                 "Académico": "categorias.registroAcademico",
                 "Hábito Personalizado": "categoriaPersonalizada"
             };
@@ -173,6 +176,7 @@
                 "Alimentación": "alimentacion",
                 "Salud Mental": "salud-mental",
                 "Actividad Física": "actividad-fisica",
+                "Registro Académico": "registro-academico",
                 "Académico": "registro-academico",
                 "Hábito Personalizado": "personalizada"
             };

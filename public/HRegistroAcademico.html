@@ -163,21 +163,30 @@
 
             <div class="text-center">
 
+                <!-- ETIQUETA DINÁMICA SEGÚN FRECUENCIA -->
                 <span
                     class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido"
+                    id="label-meta-frecuencia"
                     data-i18n="registroAcademico.metaDiaria">
 
-                    Meta diaria
+                    Meta Diaria
 
                 </span>
 
                 <span
-                    class="text-pink fw-bold meta-texto-fluido"
+                    class="text-pink fw-bold meta-texto-fluido d-block"
                     id="meta-academico">
 
                     3 registros académicos
 
                 </span>
+
+                <!-- TOTAL DE HORAS CALCULADAS ENTRE TODAS LAS SESIONES -->
+                <small class="text-subtle fw-medium d-block mt-1" id="meta-horas-totales">
+
+                    Total: 2h 15m de estudio
+
+                </small>
 
             </div>
 
@@ -186,17 +195,29 @@
 
         <div class="w-100">
 
-            <div
-                class="registro-container p-3 rounded-4 mb-3"
-                id="lista-registros">
+            <div class="registro-card-container p-3 rounded-4 mb-3">
 
-                <span
-                    class="text-subtle d-block fw-semibold mb-2 label-fluido"
-                    data-i18n="registroAcademico.progreso">
+                <div class="d-flex justify-content-between align-items-center mb-3">
 
-                    Progreso académico
+                    <span
+                        class="text-subtle fw-semibold label-fluido"
+                        data-i18n="registroAcademico.progreso">
 
-                </span>
+                        Progreso de Sesiones
+
+                    </span>
+
+                    <span
+                        class="badge rounded-pill bg-pink-soft text-pink px-2 py-1 small fw-bold"
+                        id="sesiones-resumen-badge">
+
+                        0 de 3 completadas
+
+                    </span>
+
+                </div>
+
+                <div class="sesiones-grid" id="lista-registros"></div>
 
             </div>
 
@@ -215,6 +236,7 @@
     </div>
 
 
+    <!-- MODAL DE CONFIGURACIÓN -->
     <div
         class="modal fade"
         id="modalEditarAcademico"
@@ -224,7 +246,7 @@
 
         <div class="modal-dialog modal-dialog-centered">
 
-            <div class="modal-content config-modal-bg text-white border-0 rounded-4">
+            <div class="modal-content modal-lifesync text-white border-0 rounded-4">
 
                 <div class="modal-header border-bottom border-secondary border-opacity-25">
 
@@ -255,6 +277,53 @@
 
                     <form id="form-config-academico">
 
+                        <!-- 1. FRECUENCIA -->
+                        <div class="mb-3">
+
+                            <label
+                                for="select-frecuencia"
+                                class="form-label text-subtle fw-semibold"
+                                data-i18n="registroAcademico.frecuencia">
+
+                                Frecuencia
+
+                            </label>
+
+                            <select
+                                class="form-select custom-input"
+                                id="select-frecuencia">
+
+                                <option value="diaria" selected data-i18n="frecuencia.diaria">Diaria</option>
+                                <option value="semanal" data-i18n="frecuencia.semanal">Semanal</option>
+                                <option value="mensual" data-i18n="frecuencia.mensual">Mensual</option>
+                                <option value="personalizada" data-i18n="frecuencia.personalizada">Personalizada (días específicos)</option>
+
+                            </select>
+
+                        </div>
+
+                        <!-- DÍAS ACTIVOS (PERSONALIZADO) -->
+                        <div class="mb-3 d-none" id="contenedor-dias-semana">
+
+                            <label class="form-label text-subtle fw-semibold" data-i18n="comun.seleccionarDias">
+                                Días activos
+                            </label>
+
+                            <div class="d-flex justify-content-between gap-1 mt-1">
+
+                                <button type="button" class="btn btn-dia-semana flex-fill py-2 active" data-dia="1">L</button>
+                                <button type="button" class="btn btn-dia-semana flex-fill py-2 active" data-dia="2">M</button>
+                                <button type="button" class="btn btn-dia-semana flex-fill py-2 active" data-dia="3">X</button>
+                                <button type="button" class="btn btn-dia-semana flex-fill py-2 active" data-dia="4">J</button>
+                                <button type="button" class="btn btn-dia-semana flex-fill py-2 active" data-dia="5">V</button>
+                                <button type="button" class="btn btn-dia-semana flex-fill py-2" data-dia="6">S</button>
+                                <button type="button" class="btn btn-dia-semana flex-fill py-2" data-dia="0">D</button>
+
+                            </div>
+
+                        </div>
+
+                        <!-- 2. CANTIDAD DE SESIONES -->
                         <div class="mb-3">
 
                             <label
@@ -262,13 +331,13 @@
                                 class="form-label text-subtle fw-semibold"
                                 data-i18n="registroAcademico.cantidadRegistros">
 
-                                Registros al día (Máx. 20)
+                                Cantidad de sesiones (Máx. 20)
 
                             </label>
 
                             <input
                                 type="number"
-                                class="form-control config-input "
+                                class="form-control custom-input"
                                 id="input-registros"
                                 min="1"
                                 max="20"
@@ -277,48 +346,84 @@
 
                         </div>
 
+                        <!-- 3. MINUTOS POR SESIÓN (LÍMITE MÁXIMO DE 180 MIN) -->
+                        <div class="mb-3">
+
+                            <label
+                                for="input-duracion-sesion"
+                                class="form-label text-subtle fw-semibold"
+                                data-i18n="registroAcademico.duracionSesion">
+
+                                Minutos por sesión (Máx. 180 min)
+
+                            </label>
+
+                            <div class="input-group">
+
+                                <input
+                                    type="number"
+                                    class="form-control custom-input input-group-left"
+                                    id="input-duracion-sesion"
+                                    min="5"
+                                    max="180"
+                                    step="5"
+                                    value="45"
+                                    required>
+
+                                <span class="custom-input-suffix">
+                                    min
+                                </span>
+
+                            </div>
+
+                        </div>
+
                     </form>
 
                 </div>
 
-                <div class="modal-footer border-top border-secondary border-opacity-25 d-flex justify-content-between">
+                <div class="modal-footer border-top border-secondary border-opacity-25">
 
-                    <button
-                        type="button"
-                        class="btn btn-outline-danger rounded-pill px-3"
-                        id="btn-reiniciar-meta">
-
-                        <i class="fa-solid fa-rotate-left me-1"></i>
-
-                        <span data-i18n="comun.reiniciar">
-                            Reiniciar
-                        </span>
-
-                    </button>
-
-                    <div>
+                    <div class="footer-buttons-container">
 
                         <button
                             type="button"
-                            class="btn btn-outline-light rounded-pill px-3 me-2"
-                            data-bs-dismiss="modal">
+                            class="btn btn-outline-danger-custom rounded-pill px-3"
+                            id="btn-reiniciar-meta">
 
-                            <span data-i18n="comun.cancelar">
-                                Cancelar
+                            <i class="fa-solid fa-rotate-left me-1"></i>
+
+                            <span data-i18n="comun.reiniciar">
+                                Reiniciar
                             </span>
 
                         </button>
 
-                        <button
-                            type="button"
-                            class="btn btn-action-pink rounded-pill px-4"
-                            id="btn-guardar-config">
+                        <div class="actions-right">
 
-                            <span data-i18n="comun.guardarCambios">
-                                Guardar cambios
-                            </span>
+                            <button
+                                type="button"
+                                class="btn btn-secondary-custom rounded-pill px-3 me-2"
+                                data-bs-dismiss="modal">
 
-                        </button>
+                                <span data-i18n="comun.cancelar">
+                                    Cancelar
+                                </span>
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-action-pink rounded-pill px-4"
+                                id="btn-guardar-config">
+
+                                <span data-i18n="comun.guardarCambios">
+                                    Guardar cambios
+                                </span>
+
+                            </button>
+
+                        </div>
 
                     </div>
 
