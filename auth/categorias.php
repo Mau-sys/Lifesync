@@ -15,20 +15,24 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
+    // 1. Obtener todas las categorías base
     $consultaCategorias = $db->query(
-        'SELECT id_categoria, nombre
+        'SELECT id_categoria, nombre, descripcion
          FROM categorias
          ORDER BY id_categoria ASC'
     );
     $categorias = $consultaCategorias->fetchAll(PDO::FETCH_ASSOC);
 
+    // 2. Obtener hábitos activos del usuario
+    // Se elimina la restricción estricta de fecha_inicio <= CURDATE() para garantizar
+    // que los hábitos recién creados aparezcan de inmediato.
     $consultaHabitos = $db->prepare(
         'SELECT
             hu.id_habito_usuario,
             h.id_habito,
             h.id_categoria,
             h.nombre_habito,
-            h.descripcion,
+            h.descripcion AS descripcion_base,
             h.imagen_url,
             hu.objetivo,
             hu.unidad,
@@ -51,9 +55,8 @@ try {
          INNER JOIN habitos h ON h.id_habito = hu.id_habito
          WHERE hu.id_usuario = :id_usuario
            AND hu.activo = TRUE
-           AND hu.fecha_inicio <= CURDATE()
            AND (hu.fecha_fin IS NULL OR hu.fecha_fin >= CURDATE())
-         ORDER BY h.id_habito ASC'
+         ORDER BY hu.id_habito_usuario DESC'
     );
     $consultaHabitos->execute([':id_usuario' => $usuarioId]);
     $habitosUsuario = $consultaHabitos->fetchAll(PDO::FETCH_ASSOC);
@@ -67,11 +70,11 @@ try {
 
         $habito['id_habito_usuario'] = (int) $habito['id_habito_usuario'];
         $habito['id_habito'] = (int) $habito['id_habito'];
+        $habito['nombre_habito'] = $habito['nombre_habito'];
         $habito['objetivo'] = $objetivo;
         $habito['progreso_hoy'] = $progreso;
         $habito['porcentaje'] = round($porcentaje, 2);
         $habito['completado'] = $porcentaje >= 100;
-        $habito['duracion_minutos'] = $habito['duracion_minutos'] !== null ? (int) $habito['duracion_minutos'] : null;
 
         $porCategoria[$idCategoria][] = $habito;
     }

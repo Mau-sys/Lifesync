@@ -2,23 +2,34 @@
     "use strict";
 
     const LS = texto => typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(texto) : texto;
-    const API = "../auth/";
+    
+    // Ruta relativa correcta hacia la carpeta auth desde la raíz
+    const API = "auth/";
     const params = new URLSearchParams(location.search);
     const $ = id => document.getElementById(id);
 
-    let id = Number(params.get("id_habito_usuario")) || 0;
-    let objetivo = 1;
-    let progreso = 0;
-    let frecuencia = "diaria";
+    // Lee el parámetro de la URL: acepta id_habito_usuario o id
+    let idHabitoUsuario = Number(params.get("id_habito_usuario")) || Number(params.get("id")) || 0;
+    let categoriaParam = params.get("categoria") || "";
+
+    let habitoActual = null;
     let guardando = false;
 
     const menu = $("kebab-menu-personalizado");
     const ring = $("ring-veces-personalizado");
     const contador = $("contador-veces-personalizado");
+    const tituloHabito = $("titulo-habito");
     const descripcion = $("habito-descripcion");
     const frecuenciaTexto = $("habito-frecuencia");
-    const btn = $("btn-add-registro");
+    const btnAdd = $("btn-add-registro");
+    const msgBloqueado = $("mensaje-dia-bloqueado");
 
+    let modalEditar = null;
+    if ($("modalEditarHabito") && typeof bootstrap !== "undefined") {
+        modalEditar = new bootstrap.Modal($("modalEditarHabito"));
+    }
+
+    // Toggle Kebab Menu
     $("btn-options-personalizado")?.addEventListener("click", e => {
         e.stopPropagation();
         menu?.classList.toggle("show");
@@ -33,55 +44,115 @@
         history.length > 1 ? history.back() : location.href = "inicio.html";
     });
 
-    function textoFrecuencia(valor) {
-        const mapa = {
-            diaria: LS("diaria"),
-            semanal: LS("semanal"),
-            mensual: LS("mensual"),
-            personalizada: LS("personalizada")
-        };
-        return mapa[valor] || valor || LS("diaria");
+    // Evalúa si hoy (Lunes=1, ..., Domingo=7) está en el arreglo de dias_activos
+    function esDiaHabilitado() {
+        if (!habitoActual) return true;
+
+        const frecuencia = (habitoActual.frecuencia || "").toLowerCase();
+        const diasActivos = Array.isArray(habitoActual.dias_activos) ? habitoActual.dias_activos : [];
+
+        if (frecuencia === "dias específicos" || frecuencia === "personalizada") {
+            if (diasActivos.length === 0) return true;
+
+            let diaJS = new Date().getDay(); // 0=Domingo, 1=Lunes...
+            let diaMySQL = diaJS === 0 ? 7 : diaJS; // Convertir Domingo (0) a 7
+            return diasActivos.includes(diaMySQL);
+        }
+
+        return true;
     }
 
-    async function cargar() {
-        if (!id) throw new Error(LS("No se indicó el hábito personalizado."));
-        const r = await fetch(`${API}obtener-habito.php?id_habito_usuario=${id}`, { credentials: "include", cache: "no-store" });
-        const d = await r.json();
-        if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
+    function formatearTextoFrecuencia() {
+        if (!habitoActual) return "Diario";
+        const frecuencia = (habitoActual.frecuencia || "").toLowerCase();
+        const diasActivos = Array.isArray(habitoActual.dias_activos) ? habitoActual.dias_activos : [];
 
-        const h = d.habito;
-        id = Number(h.id_habito_usuario);
-        objetivo = Number(h.objetivo) || 1;
-        progreso = Number(h.progreso_hoy) || 0;
-        frecuencia = h.frecuencia || "diaria";
-        if (descripcion) descripcion.textContent = h.descripcion || h.nombre_habito || LS("Mi hábito");
-        if (frecuenciaTexto) frecuenciaTexto.textContent = textoFrecuencia(frecuencia);
+        if (frecuencia === "dias específicos" || frecuencia === "personalizada") {
+            const nombresDias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+            const diasTexto = diasActivos.map(d => nombresDias[d - 1]).filter(Boolean).join(", ");
+            return `Personalizado (${diasTexto || "Sin días"})`;
+        }
+
+        const mapa = { diaria: "Diario", semanal: "Semanal", mensual: "Mensual" };
+        return mapa[frecuencia] || habitoActual.frecuencia || "Diario";
+    }
+
+    async function cargarHabito() {
+        let url = `${API}Obtener_habito.php?`;
+        if (idHabitoUsuario > 0) {
+            url += `id_habito_usuario=${idHabitoUsuario}`;
+        } else if (categoriaParam) {
+            url += `categoria=${encodeURIComponent(categoriaParam)}`;
+        } else {
+            url += `categoria=Hábito Personalizado`;
+        }
+
+        const r = await fetch(url, { credentials: "include", cache: "no-store" });
+        const d = await r.json();
+
+        if (!r.ok || !d.exito) {
+            throw new Error(d.mensaje || LS("No se pudieron cargar los datos del hábito."));
+        }
+
+        habitoActual = d.habito;
+        idHabitoUsuario = Number(habitoActual.id_habito_usuario);
+
+        // Arreglo de días activos provenientes de Obtener_habito.php
+        habitoActual.dias_activos = Array.isArray(d.habito.dias_activos) ? d.habito.dias_activos : [];
+
+        // Rellenar la información en el DOM
+        if (tituloHabito) tituloHabito.textContent = habitoActual.nombre_habito || "Hábito Personalizado";
+        if (descripcion) descripcion.textContent = habitoActual.descripcion || habitoActual.nombre_habito;
     }
 
     function render() {
-        if (!contador || !ring || !btn) return;
+        if (!habitoActual || !contador || !ring || !btnAdd) return;
+
+        const objetivo = Number(habitoActual.objetivo) || 1;
+        const progreso = Number(habitoActual.progreso_hoy) || 0;
+        const habilitadoHoy = esDiaHabilitado();
+
         contador.textContent = `${progreso}/${objetivo}`;
-        const porcentaje = objetivo ? Math.min(100, progreso / objetivo * 100) : 0;
+
+        const porcentaje = objetivo > 0 ? Math.min(100, (progreso / objetivo) * 100) : 0;
         ring.style.background = `conic-gradient(var(--ls-orange) ${porcentaje}%, rgba(249,115,22,.15) ${porcentaje}%)`;
-        btn.disabled = progreso >= objetivo || guardando;
-        btn.innerHTML = `<span>${progreso >= objetivo ? LS("metaCompletada") : LS("agregarRegistro")}</span>`;
-        if (frecuenciaTexto) frecuenciaTexto.textContent = textoFrecuencia(frecuencia);
+
+        if (!habilitadoHoy) {
+            btnAdd.disabled = true;
+            btnAdd.innerHTML = `<span>Día no programado</span>`;
+            if (msgBloqueado) msgBloqueado.classList.remove("d-none");
+        } else {
+            if (msgBloqueado) msgBloqueado.classList.add("d-none");
+            btnAdd.disabled = progreso >= objetivo || guardando;
+            btnAdd.innerHTML = `<span>${progreso >= objetivo ? "Meta Completada" : "+1 registro"}</span>`;
+        }
+
+        if (frecuenciaTexto) frecuenciaTexto.textContent = formatearTextoFrecuencia();
     }
 
-    btn?.addEventListener("click", async () => {
-        if (btn.disabled || !id) return;
+    // Botón para agregar progreso (+1)
+    btnAdd?.addEventListener("click", async () => {
+        if (btnAdd.disabled || !idHabitoUsuario || !esDiaHabilitado()) return;
+
         guardando = true;
         render();
+
         try {
             const r = await fetch(`${API}registrar-habito.php`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id_habito_usuario: id, valor: 1, observaciones: "hábito personalizado" })
+                body: JSON.stringify({
+                    id_habito_usuario: idHabitoUsuario,
+                    valor: 1,
+                    observaciones: "registro personalizado"
+                })
             });
+
             const d = await r.json();
             if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo registrar."));
-            progreso = Number(d.registro.progreso_hoy) || progreso + 1;
+
+            await cargarHabito();
         } catch (e) {
             alert(e.message);
         } finally {
@@ -90,30 +161,123 @@
         }
     });
 
+    // Abrir Modal de Edición
+    $("btn-editar-meta")?.addEventListener("click", e => {
+        e.preventDefault();
+        menu?.classList.remove("show");
+
+        if (!habitoActual) return;
+
+        if ($("editNombre")) $("editNombre").value = habitoActual.nombre_habito || "";
+        if ($("editDescripcion")) $("editDescripcion").value = habitoActual.descripcion || "";
+        if ($("editObjetivo")) $("editObjetivo").value = habitoActual.objetivo || 1;
+
+        const freq = (habitoActual.frecuencia || "").toLowerCase();
+        const esEspecial = freq === "dias específicos" || freq === "personalizada";
+        if ($("editFrecuencia")) $("editFrecuencia").value = esEspecial ? "dias específicos" : freq;
+
+        const contenedorDias = $("contenedorDiasSemana");
+        if (contenedorDias) {
+            if (esEspecial) {
+                contenedorDias.classList.remove("d-none");
+            } else {
+                contenedorDias.classList.add("d-none");
+            }
+        }
+
+        const diasActivos = Array.isArray(habitoActual.dias_activos) ? habitoActual.dias_activos : [];
+        document.querySelectorAll('input[name="diasSemana"]').forEach(cb => {
+            cb.checked = diasActivos.includes(Number(cb.value));
+        });
+
+        modalEditar?.show();
+    });
+
+    // Selector de frecuencia en Modal
+    $("editFrecuencia")?.addEventListener("change", e => {
+        const contenedor = $("contenedorDiasSemana");
+        if (contenedor) {
+            if (e.target.value === "dias específicos") {
+                contenedor.classList.remove("d-none");
+            } else {
+                contenedor.classList.add("d-none");
+            }
+        }
+    });
+
+    // Formulario de Edición
+    $("formEditarHabito")?.addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const nuevaFrecuencia = $("editFrecuencia").value;
+        const diasSeleccionados = [];
+
+        if (nuevaFrecuencia === "dias específicos") {
+            document.querySelectorAll('input[name="diasSemana"]:checked').forEach(cb => {
+                diasSeleccionados.push(Number(cb.value));
+            });
+
+            if (diasSeleccionados.length === 0) {
+                alert("Por favor selecciona al menos un día de la semana.");
+                return;
+            }
+        }
+
+        try {
+            const res = await fetch(`${API}editar-habito.php`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id_habito_usuario: idHabitoUsuario,
+                    nombre_habito: $("editNombre").value.trim(),
+                    descripcion: $("editDescripcion").value.trim(),
+                    objetivo: Number($("editObjetivo").value),
+                    frecuencia: nuevaFrecuencia,
+                    dias_semana: diasSeleccionados
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok || !data.exito) throw new Error(data.mensaje || "Error al actualizar.");
+
+            modalEditar?.hide();
+            await cargarHabito();
+            render();
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    // Eliminar
     $("btn-eliminar-habito")?.addEventListener("click", async e => {
         e.preventDefault();
-        if (!id || !confirm(LS("¿Quieres eliminar este hábito?"))) return;
+        if (!idHabitoUsuario || !confirm(LS("¿Quieres eliminar este hábito?"))) return;
+
         try {
             const r = await fetch(`${API}eliminar-personalizado.php`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id_habito_usuario: id })
+                body: JSON.stringify({ id_habito_usuario: idHabitoUsuario })
             });
+
             const d = await r.json();
             if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo eliminar el hábito."));
-            location.href = "inicio.html";
+
+            location.href = "Personalizados.html";
         } catch (e) {
             alert(e.message);
         }
     });
 
-    $("btn-editar-meta")?.addEventListener("click", e => {
-        e.preventDefault();
-        menu?.classList.remove("show");
-        alert(LS("La edición de este hábito se realiza desde la configuración del hábito personalizado."));
-    });
-
     window.addEventListener("lifesyncIdiomaCambiado", render);
-    cargar().then(render).catch(e => alert(e.message));
+
+    // Inicializar
+    cargarHabito()
+        .then(render)
+        .catch(e => {
+            console.error(e);
+            alert(e.message);
+        });
 })();

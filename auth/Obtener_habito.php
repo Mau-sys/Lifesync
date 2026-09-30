@@ -1,17 +1,26 @@
 <?php
+// Limpiar cualquier salida previa para evitar corrupción de JSON
+if (ob_get_length()) ob_clean();
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/../config/conexion.php';
+// Compatibilidad de ruta
+$rutaConexion = __DIR__ . '/../config/conexion.php';
+if (!file_exists($rutaConexion)) {
+    $rutaConexion = '../config/conexion.php';
+}
+require_once $rutaConexion;
 
 try {
     if (empty($_SESSION['usuario_id'])) {
         http_response_code(401);
-        throw new Exception('Sesión no válida.');
+        echo json_encode(['exito' => false, 'mensaje' => 'Sesión no válida.'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
     $usuarioId = (int) $_SESSION['usuario_id'];
-    $idHabitoUsuario = isset($_GET['id_habito_usuario']) ? (int) $_GET['id_habito_usuario'] : 0;
+    $idHabitoUsuario = isset($_GET['id_habito_usuario']) ? (int) $_GET['id_habito_usuario'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
     $categoria = trim((string) ($_GET['categoria'] ?? ''));
 
     $database = new Database();
@@ -53,8 +62,7 @@ try {
         $sql .= " AND c.nombre = :categoria";
         $params[':categoria'] = $categoria;
     } else {
-        http_response_code(400);
-        throw new Exception('Debes indicar el hábito o la categoría.');
+        $sql .= " AND c.nombre = 'Hábito Personalizado'";
     }
 
     $sql .= " ORDER BY hu.id_habito_usuario DESC LIMIT 1";
@@ -65,7 +73,8 @@ try {
 
     if (!$habito) {
         http_response_code(404);
-        throw new Exception('No tienes este hábito activo.');
+        echo json_encode(['exito' => false, 'mensaje' => 'No se encontró ningún hábito personalizado activo.'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
     $idHU = (int) $habito['id_habito_usuario'];
@@ -108,18 +117,20 @@ try {
     $objetivo = (float) $habito['objetivo'];
     $porcentaje = $objetivo > 0 ? min(100, round(($progresoHoy / $objetivo) * 100, 2)) : 0;
 
+    // Construcción compatible del array de respuesta sin operador unpacking (...)
+    $habitoRespuesta = array_merge($habito, [
+        'objetivo' => $objetivo,
+        'progreso_hoy' => $progresoHoy,
+        'suma_hoy' => $sumaHoy,
+        'registros_hoy' => $registrosHoy,
+        'total_sesiones' => $registrosHoy,
+        'porcentaje_hoy' => $porcentaje,
+        'dias_activos' => $diasActivos
+    ]);
+
     echo json_encode([
         'exito' => true,
-        'habito' => [
-            ...$habito,
-            'objetivo' => $objetivo,
-            'progreso_hoy' => $progresoHoy,
-            'suma_hoy' => $sumaHoy,
-            'registros_hoy' => $registrosHoy,
-            'total_sesiones' => $registrosHoy,
-            'porcentaje_hoy' => $porcentaje,
-            'dias_activos' => $diasActivos
-        ],
+        'habito' => $habitoRespuesta,
         'racha' => $racha
     ], JSON_UNESCAPED_UNICODE);
 

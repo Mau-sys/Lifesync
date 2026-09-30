@@ -83,13 +83,13 @@
 
             const descripcion = document.createElement("p");
             if (activo) {
+                // Si es un hábito personalizado o sólo tiene 1 hábito registrado, mostramos su nombre
                 if (habitos.length === 1) {
-                    descripcion.textContent =
-                        habitos[0].descripcion ||
-                        `${habitos[0].objetivo} ${habitos[0].unidad}`;
+                    descripcion.textContent = habitos[0].nombre_habito || habitos[0].descripcion_base;
                 } else {
-                    descripcion.textContent =
-                        `${habitos.length} ${LS("habitosCompletados").toLowerCase()}`;
+                    // Si tiene múltiples hábitos personalizados
+                    const nombres = habitos.map(h => h.nombre_habito).join(", ");
+                    descripcion.textContent = nombres;
                 }
             } else {
                 descripcion.textContent = LS("categorias.objetivoEjemplo");
@@ -153,9 +153,7 @@
             let destino = "preferencias.html";
             if (activo) {
                 if (nombre === "Hábito Personalizado") {
-                    destino = habitos.length === 1
-                        ? `${RUTAS[nombre]}?id_habito_usuario=${habitos[0].id_habito_usuario}`
-                        : "Personalizados.html";
+                    destino = "Personalizados.html";
                 } else {
                     destino = `${RUTAS[nombre]}?id_habito_usuario=${habitos[0].id_habito_usuario}`;
                 }
@@ -182,6 +180,50 @@
             };
 
             return clases[nombre] || "hidratacion";
+        }
+
+        function renderizarListaCategorias(categorias) {
+            lista.innerHTML = "";
+
+            // Separa categorías predeterminadas de la personalizada
+            const predeterminadas = categorias.filter(cat =>
+                cat.nombre.trim().toLowerCase() !== "hábito personalizado"
+            );
+            const personalizada = categorias.find(cat =>
+                cat.nombre.trim().toLowerCase() === "hábito personalizado"
+            );
+
+            // 1. Renderiza categorías predeterminadas
+            predeterminadas.forEach(categoria => {
+                lista.appendChild(crearTarjeta(categoria));
+            });
+
+            // 2. Renderiza la sección de hábitos personalizados
+            if (personalizada) {
+                const hr = document.createElement("hr");
+                hr.className = "divisor-seccion";
+                lista.appendChild(hr);
+
+                const habitos = Array.isArray(personalizada.habitos) ? personalizada.habitos : [];
+                const tienePersonalizados = habitos.length > 0;
+
+                if (tienePersonalizados) {
+                    // Si TIENE hábitos personalizados creados, se dibuja la tarjeta mostrando el/los nombres
+                    lista.appendChild(crearTarjeta(personalizada));
+                } else {
+                    // Si NO tiene hábitos, muestra únicamente el botón centrado para crearlos
+                    const contenedorBtn = document.createElement("div");
+                    contenedorBtn.className = "contenedor-crear-personalizado";
+
+                    const btnCrear = document.createElement("a");
+                    btnCrear.href = "Personalizados.html";
+                    btnCrear.className = "btn-crear-habito";
+                    btnCrear.textContent = "+ Crear hábito";
+
+                    contenedorBtn.appendChild(btnCrear);
+                    lista.appendChild(contenedorBtn);
+                }
+            }
         }
 
         async function cargarCategorias() {
@@ -213,9 +255,7 @@
                     return;
                 }
 
-                categorias.forEach(categoria => {
-                    lista.appendChild(crearTarjeta(categoria));
-                });
+                renderizarListaCategorias(categorias);
             } catch (error) {
                 console.error("Error al cargar categorías:", error);
                 mostrarMensaje(error.message || LS("noSePudieronCargarHabitos"));

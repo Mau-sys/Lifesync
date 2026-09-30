@@ -19,44 +19,34 @@ if (!is_array($datos)) {
     responder(["exito" => false, "mensaje" => "Los datos enviados no son válidos."], 400);
 }
 
-$nombre = trim($datos["nombre"] ?? "");
-$descripcion = trim($datos["descripcion"] ?? "");
-$frecuencia = trim($datos["frecuencia"] ?? "");
-$fechaInicio = trim($datos["fechaInicio"] ?? "");
-$fechaFin = trim($datos["fechaFin"] ?? "");
+// Normalización de claves
+$nombre = trim($datos["nombre_habito"] ?? $datos["nombre"] ?? "");
+$descripcion = trim($datos["descripcion"] ?? $datos["objetivo"] ?? "");
+$frecuenciaRaw = trim($datos["frecuencia"] ?? "");
+$fechaInicio = trim($datos["fecha_inicio"] ?? $datos["fechaInicio"] ?? "");
+$fechaFin = trim($datos["fecha_fin"] ?? $datos["fechaFin"] ?? "");
 
-if ($nombre === "" || $descripcion === "" || $frecuencia === "" || $fechaInicio === "") {
+// Aceptar días de la semana
+$diasEntrada = $datos["dias_activos"] ?? $datos["dias_semana"] ?? $datos["dias"] ?? [];
+
+if ($nombre === "" || $descripcion === "" || $frecuenciaRaw === "") {
     responder(["exito" => false, "mensaje" => "Completa todos los campos obligatorios."], 400);
 }
 
-if (mb_strlen($nombre) < 2 || mb_strlen($nombre) > 150) {
-    responder(["exito" => false, "mensaje" => "El nombre del hábito debe tener entre 2 y 150 caracteres."], 400);
+if ($fechaInicio === "") {
+    $fechaInicio = date("Y-m-d");
 }
 
-if (mb_strlen($descripcion) < 3 || mb_strlen($descripcion) > 500) {
-    responder(["exito" => false, "mensaje" => "La descripción debe tener entre 3 y 500 caracteres."], 400);
-}
-
-$frecuenciasPermitidas = ["diaria", "semanal", "mensual"];
-if (!in_array($frecuencia, $frecuenciasPermitidas, true)) {
-    responder(["exito" => false, "mensaje" => "La frecuencia seleccionada no es válida."], 400);
-}
-
-$inicio = DateTime::createFromFormat("Y-m-d", $fechaInicio);
-if (!$inicio || $inicio->format("Y-m-d") !== $fechaInicio) {
-    responder(["exito" => false, "mensaje" => "La fecha de inicio no es válida."], 400);
-}
-
-if ($fechaFin !== "") {
-    $fin = DateTime::createFromFormat("Y-m-d", $fechaFin);
-    if (!$fin || $fin->format("Y-m-d") !== $fechaFin) {
-        responder(["exito" => false, "mensaje" => "La fecha de finalización no es válida."], 400);
-    }
-    if ($fin < $inicio) {
-        responder(["exito" => false, "mensaje" => "La fecha de finalización no puede ser anterior a la fecha de inicio."], 400);
-    }
+// Normalizar ENUM frecuencia MySQL
+$frecuencia = strtolower($frecuenciaRaw);
+if ($frecuencia === "diario" || $frecuencia === "diaria") {
+    $frecuenciaBD = "diaria";
+} elseif ($frecuencia === "semanal") {
+    $frecuenciaBD = "semanal";
+} elseif ($frecuencia === "mensual") {
+    $frecuenciaBD = "mensual";
 } else {
-    $fechaFin = null;
+    $frecuenciaBD = "dias específicos";
 }
 
 $usuarioId = (int) $_SESSION["usuario_id"];
@@ -66,38 +56,59 @@ try {
     $db = $database->getConnection();
     $db->beginTransaction();
 
-    $categoria = $db->prepare("SELECT id_categoria FROM categorias WHERE nombre = 'Hábito Personalizado' LIMIT 1");
-    $categoria->execute();
-    $idCategoria = $categoria->fetchColumn();
+    $categoriaQuery = $db->prepare("SELECT id_categoria FROM categorias WHERE nombre = 'Hábito Personalizado' LIMIT 1");
+    $categoriaQuery->execute();
+    $idCategoria = $categoriaQuery->fetchColumn();
 
     if (!$idCategoria) {
-        throw new Exception("La categoría de hábitos personalizados no existe. Ejecuta la migración correspondiente.");
+        throw new Exception("La categoría 'Hábito Personalizado' no existe en la base de datos.");
     }
 
-    $insertarHabito = $db->prepare("INSERT INTO habitos (id_categoria, nombre_habito, descripcion, es_base, color, imagen_url) VALUES (:id_categoria, :nombre, :descripcion, FALSE, :color, :imagen)");
+    // 1. Insertar en habitos
+    $insertarHabito = $db->prepare("
+        INSERT INTO habitos (id_categoria, nombre_habito, descripcion, es_base, color, imagen_url) 
+        VALUES (:id_categoria, :nombre, :descripcion, FALSE, '#F59E0B', 'img/H-Perzona.png')
+    ");
     $insertarHabito->execute([
         ":id_categoria" => (int) $idCategoria,
         ":nombre" => $nombre,
-        ":descripcion" => $descripcion,
-        ":color" => "#F59E0B",
-        ":imagen" => "img/H-Perzona.png"
+        ":descripcion" => $descripcion
     ]);
 
     $idHabito = (int) $db->lastInsertId();
 
-    $insertarUsuarioHabito = $db->prepare("INSERT INTO habitos_usuario (id_usuario, id_habito, activo, objetivo, unidad, frecuencia, duracion_minutos, fecha_inicio, fecha_fin) VALUES (:id_usuario, :id_habito, TRUE, 1, 'registros', :frecuencia, NULL, :fecha_inicio, :fecha_fin)");
+    // 2. Insertar en habitos_usuario
+    $insertarUsuarioHabito = $db->prepare("
+        INSERT INTO habitos_usuario (id_usuario, id_habito, activo, objetivo, unidad, frecuencia, fecha_inicio, fecha_fin) 
+        VALUES (:id_usuario, :id_habito, TRUE, 1.00, 'registros', :frecuencia, :fecha_inicio, :fecha_fin)
+    ");
     $insertarUsuarioHabito->execute([
         ":id_usuario" => $usuarioId,
         ":id_habito" => $idHabito,
-        ":frecuencia" => $frecuencia,
+        ":frecuencia" => $frecuenciaBD,
         ":fecha_inicio" => $fechaInicio,
-        ":fecha_fin" => $fechaFin
+        ":fecha_fin" => !empty($fechaFin) ? $fechaFin : null
     ]);
 
     $idHabitoUsuario = (int) $db->lastInsertId();
 
-    $insertarRacha = $db->prepare("INSERT INTO rachas (id_habito_usuario, racha_actual, mejor_racha, total_completados, ultima_fecha) VALUES (:id_habito_usuario, 0, 0, 0, NULL)");
-    $insertarRacha->execute([":id_habito_usuario" => $idHabitoUsuario]);
+    // 3. Guardar en habito_dias si es frecuencia específica
+    if ($frecuenciaBD === "dias específicos" && is_array($diasEntrada)) {
+        $stmtDia = $db->prepare("INSERT INTO habito_dias (id_habito_usuario, dia_semana) VALUES (:id_hu, :dia)");
+        foreach ($diasEntrada as $dia) {
+            $diaInt = (int) $dia;
+            if ($diaInt >= 1 && $diaInt <= 7) {
+                $stmtDia->execute([":id_hu" => $idHabitoUsuario, ":dia" => $diaInt]);
+            }
+        }
+    }
+
+    // 4. Crear racha inicial
+    $insertarRacha = $db->prepare("
+        INSERT INTO rachas (id_habito_usuario, racha_actual, mejor_racha, total_completados, ultima_fecha) 
+        VALUES (:id_hu, 0, 0, 0, NULL)
+    ");
+    $insertarRacha->execute([":id_hu" => $idHabitoUsuario]);
 
     $db->commit();
 
@@ -108,16 +119,12 @@ try {
             "id_habito" => $idHabito,
             "id_habito_usuario" => $idHabitoUsuario,
             "nombre" => $nombre,
-            "descripcion" => $descripcion,
-            "frecuencia" => $frecuencia,
-            "fechaInicio" => $fechaInicio,
-            "fechaFin" => $fechaFin
+            "frecuencia" => $frecuenciaBD
         ]
     ]);
 } catch (Throwable $error) {
     if (isset($db) && $db instanceof PDO && $db->inTransaction()) {
         $db->rollBack();
     }
-    error_log("LifeSync auth/crear-habito.php: " . $error->getMessage());
-    responder(["exito" => false, "mensaje" => "Ocurrió un error al crear el hábito."], 500);
+    responder(["exito" => false, "mensaje" => $error->getMessage()], 500);
 }
