@@ -2,7 +2,7 @@
     "use strict";
 
     const LS = texto => typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(texto) : texto;
-    const API = "../auth/";
+    const API = window.location.pathname.includes("/public/") ? "../auth/" : "auth/";
     const CATEGORIA = "Hidratación";
     const params = new URLSearchParams(location.search);
     const $ = id => document.getElementById(id);
@@ -40,9 +40,11 @@
 
     async function cargar() {
         const q = id ? `?id_habito_usuario=${id}` : `?categoria=${encodeURIComponent(CATEGORIA)}`;
-        const r = await fetch(`${API}obtener-habito.php${q}`, { credentials: "include", cache: "no-store" });
+        const r = await fetch(`${API}Obtener_habito.php${q}`, { credentials: "include", cache: "no-store" });
+        if (!r.ok) throw new Error(`Error (${r.status}): No se encontró el recurso.`);
         const d = await r.json();
-        if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
+        if (!d.exito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
+        
         id = Number(d.habito.id_habito_usuario);
         vasosTotales = Number(d.habito.objetivo) || 8;
         vasosTomados = Number(d.habito.progreso_hoy) || 0;
@@ -89,9 +91,19 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id_habito_usuario: id, valor: 1, observaciones: "vaso" })
             });
+
+            if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
             const d = await r.json();
-            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo registrar el vaso."));
-            vasosTomados = Number(d.registro.progreso_hoy) || vasosTomados + 1;
+            if (!d.exito) throw new Error(d.mensaje || LS("No se pudo registrar el vaso."));
+
+            if (d.registro && typeof d.registro.progreso_hoy !== "undefined") {
+                vasosTomados = Number(d.registro.progreso_hoy);
+            } else if (typeof d.progreso_hoy !== "undefined") {
+                vasosTomados = Number(d.progreso_hoy);
+            } else {
+                vasosTomados = Math.min(vasosTotales, vasosTomados + 1);
+            }
         } catch (e) {
             alert(e.message);
         } finally {
@@ -127,25 +139,6 @@
         }
     }
 
-    async function reiniciar() {
-        if (!confirm(LS("¿Quieres reiniciar la cuenta a 0?"))) return;
-        try {
-            const r = await fetch(`${API}eliminar-registros-hoy.php`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id_habito_usuario: id })
-            });
-            const d = await r.json();
-            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo reiniciar."));
-            vasosTomados = 0;
-            render();
-            bootstrap.Modal.getInstance($("modalEditarHidratacion"))?.hide();
-        } catch (e) {
-            alert(e.message);
-        }
-    }
-
     $("btn-editar-meta")?.addEventListener("click", e => {
         e.preventDefault();
         kebabMenu?.classList.remove("show");
@@ -155,8 +148,14 @@
     inputCapacidad?.addEventListener("input", actualizarPreview);
     btnAdd?.addEventListener("click", registrar);
     $("btn-guardar-config")?.addEventListener("click", guardarConfiguracion);
-    $("btn-reiniciar-meta")?.addEventListener("click", reiniciar);
     window.addEventListener("lifesyncIdiomaCambiado", render);
 
     cargar().then(render).catch(e => alert(e.message));
 })();
+
+HabitoUniversal.init({
+    btnOptionsId: "btn-options-actividad-fisica",
+    menuId: "kebab-menu-actividad-fisica",
+    btnDeshabilitarId: "btn-deshabilitar-habito", // ID de la opción deshabilitar en el menú
+    urlRedireccion: "inicio.html"
+});

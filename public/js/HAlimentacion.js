@@ -2,7 +2,7 @@
     "use strict";
 
     const LS = texto => typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(texto) : texto;
-    const API = "../auth/";
+    const API = "/lifesync/auth/";
     const CATEGORIA = "Alimentación";
     const STORAGE = "lifesync_config_alimentacion";
     const params = new URLSearchParams(location.search);
@@ -59,10 +59,16 @@
     });
 
     async function cargar() {
-        const q = id ? `?id_habito_usuario=${id}` : `?categoria=${encodeURIComponent(CATEGORIA)}`;
-        const r = await fetch(`${API}obtener-habito.php${q}`, { credentials: "include", cache: "no-store" });
+        if (!id) {
+            throw new Error(LS("No se especificó un ID de hábito válido."));
+        }
+
+        // Se corrigió el nombre a Obtener_habito.php
+        const r = await fetch(`${API}Obtener_habito.php?id_habito_usuario=${id}`, { credentials: "include", cache: "no-store" });
+        if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
         const d = await r.json();
-        if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
+        if (!d.exito || !d.habito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
         id = Number(d.habito.id_habito_usuario);
         completadas = Math.max(0, Number(d.habito.progreso_hoy) || 0);
     }
@@ -116,8 +122,10 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id_habito_usuario: id, observaciones: comida.id })
                 });
+                if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
                 const d = await r.json();
-                if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo quitar la comida."));
+                if (!d.exito) throw new Error(d.mensaje || LS("No se pudo quitar la comida."));
                 completadas = Math.max(0, completadas - 1);
             } else {
                 await registrar(comida.id);
@@ -140,8 +148,10 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id_habito_usuario: id, valor: 1, observaciones: idComida })
         });
+        if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
         const d = await r.json();
-        if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo registrar la comida."));
+        if (!d.exito) throw new Error(d.mensaje || LS("No se pudo registrar la comida."));
         completadas = Number(d.registro.progreso_hoy) || completadas + 1;
     }
 
@@ -212,8 +222,10 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id_habito_usuario: id, objetivo: comidas.length, unidad: "comidas" })
             });
+            if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
             const d = await r.json();
-            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron guardar los cambios."));
+            if (!d.exito) throw new Error(d.mensaje || LS("No se pudieron guardar los cambios."));
             localStorage.setItem(STORAGE, JSON.stringify(config));
             completadas = Math.min(completadas, comidas.length);
             render();
@@ -226,3 +238,10 @@
     window.addEventListener("lifesyncIdiomaCambiado", render);
     cargar().then(render).catch(e => alert(e.message));
 })();
+
+HabitoUniversal.init({
+    btnOptionsId: "btn-options-actividad-fisica",
+    menuId: "kebab-menu-actividad-fisica",
+    btnDeshabilitarId: "btn-deshabilitar-habito", // ID de la opción deshabilitar en el menú
+    urlRedireccion: "inicio.html"
+});

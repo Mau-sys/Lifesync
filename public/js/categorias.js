@@ -48,6 +48,20 @@
             if (mensaje) mensaje.textContent = texto || "";
         }
 
+        function claseColor(nombre) {
+            const clases = {
+                "Hidratación": "hidratacion",
+                "Alimentación": "alimentacion",
+                "Salud Mental": "salud-mental",
+                "Actividad Física": "actividad-fisica",
+                "Registro Académico": "registro-academico",
+                "Académico": "registro-academico",
+                "Hábito Personalizado": "personalizada"
+            };
+
+            return clases[nombre] || "hidratacion";
+        }
+
         function crearTarjeta(categoria) {
             const nombre = categoria.nombre;
             const habitos = Array.isArray(categoria.habitos) ? categoria.habitos : [];
@@ -83,14 +97,7 @@
 
             const descripcion = document.createElement("p");
             if (activo) {
-                // Si es un hábito personalizado o sólo tiene 1 hábito registrado, mostramos su nombre
-                if (habitos.length === 1) {
-                    descripcion.textContent = habitos[0].nombre_habito || habitos[0].descripcion_base;
-                } else {
-                    // Si tiene múltiples hábitos personalizados
-                    const nombres = habitos.map(h => h.nombre_habito).join(", ");
-                    descripcion.textContent = nombres;
-                }
+                descripcion.textContent = habitos[0]?.nombre_habito || habitos[0]?.descripcion_base || "";
             } else {
                 descripcion.textContent = LS("categorias.objetivoEjemplo");
             }
@@ -152,11 +159,7 @@
 
             let destino = "preferencias.html";
             if (activo) {
-                if (nombre === "Hábito Personalizado") {
-                    destino = "Personalizados.html";
-                } else {
-                    destino = `${RUTAS[nombre]}?id_habito_usuario=${habitos[0].id_habito_usuario}`;
-                }
+                destino = `${RUTAS[nombre]}?id_habito_usuario=${habitos[0].id_habito_usuario}`;
             }
 
             boton.href = destino;
@@ -168,24 +171,99 @@
             return articulo;
         }
 
-        function claseColor(nombre) {
-            const clases = {
-                "Hidratación": "hidratacion",
-                "Alimentación": "alimentacion",
-                "Salud Mental": "salud-mental",
-                "Actividad Física": "actividad-fisica",
-                "Registro Académico": "registro-academico",
-                "Académico": "registro-academico",
-                "Hábito Personalizado": "personalizada"
-            };
+        function crearTarjetaPersonalizada(habito) {
+            const idHU = habito.id_habito_usuario;
+            const objetivo = Number(habito.objetivo) || 1;
+            const progresoVal = Number(habito.progreso_hoy) || Number(habito.progreso) || 0;
+            const porcentajeCalculado = objetivo > 0 ? Math.min(100, Math.round((progresoVal / objetivo) * 100)) : 0;
+            const completado = porcentajeCalculado >= 100;
 
-            return clases[nombre] || "hidratacion";
+            const articulo = document.createElement("article");
+            articulo.className = "categoria";
+            if (completado) {
+                articulo.classList.add("completada");
+            }
+
+            const superior = document.createElement("div");
+            superior.className = "categoria-superior";
+
+            const contenedorIcono = document.createElement("div");
+            contenedorIcono.className = "categoria-icono";
+
+            const imagen = document.createElement("img");
+            imagen.src = habito.imagen_url || habito.icono || "img/H-Perzona.png";
+            imagen.alt = LS("categorias.iconoCategoria");
+            contenedorIcono.appendChild(imagen);
+
+            const info = document.createElement("div");
+            info.className = "categoria-info";
+
+            const titulo = document.createElement("h2");
+            titulo.textContent = habito.nombre_habito || "Hábito Personalizado";
+
+            const descripcion = document.createElement("p");
+            descripcion.textContent = habito.descripcion || habito.nombre_habito || "";
+
+            const estado = document.createElement("span");
+            estado.className = "estado-categoria";
+            estado.textContent = LS("categorias.estadoHabito");
+
+            info.append(titulo, descripcion, estado);
+            superior.append(contenedorIcono, info);
+
+            const progreso = document.createElement("div");
+            progreso.className = "categoria-progreso";
+
+            const progresoInfo = document.createElement("div");
+            progresoInfo.className = "progreso-info";
+
+            const textoProgreso = document.createElement("span");
+            textoProgreso.textContent = LS("categorias.progresoDiario");
+
+            const porcentajeSpan = document.createElement("span");
+            porcentajeSpan.className = "porcentaje";
+            porcentajeSpan.textContent = `${porcentajeCalculado}%`;
+
+            progresoInfo.append(textoProgreso, porcentajeSpan);
+
+            const barraProgreso = document.createElement("div");
+            barraProgreso.className = "barra-progreso";
+
+            const barra = document.createElement("div");
+            barra.className = "barra personalizada";
+            barra.style.width = `${porcentajeCalculado}%`;
+
+            barraProgreso.appendChild(barra);
+            progreso.append(progresoInfo, barraProgreso);
+
+            const inferior = document.createElement("div");
+            inferior.className = "categoria-inferior";
+
+            const resumen = document.createElement("div");
+            resumen.className = "resumen";
+
+            const registro = document.createElement("span");
+            registro.textContent = LS("categorias.registro");
+
+            const datos = document.createElement("span");
+            datos.textContent = `${progresoVal}/${objetivo} ${habito.unidad || 'registros'}`;
+
+            resumen.append(registro, datos);
+
+            const boton = document.createElement("a");
+            boton.className = "btn-categoria";
+            boton.href = `HHabitoPersonalizado.html?id_habito_usuario=${idHU}`;
+            boton.textContent = LS("categorias.abrirCategoria");
+
+            inferior.append(resumen, boton);
+            articulo.append(superior, progreso, inferior);
+
+            return articulo;
         }
 
         function renderizarListaCategorias(categorias) {
             lista.innerHTML = "";
 
-            // Separa categorías predeterminadas de la personalizada
             const predeterminadas = categorias.filter(cat =>
                 cat.nombre.trim().toLowerCase() !== "hábito personalizado"
             );
@@ -193,36 +271,31 @@
                 cat.nombre.trim().toLowerCase() === "hábito personalizado"
             );
 
-            // 1. Renderiza categorías predeterminadas
             predeterminadas.forEach(categoria => {
                 lista.appendChild(crearTarjeta(categoria));
             });
 
-            // 2. Renderiza la sección de hábitos personalizados
             if (personalizada) {
                 const hr = document.createElement("hr");
                 hr.className = "divisor-seccion";
                 lista.appendChild(hr);
 
                 const habitos = Array.isArray(personalizada.habitos) ? personalizada.habitos : [];
-                const tienePersonalizados = habitos.length > 0;
 
-                if (tienePersonalizados) {
-                    // Si TIENE hábitos personalizados creados, se dibuja la tarjeta mostrando el/los nombres
-                    lista.appendChild(crearTarjeta(personalizada));
-                } else {
-                    // Si NO tiene hábitos, muestra únicamente el botón centrado para crearlos
-                    const contenedorBtn = document.createElement("div");
-                    contenedorBtn.className = "contenedor-crear-personalizado";
+                habitos.forEach(habito => {
+                    lista.appendChild(crearTarjetaPersonalizada(habito));
+                });
 
-                    const btnCrear = document.createElement("a");
-                    btnCrear.href = "Personalizados.html";
-                    btnCrear.className = "btn-crear-habito";
-                    btnCrear.textContent = "+ Crear hábito";
+                const contenedorBtn = document.createElement("div");
+                contenedorBtn.className = "contenedor-crear-personalizado";
 
-                    contenedorBtn.appendChild(btnCrear);
-                    lista.appendChild(contenedorBtn);
-                }
+                const btnCrear = document.createElement("a");
+                btnCrear.href = "Personalizados.html";
+                btnCrear.className = "btn-crear-habito";
+                btnCrear.textContent = "+ Crear hábito";
+
+                contenedorBtn.appendChild(btnCrear);
+                lista.appendChild(contenedorBtn);
             }
         }
 
@@ -233,6 +306,7 @@
                 lista.innerHTML = "";
                 mostrarMensaje("");
 
+                // Ruta relativa directa saliendo de /public/ hacia /auth/
                 const respuesta = await fetch("../auth/categorias.php", {
                     method: "GET",
                     credentials: "include",
@@ -240,9 +314,13 @@
                     headers: { "Accept": "application/json" }
                 });
 
+                if (!respuesta.ok) {
+                    throw new Error(`Error ${respuesta.status}: No se encontró el recurso`);
+                }
+
                 const datos = await respuesta.json();
 
-                if (!respuesta.ok || !datos.exito) {
+                if (!datos.exito) {
                     throw new Error(datos.mensaje || LS("noSePudieronCargarHabitos"));
                 }
 

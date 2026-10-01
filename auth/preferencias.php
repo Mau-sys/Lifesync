@@ -38,15 +38,54 @@ try {
         exit;
     }
 
-    // --- PETICIÓN POST: Guardar / Sincronizar las categorías seleccionadas ---
+    // --- PETICIÓN POST: Sincronización general O Deshabilitación individual ---
     if ($metodo === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
+        $accion = $input['accion'] ?? 'sincronizar';
+
+        // ACCIÓN A: Deshabilitar un hábito específico
+        if ($accion === 'deshabilitar') {
+            $idHabitoUsuario = isset($input['id_habito_usuario']) ? (int)$input['id_habito_usuario'] : 0;
+
+            if ($idHabitoUsuario <= 0) {
+                http_response_code(400);
+                echo json_encode([
+                    "exito" => false,
+                    "mensaje" => "Identificador de hábito no válido."
+                ], JSON_UNESCAPED_UNICODE);
+                exit;
+            }
+
+            $stmtDeshabilitar = $db->prepare(
+                "UPDATE habitos_usuario 
+                 SET activo = FALSE 
+                 WHERE id_habito_usuario = :id_habito_usuario AND id_usuario = :id_usuario"
+            );
+            $stmtDeshabilitar->execute([
+                ":id_habito_usuario" => $idHabitoUsuario,
+                ":id_usuario" => $usuarioId
+            ]);
+
+            if ($stmtDeshabilitar->rowCount() > 0) {
+                echo json_encode([
+                    "exito" => true,
+                    "mensaje" => "Hábito deshabilitado correctamente."
+                ], JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode([
+                    "exito" => false,
+                    "mensaje" => "No se encontró el hábito o ya se encuentra deshabilitado."
+                ], JSON_UNESCAPED_UNICODE);
+            }
+            exit;
+        }
+
+        // ACCIÓN B: Guardar / Sincronizar selección masiva de categorías
         $categoriasSeleccionadas = $input['categorias'] ?? [];
 
         $db->beginTransaction();
 
-        // 1. Desactivar o ajustar los hábitos actuales del usuario
-        // Opcional: Desactivar todos primero para luego activar solo los seleccionados
+        // 1. Desactivar todos los hábitos actuales del usuario
         $stmtDesactivar = $db->prepare("UPDATE habitos_usuario SET activo = FALSE WHERE id_usuario = :id_usuario");
         $stmtDesactivar->execute([":id_usuario" => $usuarioId]);
 

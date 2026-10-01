@@ -1,130 +1,139 @@
 <?php
+if (ob_get_length()) ob_clean();
+
 session_start();
-header("Content-Type: application/json; charset=UTF-8");
-require_once "../config/conexion.php";
+header('Content-Type: application/json; charset=utf-8');
 
-function responder(array $datos, int $codigo = 200): void
-{
-    http_response_code($codigo);
-    echo json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    exit;
+$rutaConexion = __DIR__ . '/../config/conexion.php';
+if (!file_exists($rutaConexion)) {
+    $rutaConexion = '../config/conexion.php';
 }
-
-if (!isset($_SESSION["usuario_id"])) {
-    responder(["exito" => false, "mensaje" => "La sesión ha expirado. Inicia sesión nuevamente."], 401);
-}
-
-$datos = json_decode(file_get_contents("php://input"), true);
-if (!is_array($datos)) {
-    responder(["exito" => false, "mensaje" => "Los datos enviados no son válidos."], 400);
-}
-
-// Normalización de parámetros
-$nombre = trim($datos["nombre_habito"] ?? $datos["nombre"] ?? "");
-$descripcion = trim($datos["descripcion"] ?? $datos["objetivo"] ?? "");
-$frecuenciaRaw = trim($datos["frecuencia"] ?? "");
-$fechaInicio = trim($datos["fecha_inicio"] ?? $datos["fechaInicio"] ?? "");
-$fechaFin = trim($datos["fecha_fin"] ?? $datos["fechaFin"] ?? "");
-
-// Aceptar días de la semana desde el formulario o JS
-$diasEntrada = $datos["dias_activos"] ?? $datos["dias_semana"] ?? $datos["dias"] ?? [];
-
-if ($nombre === "" || $descripcion === "" || $frecuenciaRaw === "") {
-    responder(["exito" => false, "mensaje" => "Completa todos los campos obligatorios."], 400);
-}
-
-if ($fechaInicio === "") {
-    $fechaInicio = date("Y-m-d");
-}
-
-// Mapeo a valores válidos del ENUM en MySQL: 'diaria', 'semanal', 'dias específicos', 'mensual'
-$frecuencia = strtolower($frecuenciaRaw);
-if ($frecuencia === "diario" || $frecuencia === "diaria") {
-    $frecuenciaBD = "diaria";
-} elseif ($frecuencia === "semanal") {
-    $frecuenciaBD = "semanal";
-} elseif ($frecuencia === "mensual") {
-    $frecuenciaBD = "mensual";
-} else {
-    $frecuenciaBD = "dias específicos";
-}
-
-$usuarioId = (int) $_SESSION["usuario_id"];
+require_once $rutaConexion;
 
 try {
-    $database = new Database();
-    $db = $database->getConnection();
-    $db->beginTransaction();
-
-    $categoriaQuery = $db->prepare("SELECT id_categoria FROM categorias WHERE nombre = 'Hábito Personalizado' LIMIT 1");
-    $categoriaQuery->execute();
-    $idCategoria = $categoriaQuery->fetchColumn();
-
-    if (!$idCategoria) {
-        throw new Exception("La categoría 'Hábito Personalizado' no existe en la base de datos.");
+    if (empty($_SESSION['usuario_id'])) {
+        http_response_code(401);
+        echo json_encode(['exito' => false, 'mensaje' => 'Sesión no válida.'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
-    // 1. Insertar en habitos
-    $insertarHabito = $db->prepare("
+    $usuarioId = (int) $_SESSION['usuario_id'];
+
+    $database = new Database();
+    $db = $database->getConnection();
+
+    // Validar existencia del usuario
+    $stmtVerificarUser = $db->prepare("SELECT id_usuario FROM usuario WHERE id_usuario = :id LIMIT 1");
+    $stmtVerificarUser->execute([':id' => $usuarioId]);
+    
+    if (!$stmtVerificarUser->fetch()) {
+        session_destroy();
+        http_response_code(401);
+        echo json_encode([
+            'exito' => false, 
+            'mensaje' => 'La sesión actual pertenece a un usuario inexistente. Por favor, vuelve a iniciar sesión.'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    // Leer payload JSON o FormData POST
+    $inputRaw = file_get_contents('php://input');
+    $data = json_decode($inputRaw, true);
+    if (!is_array($data)) {
+        $data = $_POST;
+    }
+
+    // Normalización de campos
+    $nombre = trim((string)($data['nombre_habito'] ?? $data['nombre'] ?? ''));
+    $descripcion = trim((string)($data['descripcion'] ?? 'Hábito personalizado'));
+    $idCategoria = isset($data['id_categoria']) ? (int)$data['id_categoria'] : 0;
+    $frecuenciaBD = trim((string)($data['frecuencia'] ?? 'diaria'));
+    $objetivo = !empty($data['objetivo']) ? (float)$data['objetivo'] : 1.00;
+    $unidad = trim((string)($data['unidad'] ?? 'completar'));
+    
+    // SOLUCIÓN AL CHECK CONSTRAINT: Si es <= 0 o está vacío, enviamos NULL
+    $duracionVal = isset($data['duracion_minutos']) ? (int)$data['duracion_minutos'] : 0;
+    $duracionMinutos = ($duracionVal > 0) ? $duracionVal : null;
+
+    $fechaInicio = !empty($data['fecha_inicio']) ? $data['fecha_inicio'] : date('Y-m-d');
+    $fechaFin = !empty($data['fecha_fin']) ? $data['fecha_fin'] : null;
+
+    if ($nombre === '') {
+        http_response_code(400);
+        echo json_encode(['exito' => false, 'mensaje' => 'El nombre del hábito es obligatorio.'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $db->beginTransaction();
+
+    // 1. Categoria válida
+    if ($idCategoria <= 0) {
+        $stmtCat = $db->prepare("SELECT id_categoria FROM categorias WHERE nombre LIKE '%personalizado%' OR nombre LIKE '%otro%' LIMIT 1");
+        $stmtCat->execute();
+        $idCategoria = (int)$stmtCat->fetchColumn();
+
+        if ($idCategoria <= 0) {
+            $stmtCatFallback = $db->query("SELECT id_categoria FROM categorias ORDER BY id_categoria ASC LIMIT 1");
+            $idCategoria = (int)$stmtCatFallback->fetchColumn();
+        }
+    }
+
+    // 2. Insertar en habitos
+    $stmtHabito = $db->prepare("
         INSERT INTO habitos (id_categoria, nombre_habito, descripcion, es_base, color, imagen_url) 
-        VALUES (:id_categoria, :nombre, :descripcion, FALSE, '#F59E0B', 'img/H-Perzona.png')
+        VALUES (:id_cat, :nombre, :desc, 0, '#81C784', 'img/H-Perzona.png')
     ");
-    $insertarHabito->execute([
-        ":id_categoria" => (int) $idCategoria,
-        ":nombre" => $nombre,
-        ":descripcion" => $descripcion
+    $stmtHabito->execute([
+        ':id_cat' => $idCategoria,
+        ':nombre' => $nombre,
+        ':desc'   => $descripcion
     ]);
 
     $idHabito = (int) $db->lastInsertId();
 
-    // 2. Insertar en habitos_usuario
-    $insertarUsuarioHabito = $db->prepare("
-        INSERT INTO habitos_usuario (id_usuario, id_habito, activo, objetivo, unidad, frecuencia, fecha_inicio, fecha_fin) 
-        VALUES (:id_usuario, :id_habito, TRUE, 1.00, 'registros', :frecuencia, :fecha_inicio, :fecha_fin)
+    // 3. Insertar en habitos_usuario
+    $stmtUsuario = $db->prepare("
+        INSERT INTO habitos_usuario (
+            id_usuario, id_habito, activo, objetivo, unidad, frecuencia, duracion_minutos, fecha_inicio, fecha_fin
+        ) VALUES (
+            :id_u, :id_h, 1, :obj, :uni, :frec, :dur, :f_ini, :f_fin
+        )
     ");
-    $insertarUsuarioHabito->execute([
-        ":id_usuario" => $usuarioId,
-        ":id_habito" => $idHabito,
-        ":frecuencia" => $frecuenciaBD,
-        ":fecha_inicio" => $fechaInicio,
-        ":fecha_fin" => !empty($fechaFin) ? $fechaFin : null
+    $stmtUsuario->execute([
+        ':id_u'   => $usuarioId,
+        ':id_h'   => $idHabito,
+        ':obj'    => $objetivo,
+        ':uni'    => $unidad,
+        ':frec'   => $frecuenciaBD,
+        ':dur'    => $duracionMinutos,
+        ':f_ini'  => $fechaInicio,
+        ':f_fin'  => $fechaFin
     ]);
 
     $idHabitoUsuario = (int) $db->lastInsertId();
 
-    // 3. Guardar en habito_dias si aplica
-    if ($frecuenciaBD === "dias específicos" && is_array($diasEntrada)) {
-        $stmtDia = $db->prepare("INSERT INTO habito_dias (id_habito_usuario, dia_semana) VALUES (:id_hu, :dia)");
-        foreach ($diasEntrada as $dia) {
-            $diaInt = (int) $dia;
-            if ($diaInt >= 1 && $diaInt <= 7) {
-                $stmtDia->execute([":id_hu" => $idHabitoUsuario, ":dia" => $diaInt]);
-            }
-        }
-    }
-
-    // 4. Crear racha inicial
-    $insertarRacha = $db->prepare("
-        INSERT INTO rachas (id_habito_usuario, racha_actual, mejor_racha, total_completados, ultima_fecha) 
-        VALUES (:id_hu, 0, 0, 0, NULL)
+    // 4. Inicializar racha
+    $stmtRacha = $db->prepare("
+        INSERT IGNORE INTO rachas (id_habito_usuario, racha_actual, mejor_racha, total_completados) 
+        VALUES (:id_hu, 0, 0, 0)
     ");
-    $insertarRacha->execute([":id_hu" => $idHabitoUsuario]);
+    $stmtRacha->execute([':id_hu' => $idHabitoUsuario]);
 
     $db->commit();
 
-    responder([
-        "exito" => true,
-        "mensaje" => "Hábito creado correctamente.",
-        "habito" => [
-            "id_habito" => $idHabito,
-            "id_habito_usuario" => $idHabitoUsuario,
-            "nombre" => $nombre,
-            "frecuencia" => $frecuenciaBD
-        ]
-    ]);
-} catch (Throwable $error) {
-    if (isset($db) && $db instanceof PDO && $db->inTransaction()) {
+    echo json_encode([
+        'exito' => true,
+        'mensaje' => 'Hábito creado con éxito.',
+        'id_habito_usuario' => $idHabitoUsuario
+    ], JSON_UNESCAPED_UNICODE);
+
+} catch (Throwable $e) {
+    if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
     }
-    responder(["exito" => false, "mensaje" => $error->getMessage()], 500);
+    http_response_code(500);
+    echo json_encode([
+        'exito' => false,
+        'mensaje' => 'Error SQL/Servidor: ' . $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
 }

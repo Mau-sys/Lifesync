@@ -3,8 +3,8 @@
 
     const LS = texto => typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(texto) : texto;
     
-    // Ruta relativa correcta hacia la carpeta auth desde la raíz
-    const API = "auth/";
+    // Ruta dinámica según la ubicación del HTML actual
+    const API = window.location.pathname.includes("/public/") ? "../auth/" : "auth/";
     const params = new URLSearchParams(location.search);
     const $ = id => document.getElementById(id);
 
@@ -88,19 +88,22 @@
         }
 
         const r = await fetch(url, { credentials: "include", cache: "no-store" });
+        
+        if (!r.ok) {
+            throw new Error(`Error en el servidor (${r.status}): No se encontró el archivo en ${url}`);
+        }
+
         const d = await r.json();
 
-        if (!r.ok || !d.exito) {
+        if (!d.exito) {
             throw new Error(d.mensaje || LS("No se pudieron cargar los datos del hábito."));
         }
 
         habitoActual = d.habito;
         idHabitoUsuario = Number(habitoActual.id_habito_usuario);
 
-        // Arreglo de días activos provenientes de Obtener_habito.php
         habitoActual.dias_activos = Array.isArray(d.habito.dias_activos) ? d.habito.dias_activos : [];
 
-        // Rellenar la información en el DOM
         if (tituloHabito) tituloHabito.textContent = habitoActual.nombre_habito || "Hábito Personalizado";
         if (descripcion) descripcion.textContent = habitoActual.descripcion || habitoActual.nombre_habito;
     }
@@ -149,8 +152,10 @@
                 })
             });
 
+            if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
             const d = await r.json();
-            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo registrar."));
+            if (!d.exito) throw new Error(d.mensaje || LS("No se pudo registrar."));
 
             await cargarHabito();
         } catch (e) {
@@ -238,8 +243,10 @@
                 })
             });
 
+            if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+
             const data = await res.json();
-            if (!res.ok || !data.exito) throw new Error(data.mensaje || "Error al actualizar.");
+            if (!data.exito) throw new Error(data.mensaje || "Error al actualizar.");
 
             modalEditar?.hide();
             await cargarHabito();
@@ -262,8 +269,10 @@
                 body: JSON.stringify({ id_habito_usuario: idHabitoUsuario })
             });
 
+            if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
             const d = await r.json();
-            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo eliminar el hábito."));
+            if (!d.exito) throw new Error(d.mensaje || LS("No se pudo eliminar el hábito."));
 
             location.href = "Personalizados.html";
         } catch (e) {

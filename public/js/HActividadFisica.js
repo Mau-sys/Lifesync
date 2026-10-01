@@ -11,12 +11,11 @@
     let tipoMeta = "semanal";
     let metaSesiones = 5;
     let metaMinutosTotal = 150;
-    let dias = [0, 2, 4]; // Representa Lunes, Miércoles, Viernes (0-6)
+    let dias = [0, 2, 4];
     let sesiones = 0;
     let minutos = 0;
     let cargando = false;
 
-    const menu = $("kebab-menu-actividad-fisica");
     const ring = $("ring-sesiones-fisica");
     const contador = $("contador-sesiones-fisica");
     const meta = $("meta-fisica");
@@ -25,38 +24,34 @@
     const modalSesion = typeof bootstrap !== "undefined" && $("modalRegistrarSesion") ? new bootstrap.Modal($("modalRegistrarSesion")) : null;
     const modalMeta = typeof bootstrap !== "undefined" && $("modalEditarMetaFisica") ? new bootstrap.Modal($("modalEditarMetaFisica")) : null;
 
-    // Obtiene el día de hoy en formato 1 (Lunes) a 7 (Domingo)
+    // Inicializar lógica universal (Menú Kebab, Regresar y Deshabilitar)
+    if (typeof HabitoUniversal !== "undefined") {
+        HabitoUniversal.init({
+            idHabito: id,
+            btnOptionsId: "btn-options-actividad-fisica",
+            menuId: "kebab-menu-actividad-fisica",
+            btnDeshabilitarId: "btn-deshabilitar-habito",
+            btnRegresarId: "btn-regresar",
+            urlRedireccion: "inicio.html"
+        });
+    }
+
     function getDiaSemanaHoy() {
-        const diaJs = new Date().getDay(); // 0: Domingo, 1: Lunes...
+        const diaJs = new Date().getDay();
         return diaJs === 0 ? 7 : diaJs;
     }
 
-    // Verifica si el hábito está programado para registrar el día de hoy
     function esDiaActivoHoy() {
         if (tipoMeta === "diaria" || tipoMeta === "semanal") {
             return true;
         }
         if (tipoMeta === "personalizado" || tipoMeta === "dias específicos") {
-            const diaHoy1a7 = getDiaSemanaHoy(); // 1-7
-            const dias1a7 = dias.map(d => d + 1); // Convierte 0-6 en 1-7
+            const diaHoy1a7 = getDiaSemanaHoy();
+            const dias1a7 = dias.map(d => d + 1);
             return dias1a7.includes(diaHoy1a7);
         }
         return true;
     }
-
-    $("btn-options-actividad-fisica")?.addEventListener("click", e => {
-        e.stopPropagation();
-        menu?.classList.toggle("show");
-    });
-
-    document.addEventListener("click", e => {
-        if (menu && !menu.contains(e.target)) menu.classList.remove("show");
-    });
-
-    $("btn-regresar")?.addEventListener("click", e => {
-        e.preventDefault();
-        history.length > 1 ? history.back() : location.href = "inicio.html";
-    });
 
     function normalizarFrecuencia(valor) {
         return valor === "personalizada" || valor === "dias específicos" ? "personalizado" : (valor || "semanal");
@@ -82,10 +77,15 @@
     }
 
     async function cargar() {
-        const q = id ? `?id_habito_usuario=${id}` : `?categoria=${encodeURIComponent(CATEGORIA)}`;
-        const r = await fetch(`${API}obtener-habito.php${q}`, { credentials: "include", cache: "no-store" });
+        if (!id) {
+            throw new Error(LS("No se especificó un ID de hábito válido."));
+        }
+
+        const r = await fetch(`${API}Obtener_habito.php?id_habito_usuario=${id}`, { credentials: "include", cache: "no-store" });
+        if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
         const d = await r.json();
-        if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
+        if (!d.exito || !d.habito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
 
         id = Number(d.habito.id_habito_usuario);
         metaSesiones = Number(d.habito.objetivo) || 5;
@@ -111,7 +111,6 @@
         const completada = sesiones >= metaSesiones;
         const activoHoy = esDiaActivoHoy();
 
-        // Deshabilitar botón si la meta está completada, si está cargando o si NO es un día activo
         btn.disabled = completada || cargando || !activoHoy;
 
         if (!activoHoy) {
@@ -159,7 +158,7 @@
         cargando = true;
         render();
         try {
-            const r = await fetch(`${API}registrar-habito.php`, {
+            const r = await fetch(`${API}registrar_habito.php`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -170,8 +169,10 @@
                     observaciones: $("select-tipo-actividad")?.value || "Actividad"
                 })
             });
+            if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
             const d = await r.json();
-            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo registrar la sesión."));
+            if (!d.exito) throw new Error(d.mensaje || LS("No se pudo registrar la sesión."));
 
             if (d.registro) {
                 minutos = Number(d.registro.suma_hoy);
@@ -194,6 +195,7 @@
 
     $("btn-editar-meta")?.addEventListener("click", e => {
         e.preventDefault();
+        const menu = $("kebab-menu-actividad-fisica");
         menu?.classList.remove("show");
 
         const selectMeta = $("select-tipo-meta");
@@ -255,7 +257,7 @@
         const dias1a7 = dias.map(x => x + 1);
 
         try {
-            const r = await fetch(`${API}actualizar-habito.php`, {
+            const r = await fetch(`${API}actualizar_habito.php`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -269,34 +271,16 @@
                     dias_activos: tipoMeta === "personalizado" ? dias1a7 : []
                 })
             });
+            if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
+
             const d = await r.json();
-            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudieron guardar los cambios."));
+            if (!d.exito) throw new Error(d.mensaje || LS("No se pudieron guardar los cambios."));
 
             metaSesiones = n;
             metaMinutosTotal = m;
             render();
             modalMeta?.hide();
-            menu?.classList.remove("show");
-        } catch (e) {
-            alert(e.message);
-        }
-    });
-
-    $("btn-reiniciar-habito-modal")?.addEventListener("click", async () => {
-        if (!confirm(LS("¿Quieres reiniciar la cuenta a 0?"))) return;
-        try {
-            const r = await fetch(`${API}eliminar-registros-hoy.php`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id_habito_usuario: id })
-            });
-            const d = await r.json();
-            if (!r.ok || !d.exito) throw new Error(d.mensaje || LS("No se pudo reiniciar."));
-            sesiones = 0;
-            minutos = 0;
-            render();
-            modalMeta?.hide();
+            $("kebab-menu-actividad-fisica")?.classList.remove("show");
         } catch (e) {
             alert(e.message);
         }

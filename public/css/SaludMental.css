@@ -38,9 +38,11 @@ html, body {
 .card-full-screen {
     background-color: var(--ls-bg-dark);
     width: 100vw;
+    height: 100vh;
     min-height: 100vh;
     box-sizing: border-box;
     padding: clamp(1.2rem, 3vh, 3rem) clamp(1.2rem, 5vw, 4rem);
+    overflow: hidden;
 }
 
 .icon-circle {
@@ -128,6 +130,7 @@ html, body {
     letter-spacing: 0.5px;
     box-shadow: 0 4px 20px var(--ls-purple-glow);
     transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .btn-action-purple:hover {

@@ -101,21 +101,23 @@
     }
 
     async function cargar() {
-        const query = id
-            ? `?id_habito_usuario=${id}`
-            : `?categoria=${encodeURIComponent(CATEGORIA)}`;
+        if (!id) {
+            throw new Error(LS("No se especificó un ID de hábito válido."));
+        }
 
         const respuesta = await fetch(
-            `${API}obtener-habito.php${query}`,
+            `${API}Obtener_habito.php?id_habito_usuario=${id}`,
             {
                 credentials: "include",
                 cache: "no-store"
             }
         );
 
+        if (!respuesta.ok) throw new Error(`HTTP Error: ${respuesta.status}`);
+
         const datos = await respuesta.json();
 
-        if (!respuesta.ok || !datos.exito || !datos.habito) {
+        if (!datos.exito || !datos.habito) {
             throw new Error(
                 datos.mensaje || LS("No se pudieron cargar los datos.")
             );
@@ -252,9 +254,11 @@
                 }
             );
 
+            if (!respuesta.ok) throw new Error(`HTTP Error: ${respuesta.status}`);
+
             const datos = await respuesta.json();
 
-            if (!respuesta.ok || !datos.exito) {
+            if (!datos.exito) {
                 throw new Error(
                     datos.mensaje || LS("No se pudo registrar.")
                 );
@@ -331,7 +335,6 @@
             return;
         }
 
-        // Validación estricta con el máximo de minutos por sesión
         if (
             !Number.isInteger(nuevaDuracion) ||
             nuevaDuracion < MIN_DURACION_MINUTOS ||
@@ -380,9 +383,11 @@
                 }
             );
 
+            if (!respuesta.ok) throw new Error(`HTTP Error: ${respuesta.status}`);
+
             const datos = await respuesta.json();
 
-            if (!respuesta.ok || !datos.exito) {
+            if (!datos.exito) {
                 throw new Error(
                     datos.mensaje ||
                     LS("No se pudieron guardar los cambios.")
@@ -439,9 +444,11 @@
                 }
             );
 
+            if (!respuesta.ok) throw new Error(`HTTP Error: ${respuesta.status}`);
+
             const datos = await respuesta.json();
 
-            if (!respuesta.ok || !datos.exito) {
+            if (!datos.exito) {
                 throw new Error(
                     datos.mensaje ||
                     LS("No se pudo reiniciar.")
@@ -469,3 +476,10 @@
             alert(error.message);
         });
 })();
+
+HabitoUniversal.init({
+    btnOptionsId: "btn-options-actividad-fisica",
+    menuId: "kebab-menu-actividad-fisica",
+    btnDeshabilitarId: "btn-deshabilitar-habito", // ID de la opción deshabilitar en el menú
+    urlRedireccion: "inicio.html"
+});

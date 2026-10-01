@@ -1,11 +1,9 @@
 <?php
-// Limpiar cualquier salida previa para evitar corrupción de JSON
 if (ob_get_length()) ob_clean();
 
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
-// Compatibilidad de ruta
 $rutaConexion = __DIR__ . '/../config/conexion.php';
 if (!file_exists($rutaConexion)) {
     $rutaConexion = '../config/conexion.php';
@@ -21,13 +19,12 @@ try {
 
     $usuarioId = (int) $_SESSION['usuario_id'];
     $idHabitoUsuario = isset($_GET['id_habito_usuario']) ? (int) $_GET['id_habito_usuario'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
-    $categoria = trim((string) ($_GET['categoria'] ?? ''));
+    $categoriaParam = isset($_GET['categoria']) ? trim($_GET['categoria']) : '';
 
     $database = new Database();
     $db = $database->getConnection();
 
-    // Consulta base
-    $sql = "
+    $selectFields = "
         SELECT
             hu.id_habito_usuario,
             hu.id_habito,
@@ -49,37 +46,39 @@ try {
         FROM habitos_usuario hu
         INNER JOIN habitos h ON h.id_habito = hu.id_habito
         LEFT JOIN categorias c ON c.id_categoria = h.id_categoria
-        WHERE hu.id_usuario = :usuario
-          AND hu.activo = 1
     ";
 
-    $params = [':usuario' => $usuarioId];
+    $habito = null;
 
+    // Búsqueda por ID directo
     if ($idHabitoUsuario > 0) {
-        $sql .= " AND hu.id_habito_usuario = :id_habito_usuario";
-        $params[':id_habito_usuario'] = $idHabitoUsuario;
-    } elseif ($categoria !== '') {
-        $sql .= " AND c.nombre = :categoria";
-        $params[':categoria'] = $categoria;
+        $stmt = $db->prepare($selectFields . " WHERE hu.id_usuario = :usuario AND hu.id_habito_usuario = :id_hu LIMIT 1");
+        $stmt->execute([':usuario' => $usuarioId, ':id_hu' => $idHabitoUsuario]);
+        $habito = $stmt->fetch(PDO::FETCH_ASSOC);
+    } elseif ($categoriaParam !== '') {
+        $stmt = $db->prepare($selectFields . " WHERE hu.id_usuario = :usuario AND c.nombre = :categoria ORDER BY hu.id_habito_usuario DESC LIMIT 1");
+        $stmt->execute([':usuario' => $usuarioId, ':categoria' => $categoriaParam]);
+        $habito = $stmt->fetch(PDO::FETCH_ASSOC);
     } else {
-        $sql .= " AND c.nombre = 'Hábito Personalizado'";
+        http_response_code(400);
+        echo json_encode(['exito' => false, 'mensaje' => 'Se requiere el parámetro id_habito_usuario en la URL.'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
-
-    $sql .= " ORDER BY hu.id_habito_usuario DESC LIMIT 1";
-
-    $stmt = $db->prepare($sql);
-    $stmt->execute($params);
-    $habito = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$habito) {
         http_response_code(404);
-        echo json_encode(['exito' => false, 'mensaje' => 'No se encontró ningún hábito personalizado activo.'], JSON_UNESCAPED_UNICODE);
+        echo json_encode(['exito' => false, 'mensaje' => 'No se encontró el hábito solicitado.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
     $idHU = (int) $habito['id_habito_usuario'];
 
-    // 1. Obtener métricas acumuladas de hoy
+    if ((int)$habito['activo'] !== 1) {
+        $stmtFix = $db->prepare("UPDATE habitos_usuario SET activo = 1 WHERE id_habito_usuario = :id");
+        $stmtFix->execute([':id' => $idHU]);
+        $habito['activo'] = 1;
+    }
+
     $stmtSum = $db->prepare("
         SELECT 
             COALESCE(SUM(valor_registrado), 0) AS suma_hoy, 
@@ -94,17 +93,14 @@ try {
     $sumaHoy = (float) $macheoHoy['suma_hoy'];
     $registrosHoy = (int) $macheoHoy['registros_hoy'];
 
-    // Determinar progreso según la unidad
     $unidad = mb_strtolower((string) $habito['unidad'], 'UTF-8');
     $esSesion = str_contains($unidad, 'sesion') || str_contains($unidad, 'registro') || str_contains($unidad, 'comida') || str_contains($unidad, 'pausa');
     $progresoHoy = $esSesion ? $registrosHoy : $sumaHoy;
 
-    // 2. Obtener días configurados en la tabla habito_dias
     $stmtDias = $db->prepare("SELECT dia_semana FROM habito_dias WHERE id_habito_usuario = :id ORDER BY dia_semana ASC");
     $stmtDias->execute([':id' => $idHU]);
     $diasActivos = array_map('intval', $stmtDias->fetchAll(PDO::FETCH_COLUMN));
 
-    // 3. Obtener racha del hábito
     $stmtRacha = $db->prepare("SELECT racha_actual, mejor_racha, total_completados, ultima_fecha FROM rachas WHERE id_habito_usuario = :id LIMIT 1");
     $stmtRacha->execute([':id' => $idHU]);
     $racha = $stmtRacha->fetch(PDO::FETCH_ASSOC) ?: [
@@ -117,7 +113,6 @@ try {
     $objetivo = (float) $habito['objetivo'];
     $porcentaje = $objetivo > 0 ? min(100, round(($progresoHoy / $objetivo) * 100, 2)) : 0;
 
-    // Construcción compatible del array de respuesta sin operador unpacking (...)
     $habitoRespuesta = array_merge($habito, [
         'objetivo' => $objetivo,
         'progreso_hoy' => $progresoHoy,
