@@ -2,7 +2,7 @@
     "use strict";
 
     const LS = texto => typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(texto) : texto;
-    const API = "/lifesync/auth/";
+    const API = "../auth/";
     const CATEGORIA = "Alimentación";
     const STORAGE = "lifesync_config_alimentacion";
     const params = new URLSearchParams(location.search);
@@ -35,8 +35,6 @@
         cena: "cena"
     };
 
-    const btnOptions = $("btn-options-alimentacion");
-    const kebab = $("kebab-menu-alimentacion");
     const lista = $("lista-comidas");
     const btnAdd = $("btn-add-comida");
     const contador = $("contador-comidas");
@@ -44,33 +42,31 @@
     const ring = $("ring-comidas");
     const modal = $("modalEditarMeta");
 
-    btnOptions?.addEventListener("click", e => {
-        e.stopPropagation();
-        kebab?.classList.toggle("show");
-    });
-
-    document.addEventListener("click", e => {
-        if (kebab && !kebab.contains(e.target)) kebab.classList.remove("show");
-    });
-
-    $("btn-regresar")?.addEventListener("click", e => {
-        e.preventDefault();
-        history.length > 1 ? history.back() : location.href = "inicio.html";
-    });
+    // Inicializar menú Kebab, Deshabilitar y Regresar usando HabitoUniversal
+    if (typeof HabitoUniversal !== "undefined") {
+        HabitoUniversal.init({
+            idHabito: id,
+            btnOptionsId: "btn-options-alimentacion",
+            menuId: "kebab-menu-alimentacion",
+            btnDeshabilitarId: "btn-deshabilitar-habito",
+            btnRegresarId: "btn-regresar",
+            urlRedireccion: "inicio.html"
+        });
+    }
 
     async function cargar() {
         if (!id) {
             throw new Error(LS("No se especificó un ID de hábito válido."));
         }
 
-        // Se corrigió el nombre a Obtener_habito.php
         const r = await fetch(`${API}Obtener_habito.php?id_habito_usuario=${id}`, { credentials: "include", cache: "no-store" });
         if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
 
         const d = await r.json();
         if (!d.exito || !d.habito) throw new Error(d.mensaje || LS("No se pudieron cargar los datos."));
+        
         id = Number(d.habito.id_habito_usuario);
-        completadas = Math.max(0, Number(d.habito.progreso_hoy) || 0);
+        completadas = Math.max(0, Number(d.habito.progreso_hoy ?? d.habito.registros_hoy) || 0);
     }
 
     function hora(valor) {
@@ -91,7 +87,7 @@
 
         contador.textContent = `${hechas}/${total}`;
         meta.textContent = `${total} ${LS("tiemposAlDia")}`;
-        const porcentaje = total ? Math.min(100, hechas / total * 100) : 0;
+        const porcentaje = total ? Math.min(100, (hechas / total) * 100) : 0;
         ring.style.background = `conic-gradient(var(--ls-emerald) ${porcentaje}%, rgba(44,212,120,.15) ${porcentaje}%)`;
 
         lista.innerHTML = "";
@@ -116,7 +112,7 @@
         render();
         try {
             if (hecho) {
-                const r = await fetch(`${API}eliminar-registro.php`, {
+                const r = await fetch(`${API}eliminar_registro.php`, {
                     method: "POST",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
@@ -152,7 +148,13 @@
 
         const d = await r.json();
         if (!d.exito) throw new Error(d.mensaje || LS("No se pudo registrar la comida."));
-        completadas = Number(d.registro.progreso_hoy) || completadas + 1;
+        
+        // Validación segura del valor retornado para evitar errores undefined
+        if (d.registro && (d.registro.progreso_hoy !== undefined || d.registro.registros_hoy !== undefined)) {
+            completadas = Number(d.registro.progreso_hoy ?? d.registro.registros_hoy);
+        } else {
+            completadas += 1;
+        }
     }
 
     btnAdd?.addEventListener("click", async () => {
@@ -175,8 +177,8 @@
         ["desayuno", "merienda_m", "almuerzo", "merienda_t", "cena"].forEach(idComida => {
             const c = config.find(x => x.id === idComida);
             if (!c) return;
-            $("time-" + idComida.replace("_", "-") + "-inicio") && ($("time-" + idComida.replace("_", "-") + "-inicio").value = c.inicio);
-            $("time-" + idComida.replace("_", "-") + "-fin") && ($("time-" + idComida.replace("_", "-") + "-fin").value = c.fin);
+            if ($("time-" + idComida.replace("_", "-") + "-inicio")) $("time-" + idComida.replace("_", "-") + "-inicio").value = c.inicio;
+            if ($("time-" + idComida.replace("_", "-") + "-fin")) $("time-" + idComida.replace("_", "-") + "-fin").value = c.fin;
         });
         if ($("switch-merienda-m")) $("switch-merienda-m").checked = !!config.find(c => c.id === "merienda_m")?.activo;
         if ($("switch-merienda-t")) $("switch-merienda-t").checked = !!config.find(c => c.id === "merienda_t")?.activo;
@@ -195,9 +197,10 @@
 
     $("switch-merienda-m")?.addEventListener("change", actualizarSwitches);
     $("switch-merienda-t")?.addEventListener("change", actualizarSwitches);
+    
     $("btn-editar-meta")?.addEventListener("click", e => {
         e.preventDefault();
-        kebab?.classList.remove("show");
+        $("kebab-menu-alimentacion")?.classList.remove("show");
         cargarFormulario();
     });
 
@@ -216,7 +219,7 @@
         if (comidas.some(c => !c.inicio || !c.fin)) return alert(LS("especificaHoras"));
 
         try {
-            const r = await fetch(`${API}actualizar-habito.php`, {
+            const r = await fetch(`${API}actualizar_habito.php`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -226,10 +229,14 @@
 
             const d = await r.json();
             if (!d.exito) throw new Error(d.mensaje || LS("No se pudieron guardar los cambios."));
+            
             localStorage.setItem(STORAGE, JSON.stringify(config));
             completadas = Math.min(completadas, comidas.length);
             render();
-            bootstrap.Modal.getInstance(modal)?.hide();
+            if (modal) {
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                modalInstance?.hide();
+            }
         } catch (e) {
             alert(e.message);
         }
@@ -238,10 +245,3 @@
     window.addEventListener("lifesyncIdiomaCambiado", render);
     cargar().then(render).catch(e => alert(e.message));
 })();
-
-HabitoUniversal.init({
-    btnOptionsId: "btn-options-actividad-fisica",
-    menuId: "kebab-menu-actividad-fisica",
-    btnDeshabilitarId: "btn-deshabilitar-habito", // ID de la opción deshabilitar en el menú
-    urlRedireccion: "inicio.html"
-});

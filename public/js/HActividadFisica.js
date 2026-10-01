@@ -158,7 +158,7 @@
         cargando = true;
         render();
         try {
-            const r = await fetch(`${API}registrar_habito.php`, {
+            const r = await fetch(`${API}registrar-habito.php`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

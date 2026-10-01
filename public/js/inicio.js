@@ -258,8 +258,33 @@
         }
 
         function actualizarRacha(racha) {
-            const elemento = document.getElementById("diasRacha");
-            if (elemento) elemento.textContent = Number(racha) || 0;
+            const elemento = document.getElementById("diasRacha") 
+                          || document.getElementById("rachaActual") 
+                          || document.getElementById("racha");
+
+            if (!elemento) return;
+
+            let valor = 0;
+
+            if (typeof racha === "object" && racha !== null) {
+                valor = Number(
+                    racha.racha_actual ?? 
+                    racha.dias_racha ?? 
+                    racha.racha ?? 
+                    racha.dias ?? 
+                    racha.total ?? 
+                    0
+                );
+            } else {
+                valor = Number(racha);
+            }
+
+            if (elemento.id === "diasRacha") {
+                const textoDia = valor === 1 ? LS("dia") || "día" : LS("dias") || "días";
+                elemento.textContent = `${valor} ${textoDia}`;
+            } else {
+                elemento.textContent = !isNaN(valor) ? valor : 0;
+            }
         }
 
         function actualizarProgreso(progreso) {
