@@ -20,7 +20,6 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
-    // 1. Datos del perfil del usuario
     $consultaUsuario = $db->prepare(
         'SELECT u.nombre_usuario, p.foto_perfil
          FROM usuario u
@@ -37,7 +36,6 @@ try {
         exit;
     }
 
-    // 2. Obtener hábitos activos del usuario
     $consultaHabitos = $db->prepare(
         'SELECT
             hu.id_habito_usuario,
@@ -138,7 +136,6 @@ try {
         ? ($habitosCompletados / $totalHabitos) * 100
         : 0;
 
-    // 3. Consulta de Racha General
     $racha = 0;
     try {
         $consultaRacha = $db->prepare(
@@ -153,7 +150,6 @@ try {
         $racha = 0;
     }
 
-    // 4. Consulta y gestión de Notificaciones
     $consultaNotificaciones = $db->prepare(
         'SELECT id_notificacion, titulo, mensaje, leida, fecha_notificacion
          FROM notificaciones
@@ -200,7 +196,6 @@ try {
         ];
     }
 
-    // 5. Consulta de Recordatorios del día
     $consultaRecordatorios = $db->prepare(
         'SELECT 
             r.id_recordatorio,
@@ -243,7 +238,7 @@ try {
             'id_notificacion' => 'rec_' . $rec['id_recordatorio'],
             'titulo' => '📌 ' . $rec['titulo'],
             'mensaje' => $mensajeDetalle,
-            'leida' => true, // Se muestran como leídas en la lista general para no disparar el contador
+            'leida' => true,
             'fecha_formateada' => 'Hoy ' . $horaFormateada,
             'timestamp' => $fechaObj->getTimestamp()
         ];
@@ -254,7 +249,6 @@ try {
         return ($b['timestamp'] ?? 0) <=> ($a['timestamp'] ?? 0);
     });
 
-    // Conteo exclusivo de notificaciones no leídas persistentes en la BD
     $consultaNoLeidas = $db->prepare(
         'SELECT COUNT(*)
          FROM notificaciones
@@ -263,12 +257,13 @@ try {
     $consultaNoLeidas->execute([':id_usuario' => $usuarioId]);
     $notificacionesNoLeidas = (int) ($consultaNoLeidas->fetchColumn() ?: 0);
 
-    // 6. Respuesta JSON final
+    $fotoPerfil = !empty($usuario['foto_perfil']) ? $usuario['foto_perfil'] : 'img/Perfil.png';
+
     echo json_encode([
         'exito' => true,
         'usuario' => [
             'nombre' => $usuario['nombre_usuario'],
-            'foto' => $usuario['foto_perfil'] ?: 'img/Perfil.png'
+            'foto' => $fotoPerfil
         ],
         'progreso' => [
             'porcentaje' => round($porcentajeGeneral, 2),

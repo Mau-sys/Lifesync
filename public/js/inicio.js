@@ -49,7 +49,6 @@
             btnNotificaciones?.setAttribute("aria-expanded", "true");
             document.body.classList.add("panel-notificaciones-abierto");
 
-            // Limpieza inmediata en el DOM + actualización en el servidor
             limpiarEstadoNotificaciones();
             marcarNotificacionesLeidas();
         }
@@ -102,7 +101,6 @@
 
                 actualizarUsuario(resultado.usuario);
 
-                // Si el panel de notificaciones ya está abierto, no sobreescribir con no-leídas
                 if (panelNotificaciones && !panelNotificaciones.classList.contains("oculto")) {
                     actualizarContador(0);
                 } else {
@@ -126,8 +124,23 @@
                 nombreUsuario.textContent = usuario.nombre || LS("usuario");
             }
 
-            if (fotoPerfil && usuario.foto) {
-                fotoPerfil.src = usuario.foto;
+            if (fotoPerfil) {
+                let rutaFoto = usuario.foto || "img/Perfil.png";
+
+                if (!/^https?:\/\//i.test(rutaFoto) && !rutaFoto.startsWith("/")) {
+                    if (window.location.pathname.includes("/public/") && !rutaFoto.startsWith("../")) {
+                        rutaFoto = "../" + rutaFoto;
+                    }
+                }
+
+                fotoPerfil.src = rutaFoto;
+
+                fotoPerfil.onerror = function () {
+                    this.onerror = null;
+                    this.src = window.location.pathname.includes("/public/") 
+                        ? "../img/Perfil.png" 
+                        : "img/Perfil.png";
+                };
             }
         }
 
@@ -148,10 +161,8 @@
         }
 
         function limpiarEstadoNotificaciones() {
-            // Resetear número a 0 y quitar clase activa en el HTML
             actualizarContador(0);
 
-            // Remover estilos visuales de no-leído dentro de la lista
             document.querySelectorAll(".notificacion-item").forEach(item => {
                 item.classList.remove("notificacion-no-leida");
             });
@@ -179,7 +190,6 @@
             const articulo = document.createElement("article");
             articulo.className = "notificacion-item";
 
-            // Si el panel está abierto, marcamos todos los elementos como leídos visualmente
             const panelAbierto = panelNotificaciones && !panelNotificaciones.classList.contains("oculto");
             const leida = panelAbierto || notificacion.leida === true || Number(notificacion.leida) === 1;
 
