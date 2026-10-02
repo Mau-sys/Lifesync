@@ -221,7 +221,6 @@
         obtenerTemaGuardado;
 
 
-    // Función para forzar restablecimiento al cerrar sesión
     window.restablecerTemaPorDefecto =
         function () {
 

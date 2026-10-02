@@ -229,7 +229,6 @@ async function cargarConfiguracion() {
         const configuracion =
             datos.configuracion;
 
-        // Lee el idioma asignado desde el servidor ('es' si existía previamente, 'en' para nuevos usuarios)
         const idiomaGuardado =
             configuracion.idioma === "es"
                 ? "es"
@@ -956,9 +955,13 @@ async function cerrarSesion(idSesion) {
             resultado.sesion_actual
         ) {
 
-            localStorage.removeItem(
-                "lifesync_tema"
-            );
+            if (typeof window.restablecerTemaPorDefecto === "function") {
+                window.restablecerTemaPorDefecto();
+            } else {
+                localStorage.removeItem("lifesync_tema");
+            }
+
+            localStorage.removeItem("lifesync_usuario");
 
             window.location.href =
                 "inicio-sesion.html";
