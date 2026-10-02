@@ -19,7 +19,7 @@
                 urlRedireccion = "inicio.html"
             } = config;
 
-            // 1. Botón regresar
+            
             const btnRegresar = document.getElementById(btnRegresarId);
             if (btnRegresar) {
                 btnRegresar.addEventListener("click", e => {
@@ -28,7 +28,7 @@
                 });
             }
 
-            // 2. Control desplegable del menú Kebab
+            
             if (btnOptionsId && menuId) {
                 const btnMenu = document.getElementById(btnOptionsId);
                 const menuContainer = document.getElementById(menuId);
@@ -47,7 +47,7 @@
                 }
             }
 
-            // 3. Deshabilitar hábito con mensajes formateados
+            
             const btnDeshabilitar = document.getElementById(btnDeshabilitarId);
             if (btnDeshabilitar) {
                 btnDeshabilitar.addEventListener("click", async e => {
@@ -83,7 +83,7 @@
                         const d = await r.json();
                         
                         if (!d.exito) {
-                            // Si el servidor devolvió un mensaje vació, usa un texto por defecto
+                            
                             const msgError = d.mensaje || LS("No se pudo deshabilitar el hábito. Inténtalo de nuevo.");
                             throw new Error(msgError);
                         }
@@ -92,7 +92,7 @@
                         location.href = urlRedireccion;
 
                     } catch (err) {
-                        // Aseguramos que err.message nunca esté vacío
+                        
                         const mensajeFinal = (err && err.message) 
                             ? err.message 
                             : LS("Ocurrió un error inesperado al intentar deshabilitar el hábito.");

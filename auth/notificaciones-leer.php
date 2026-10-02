@@ -2,7 +2,12 @@
 
 session_start();
 header("Content-Type: application/json; charset=UTF-8");
-require_once "../config/conexion.php";
+
+$rutaConexion = __DIR__ . '/../config/conexion.php';
+if (!file_exists($rutaConexion)) {
+    $rutaConexion = '../config/conexion.php';
+}
+require_once $rutaConexion;
 
 if (!isset($_SESSION["usuario_id"])) {
     http_response_code(401);
@@ -27,36 +32,44 @@ $usuarioId = (int) $_SESSION["usuario_id"];
 try {
     $database = new Database();
     $db = $database->getConnection();
-    $datos = json_decode(file_get_contents("php://input"), true);
-    $idNotificacion = (int) ($datos["id_notificacion"] ?? 0);
+    
+    // Obtener posible JSON enviado
+    $input = file_get_contents("php://input");
+    $datos = json_decode($input, true);
+    
+    // Convertir el ID a entero (si es un id de recordatorio como "rec_1", (int) dará 0)
+    $idNotificacion = isset($datos["id_notificacion"]) ? (int) $datos["id_notificacion"] : 0;
 
     if ($idNotificacion > 0) {
         $consulta = $db->prepare(
             "UPDATE notificaciones
-             SET leida = TRUE
+             SET leida = 1
              WHERE id_notificacion = :id_notificacion
-             AND id_usuario = :id_usuario"
+               AND id_usuario = :id_usuario"
         );
         $consulta->execute([
             ":id_notificacion" => $idNotificacion,
             ":id_usuario" => $usuarioId
         ]);
     } else {
+        // Si no se especifica ID o es un marcado general
         $consulta = $db->prepare(
             "UPDATE notificaciones
-             SET leida = TRUE
+             SET leida = 1
              WHERE id_usuario = :id_usuario
-             AND leida = FALSE"
+               AND leida = 0"
         );
         $consulta->execute([":id_usuario" => $usuarioId]);
     }
 
     echo json_encode([
         "exito" => true,
+        "filas_afectadas" => $consulta->rowCount(),
         "mensaje" => "Notificaciones marcadas como leídas."
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $error) {
+    error_log("Error en notificaciones-leer.php: " . $error->getMessage());
     http_response_code(500);
     echo json_encode([
         "exito" => false,

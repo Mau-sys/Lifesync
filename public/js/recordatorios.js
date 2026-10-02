@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             una_vez: t('soloUnaVez'),
             personalizado: t('personalizado')
         };
+        // CORREGIDO: Se cambió r.nombre_categoria por r.categoria
         let texto = `${r.categoria || t('sinCategoria')} • ${repeticiones[r.repeticion] || r.repeticion}`;
         if (r.repeticion === 'una_vez' && r.fecha_recordatorio) texto += ` • ${r.fecha_recordatorio}`;
         detalle.textContent = texto;
@@ -91,7 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function eliminarRecordatorio(id) {
         if (!confirm(t('eliminarRecordatorioPregunta'))) return;
         try {
-            const respuesta = await fetch(endpoint, { method: 'POST', credentials: 'same-origin', headers: {'Content-Type':'application/json'}, body: JSON.stringify({accion:'eliminar', id_recordatorio:id}) });
+            // CORREGIDO: Se envía tanto 'id' como 'id_recordatorio'
+            const respuesta = await fetch(endpoint, { 
+                method: 'POST', 
+                credentials: 'same-origin', 
+                headers: {'Content-Type':'application/json'}, 
+                body: JSON.stringify({accion:'eliminar', id: id, id_recordatorio: id}) 
+            });
             const datos = await respuesta.json();
             if (!respuesta.ok || !datos.exito) throw new Error(datos.mensaje || 'No se pudo eliminar el recordatorio.');
             cargar();
@@ -124,6 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const respuesta = await fetch(endpoint, { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify(datos) });
             const resultado = await respuesta.json();
             if (!respuesta.ok || !resultado.exito) throw new Error(resultado.mensaje || 'No se pudo guardar el recordatorio.');
+            
+            // Opcional: Reproducir sonido al guardar con éxito si está disponible
+            if (typeof window.reproducirSonidoNotificacion === 'function') {
+                window.reproducirSonidoNotificacion();
+            }
+
             cerrar();
             cargar();
         } catch (error) {

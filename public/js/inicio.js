@@ -48,7 +48,10 @@
             panelNotificaciones.setAttribute("aria-hidden", "false");
             btnNotificaciones?.setAttribute("aria-expanded", "true");
             document.body.classList.add("panel-notificaciones-abierto");
-            cargarDatosInicio();
+
+            // Limpieza inmediata en el DOM + actualización en el servidor
+            limpiarEstadoNotificaciones();
+            marcarNotificacionesLeidas();
         }
 
         function cerrarNotificaciones() {
@@ -98,7 +101,14 @@
                 }
 
                 actualizarUsuario(resultado.usuario);
-                actualizarContador(resultado.notificaciones_no_leidas);
+
+                // Si el panel de notificaciones ya está abierto, no sobreescribir con no-leídas
+                if (panelNotificaciones && !panelNotificaciones.classList.contains("oculto")) {
+                    actualizarContador(0);
+                } else {
+                    actualizarContador(resultado.notificaciones_no_leidas);
+                }
+
                 mostrarNotificaciones(resultado.notificaciones);
                 actualizarRacha(resultado.racha);
                 actualizarProgreso(resultado.progreso);
@@ -125,9 +135,29 @@
             if (!contadorNotificaciones) return;
 
             const numero = Math.max(0, Number(cantidad) || 0);
-            contadorNotificaciones.textContent = numero > 99 ? "99+" : numero;
-            contadorNotificaciones.classList.toggle("activo", numero > 0);
-            btnNotificaciones?.classList.toggle("tiene-notificaciones", numero > 0);
+
+            if (numero > 0) {
+                contadorNotificaciones.textContent = numero > 99 ? "99+" : numero;
+                contadorNotificaciones.classList.add("activo");
+                btnNotificaciones?.classList.add("tiene-notificaciones");
+            } else {
+                contadorNotificaciones.textContent = "0";
+                contadorNotificaciones.classList.remove("activo");
+                btnNotificaciones?.classList.remove("tiene-notificaciones");
+            }
+        }
+
+        function limpiarEstadoNotificaciones() {
+            // Resetear número a 0 y quitar clase activa en el HTML
+            actualizarContador(0);
+
+            // Remover estilos visuales de no-leído dentro de la lista
+            document.querySelectorAll(".notificacion-item").forEach(item => {
+                item.classList.remove("notificacion-no-leida");
+            });
+            document.querySelectorAll(".punto-notificacion").forEach(punto => {
+                punto.remove();
+            });
         }
 
         function mostrarNotificaciones(notificaciones) {
@@ -149,7 +179,10 @@
             const articulo = document.createElement("article");
             articulo.className = "notificacion-item";
 
-            const leida = notificacion.leida === true || Number(notificacion.leida) === 1;
+            // Si el panel está abierto, marcamos todos los elementos como leídos visualmente
+            const panelAbierto = panelNotificaciones && !panelNotificaciones.classList.contains("oculto");
+            const leida = panelAbierto || notificacion.leida === true || Number(notificacion.leida) === 1;
+
             if (!leida) articulo.classList.add("notificacion-no-leida");
 
             const contenido = document.createElement("div");
@@ -159,7 +192,37 @@
             encabezado.className = "notificacion-titulo";
 
             const titulo = document.createElement("h3");
-            titulo.textContent = notificacion.titulo || LS("notificacion");
+            
+            const esIngles = (
+                (window.LifeSyncIdioma && typeof window.LifeSyncIdioma.obtener === "function" && window.LifeSyncIdioma.obtener() === "en") ||
+                document.documentElement.lang === "en" ||
+                localStorage.getItem("idioma_lifesync") === "en"
+            );
+
+            let tituloTexto = notificacion.titulo || "";
+            let mensajeTexto = notificacion.mensaje || "";
+
+            if (
+                tituloTexto.toLowerCase().includes("bienvenido") || 
+                tituloTexto.toLowerCase().includes("welcome") ||
+                tituloTexto === "inicio.bienvenidaTitulo"
+            ) {
+                tituloTexto = esIngles ? "Welcome to LifeSync" : "Bienvenido a LifeSync";
+            } else {
+                tituloTexto = LS(tituloTexto) || tituloTexto;
+            }
+
+            if (
+                mensajeTexto.toLowerCase().includes("activa los permisos") || 
+                mensajeTexto.toLowerCase().includes("enable notification") ||
+                mensajeTexto === "inicio.bienvenidaMensaje"
+            ) {
+                mensajeTexto = esIngles 
+                    ? "Enable notification and reminder permissions to receive important alerts for your habits and streaks."
+                    : "Activa los permisos de notificaciones y recordatorios para recibir avisos importantes de tus hábitos y rachas.";
+            }
+
+            titulo.textContent = tituloTexto;
             encabezado.appendChild(titulo);
 
             if (!leida) {
@@ -170,7 +233,7 @@
             }
 
             const mensaje = document.createElement("p");
-            mensaje.textContent = notificacion.mensaje || "";
+            mensaje.textContent = mensajeTexto;
 
             const fecha = document.createElement("time");
             fecha.textContent = notificacion.fecha_formateada || "";
@@ -183,6 +246,8 @@
 
         function mostrarSinNotificaciones() {
             if (!listaNotificaciones) return;
+
+            listaNotificaciones.innerHTML = "";
 
             const contenedor = document.createElement("div");
             contenedor.className = "sin-notificaciones";
@@ -245,9 +310,9 @@
             if (!fechaActual) return;
 
             const idioma =
-                window.LifeSyncIdioma &&
-                typeof window.LifeSyncIdioma.obtener === "function" &&
-                window.LifeSyncIdioma.obtener() === "en"
+                (window.LifeSyncIdioma && typeof window.LifeSyncIdioma.obtener === "function" && window.LifeSyncIdioma.obtener() === "en") ||
+                document.documentElement.lang === "en" ||
+                localStorage.getItem("idioma_lifesync") === "en"
                     ? "en-US"
                     : "es-ES";
 
@@ -438,13 +503,5 @@
             mostrarFechaActual();
             cargarDatosInicio();
         });
-
-        if (panelNotificaciones) {
-            panelNotificaciones.addEventListener("transitionend", () => {
-                if (!panelNotificaciones.classList.contains("oculto")) {
-                    marcarNotificacionesLeidas();
-                }
-            });
-        }
     });
 })();

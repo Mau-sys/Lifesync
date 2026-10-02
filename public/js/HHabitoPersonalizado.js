@@ -3,12 +3,12 @@
 
     const LS = texto => typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(texto) : texto;
     
-    // Ruta dinámica según la ubicación del HTML actual
+    
     const API = window.location.pathname.includes("/public/") ? "../auth/" : "auth/";
     const params = new URLSearchParams(location.search);
     const $ = id => document.getElementById(id);
 
-    // Lee el parámetro de la URL: acepta id_habito_usuario o id
+    
     let idHabitoUsuario = Number(params.get("id_habito_usuario")) || Number(params.get("id")) || 0;
     let categoriaParam = params.get("categoria") || "";
 
@@ -29,7 +29,7 @@
         modalEditar = new bootstrap.Modal($("modalEditarHabito"));
     }
 
-    // Toggle Kebab Menu
+    
     $("btn-options-personalizado")?.addEventListener("click", e => {
         e.stopPropagation();
         menu?.classList.toggle("show");
@@ -44,7 +44,7 @@
         history.length > 1 ? history.back() : location.href = "inicio.html";
     });
 
-    // Evalúa si hoy (Lunes=1, ..., Domingo=7) está en el arreglo de dias_activos
+    
     function esDiaHabilitado() {
         if (!habitoActual) return true;
 
@@ -54,8 +54,8 @@
         if (frecuencia === "dias específicos" || frecuencia === "personalizada") {
             if (diasActivos.length === 0) return true;
 
-            let diaJS = new Date().getDay(); // 0=Domingo, 1=Lunes...
-            let diaMySQL = diaJS === 0 ? 7 : diaJS; // Convertir Domingo (0) a 7
+            let diaJS = new Date().getDay(); 
+            let diaMySQL = diaJS === 0 ? 7 : diaJS; 
             return diasActivos.includes(diaMySQL);
         }
 

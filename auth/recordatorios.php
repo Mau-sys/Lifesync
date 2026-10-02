@@ -6,52 +6,35 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require_once "../config/conexion.php";
 
-
 if (!isset($_SESSION["usuario_id"])) {
-
     http_response_code(401);
-
     echo json_encode([
         "exito" => false,
         "mensaje" => "La sesión ha expirado."
     ]);
-
     exit;
-
 }
-
 
 $usuarioId = (int) $_SESSION["usuario_id"];
 
-
 try {
-
     $database = new Database();
-
     $db = $database->getConnection();
 
-
     if ($db === null) {
-
         http_response_code(500);
-
         echo json_encode([
             "exito" => false,
             "mensaje" => "No se pudo conectar con la base de datos."
         ]);
-
         exit;
-
     }
 
-
     if ($_SERVER["REQUEST_METHOD"] === "GET") {
-
         $accion = $_GET["accion"] ?? "";
 
-
         if ($accion === "listar") {
-
+            // CORREGIDO: Se agregó "AS nombre_categoria" para que coincida con la extracción posterior
             $consulta = $db->prepare(
                 "SELECT
                     r.id_recordatorio,
@@ -62,7 +45,7 @@ try {
                     r.fecha_recordatorio,
                     r.mensaje,
                     r.activo,
-                    c.nombre
+                    c.nombre AS nombre_categoria
                 FROM recordatorios r
                 LEFT JOIN categorias c
                     ON c.id_categoria = r.id_categoria
@@ -73,191 +56,99 @@ try {
                     r.fecha_creacion DESC"
             );
 
-
             $consulta->execute([
                 ":id_usuario" => $usuarioId
             ]);
 
-
-            $recordatorios = $consulta->fetchAll(
-                PDO::FETCH_ASSOC
-            );
-
+            $recordatorios = $consulta->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($recordatorios as &$recordatorio) {
-
-                $recordatorio["categoria"] =
-                    $recordatorio["nombre_categoria"];
-
-                unset(
-                    $recordatorio["nombre_categoria"]
-                );
-
+                $recordatorio["categoria"] = $recordatorio["nombre_categoria"];
+                unset($recordatorio["nombre_categoria"]);
             }
-
 
             echo json_encode([
                 "exito" => true,
                 "recordatorios" => $recordatorios
             ]);
-
             exit;
-
         }
 
-
         http_response_code(400);
-
         echo json_encode([
             "exito" => false,
             "mensaje" => "Acción no válida."
         ]);
-
         exit;
-
     }
 
-
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-        $contenido =
-            file_get_contents("php://input");
-
-
-        $datos =
-            json_decode($contenido, true);
-
+        $contenido = file_get_contents("php://input");
+        $datos = json_decode($contenido, true);
 
         if (!is_array($datos)) {
-
             http_response_code(400);
-
             echo json_encode([
                 "exito" => false,
                 "mensaje" => "Los datos enviados no son válidos."
             ]);
-
             exit;
-
         }
 
-
-        $accion =
-            $datos["accion"] ?? "";
-
+        $accion = $datos["accion"] ?? "";
 
         if ($accion === "crear") {
-
-            $titulo =
-                trim($datos["titulo"] ?? "");
-
-
-            $idCategoria =
-                !empty($datos["id_categoria"])
-                    ? (int) $datos["id_categoria"]
-                    : null;
-
-
-            $hora =
-                $datos["hora"] ?? "";
-
-
-            $repeticion =
-                $datos["repeticion"] ?? "diario";
-
-
-            $fechaRecordatorio =
-                !empty($datos["fecha_recordatorio"])
-                    ? $datos["fecha_recordatorio"]
-                    : null;
-
-
-            $mensaje =
-                trim($datos["mensaje"] ?? "");
-
+            $titulo = trim($datos["titulo"] ?? "");
+            $idCategoria = !empty($datos["id_categoria"]) ? (int) $datos["id_categoria"] : null;
+            $hora = $datos["hora"] ?? "";
+            $repeticion = $datos["repeticion"] ?? "diario";
+            $fechaRecordatorio = !empty($datos["fecha_recordatorio"]) ? $datos["fecha_recordatorio"] : null;
+            $mensaje = trim($datos["mensaje"] ?? "");
 
             if ($titulo === "") {
-
                 http_response_code(400);
-
                 echo json_encode([
                     "exito" => false,
-                    "mensaje" =>
-                        "El nombre del recordatorio es obligatorio."
+                    "mensaje" => "El nombre del recordatorio es obligatorio."
                 ]);
-
                 exit;
-
             }
-
 
             if ($hora === "") {
-
                 http_response_code(400);
-
                 echo json_encode([
                     "exito" => false,
-                    "mensaje" =>
-                        "La hora es obligatoria."
+                    "mensaje" => "La hora es obligatoria."
                 ]);
-
                 exit;
-
             }
-
 
             $repeticionesValidas = [
-
                 "diario",
-
                 "lunes_viernes",
-
                 "una_vez",
-
                 "personalizado"
-
             ];
 
-
-            if (
-                !in_array(
-                    $repeticion,
-                    $repeticionesValidas,
-                    true
-                )
-            ) {
-
+            if (!in_array($repeticion, $repeticionesValidas, true)) {
                 http_response_code(400);
-
                 echo json_encode([
                     "exito" => false,
-                    "mensaje" =>
-                        "La repetición seleccionada no es válida."
+                    "mensaje" => "La repetición seleccionada no es válida."
                 ]);
-
                 exit;
-
             }
 
-
-            if (
-                $repeticion === "una_vez" &&
-                $fechaRecordatorio === null
-            ) {
-
+            if ($repeticion === "una_vez" && $fechaRecordatorio === null) {
                 http_response_code(400);
-
                 echo json_encode([
                     "exito" => false,
-                    "mensaje" =>
-                        "Debes seleccionar una fecha."
+                    "mensaje" => "Debes seleccionar una fecha."
                 ]);
-
                 exit;
-
             }
 
-
+            // CORREGIDO: Se ajustaron los marcadores en VALUES a :fecha_recordatorio
             $consulta = $db->prepare(
                 "INSERT INTO recordatorios (
                     id_usuario,
@@ -280,70 +171,36 @@ try {
                 )"
             );
 
-
             $consulta->execute([
-
-                ":id_usuario" =>
-                    $usuarioId,
-
-                ":id_categoria" =>
-                    $idCategoria,
-
-                ":titulo" =>
-                    $titulo,
-
-                ":hora" =>
-                    $hora,
-
-                ":repeticion" =>
-                    $repeticion,
-
-                ":fecha_recordatorio" =>
-                    $fechaRecordatorio,
-
-                ":mensaje" =>
-                    $mensaje !== ""
-                        ? $mensaje
-                        : null
-
+                ":id_usuario" => $usuarioId,
+                ":id_categoria" => $idCategoria,
+                ":titulo" => $titulo,
+                ":hora" => $hora,
+                ":repeticion" => $repeticion,
+                ":fecha_recordatorio" => $fechaRecordatorio,
+                ":mensaje" => $mensaje !== "" ? $mensaje : null
             ]);
-
 
             echo json_encode([
                 "exito" => true,
-                "mensaje" =>
-                    "Recordatorio guardado correctamente.",
-                "id_recordatorio" =>
-                    $db->lastInsertId()
+                "mensaje" => "Recordatorio guardado correctamente.",
+                "id_recordatorio" => $db->lastInsertId()
             ]);
-
             exit;
-
         }
 
-
         if ($accion === "eliminar") {
-
-            $idRecordatorio =
-                (int) (
-                    $datos["id_recordatorio"] ?? 0
-                );
-
+            // Se acepta tanto 'id' como 'id_recordatorio' por compatibilidad
+            $idRecordatorio = (int) ($datos["id"] ?? $datos["id_recordatorio"] ?? 0);
 
             if ($idRecordatorio <= 0) {
-
                 http_response_code(400);
-
                 echo json_encode([
                     "exito" => false,
-                    "mensaje" =>
-                        "Recordatorio no válido."
+                    "mensaje" => "Recordatorio no válido."
                 ]);
-
                 exit;
-
             }
-
 
             $consulta = $db->prepare(
                 "UPDATE recordatorios
@@ -352,59 +209,37 @@ try {
                    AND id_usuario = :id_usuario"
             );
 
-
             $consulta->execute([
-
-                ":id_recordatorio" =>
-                    $idRecordatorio,
-
-                ":id_usuario" =>
-                    $usuarioId
-
+                ":id_recordatorio" => $idRecordatorio,
+                ":id_usuario" => $usuarioId
             ]);
-
 
             echo json_encode([
                 "exito" => true,
-                "mensaje" =>
-                    "Recordatorio eliminado correctamente."
+                "mensaje" => "Recordatorio eliminado correctamente."
             ]);
-
             exit;
-
         }
 
-
         http_response_code(400);
-
         echo json_encode([
             "exito" => false,
             "mensaje" => "Acción no válida."
         ]);
-
         exit;
-
     }
 
-
     http_response_code(405);
-
     echo json_encode([
         "exito" => false,
         "mensaje" => "Método no permitido."
     ]);
 
-
 } catch (PDOException $error) {
-
     http_response_code(500);
-
     echo json_encode([
         "exito" => false,
-        "mensaje" =>
-            "Ocurrió un error al procesar el recordatorio."
+        "mensaje" => "Ocurrió un error al procesar el recordatorio."
     ]);
-
 }
-
 ?>

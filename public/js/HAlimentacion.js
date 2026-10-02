@@ -42,7 +42,7 @@
     const ring = $("ring-comidas");
     const modal = $("modalEditarMeta");
 
-    // Inicializar menú Kebab, Deshabilitar y Regresar usando HabitoUniversal
+    
     if (typeof HabitoUniversal !== "undefined") {
         HabitoUniversal.init({
             idHabito: id,

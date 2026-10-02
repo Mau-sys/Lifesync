@@ -76,6 +76,8 @@ try {
     $habitos = $consultaHabitos->fetchAll(PDO::FETCH_ASSOC);
 
     $diaSemana = (int) date('N');
+    $fechaHoy = date('Y-m-d');
+
     $habitosHoy = [];
     $habitosPendientes = [];
     $totalHabitos = 0;
@@ -136,7 +138,7 @@ try {
         ? ($habitosCompletados / $totalHabitos) * 100
         : 0;
 
-    // 3. Consulta de Racha General (Usando la nueva estructura de rachas_usuario)
+    // 3. Consulta de Racha General
     $racha = 0;
     try {
         $consultaRacha = $db->prepare(
@@ -148,7 +150,6 @@ try {
         $consultaRacha->execute([':id_usuario' => $usuarioId]);
         $racha = (int) ($consultaRacha->fetchColumn() ?: 0);
     } catch (Throwable $e) {
-        // En caso de que la tabla aún no contenga la fila del usuario
         $racha = 0;
     }
 
@@ -164,8 +165,8 @@ try {
     $notificacionesBD = $consultaNotificaciones->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($notificacionesBD) === 0) {
-        $titulo = 'Bienvenido a LifeSync';
-        $mensaje = 'Activa los permisos de notificaciones y recordatorios para recibir avisos importantes de tus hábitos y rachas.';
+        $titulo = 'inicio.bienvenidaTitulo';
+        $mensaje = 'inicio.bienvenidaMensaje';
 
         $insertar = $db->prepare(
             'INSERT INTO notificaciones (id_usuario, titulo, mensaje, leida)
@@ -194,10 +195,66 @@ try {
             'titulo' => $notificacion['titulo'],
             'mensaje' => $notificacion['mensaje'],
             'leida' => (int) $notificacion['leida'] === 1,
-            'fecha_formateada' => $fecha->format('d/m/Y H:i')
+            'fecha_formateada' => $fecha->format('d/m/Y H:i'),
+            'timestamp' => $fecha->getTimestamp()
         ];
     }
 
+    // 5. Consulta de Recordatorios del día
+    $consultaRecordatorios = $db->prepare(
+        'SELECT 
+            r.id_recordatorio,
+            r.titulo,
+            r.mensaje,
+            r.hora,
+            r.repeticion,
+            r.fecha_recordatorio,
+            c.nombre AS nombre_categoria
+         FROM recordatorios r
+         LEFT JOIN categorias c ON c.id_categoria = r.id_categoria
+         WHERE r.id_usuario = :id_usuario
+           AND r.activo = 1
+           AND (
+               r.repeticion = "diario"
+               OR (r.repeticion = "lunes_viernes" AND :dia_semana BETWEEN 1 AND 5)
+               OR (r.repeticion = "una_vez" AND r.fecha_recordatorio = :fecha_hoy)
+               OR r.repeticion = "personalizado"
+           )
+         ORDER BY r.hora ASC'
+    );
+    $consultaRecordatorios->execute([
+        ':id_usuario' => $usuarioId,
+        ':dia_semana' => $diaSemana,
+        ':fecha_hoy' => $fechaHoy
+    ]);
+    $recordatoriosBD = $consultaRecordatorios->fetchAll(PDO::FETCH_ASSOC);
+
+    $recordatoriosParaNotificacion = [];
+    foreach ($recordatoriosBD as $rec) {
+        $horaFormateada = substr((string)$rec['hora'], 0, 5);
+        $cat = $rec['nombre_categoria'] ? " ({$rec['nombre_categoria']})" : "";
+        $mensajeDetalle = $rec['mensaje'] 
+            ? "⏰ {$horaFormateada}{$cat} - " . $rec['mensaje'] 
+            : "⏰ Recordatorio programado para las {$horaFormateada}{$cat}.";
+
+        $fechaObj = new DateTime("{$fechaHoy} {$rec['hora']}");
+
+        $recordatoriosParaNotificacion[] = [
+            'id_notificacion' => 'rec_' . $rec['id_recordatorio'],
+            'titulo' => '📌 ' . $rec['titulo'],
+            'mensaje' => $mensajeDetalle,
+            'leida' => true, // Se muestran como leídas en la lista general para no disparar el contador
+            'fecha_formateada' => 'Hoy ' . $horaFormateada,
+            'timestamp' => $fechaObj->getTimestamp()
+        ];
+    }
+
+    $todasNotificaciones = array_merge($recordatoriosParaNotificacion, $notificaciones);
+    usort($todasNotificaciones, function($a, $b) {
+        return ($b['timestamp'] ?? 0) <=> ($a['timestamp'] ?? 0);
+    });
+
+    // Conteo exclusivo de notificaciones no leídas persistentes en la BD
     $consultaNoLeidas = $db->prepare(
         'SELECT COUNT(*)
          FROM notificaciones
@@ -206,7 +263,7 @@ try {
     $consultaNoLeidas->execute([':id_usuario' => $usuarioId]);
     $notificacionesNoLeidas = (int) ($consultaNoLeidas->fetchColumn() ?: 0);
 
-    // 5. Respuesta JSON final limpia
+    // 6. Respuesta JSON final
     echo json_encode([
         'exito' => true,
         'usuario' => [
@@ -222,7 +279,7 @@ try {
         'racha' => $racha,
         'habitos_hoy' => $habitosHoy,
         'habitos_pendientes' => $habitosPendientes,
-        'notificaciones' => $notificaciones,
+        'notificaciones' => $todasNotificaciones,
         'notificaciones_no_leidas' => $notificacionesNoLeidas
     ], JSON_UNESCAPED_UNICODE);
 

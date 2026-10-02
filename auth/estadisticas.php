@@ -1,20 +1,18 @@
 <?php
-
 declare(strict_types=1);
 
 session_start();
 header('Content-Type: application/json; charset=UTF-8');
 require_once __DIR__ . '/../config/conexion.php';
 
-function responderEstadisticas(bool $exito, string $mensaje = '', array $datos = [], int $codigo = 200): never
-{
+function responder(bool $exito, string $mensaje = '', array $datos = [], int $codigo = 200): never {
     http_response_code($codigo);
     echo json_encode(array_merge(['exito' => $exito, 'mensaje' => $mensaje], $datos), JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 if (!isset($_SESSION['usuario_id'])) {
-    responderEstadisticas(false, 'La sesión ha expirado.', [], 401);
+    responder(false, 'La sesión ha expirado.', [], 401);
 }
 
 $idUsuario = (int) $_SESSION['usuario_id'];
@@ -29,6 +27,7 @@ try {
 
     $hoy = new DateTimeImmutable('today');
     $fechaFin = $hoy;
+
     if ($periodo === 'semana') {
         $fechaInicio = $hoy->modify('-6 days');
     } elseif ($periodo === 'mes') {
@@ -37,222 +36,164 @@ try {
         $fechaInicio = $hoy->modify('first day of January this year');
     }
 
+    // 1. Obtener hábitos activos del usuario
     $consultaHabitos = $db->prepare(
-        "SELECT
-            hu.id_habito_usuario,
-            h.id_habito,
-            h.id_categoria,
-            h.nombre_habito,
-            h.descripcion,
-            h.imagen_url,
-            h.es_base,
-            c.nombre AS nombre_categoria,
-            hu.objetivo,
-            hu.unidad,
-            hu.frecuencia,
-            hu.duracion_minutos,
-            hu.fecha_inicio,
-            hu.fecha_fin
+        "SELECT hu.id_habito_usuario, h.id_categoria, h.nombre_habito, h.es_base,
+                c.nombre AS nombre_categoria, hu.objetivo, hu.frecuencia, hu.fecha_inicio, hu.fecha_fin
          FROM habitos_usuario hu
          INNER JOIN habitos h ON h.id_habito = hu.id_habito
          LEFT JOIN categorias c ON c.id_categoria = h.id_categoria
-         WHERE hu.id_usuario = :id_usuario
-         AND hu.activo = TRUE
-         ORDER BY h.id_categoria, h.id_habito"
+         WHERE hu.id_usuario = :id_usuario AND hu.activo = TRUE"
     );
     $consultaHabitos->execute([':id_usuario' => $idUsuario]);
     $habitos = $consultaHabitos->fetchAll(PDO::FETCH_ASSOC);
 
-    $consultaCategorias = $db->query(
-        "SELECT id_categoria, nombre
-         FROM categorias
-         ORDER BY id_categoria"
-    );
-    $categoriasBD = $consultaCategorias->fetchAll(PDO::FETCH_ASSOC);
-
+    // 2. Registros reales de la BD dentro del rango seleccionado
     $consultaRegistros = $db->prepare(
-        "SELECT
-            r.id_habito_usuario,
-            DATE(r.fecha_registro) AS fecha,
-            r.valor_registrado
+        "SELECT r.id_habito_usuario, DATE(r.fecha_registro) AS fecha, SUM(r.valor_registrado) AS total_dia
          FROM registros_habitos r
          INNER JOIN habitos_usuario hu ON hu.id_habito_usuario = r.id_habito_usuario
          WHERE hu.id_usuario = :id_usuario
-         AND DATE(r.fecha_registro) BETWEEN :inicio AND :fin
-         ORDER BY r.fecha_registro"
+           AND DATE(r.fecha_registro) BETWEEN :inicio AND :fin
+         GROUP BY r.id_habito_usuario, DATE(r.fecha_registro)"
     );
     $consultaRegistros->execute([
         ':id_usuario' => $idUsuario,
         ':inicio' => $fechaInicio->format('Y-m-d'),
         ':fin' => $fechaFin->format('Y-m-d')
     ]);
-    $registros = $consultaRegistros->fetchAll(PDO::FETCH_ASSOC);
+    $registrosBD = $consultaRegistros->fetchAll(PDO::FETCH_ASSOC);
 
-    $porHabito = [];
-    foreach ($registros as $registro) {
-        $idHabitoUsuario = (int) $registro['id_habito_usuario'];
-        if (!isset($porHabito[$idHabitoUsuario])) {
-            $porHabito[$idHabitoUsuario] = [];
-        }
-        $porHabito[$idHabitoUsuario][] = $registro;
+    // Mapear registros por [id_habito_usuario][fecha]
+    $matrizRegistros = [];
+    foreach ($registrosBD as $reg) {
+        $matrizRegistros[(int)$reg['id_habito_usuario']][$reg['fecha']] = (float)$reg['total_dia'];
     }
 
-    $diaSemana = (int) $hoy->format('N');
-    $progresoGeneral = 0;
-    $habitosCompletados = 0;
-    $habitosContados = 0;
-    $habitosPersonalizados = [];
+    // 3. Días específicos para hábitos con frecuencia personalizada
+    $diasPersonalizados = [];
+    $consultaDias = $db->query("SELECT id_habito_usuario, dia_semana FROM habito_dias");
+    foreach ($consultaDias->fetchAll(PDO::FETCH_ASSOC) as $dia) {
+        $diasPersonalizados[(int)$dia['id_habito_usuario']][] = (int)$dia['dia_semana'];
+    }
 
-    foreach ($habitos as $habito) {
-        $idHU = (int) $habito['id_habito_usuario'];
-        $objetivo = (float) $habito['objetivo'];
-        if ($objetivo <= 0) {
-            continue;
-        }
+    // 4. Calcular datos de la gráfica día por día
+    $grafica = [];
+    $cursor = $fechaInicio;
+    $totalCompletadosPeriodo = 0;
 
-        $registrosHabito = $porHabito[$idHU] ?? [];
-        $total = 0;
-        foreach ($registrosHabito as $registro) {
-            $total += (float) $registro['valor_registrado'];
-        }
+    while ($cursor <= $fechaFin) {
+        $fechaStr = $cursor->format('Y-m-d');
+        $numDiaSemana = (int)$cursor->format('N');
+        $esperados = 0;
+        $completados = 0;
 
-        $porcentaje = min(100, ($total / $objetivo) * 100);
-        $progresoGeneral += $porcentaje;
-        $habitosContados++;
+        foreach ($habitos as $habito) {
+            $idHU = (int)$habito['id_habito_usuario'];
 
-        $progresoHoy = 0;
-        foreach ($registrosHabito as $registro) {
-            if ($registro['fecha'] === $hoy->format('Y-m-d')) {
-                $progresoHoy += (float) $registro['valor_registrado'];
+            // Comprobar rango de fechas activas
+            if ($habito['fecha_inicio'] > $fechaStr || ($habito['fecha_fin'] !== null && $habito['fecha_fin'] < $fechaStr)) {
+                continue;
+            }
+
+            // Comprobar si correspondía realizar el hábito en este día
+            $corresponde = $habito['frecuencia'] === 'diaria';
+            if ($habito['frecuencia'] === 'dias específicos' || $habito['frecuencia'] === 'personalizada') {
+                $corresponde = in_array($numDiaSemana, $diasPersonalizados[$idHU] ?? [], true);
+            }
+
+            if (!$corresponde) continue;
+
+            $esperados++;
+            $avance = $matrizRegistros[$idHU][$fechaStr] ?? 0;
+            if ($avance >= (float)$habito['objetivo']) {
+                $completados++;
             }
         }
-        if ($progresoHoy >= $objetivo) {
-            $habitosCompletados++;
-        }
 
-        if (!(bool) $habito['es_base']) {
-            $habitosPersonalizados[] = [
-                'nombre' => $habito['nombre_habito'],
-                'detalle' => count($registrosHabito) . (count($registrosHabito) === 1 ? ' registro' : ' registros'),
-                'porcentaje' => round($porcentaje, 2)
-            ];
-        }
+        $porcentajeDia = $esperados > 0 ? round(($completados / $esperados) * 100, 2) : 0;
+        $totalCompletadosPeriodo += $completados;
+
+        $grafica[] = [
+            'fecha' => $fechaStr,
+            'porcentaje' => $porcentajeDia,
+            'completados' => $completados,
+            'esperados' => $esperados
+        ];
+
+        $cursor = $cursor->modify('+1 day');
     }
+
+    // 5. Racha general desde BD
+    $consultaRacha = $db->prepare(
+        "SELECT COALESCE(racha_general_actual, 0) 
+         FROM rachas_usuario 
+         WHERE id_usuario = :id_usuario LIMIT 1"
+    );
+    $consultaRacha->execute([':id_usuario' => $idUsuario]);
+    $diasRacha = (int) $consultaRacha->fetchColumn();
+
+    // 6. Progreso Promedio General
+    $sumaPorcentajes = array_sum(array_column($grafica, 'porcentaje'));
+    $progresoGeneral = count($grafica) > 0 ? round($sumaPorcentajes / count($grafica), 2) : 0;
+
+    // 7. Estadísticas por Categorías
+    $consultaCategorias = $db->query("SELECT id_categoria, nombre FROM categorias ORDER BY id_categoria");
+    $categoriasBD = $consultaCategorias->fetchAll(PDO::FETCH_ASSOC);
 
     $categorias = [];
-    foreach ($categoriasBD as $categoria) {
-        $idCategoria = (int) $categoria['id_categoria'];
-        $habitosCategoria = array_filter($habitos, fn($habito) => (int) $habito['id_categoria'] === $idCategoria);
-        $totalHabitos = count($habitosCategoria);
+    foreach ($categoriasBD as $cat) {
+        $idCat = (int)$cat['id_categoria'];
+        $habsCat = array_filter($habitos, fn($h) => (int)$h['id_categoria'] === $idCat);
+        $totalHabs = count($habsCat);
         $completadosHoy = 0;
-        $sumaPorcentajes = 0;
 
-        foreach ($habitosCategoria as $habito) {
-            $idHU = (int) $habito['id_habito_usuario'];
-            $objetivo = (float) $habito['objetivo'];
-            $progresoHoy = 0;
-            foreach ($porHabito[$idHU] ?? [] as $registro) {
-                if ($registro['fecha'] === $hoy->format('Y-m-d')) {
-                    $progresoHoy += (float) $registro['valor_registrado'];
-                }
-            }
-            $porcentajeHoy = $objetivo > 0 ? min(100, ($progresoHoy / $objetivo) * 100) : 0;
-            $sumaPorcentajes += $porcentajeHoy;
-            if ($porcentajeHoy >= 100) {
+        foreach ($habsCat as $h) {
+            $idHU = (int)$h['id_habito_usuario'];
+            $avanceHoy = $matrizRegistros[$idHU][$hoy->format('Y-m-d')] ?? 0;
+            if ($avanceHoy >= (float)$h['objetivo']) {
                 $completadosHoy++;
             }
         }
 
         $categorias[] = [
-            'id_categoria' => $idCategoria,
-            'nombre_categoria' => $categoria['nombre'],
-            'descripcion' => 'Administra tus hábitos de esta categoría.',
-            'seleccionada' => $totalHabitos > 0,
-            'porcentaje' => $totalHabitos > 0 ? round($sumaPorcentajes / $totalHabitos, 2) : 0,
-            'total_habitos' => $totalHabitos,
-            'completados_hoy' => $completadosHoy
+            'id_categoria' => $idCat,
+            'nombre_categoria' => $cat['nombre'],
+            'total_habitos' => $totalHabs,
+            'completados_hoy' => $completadosHoy,
+            'porcentaje' => $totalHabs > 0 ? round(($completadosHoy / $totalHabs) * 100, 2) : 0
         ];
     }
 
-    $diasPersonalizados = [];
-    $consultaDias = $db->query(
-        "SELECT id_habito_usuario, dia_semana
-         FROM habito_dias"
-    );
-    foreach ($consultaDias->fetchAll(PDO::FETCH_ASSOC) as $dia) {
-        $idHU = (int) $dia['id_habito_usuario'];
-        $diasPersonalizados[$idHU][] = (int) $dia['dia_semana'];
-    }
+    // 8. Hábitos Personalizados
+    $habitosPersonalizados = [];
+    foreach ($habitos as $h) {
+        if (!(bool)$h['es_base']) {
+            $idHU = (int)$h['id_habito_usuario'];
+            $totalRegs = count($matrizRegistros[$idHU] ?? []);
+            $avanceHoy = $matrizRegistros[$idHU][$hoy->format('Y-m-d')] ?? 0;
+            $pctHoy = min(100, round(($avanceHoy / (float)$h['objetivo']) * 100, 2));
 
-    $consultaRacha = $db->prepare(
-        "SELECT COALESCE(MAX(r.racha_actual), 0)
-         FROM rachas r
-         INNER JOIN habitos_usuario hu ON hu.id_habito_usuario = r.id_habito_usuario
-         WHERE hu.id_usuario = :id_usuario
-         AND hu.activo = TRUE"
-    );
-    $consultaRacha->execute([':id_usuario' => $idUsuario]);
-    $diasRacha = (int) $consultaRacha->fetchColumn();
-
-    $grafica = [];
-    $cursor = $fechaInicio;
-    while ($cursor <= $fechaFin) {
-        $fecha = $cursor->format('Y-m-d');
-        $esperados = 0;
-        $completados = 0;
-        $dia = (int) $cursor->format('N');
-
-        foreach ($habitos as $habito) {
-            if ($habito['fecha_inicio'] > $fecha || ($habito['fecha_fin'] !== null && $habito['fecha_fin'] < $fecha)) {
-                continue;
-            }
-            $programado = $habito['frecuencia'] === 'diaria';
-            if ($habito['frecuencia'] === 'personalizada') {
-                $programado = in_array(
-                    $dia,
-                    $diasPersonalizados[(int) $habito['id_habito_usuario']] ?? [],
-                    true
-                );
-            }
-            if (!$programado) {
-                continue;
-            }
-            $esperados++;
-            $progreso = 0;
-            foreach ($porHabito[(int) $habito['id_habito_usuario']] ?? [] as $registro) {
-                if ($registro['fecha'] === $fecha) {
-                    $progreso += (float) $registro['valor_registrado'];
-                }
-            }
-            if ($progreso >= (float) $habito['objetivo']) {
-                $completados++;
-            }
+            $habitosPersonalizados[] = [
+                'nombre' => $h['nombre_habito'],
+                'detalle' => $totalRegs . ($totalRegs === 1 ? ' registro en el período' : ' registros en el período'),
+                'porcentaje' => $pctHoy
+            ];
         }
-
-        $grafica[] = [
-            'fecha' => $fecha,
-            'porcentaje' => $esperados > 0 ? round(($completados / $esperados) * 100, 2) : 0,
-            'completados' => $completados,
-            'esperados' => $esperados
-        ];
-        $cursor = $cursor->modify('+1 day');
     }
 
-    responderEstadisticas(true, '', [
-        'periodo' => $periodo,
-        'fecha_inicio' => $fechaInicio->format('Y-m-d'),
-        'fecha_fin' => $fechaFin->format('Y-m-d'),
+    responder(true, '', [
         'resumen' => [
-            'progreso_general' => $habitosContados > 0 ? round($progresoGeneral / $habitosContados, 2) : 0,
+            'progreso_general' => $progresoGeneral,
             'dias_racha' => $diasRacha,
-            'habitos_completados' => $habitosCompletados
+            'habitos_completados' => $totalCompletadosPeriodo
         ],
         'grafica' => $grafica,
         'categorias' => $categorias,
         'habitos' => $habitosPersonalizados
     ]);
 
-} catch (Throwable $error) {
-    error_log('LifeSync estadisticas.php: ' . $error->getMessage());
-    responderEstadisticas(false, 'No se pudieron cargar las estadísticas.', [], 500);
+} catch (Throwable $e) {
+    error_log("Error en estadisticas.php: " . $e->getMessage());
+    responder(false, "No se pudieron obtener las estadísticas.", [], 500);
 }

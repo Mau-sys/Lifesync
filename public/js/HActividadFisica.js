@@ -24,7 +24,7 @@
     const modalSesion = typeof bootstrap !== "undefined" && $("modalRegistrarSesion") ? new bootstrap.Modal($("modalRegistrarSesion")) : null;
     const modalMeta = typeof bootstrap !== "undefined" && $("modalEditarMetaFisica") ? new bootstrap.Modal($("modalEditarMetaFisica")) : null;
 
-    // Inicializar lógica universal (Menú Kebab, Regresar y Deshabilitar)
+ 
     if (typeof HabitoUniversal !== "undefined") {
         HabitoUniversal.init({
             idHabito: id,
