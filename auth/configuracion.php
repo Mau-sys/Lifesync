@@ -47,9 +47,10 @@ try {
         $configuracion = $consulta->fetch(PDO::FETCH_ASSOC);
 
         if (!$configuracion) {
+            // Usuario nuevo sin configuración previa: asigna 'en' por defecto
             $configuracion = [
                 'tema' => 'oscuro',
-                'idioma' => 'es',
+                'idioma' => 'en',
                 'notificaciones_activas' => 1,
                 'sonidos_activados' => 1,
                 'sincronizacion_automatica' => 1,
@@ -58,11 +59,16 @@ try {
             ];
         }
 
+        // Si el usuario ya tenía 'es' en la BD, lo conserva; de lo contrario toma 'en'
+        $idiomaUsuario = (!empty($configuracion['idioma']) && in_array($configuracion['idioma'], ['es', 'en'], true))
+            ? $configuracion['idioma']
+            : 'en';
+
         echo json_encode([
             'exito' => true,
             'configuracion' => [
                 'tema' => in_array($configuracion['tema'], ['claro', 'oscuro', 'sistema'], true) ? $configuracion['tema'] : 'oscuro',
-                'idioma' => $configuracion['idioma'] === 'en' ? 'en' : 'es',
+                'idioma' => $idiomaUsuario,
                 'notificaciones_activas' => (int) $configuracion['notificaciones_activas'],
                 'sonidos_activados' => (int) $configuracion['sonidos_activados'],
                 'sincronizacion_automatica' => (int) $configuracion['sincronizacion_automatica'],
@@ -75,7 +81,7 @@ try {
 
     if ($accion === 'guardar') {
         $tema = $_POST['tema'] ?? 'oscuro';
-        $idioma = $_POST['idioma'] ?? 'es';
+        $idioma = $_POST['idioma'] ?? 'en';
         $notificaciones = !empty($_POST['notificaciones']) ? 1 : 0;
         $sonidos = !empty($_POST['sonidos']) ? 1 : 0;
         $sincronizacion = !empty($_POST['sincronizacion']) ? 1 : 0;
@@ -86,7 +92,7 @@ try {
             $tema = 'oscuro';
         }
         if (!in_array($idioma, ['es', 'en'], true)) {
-            $idioma = 'es';
+            $idioma = 'en';
         }
 
         $db->beginTransaction();

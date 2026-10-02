@@ -234,25 +234,38 @@ CREATE TABLE IF NOT EXISTS estadisticas_habitos (
     )
 );
 
-
-CREATE TABLE IF NOT EXISTS rachas (
-    id_racha INT AUTO_INCREMENT PRIMARY KEY,
-
+CREATE TABLE IF NOT EXISTS rachas_habito (
+    id_racha_habito INT AUTO_INCREMENT PRIMARY KEY,
     id_habito_usuario INT NOT NULL UNIQUE,
-
-    racha_actual INT DEFAULT 0,
-
-    mejor_racha INT DEFAULT 0,
-
-    total_completados INT DEFAULT 0,
-
-    ultima_fecha DATE NULL,
-
-    fecha_inicio DATETIME
-        DEFAULT CURRENT_TIMESTAMP,
-
+    racha_actual INT DEFAULT 0,           
+    mejor_racha INT DEFAULT 0,             
+    total_completados INT DEFAULT 0,      
+    ultima_fecha DATE NULL,               
     FOREIGN KEY (id_habito_usuario)
         REFERENCES habitos_usuario(id_habito_usuario)
+        ON DELETE CASCADE
+);
+  
+
+CREATE TABLE IF NOT EXISTS rachas_usuario (
+    id_racha_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL UNIQUE,
+    racha_general_actual INT DEFAULT 0,    
+    mejor_racha_general INT DEFAULT 0,     
+    ultima_fecha_actividad DATE NULL,      
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id_usuario)
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS constelacion_dias (
+    id_constelacion_dia INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    fecha DATE NOT NULL,                  
+    CONSTRAINT uq_usuario_constelacion_fecha UNIQUE (id_usuario, fecha),
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id_usuario)
         ON DELETE CASCADE
 );
 

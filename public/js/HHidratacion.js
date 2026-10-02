@@ -33,9 +33,14 @@
         if (kebabMenu && !kebabMenu.contains(e.target)) kebabMenu.classList.remove("show");
     });
 
+    // Navegación de regreso limpia usando document.referrer
     $("btn-regresar")?.addEventListener("click", e => {
         e.preventDefault();
-        history.length > 1 ? history.back() : location.href = "inicio.html";
+        if (document.referrer && document.referrer.includes(window.location.host)) {
+            window.location.href = document.referrer;
+        } else {
+            window.location.href = "inicio.html";
+        }
     });
 
     async function cargar() {
@@ -156,6 +161,6 @@
 HabitoUniversal.init({
     btnOptionsId: "btn-options-actividad-fisica",
     menuId: "kebab-menu-actividad-fisica",
-    btnDeshabilitarId: "btn-deshabilitar-habito", // ID de la opción deshabilitar en el menú
+    btnDeshabilitarId: "btn-deshabilitar-habito",
     urlRedireccion: "inicio.html"
 });

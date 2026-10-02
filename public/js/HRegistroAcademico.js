@@ -26,7 +26,6 @@
 
     const $ = id => document.getElementById(id);
 
-    const menu = $("kebab-menu-academico");
     const ring = $("ring-academico");
     const contador = $("contador-academico");
     const meta = $("meta-academico");
@@ -35,7 +34,6 @@
     const lista = $("lista-registros");
     const btn = $("btn-add-registro");
 
-    const btnOptions = $("btn-options-academico");
     const btnRegresar = $("btn-regresar");
     const btnEditarMeta = $("btn-editar-meta");
     const btnGuardarConfig = $("btn-guardar-config");
@@ -50,26 +48,27 @@
 
     const modalEditar = $("modalEditarAcademico");
 
-    btnOptions?.addEventListener("click", e => {
-        e.stopPropagation();
-        menu?.classList.toggle("show");
-    });
-
-    document.addEventListener("click", e => {
-        if (menu && !menu.contains(e.target)) {
-            menu.classList.remove("show");
-        }
-    });
-
+    // NAVEGACIÓN INTELIGENTE Y BLINDADA
     btnRegresar?.addEventListener("click", e => {
         e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
 
-        if (history.length > 1) {
-            history.back();
+        const origenSesion = sessionStorage.getItem("origen_navegacion");
+        sessionStorage.removeItem("origen_navegacion");
+
+        const paginaAnterior = document.referrer ? document.referrer.toLowerCase() : "";
+
+        if (origenSesion && !origenSesion.toLowerCase().includes("registroacademico")) {
+            window.location.href = origenSesion;
+        } else if (paginaAnterior.includes("categorias.html")) {
+            window.location.href = "Categorias.html";
+        } else if (paginaAnterior.includes("rachas.html")) {
+            window.location.href = "Rachas.html";
         } else {
-            location.href = "inicio.html";
+            window.location.href = "inicio.html";
         }
-    });
+    }, true);
 
     // Control de visibilidad para los días personalizados
     selectFrecuencia?.addEventListener("change", e => {
@@ -284,6 +283,7 @@
     btnEditarMeta?.addEventListener("click", e => {
         e.preventDefault();
 
+        const menu = $("kebab-menu-academico");
         menu?.classList.remove("show");
 
         if (selectFrecuencia) {
@@ -477,9 +477,12 @@
         });
 })();
 
-HabitoUniversal.init({
-    btnOptionsId: "btn-options-actividad-fisica",
-    menuId: "kebab-menu-actividad-fisica",
-    btnDeshabilitarId: "btn-deshabilitar-habito", // ID de la opción deshabilitar en el menú
-    urlRedireccion: "inicio.html"
-});
+// Inicialización corregida para Registro Académico
+if (typeof HabitoUniversal !== "undefined" && HabitoUniversal.init) {
+    HabitoUniversal.init({
+        btnOptionsId: "btn-options-academico",
+        menuId: "kebab-menu-academico",
+        btnDeshabilitarId: "btn-deshabilitar-habito",
+        urlRedireccion: "inicio.html"
+    });
+}

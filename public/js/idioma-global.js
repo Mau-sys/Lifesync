@@ -940,7 +940,6 @@
         "idioma"
     ];
 
-    // Se establece "en" como idioma inicial por defecto
     let idiomaActual = "en";
 
     function leerIdiomaGuardado() {
@@ -960,7 +959,6 @@
             const valor = localStorage.getItem(key);
             if (valor === "es" || valor === "en") return valor;
         }
-        // Idioma predeterminado cuando no hay registro guardado
         return "en";
     }
 
@@ -1004,7 +1002,6 @@
         if (clave === null || clave === undefined) return fallback || "";
 
         const texto = String(clave);
-        // Usa EN como diccionario de reserva si no se encuentra
         const diccionario = idiomas[idiomaActual] || EN;
 
         if (Object.prototype.hasOwnProperty.call(diccionario, texto)) {

@@ -221,6 +221,23 @@
         obtenerTemaGuardado;
 
 
+    // Función para forzar restablecimiento al cerrar sesión
+    window.restablecerTemaPorDefecto =
+        function () {
+
+            localStorage.removeItem(CLAVE_TEMA);
+
+            try {
+                let configuracion = JSON.parse(localStorage.getItem(CLAVE_CONFIGURACION)) || {};
+                delete configuracion.modoOscuro;
+                localStorage.setItem(CLAVE_CONFIGURACION, JSON.stringify(configuracion));
+            } catch (e) {}
+
+            aplicarTema("oscuro");
+
+        };
+
+
     const temaInicial =
         obtenerTemaGuardado();
 

@@ -110,7 +110,7 @@ async function cargarHabitos() {
 }
 
 function crearTarjetaHabito(habito, contenedor) {
-    // Usar id_habito_usuario con fallback a id_habito si no viniera
+    // Usar id_habito_usuario directamente
     const idHU = habito.id_habito_usuario || habito.id_habito;
 
     const tarjeta = document.createElement("article");
@@ -131,7 +131,6 @@ function crearTarjetaHabito(habito, contenedor) {
 
     const contenido = document.createElement("a");
     contenido.className = "contenido-habito";
-    // CORRECCIÓN: Se envía el ID específico de la relación del usuario
     contenido.href = "HHabitoPersonalizado.html?id_habito_usuario=" + encodeURIComponent(idHU);
 
     const informacion = document.createElement("div");
@@ -144,7 +143,7 @@ function crearTarjetaHabito(habito, contenedor) {
     const datos = document.createElement("div");
 
     const titulo = document.createElement("h3");
-    titulo.textContent = habito.nombre_habito;
+    titulo.textContent = habito.nombre_habito || habito.nombre || LS("HabitoPersonalizado");
 
     const descripcion = document.createElement("p");
     descripcion.textContent = obtenerTextoHabito(habito);
@@ -184,13 +183,14 @@ function traducirFrecuencia(frecuencia) {
         case "mensual":
             return traducir("frecuenciaMensual");
         default:
-            return frecuencia || "";
+            return frecuencia || traducir("frecuenciaDiario");
     }
 }
 
 function calcularProgreso(habito) {
     const objetivo = Number(habito.objetivo);
-    const progreso = Number(habito.progreso ?? habito.progreso_hoy ?? 0);
+    // Evaluamos directamente progreso_hoy o progreso (evitando búsquedas de racha/consecutivos)
+    const progreso = Number(habito.progreso_hoy ?? habito.progreso ?? habito.progreso_acumulado ?? 0);
 
     if (!objetivo || objetivo <= 0) {
         return 0;
@@ -268,8 +268,7 @@ async function eliminarHabito() {
             },
             credentials: "include",
             body: JSON.stringify({
-                id_habito_usuario: habitoAEliminar,
-                id_habito: habitoAEliminar
+                id_habito_usuario: habitoAEliminar
             })
         });
 

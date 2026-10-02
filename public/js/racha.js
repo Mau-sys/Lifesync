@@ -1,6 +1,8 @@
 (function () {
     "use strict";
 
+    const API = window.location.pathname.includes("/public/") ? "../auth/" : "auth/";
+
     function iniciarRachas() {
         console.log("=== Inicializando racha.js ===");
 
@@ -67,8 +69,8 @@
 
         async function cargarRachas() {
             try {
-                // Se ajusta la ruta a auth/racha.php relativa a la raíz
-                const respuesta = await fetch("auth/racha.php", {
+                // Se utiliza la constante API para evitar errores 404
+                const respuesta = await fetch(`${API}racha.php`, {
                     method: "GET",
                     credentials: "same-origin",
                     cache: "no-store",

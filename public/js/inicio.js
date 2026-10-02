@@ -6,6 +6,8 @@
             ? window.traducirLifeSync(texto)
             : texto;
 
+    const API = window.location.pathname.includes("/public/") ? "../auth/" : "auth/";
+
     const RUTAS = {
         "Hidratación": "Hhidratacion.html",
         "Alimentación": "HAlimentacion.html",
@@ -82,7 +84,7 @@
 
         async function cargarDatosInicio() {
             try {
-                const respuesta = await fetch("../auth/inicio.php", {
+                const respuesta = await fetch(`${API}inicio.php`, {
                     method: "GET",
                     cache: "no-store",
                     credentials: "include",
@@ -219,7 +221,7 @@
 
         async function marcarNotificacionesLeidas() {
             try {
-                const respuesta = await fetch("../auth/notificaciones-leer.php", {
+                const respuesta = await fetch(`${API}notificaciones-leer.php`, {
                     method: "POST",
                     credentials: "include",
                     headers: {
@@ -396,14 +398,17 @@
                                     ? "Personalizados.html"
                                     : ruta;
 
-                    articulo.addEventListener("click", () => {
+                    const navegarConOrigen = () => {
+                        sessionStorage.setItem("origen_navegacion", "inicio.html");
                         window.location.href = destino;
-                    });
+                    };
+
+                    articulo.addEventListener("click", navegarConOrigen);
 
                     articulo.addEventListener("keydown", evento => {
                         if (evento.key === "Enter" || evento.key === " ") {
                             evento.preventDefault();
-                            window.location.href = destino;
+                            navegarConOrigen();
                         }
                     });
                 }

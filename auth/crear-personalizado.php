@@ -51,7 +51,7 @@ try {
     $objetivo = !empty($data['objetivo']) ? (float)$data['objetivo'] : 1.00;
     $unidad = trim((string)($data['unidad'] ?? 'completar'));
     
-    // SOLUCIÓN AL CHECK CONSTRAINT: Si es <= 0 o está vacío, enviamos NULL
+    // Normalización de duración para evitar CHECK CONSTRAINT
     $duracionVal = isset($data['duracion_minutos']) ? (int)$data['duracion_minutos'] : 0;
     $duracionMinutos = ($duracionVal > 0) ? $duracionVal : null;
 
@@ -111,13 +111,6 @@ try {
     ]);
 
     $idHabitoUsuario = (int) $db->lastInsertId();
-
-    // 4. Inicializar racha
-    $stmtRacha = $db->prepare("
-        INSERT IGNORE INTO rachas (id_habito_usuario, racha_actual, mejor_racha, total_completados) 
-        VALUES (:id_hu, 0, 0, 0)
-    ");
-    $stmtRacha->execute([':id_hu' => $idHabitoUsuario]);
 
     $db->commit();
 

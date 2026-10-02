@@ -70,7 +70,7 @@ try {
     $consulta = $db->prepare(
         "INSERT INTO preferencias_usuario
         (id_usuario, tema, idioma, notificaciones_activas, sonidos_activados, sincronizacion_automatica)
-        VALUES (:id_usuario, 'oscuro', 'es', TRUE, TRUE, TRUE)"
+        VALUES (:id_usuario, 'oscuro', 'en', TRUE, TRUE, TRUE)"
     );
     $consulta->execute([':id_usuario' => $usuarioId]);
 

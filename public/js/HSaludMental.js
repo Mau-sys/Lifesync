@@ -21,9 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnAddPausa = document.getElementById('btn-add-pausa');
     const listaPausas = document.getElementById('lista-pausas');
 
-    // Elementos del menú Kebab y Navegación
-    const btnOptions = document.getElementById('btn-options-saludmental');
-    const kebabMenu = document.getElementById('kebab-menu-saludmental');
+    // Botón de Regreso
     const btnRegresar = document.getElementById('btn-regresar');
 
     // Elementos del Modal de Configuración
@@ -42,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
             : clave;
     }
 
-    // Mapea y limpia el valor de la frecuencia para que siempre coincida con el <select>
+    // Mapea y limpia el valor de la frecuencia
     function normalizarFrecuencia(frec) {
         if (!frec) return 'diaria';
         const f = String(frec).toLowerCase().trim();
@@ -79,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 duracionPausa = Number(h.duracion_minutos) || 15;
                 pausasCompletadas = Number(h.progreso_hoy ?? h.total_pausas) || 0;
                 
-                // Normalizar historial desde la BD
                 if (Array.isArray(h.registros)) {
                     historialPausas = h.registros.map(r => typeof r === 'object' ? (r.hora || r.fecha_registro) : r);
                 } else {
@@ -96,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 cargarDatosLocal();
             }
         } catch (error) {
-            console.warn("Cargando desde localStorage debido a error en red o servidor:", error);
+            console.warn("Cargando desde localStorage por error de red:", error);
             cargarDatosLocal();
         }
 
@@ -174,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             } catch (error) {
-                console.warn("Servidor inaccesible, registrando de forma local:", error);
+                console.warn("Servidor inaccesible, registrando localmente:", error);
             }
         }
 
@@ -204,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
             });
         } catch (error) {
-            console.warn("No se pudo sincronizar la configuración con la BD:", error);
+            console.warn("No se pudo sincronizar con backend:", error);
         }
     }
 
@@ -253,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function esDiaActivo() {
         if (frecuenciaMeta !== 'personalizada') return true;
-        const diaHoy = new Date().getDay(); // 0 = Domingo, 1 = Lunes...
+        const diaHoy = new Date().getDay();
         return diasSeleccionados.map(Number).includes(diaHoy);
     }
 
@@ -267,7 +264,6 @@ document.addEventListener("DOMContentLoaded", () => {
             contadorElement.textContent = `${pausasCompletadas}/${pausasTotales}`;
         }
 
-        // Actualizar etiqueta según el tipo de frecuencia seleccionada
         if (labelMetaTipo) {
             if (frecuenciaMeta === 'semanal') {
                 labelMetaTipo.textContent = LS("saludMental.metaSemanal") || "META SEMANAL";
@@ -379,13 +375,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function cerrarModalYMenu() {
+    function cerrarModal() {
         const modalElement = document.getElementById('modalEditarSaludMental');
         if (modalElement) {
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             if (modalInstance) modalInstance.hide();
         }
-        if (kebabMenu) kebabMenu.classList.remove('show');
     }
 
     // ==========================================
@@ -395,30 +390,28 @@ document.addEventListener("DOMContentLoaded", () => {
         btnAddPausa.addEventListener('click', agregarPausa);
     }
 
-    if (btnOptions && kebabMenu) {
-        btnOptions.addEventListener('click', (e) => {
-            e.stopPropagation();
-            kebabMenu.classList.toggle('show');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!kebabMenu.contains(e.target)) {
-                kebabMenu.classList.remove('show');
-            }
-        });
-    }
-
+    // REGRESO BLINDADO E INDEPENDIENTE
     if (btnRegresar) {
-        btnRegresar.addEventListener('click', () => {
-            const paginaAnterior = document.referrer;
-            const mismoDominio = paginaAnterior && paginaAnterior.includes(window.location.host);
+        btnRegresar.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
 
-            if (mismoDominio) {
-                window.history.back();
+            const origenSesion = sessionStorage.getItem("origen_navegacion");
+            sessionStorage.removeItem("origen_navegacion");
+
+            const paginaAnterior = document.referrer ? document.referrer.toLowerCase() : "";
+
+            if (origenSesion && !origenSesion.toLowerCase().includes("saludmental")) {
+                window.location.href = origenSesion;
+            } else if (paginaAnterior.includes("categorias.html")) {
+                window.location.href = "Categorias.html";
+            } else if (paginaAnterior.includes("rachas.html")) {
+                window.location.href = "Rachas.html";
             } else {
-                window.location.href = 'inicio.html';
+                window.location.href = "inicio.html";
             }
-        });
+        }, true);
     }
 
     if (selectFrecuencia) {
@@ -477,7 +470,7 @@ document.addEventListener("DOMContentLoaded", () => {
             guardarDatosLocal();
             sincronizarConfiguracionBackend();
             actualizarInterfaz();
-            cerrarModalYMenu();
+            cerrarModal();
         });
     }
 
@@ -486,9 +479,12 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarDatos();
 });
 
-HabitoUniversal.init({
-    btnOptionsId: "btn-options-actividad-fisica",
-    menuId: "kebab-menu-actividad-fisica",
-    btnDeshabilitarId: "btn-deshabilitar-habito", // ID de la opción deshabilitar en el menú
-    urlRedireccion: "inicio.html"
-});
+// Inicialización de HabitoUniversal para menú Kebab y deshabilitar hábito
+if (typeof HabitoUniversal !== "undefined" && HabitoUniversal.init) {
+    HabitoUniversal.init({
+        btnOptionsId: "btn-options-saludmental",
+        menuId: "kebab-menu-saludmental",
+        btnDeshabilitarId: "btn-deshabilitar-habito",
+        urlRedireccion: "inicio.html"
+    });
+}

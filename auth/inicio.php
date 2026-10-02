@@ -1,7 +1,12 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=UTF-8');
-require_once '../config/conexion.php';
+
+$rutaConexion = __DIR__ . '/../config/conexion.php';
+if (!file_exists($rutaConexion)) {
+    $rutaConexion = '../config/conexion.php';
+}
+require_once $rutaConexion;
 
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(401);
@@ -15,6 +20,7 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
+    // 1. Datos del perfil del usuario
     $consultaUsuario = $db->prepare(
         'SELECT u.nombre_usuario, p.foto_perfil
          FROM usuario u
@@ -31,6 +37,7 @@ try {
         exit;
     }
 
+    // 2. Obtener hábitos activos del usuario
     $consultaHabitos = $db->prepare(
         'SELECT
             hu.id_habito_usuario,
@@ -129,16 +136,23 @@ try {
         ? ($habitosCompletados / $totalHabitos) * 100
         : 0;
 
-    $consultaRacha = $db->prepare(
-        'SELECT COALESCE(MAX(r.racha_actual), 0)
-         FROM rachas r
-         INNER JOIN habitos_usuario hu ON hu.id_habito_usuario = r.id_habito_usuario
-         WHERE hu.id_usuario = :id_usuario
-           AND hu.activo = TRUE'
-    );
-    $consultaRacha->execute([':id_usuario' => $usuarioId]);
-    $racha = (int) ($consultaRacha->fetchColumn() ?: 0);
+    // 3. Consulta de Racha General (Usando la nueva estructura de rachas_usuario)
+    $racha = 0;
+    try {
+        $consultaRacha = $db->prepare(
+            'SELECT COALESCE(racha_general_actual, 0)
+             FROM rachas_usuario
+             WHERE id_usuario = :id_usuario
+             LIMIT 1'
+        );
+        $consultaRacha->execute([':id_usuario' => $usuarioId]);
+        $racha = (int) ($consultaRacha->fetchColumn() ?: 0);
+    } catch (Throwable $e) {
+        // En caso de que la tabla aún no contenga la fila del usuario
+        $racha = 0;
+    }
 
+    // 4. Consulta y gestión de Notificaciones
     $consultaNotificaciones = $db->prepare(
         'SELECT id_notificacion, titulo, mensaje, leida, fecha_notificacion
          FROM notificaciones
@@ -192,6 +206,7 @@ try {
     $consultaNoLeidas->execute([':id_usuario' => $usuarioId]);
     $notificacionesNoLeidas = (int) ($consultaNoLeidas->fetchColumn() ?: 0);
 
+    // 5. Respuesta JSON final limpia
     echo json_encode([
         'exito' => true,
         'usuario' => [
@@ -216,6 +231,6 @@ try {
     http_response_code(500);
     echo json_encode([
         'exito' => false,
-        'mensaje' => 'No se pudo cargar la información de LifeSync.'
+        'mensaje' => 'No se pudo cargar la información de LifeSync: ' . $error->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }

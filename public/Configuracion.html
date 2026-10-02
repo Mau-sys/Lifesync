@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
 
@@ -11,10 +11,10 @@
 
     <meta
         name="description"
-        content="Configuración general de LifeSync"
+        content="General settings for LifeSync"
         data-i18n="configuracion.descripcionMeta">
 
-    <title>LifeSync | Configuración</title>
+    <title>LifeSync | Settings</title>
 
     <link
         rel="stylesheet"
@@ -42,16 +42,16 @@
                 class="volver"
                 data-i18n="comun.volver">
 
-                ← Volver
+                ← Back
 
             </a>
 
             <h1 data-i18n="configuracion.titulo">
-                Configuración
+                Settings
             </h1>
 
             <p data-i18n="configuracion.descripcion">
-                Personaliza el funcionamiento de tu cuenta y de la aplicación.
+                Customize your account and application preferences.
             </p>
 
         </header>
@@ -65,7 +65,7 @@
             <section class="seccion-configuracion">
 
                 <h2 data-i18n="configuracion.apariencia">
-                    🎨 Apariencia
+                    🎨 Appearance
                 </h2>
 
                 <div class="opcion">
@@ -73,11 +73,11 @@
                     <div>
 
                         <h3 data-i18n="configuracion.modoOscuro">
-                            Modo oscuro
+                            Dark Mode
                         </h3>
 
                         <p data-i18n="configuracion.descripcionModoOscuro">
-                            Activa el tema oscuro para una experiencia más cómoda durante la noche.
+                            Enable dark theme for a more comfortable night experience.
                         </p>
 
                     </div>
@@ -101,7 +101,7 @@
             <section class="seccion-configuracion">
 
                 <h2 data-i18n="configuracion.notificacionesTitulo">
-                    🔔 Notificaciones
+                    🔔 Notifications
                 </h2>
 
 
@@ -110,11 +110,11 @@
                     <div>
 
                         <h3 data-i18n="configuracion.recordatorios">
-                            Recordatorios
+                            Reminders
                         </h3>
 
                         <p data-i18n="configuracion.descripcionRecordatorios">
-                            Recibe recordatorios para completar tus hábitos diarios.
+                            Receive reminders to complete your daily habits.
                         </p>
 
                     </div>
@@ -138,11 +138,11 @@
                     <div>
 
                         <h3 data-i18n="configuracion.sonidos">
-                            Sonidos de la aplicación
+                            App Sounds
                         </h3>
 
                         <p data-i18n="configuracion.descripcionSonidos">
-                            Reproduce sonidos al completar hábitos, obtener logros y recibir notificaciones.
+                            Play sounds when completing habits, earning achievements, and receiving notifications.
                         </p>
 
                     </div>
@@ -166,11 +166,11 @@
                     <div>
 
                         <h3 data-i18n="configuracion.correos">
-                            Correos electrónicos
+                            Emails
                         </h3>
 
                         <p data-i18n="configuracion.descripcionCorreos">
-                            Envía recordatorios importantes y resúmenes semanales a tu correo.
+                            Send important reminders and weekly summaries to your email.
                         </p>
 
                     </div>
@@ -194,7 +194,7 @@
             <section class="seccion-configuracion">
 
                 <h2 data-i18n="configuracion.idiomaTitulo">
-                    🌐 Idioma
+                    🌐 Language
                 </h2>
 
                 <div class="campo">
@@ -203,7 +203,7 @@
                         for="idioma"
                         data-i18n="configuracion.seleccionarIdioma">
 
-                        Selecciona el idioma
+                        Select language
 
                     </label>
 
@@ -212,18 +212,19 @@
                         name="idioma">
 
                         <option
-                            value="es"
-                            data-i18n="configuracion.espanol">
+                            value="en"
+                            selected
+                            data-i18n="configuracion.ingles">
 
-                            Español
+                            English
 
                         </option>
 
                         <option
-                            value="en"
-                            data-i18n="configuracion.ingles">
+                            value="es"
+                            data-i18n="configuracion.espanol">
 
-                            English
+                            Spanish
 
                         </option>
 
@@ -236,75 +237,8 @@
 
             <section class="seccion-configuracion">
 
-                <h2 data-i18n="configuracion.sincronizacionTitulo">
-                    ☁️ Sincronización
-                </h2>
-
-
-                <div class="opcion">
-
-                    <div>
-
-                        <h3 data-i18n="configuracion.sincronizacionAutomatica">
-                            Sincronización automática
-                        </h3>
-
-                        <p data-i18n="configuracion.descripcionSincronizacion">
-                            Guarda automáticamente tus hábitos, estadísticas, rachas y configuraciones para mantenerlas disponibles en todos tus dispositivos.
-                        </p>
-
-                    </div>
-
-                    <label class="switch">
-
-                        <input
-                            type="checkbox"
-                            id="sincronizacion"
-                            checked>
-
-                        <span class="slider"></span>
-
-                    </label>
-
-                </div>
-
-
-                <div class="opcion">
-
-                    <div>
-
-                        <h3 data-i18n="configuracion.estadoSincronizacionTitulo">
-                            Estado de sincronización
-                        </h3>
-
-                        <p
-                            id="textoEstadoSincronizacion"
-                            data-i18n="configuracion.informacionSincronizada">
-
-                            Tu información se encuentra respaldada correctamente.
-
-                        </p>
-
-                    </div>
-
-                    <span
-                        id="estadoSincronizacion"
-                        class="estado-activo"
-                        data-i18n="configuracion.sincronizada">
-
-                        ● Sincronizada
-
-                    </span>
-
-                </div>
-
-            </section>
-
-
-            <section class="seccion-configuracion">
-
                 <h2 data-i18n="configuracion.seguridadTitulo">
-                    🔒 Seguridad
+                    🔒 Security
                 </h2>
 
 
@@ -313,11 +247,11 @@
                     <div>
 
                         <h3 data-i18n="configuracion.cambiarContrasena">
-                            Cambiar contraseña
+                            Change Password
                         </h3>
 
                         <p data-i18n="configuracion.descripcionContrasena">
-                            Actualiza tu contraseña para proteger tu cuenta.
+                            Update your password to protect your account.
                         </p>
 
                     </div>
@@ -328,7 +262,7 @@
                         class="btn-secundario"
                         data-i18n="configuracion.cambiar">
 
-                        Cambiar
+                        Change
 
                     </button>
 
@@ -340,11 +274,11 @@
                     <div>
 
                         <h3 data-i18n="configuracion.sesionesActivas">
-                            Sesiones activas
+                            Active Sessions
                         </h3>
 
                         <p data-i18n="configuracion.descripcionSesiones">
-                            Consulta y administra los dispositivos donde has iniciado sesión.
+                            View and manage devices where you are logged in.
                         </p>
 
                     </div>
@@ -355,7 +289,7 @@
                         class="btn-secundario"
                         data-i18n="configuracion.administrar">
 
-                        Administrar
+                        Manage
 
                     </button>
 
@@ -372,7 +306,7 @@
                     class="btn-principal"
                     data-i18n="comun.guardarCambios">
 
-                    Guardar cambios
+                    Save Changes
 
                 </button>
 
@@ -400,11 +334,11 @@
         <div class="modal-contenido">
 
             <h2 data-i18n="configuracion.cambiarContrasena">
-                Cambiar contraseña
+                Change Password
             </h2>
 
             <p data-i18n="configuracion.cambiarContrasenaDescripcion">
-                Introduce tu contraseña actual y después la nueva contraseña.
+                Enter your current password and then the new password.
             </p>
 
 
@@ -414,7 +348,7 @@
                     for="actual"
                     data-i18n="configuracion.contrasenaActual">
 
-                    Contraseña actual
+                    Current password
 
                 </label>
 
@@ -432,7 +366,7 @@
                     for="nueva"
                     data-i18n="configuracion.nuevaContrasena">
 
-                    Nueva contraseña
+                    New password
 
                 </label>
 
@@ -450,7 +384,7 @@
                     for="confirmar"
                     data-i18n="configuracion.confirmarContrasena">
 
-                    Confirmar nueva contraseña
+                    Confirm new password
 
                 </label>
 
@@ -478,7 +412,7 @@
                     class="btn-secundario"
                     data-i18n="comun.cancelar">
 
-                    Cancelar
+                    Cancel
 
                 </button>
 
@@ -489,7 +423,7 @@
                     class="btn-principal"
                     data-i18n="comun.guardar">
 
-                    Guardar
+                    Save
 
                 </button>
 
@@ -509,11 +443,11 @@
         <div class="modal-contenido">
 
             <h2 data-i18n="configuracion.sesionesActivas">
-                Sesiones activas
+                Active Sessions
             </h2>
 
             <p data-i18n="configuracion.descripcionModalSesiones">
-                Aquí aparecerán los dispositivos donde hayas iniciado sesión. También podrás cerrar cualquier sesión de forma segura.
+                Here you will see devices where you have logged in. You can also log out safely from any session.
             </p>
 
 
@@ -536,7 +470,7 @@
                     class="btn-secundario"
                     data-i18n="comun.cerrar">
 
-                    Cerrar
+                    Close
 
                 </button>
 

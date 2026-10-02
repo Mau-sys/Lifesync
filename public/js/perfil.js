@@ -224,6 +224,28 @@ function configurarCerrarSesion() {
                 }
 
 
+                // =========================================================
+                // LIMPIAR ALMACENAMIENTO Y RESTABLECER A DEFAULTS (EN & OSCURO)
+                // =========================================================
+                
+                // 1. Eliminar preferencias guardadas
+                localStorage.removeItem("lifesync_tema");
+                localStorage.removeItem("lifesync_idioma");
+                localStorage.removeItem("lifeSyncConfiguracion");
+
+                // 2. Restablecer tema global a Oscuro usando la función nativa del sistema
+                if (typeof window.aplicarTemaGlobal === "function") {
+                    window.aplicarTemaGlobal("oscuro");
+                }
+
+                // 3. Restablecer idioma global a Inglés ('en')
+                if (typeof window.cambiarIdiomaLifeSync === "function") {
+                    window.cambiarIdiomaLifeSync("en");
+                } else if (typeof window.aplicarIdioma === "function") {
+                    window.aplicarIdioma("en");
+                }
+
+
                 window.location.href =
                     "Inicio-sesion.html";
 
@@ -287,4 +309,4 @@ window.addEventListener(
         }
 
     }
-);
+);  

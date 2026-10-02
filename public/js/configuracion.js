@@ -17,9 +17,6 @@ const sonidos =
 const correo =
     document.getElementById("correo");
 
-const sincronizacion =
-    document.getElementById("sincronizacion");
-
 const formulario =
     document.getElementById("configuracionForm");
 
@@ -67,16 +64,6 @@ const listaSesiones =
 
 const mensajeSesiones =
     document.getElementById("mensajeSesiones");
-
-const textoEstadoSincronizacion =
-    document.getElementById(
-        "textoEstadoSincronizacion"
-    );
-
-const estadoSincronizacion =
-    document.getElementById(
-        "estadoSincronizacion"
-    );
 
 function texto(clave) {
 
@@ -200,40 +187,6 @@ function actualizarTemaDesdeCheckbox() {
     );
 }
 
-function actualizarEstadoSincronizacion(activa) {
-
-    if (textoEstadoSincronizacion) {
-
-        textoEstadoSincronizacion.textContent =
-            activa
-                ? texto(
-                    "configuracion.informacionSincronizada"
-                )
-                : texto(
-                    "configuracion.sincronizacionDesactivada"
-                );
-
-    }
-
-    if (estadoSincronizacion) {
-
-        estadoSincronizacion.textContent =
-            activa
-                ? texto(
-                    "configuracion.sincronizada"
-                )
-                : texto(
-                    "configuracion.noSincronizada"
-                );
-
-        estadoSincronizacion.classList.toggle(
-            "estado-activo",
-            activa
-        );
-
-    }
-}
-
 async function cargarConfiguracion() {
 
     try {
@@ -276,21 +229,23 @@ async function cargarConfiguracion() {
         const configuracion =
             datos.configuracion;
 
+        // Lee el idioma asignado desde el servidor ('es' si existía previamente, 'en' para nuevos usuarios)
+        const idiomaGuardado =
+            configuracion.idioma === "es"
+                ? "es"
+                : "en";
+
+        if (idioma) {
+
+            idioma.value = idiomaGuardado;
+
+        }
+
         if (modoOscuro) {
 
             modoOscuro.checked =
                 configuracion.tema ===
                 "oscuro";
-
-        }
-
-        if (idioma) {
-
-            idioma.value =
-                configuracion.idioma ===
-                "en"
-                    ? "en"
-                    : "es";
 
         }
 
@@ -333,16 +288,6 @@ async function cargarConfiguracion() {
                 logros;
         }
 
-        if (sincronizacion) {
-
-            sincronizacion.checked =
-                Number(
-                    configuracion
-                        .sincronizacion_automatica
-                ) === 1;
-
-        }
-
         aplicarTema(
             configuracion.tema ===
             "claro"
@@ -356,18 +301,10 @@ async function cargarConfiguracion() {
         ) {
 
             window.cambiarIdiomaLifeSync(
-                configuracion.idioma === "en"
-                    ? "en"
-                    : "es"
+                idiomaGuardado
             );
 
         }
-
-        actualizarEstadoSincronizacion(
-            sincronizacion
-                ? sincronizacion.checked
-                : false
-        );
 
     } catch (error) {
 
@@ -397,7 +334,7 @@ async function guardarConfiguracion(event) {
     const idiomaSeleccionado =
         idioma
             ? idioma.value
-            : "es";
+            : "en";
 
     const datos =
         new URLSearchParams();
@@ -450,14 +387,6 @@ async function guardarConfiguracion(event) {
     datos.append(
         "correo_logros",
         correoActivo
-    );
-
-    datos.append(
-        "sincronizacion",
-        sincronizacion &&
-        sincronizacion.checked
-            ? "1"
-            : "0"
     );
 
     try {
@@ -519,12 +448,6 @@ async function guardarConfiguracion(event) {
             );
 
         }
-
-        actualizarEstadoSincronizacion(
-            sincronizacion
-                ? sincronizacion.checked
-                : false
-        );
 
         mostrarMensaje(
             texto(
@@ -1080,21 +1003,6 @@ if (modoOscuro) {
 
 }
 
-if (sincronizacion) {
-
-    sincronizacion.addEventListener(
-        "change",
-        () => {
-
-            actualizarEstadoSincronizacion(
-                sincronizacion.checked
-            );
-
-        }
-    );
-
-}
-
 if (btnCambiarContrasena) {
 
     btnCambiarContrasena.addEventListener(
@@ -1203,12 +1111,6 @@ window.addEventListener(
 
         cambiarEstadoGuardado(
             false
-        );
-
-        actualizarEstadoSincronizacion(
-            sincronizacion
-                ? sincronizacion.checked
-                : false
         );
 
         if (
