@@ -3,12 +3,10 @@
 
     const LS = texto => typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(texto) : texto;
     
-    
     const API = window.location.pathname.includes("/public/") ? "../auth/" : "auth/";
     const params = new URLSearchParams(location.search);
     const $ = id => document.getElementById(id);
 
-    
     let idHabitoUsuario = Number(params.get("id_habito_usuario")) || Number(params.get("id")) || 0;
     let categoriaParam = params.get("categoria") || "";
 
@@ -29,7 +27,6 @@
         modalEditar = new bootstrap.Modal($("modalEditarHabito"));
     }
 
-    
     $("btn-options-personalizado")?.addEventListener("click", e => {
         e.stopPropagation();
         menu?.classList.toggle("show");
@@ -41,17 +38,16 @@
 
     $("btn-regresar")?.addEventListener("click", e => {
         e.preventDefault();
-        history.length > 1 ? history.back() : location.href = "inicio.html";
+        history.length > 1 ? history.back() : location.href = "Personalizados.html";
     });
 
-    
     function esDiaHabilitado() {
         if (!habitoActual) return true;
 
         const frecuencia = (habitoActual.frecuencia || "").toLowerCase();
         const diasActivos = Array.isArray(habitoActual.dias_activos) ? habitoActual.dias_activos : [];
 
-        if (frecuencia === "dias específicos" || frecuencia === "personalizada") {
+        if (frecuencia === "dias específicos" || frecuencia === "personalizada" || frecuencia === "dias especificos") {
             if (diasActivos.length === 0) return true;
 
             let diaJS = new Date().getDay(); 
@@ -63,18 +59,26 @@
     }
 
     function formatearTextoFrecuencia() {
-        if (!habitoActual) return "Diario";
+        if (!habitoActual) return LS("Diario");
         const frecuencia = (habitoActual.frecuencia || "").toLowerCase();
         const diasActivos = Array.isArray(habitoActual.dias_activos) ? habitoActual.dias_activos : [];
 
-        if (frecuencia === "dias específicos" || frecuencia === "personalizada") {
-            const nombresDias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+        if (frecuencia === "dias específicos" || frecuencia === "personalizada" || frecuencia === "dias especificos") {
+            const nombresDias = [
+                LS("Lunes"), LS("Martes"), LS("Miércoles"), 
+                LS("Jueves"), LS("Viernes"), LS("Sábado"), LS("Domingo")
+            ];
             const diasTexto = diasActivos.map(d => nombresDias[d - 1]).filter(Boolean).join(", ");
-            return `Personalizado (${diasTexto || "Sin días"})`;
+            return `${LS("Personalizado")} (${diasTexto || LS("Sin días")})`;
         }
 
-        const mapa = { diaria: "Diario", semanal: "Semanal", mensual: "Mensual" };
-        return mapa[frecuencia] || habitoActual.frecuencia || "Diario";
+        const mapa = { 
+            diaria: LS("Diario"), 
+            diario: LS("Diario"), 
+            semanal: LS("Semanal"), 
+            mensual: LS("Mensual") 
+        };
+        return mapa[frecuencia] || habitoActual.frecuencia || LS("Diario");
     }
 
     async function cargarHabito() {
@@ -90,7 +94,7 @@
         const r = await fetch(url, { credentials: "include", cache: "no-store" });
         
         if (!r.ok) {
-            throw new Error(`Error en el servidor (${r.status}): No se encontró el archivo en ${url}`);
+            throw new Error(`${LS("Error en el servidor")} (${r.status})`);
         }
 
         const d = await r.json();
@@ -101,10 +105,9 @@
 
         habitoActual = d.habito;
         idHabitoUsuario = Number(habitoActual.id_habito_usuario);
+        habitoActual.dias_activos = Array.isArray(d.habito.dias_activos) ? d.habito.dias_activos.map(Number) : [];
 
-        habitoActual.dias_activos = Array.isArray(d.habito.dias_activos) ? d.habito.dias_activos : [];
-
-        if (tituloHabito) tituloHabito.textContent = habitoActual.nombre_habito || "Hábito Personalizado";
+        if (tituloHabito) tituloHabito.textContent = habitoActual.nombre_habito || LS("Hábito Personalizado");
         if (descripcion) descripcion.textContent = habitoActual.descripcion || habitoActual.nombre_habito;
     }
 
@@ -122,18 +125,17 @@
 
         if (!habilitadoHoy) {
             btnAdd.disabled = true;
-            btnAdd.innerHTML = `<span>Día no programado</span>`;
+            btnAdd.innerHTML = `<span>${LS("Día no programado")}</span>`;
             if (msgBloqueado) msgBloqueado.classList.remove("d-none");
         } else {
             if (msgBloqueado) msgBloqueado.classList.add("d-none");
             btnAdd.disabled = progreso >= objetivo || guardando;
-            btnAdd.innerHTML = `<span>${progreso >= objetivo ? "Meta Completada" : "+1 registro"}</span>`;
+            btnAdd.innerHTML = `<span>${progreso >= objetivo ? LS("Meta Completada") : LS("+1 registro")}</span>`;
         }
 
         if (frecuenciaTexto) frecuenciaTexto.textContent = formatearTextoFrecuencia();
     }
 
-    // Botón para agregar progreso (+1)
     btnAdd?.addEventListener("click", async () => {
         if (btnAdd.disabled || !idHabitoUsuario || !esDiaHabilitado()) return;
 
@@ -166,7 +168,6 @@
         }
     });
 
-    // Abrir Modal de Edición
     $("btn-editar-meta")?.addEventListener("click", e => {
         e.preventDefault();
         menu?.classList.remove("show");
@@ -178,7 +179,7 @@
         if ($("editObjetivo")) $("editObjetivo").value = habitoActual.objetivo || 1;
 
         const freq = (habitoActual.frecuencia || "").toLowerCase();
-        const esEspecial = freq === "dias específicos" || freq === "personalizada";
+        const esEspecial = freq === "dias específicos" || freq === "personalizada" || freq === "dias especificos";
         if ($("editFrecuencia")) $("editFrecuencia").value = esEspecial ? "dias específicos" : freq;
 
         const contenedorDias = $("contenedorDiasSemana");
@@ -192,13 +193,13 @@
 
         const diasActivos = Array.isArray(habitoActual.dias_activos) ? habitoActual.dias_activos : [];
         document.querySelectorAll('input[name="diasSemana"]').forEach(cb => {
-            cb.checked = diasActivos.includes(Number(cb.value));
+            const isChecked = diasActivos.includes(Number(cb.value));
+            cb.checked = isChecked;
         });
 
         modalEditar?.show();
     });
 
-    // Selector de frecuencia en Modal
     $("editFrecuencia")?.addEventListener("change", e => {
         const contenedor = $("contenedorDiasSemana");
         if (contenedor) {
@@ -210,7 +211,6 @@
         }
     });
 
-    // Formulario de Edición
     $("formEditarHabito")?.addEventListener("submit", async e => {
         e.preventDefault();
 
@@ -223,7 +223,7 @@
             });
 
             if (diasSeleccionados.length === 0) {
-                alert("Por favor selecciona al menos un día de la semana.");
+                alert(LS("Por favor selecciona al menos un día de la semana."));
                 return;
             }
         }
@@ -246,7 +246,7 @@
             if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
 
             const data = await res.json();
-            if (!data.exito) throw new Error(data.mensaje || "Error al actualizar.");
+            if (!data.exito) throw new Error(data.mensaje || LS("Error al actualizar."));
 
             modalEditar?.hide();
             await cargarHabito();
@@ -256,7 +256,6 @@
         }
     });
 
-    // Eliminar
     $("btn-eliminar-habito")?.addEventListener("click", async e => {
         e.preventDefault();
         if (!idHabitoUsuario || !confirm(LS("¿Quieres eliminar este hábito?"))) return;
@@ -280,9 +279,13 @@
         }
     });
 
-    window.addEventListener("lifesyncIdiomaCambiado", render);
+    window.addEventListener("lifesyncIdiomaCambiado", () => {
+        if (typeof window.aplicarTraduccionesGlobales === "function") {
+            window.aplicarTraduccionesGlobales();
+        }
+        render();
+    });
 
-    // Inicializar
     cargarHabito()
         .then(render)
         .catch(e => {

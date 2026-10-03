@@ -9,9 +9,8 @@
     const API = "../auth/";
     const CATEGORIA = "Académico";
 
-    // Configuración de límites
     const MIN_DURACION_MINUTOS = 5;
-    const MAX_DURACION_MINUTOS = 180; // Máximo 3 horas por sesión
+    const MAX_DURACION_MINUTOS = 180;
     const MAX_REGISTROS = 20;
 
     let id = Number(
@@ -39,7 +38,6 @@
     const btnGuardarConfig = $("btn-guardar-config");
     const btnReiniciarMeta = $("btn-reiniciar-meta");
 
-    // Elementos del Modal
     const inputRegistros = $("input-registros");
     const inputDuracion = $("input-duracion-sesion");
     const selectFrecuencia = $("select-frecuencia");
@@ -48,7 +46,6 @@
 
     const modalEditar = $("modalEditarAcademico");
 
-    // NAVEGACIÓN INTELIGENTE Y BLINDADA
     btnRegresar?.addEventListener("click", e => {
         e.preventDefault();
         e.stopPropagation();
@@ -70,7 +67,6 @@
         }
     }, true);
 
-    // Control de visibilidad para los días personalizados
     selectFrecuencia?.addEventListener("change", e => {
         if (e.target.value === "personalizada") {
             contenedorDias?.classList.remove("d-none");
@@ -85,15 +81,17 @@
         });
     });
 
-    // Convierte el total de minutos en horas y minutos legibles
     function formatearHorasTotales(minutosTotales) {
         const horas = Math.floor(minutosTotales / 60);
         const mins = minutosTotales % 60;
 
+        const txtMin = LS("actividadFisica.min");
+        const txtHora = horas === 1 ? LS("actividadFisica.hora") : LS("actividadFisica.horas");
+
         if (horas === 0) {
-            return `${mins} min`;
+            return `${mins} ${txtMin}`;
         } else if (mins === 0) {
-            return `${horas} ${horas === 1 ? 'hora' : 'horas'}`;
+            return `${horas} ${txtHora}`;
         } else {
             return `${horas}h ${mins}m`;
         }
@@ -128,7 +126,6 @@
         progreso = Number(datos.habito.progreso_hoy) || 0;
         duracionSesion = Number(datos.habito.duracion_minutos) || 45;
         
-        // Ajustar la duración al rango permitido si viene fuera de límites desde BD
         duracionSesion = Math.min(Math.max(duracionSesion, MIN_DURACION_MINUTOS), MAX_DURACION_MINUTOS);
 
         frecuenciaHabito = datos.habito.frecuencia || "diaria";
@@ -151,37 +148,38 @@
 
         contador.textContent = `${progreso}/${objetivo}`;
 
-        // 1. Etiqueta según la frecuencia
         if (labelFrecuencia) {
             switch (frecuenciaHabito) {
                 case "semanal":
-                    labelFrecuencia.textContent = LS("Meta semanal") || "Meta semanal";
+                    labelFrecuencia.textContent = LS("registroAcademico.metaSemanal");
                     break;
                 case "mensual":
-                    labelFrecuencia.textContent = LS("Meta mensual") || "Meta mensual";
+                    labelFrecuencia.textContent = LS("registroAcademico.metaMensual");
                     break;
                 case "personalizada":
-                    labelFrecuencia.textContent = LS("Meta programada") || "Meta programada";
+                    labelFrecuencia.textContent = LS("registroAcademico.metaProgramada");
                     break;
                 case "diaria":
                 default:
-                    labelFrecuencia.textContent = LS("Meta diaria") || "Meta diaria";
+                    labelFrecuencia.textContent = LS("registroAcademico.metaDiariaLabel");
                     break;
             }
         }
 
-        meta.textContent =
-            `${objetivo} ${objetivo === 1
-                ? LS("registroAcademico")
-                : LS("registrosAcademicos")} (${duracionSesion} min/sesión)`;
+        const txtReg = objetivo === 1 
+            ? LS("registroAcademico.unRegistro") 
+            : LS("registroAcademico.variosRegistros").replace("{total}", objetivo);
 
-        // 2. Cálculo total de horas acumuladas entre todas las sesiones
+        meta.textContent = LS("registroAcademico.formatoFormaMeta")
+            .replace("{meta}", txtReg)
+            .replace("{duracion}", duracionSesion);
+
         if (metaHorasTotales) {
             const minutosTotales = objetivo * duracionSesion;
-            metaHorasTotales.textContent = `Total: ${formatearHorasTotales(minutosTotales)} de estudio`;
+            const tiempoTxt = formatearHorasTotales(minutosTotales);
+            metaHorasTotales.textContent = LS("registroAcademico.totalEstudio").replace("{tiempo}", tiempoTxt);
         }
 
-        // Anillo de progreso
         const porcentaje = objetivo > 0
             ? Math.min(100, (progreso / objetivo) * 100)
             : 0;
@@ -194,7 +192,9 @@
 
         const badgeResumen = $("sesiones-resumen-badge");
         if (badgeResumen) {
-            badgeResumen.textContent = `${progreso} de ${objetivo} completadas`;
+            badgeResumen.textContent = LS("registroAcademico.completadasResumen")
+                .replace("{progreso}", progreso)
+                .replace("{objetivo}", objetivo);
         }
 
         lista.innerHTML = "";
@@ -205,28 +205,29 @@
 
             tarjetaSesion.className = `sesion-item ${esCompletada ? "completada" : "pendiente"}`;
 
+            const txtSesion = LS("registroAcademico.sesionNumero").replace("{n}", i + 1);
+
             tarjetaSesion.innerHTML = `
                 <i class="fa-solid ${esCompletada ? "fa-circle-check" : "fa-circle-dot"} sesion-icon"></i>
-                <span class="sesion-numero">Sesión ${i + 1}</span>
+                <span class="sesion-numero">${txtSesion}</span>
             `;
 
             lista.appendChild(tarjetaSesion);
         }
 
-        // 3. Validación de día activo cuando la frecuencia es personalizada
-        const diaHoy = new Date().getDay(); // 0 = Domingo, 1 = Lunes...
+        const diaHoy = new Date().getDay();
         const esDiaPermitido = frecuenciaHabito !== "personalizada" || diasHabito.includes(diaHoy);
 
         if (!esDiaPermitido) {
             btn.disabled = true;
-            btn.innerHTML = `<span>${LS("No programado para hoy")}</span>`;
+            btn.innerHTML = `<span>${LS("registroAcademico.noProgramadoHoy")}</span>`;
         } else {
             btn.disabled = progreso >= objetivo;
             btn.innerHTML =
                 `<span>${
                     progreso >= objetivo
-                        ? LS("metaCompletada")
-                        : LS("agregarRegistro")
+                        ? LS("saludMental.metaCompletada")
+                        : LS("registroAcademico.agregarRegistro")
                 }</span>`;
         }
     }
@@ -259,7 +260,7 @@
 
             if (!datos.exito) {
                 throw new Error(
-                    datos.mensaje || LS("No se pudo registrar.")
+                    datos.mensaje || LS("registroAcademico.noSePudoRegistrar")
                 );
             }
 
@@ -331,7 +332,7 @@
             nuevaMeta < 1 ||
             nuevaMeta > MAX_REGISTROS
         ) {
-            alert(LS(`Ingresa una cantidad válida de sesiones (1 - ${MAX_REGISTROS}).`));
+            alert(LS("registroAcademico.cantidadValida").replace("{max}", MAX_REGISTROS));
             return;
         }
 
@@ -340,7 +341,9 @@
             nuevaDuracion < MIN_DURACION_MINUTOS ||
             nuevaDuracion > MAX_DURACION_MINUTOS
         ) {
-            alert(LS(`La duración por sesión debe estar entre ${MIN_DURACION_MINUTOS} y ${MAX_DURACION_MINUTOS} minutos.`));
+            alert(LS("registroAcademico.duracionValida")
+                .replace("{min}", MIN_DURACION_MINUTOS)
+                .replace("{max}", MAX_DURACION_MINUTOS));
             return;
         }
 
@@ -353,7 +356,7 @@
             });
 
             if (diasSeleccionados.length === 0) {
-                alert(LS("seleccionaAlMenosUnDia"));
+                alert(LS("registroAcademico.seleccionaUnDia"));
                 return;
             }
         }
@@ -419,7 +422,7 @@
     btnReiniciarMeta?.addEventListener("click", async () => {
         if (
             !confirm(
-                LS("¿Quieres reiniciar la cuenta a 0?")
+                LS("registroAcademico.confirmarReiniciar")
             )
         ) {
             return;
@@ -451,7 +454,7 @@
             if (!datos.exito) {
                 throw new Error(
                     datos.mensaje ||
-                    LS("No se pudo reiniciar.")
+                    LS("registroAcademico.noSePudoReiniciar")
                 );
             }
 
@@ -477,7 +480,6 @@
         });
 })();
 
-// Inicialización corregida para Registro Académico
 if (typeof HabitoUniversal !== "undefined" && HabitoUniversal.init) {
     HabitoUniversal.init({
         btnOptionsId: "btn-options-academico",

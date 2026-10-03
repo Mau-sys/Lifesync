@@ -1,7 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // ==========================================
-    // 1. ESTADO Y VARIABLES GLOBALES
-    // ==========================================
     const API = "/lifesync/auth/";
     const params = new URLSearchParams(window.location.search);
     let currentHabitoId = Number(params.get("id_habito_usuario")) || null;
@@ -13,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let diasSeleccionados = [1, 2, 3, 4, 5];
     let historialPausas = [];
 
-    // Elementos de la interfaz principal
     const ringElement = document.getElementById('ring-saludmental');
     const contadorElement = document.getElementById('contador-saludmental');
     const metaElement = document.getElementById('meta-saludmental');
@@ -21,10 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnAddPausa = document.getElementById('btn-add-pausa');
     const listaPausas = document.getElementById('lista-pausas');
 
-    // Botón de Regreso
     const btnRegresar = document.getElementById('btn-regresar');
 
-    // Elementos del Modal de Configuración
     const btnGuardar = document.getElementById('btn-guardar-config');
     const inputPausas = document.getElementById('input-pausas');
     const inputDuracion = document.getElementById('input-duracion');
@@ -33,14 +27,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const labelPausas = document.getElementById('label-pausas');
     const botonesDias = document.querySelectorAll('.btn-dia');
 
-    // Helper de internacionalización
     function LS(clave) {
         return typeof window !== "undefined" && typeof window.traducirLifeSync === "function"
             ? window.traducirLifeSync(clave)
             : clave;
     }
 
-    // Mapea y limpia el valor de la frecuencia
     function normalizarFrecuencia(frec) {
         if (!frec) return 'diaria';
         const f = String(frec).toLowerCase().trim();
@@ -50,9 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return 'diaria';
     }
 
-    // ==========================================
-    // 2. PERSISTENCIA DE DATOS (API / LOCAL STORAGE)
-    // ==========================================
     async function cargarDatos() {
         if (!currentHabitoId) {
             cargarDatosLocal();
@@ -205,9 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ==========================================
-    // 3. REGLAS DE NEGOCIO Y CONTROL DE TIEMPO
-    // ==========================================
     function obtenerSemanaActual() {
         const ahora = new Date();
         const inicioAño = new Date(ahora.getFullYear(), 0, 1);
@@ -254,9 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return diasSeleccionados.map(Number).includes(diaHoy);
     }
 
-    // ==========================================
-    // 4. INTERFAZ DE USUARIO (UI)
-    // ==========================================
     function actualizarInterfaz() {
         verificarReinicioPeriodo();
 
@@ -266,17 +249,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (labelMetaTipo) {
             if (frecuenciaMeta === 'semanal') {
-                labelMetaTipo.textContent = LS("saludMental.metaSemanal") || "META SEMANAL";
+                labelMetaTipo.textContent = LS("saludMental.metaSemanal");
             } else if (frecuenciaMeta === 'personalizada') {
-                labelMetaTipo.textContent = LS("saludMental.metaPersonalizada") || "META DÍAS ACTIVOS";
+                labelMetaTipo.textContent = LS("saludMental.metaPersonalizada");
             } else {
-                labelMetaTipo.textContent = LS("saludMental.metaDiaria") || "META DIARIA";
+                labelMetaTipo.textContent = LS("saludMental.metaDiariaLabel");
             }
         }
 
         if (metaElement) {
-            const textoPausas = pausasTotales === 1 ? LS("unaPausa") : `${pausasTotales} ${LS("pausas")}`;
-            metaElement.textContent = `${textoPausas} (${duracionPausa} min/pausa)`;
+            const plantillaPausas = pausasTotales === 1 
+                ? LS("saludMental.unaPausa") 
+                : LS("saludMental.variasPausas").replace("{total}", pausasTotales);
+            
+            const plantillaFormato = LS("saludMental.formatoMeta");
+            metaElement.textContent = plantillaFormato
+                .replace("{pausas}", plantillaPausas)
+                .replace("{duracion}", duracionPausa);
         }
 
         if (ringElement) {
@@ -288,15 +277,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const diaHabilitado = esDiaActivo();
 
             if (!diaHabilitado) {
-                btnAddPausa.textContent = LS("diaDescanso") || "Día de descanso";
+                btnAddPausa.textContent = LS("saludMental.diaDescanso");
                 btnAddPausa.disabled = true;
                 btnAddPausa.classList.add('opacity-75');
             } else if (pausasCompletadas >= pausasTotales) {
-                btnAddPausa.textContent = LS("metaCompletada") || "Meta completada";
+                btnAddPausa.textContent = LS("saludMental.metaCompletada");
                 btnAddPausa.disabled = true;
                 btnAddPausa.classList.add('opacity-75');
             } else {
-                btnAddPausa.textContent = "+1 " + (LS("unaPausa") || "pausa").replace("1 ", "").trim();
+                btnAddPausa.textContent = LS("saludMental.sumarPausa");
                 btnAddPausa.disabled = false;
                 btnAddPausa.classList.remove('opacity-75');
             }
@@ -312,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!historialPausas || historialPausas.length === 0) {
             listaPausas.innerHTML = `
                 <div class="text-subtle text-center py-2 small">
-                    ${LS("sinPausasRegistradas") || "No hay pausas registradas"}
+                    ${LS("saludMental.sinPausasRegistradas")}
                 </div>`;
             return;
         }
@@ -355,13 +344,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (valFrec === 'personalizada') {
             if (contenedorDias) contenedorDias.classList.remove('d-none');
-            if (labelPausas) labelPausas.textContent = LS("pausasPorDiaActivo") || "Cantidad de pausas por día activo";
+            if (labelPausas) labelPausas.textContent = LS("saludMental.pausasPorDiaActivo");
         } else {
             if (contenedorDias) contenedorDias.classList.add('d-none');
             if (labelPausas) {
                 labelPausas.textContent = valFrec === 'semanal' 
-                    ? (LS("pausasSemanales") || "Cantidad de pausas semanales")
-                    : (LS("pausasDiarias") || "Cantidad de pausas (Máx. 50)");
+                    ? LS("saludMental.pausasSemanales")
+                    : LS("saludMental.pausasDiarias");
             }
         }
 
@@ -383,14 +372,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ==========================================
-    // 5. EVENT LISTENERS
-    // ==========================================
     if (btnAddPausa) {
         btnAddPausa.addEventListener('click', agregarPausa);
     }
 
-    // REGRESO BLINDADO E INDEPENDIENTE
     if (btnRegresar) {
         btnRegresar.addEventListener('click', (e) => {
             e.preventDefault();
@@ -428,7 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     diasSeleccionados = numDias.filter(d => d !== valDia);
                     btn.classList.remove('active');
                 } else {
-                    alert(LS("mantenerDiaSeleccionado") || "Debes mantener al menos un día seleccionado");
+                    alert(LS("saludMental.mantenerDiaSeleccionado"));
                 }
             } else {
                 diasSeleccionados.push(valDia);
@@ -444,17 +429,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const nuevaFrecuencia = normalizarFrecuencia(selectFrecuencia.value);
 
             if (isNaN(nuevasPausas) || nuevasPausas < 1 || nuevasPausas > 50) {
-                alert(LS("cantidadPausasValida") || "Ingresa una cantidad válida de pausas");
+                alert(LS("saludMental.cantidadPausasValida"));
                 return;
             }
 
             if (isNaN(nuevaDuracion) || nuevaDuracion < 1 || nuevaDuracion > 240) {
-                alert(LS("duracionPausaValida") || "Ingresa una duración válida");
+                alert(LS("saludMental.duracionPausaValida"));
                 return;
             }
 
             if (nuevaFrecuencia === 'personalizada' && diasSeleccionados.length === 0) {
-                alert(LS("diaMetaPersonalizada") || "Selecciona al menos un día activo");
+                alert(LS("saludMental.diaMetaPersonalizada"));
                 return;
             }
 
@@ -479,7 +464,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarDatos();
 });
 
-// Inicialización de HabitoUniversal para menú Kebab y deshabilitar hábito
 if (typeof HabitoUniversal !== "undefined" && HabitoUniversal.init) {
     HabitoUniversal.init({
         btnOptionsId: "btn-options-saludmental",

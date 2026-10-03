@@ -24,7 +24,6 @@
     const modalSesion = typeof bootstrap !== "undefined" && $("modalRegistrarSesion") ? new bootstrap.Modal($("modalRegistrarSesion")) : null;
     const modalMeta = typeof bootstrap !== "undefined" && $("modalEditarMetaFisica") ? new bootstrap.Modal($("modalEditarMetaFisica")) : null;
 
- 
     if (typeof HabitoUniversal !== "undefined") {
         HabitoUniversal.init({
             idHabito: id,
@@ -63,11 +62,12 @@
 
     function formatMin(valor) {
         const n = Number(valor) || 0;
-        if (n < 60) return `${n} ${LS("min")}`;
+        if (n < 60) return `${n} ${LS("actividadFisica.min")}`;
         const h = Math.floor(n / 60);
         const m = n % 60;
-        if (!m) return `${h} ${h === 1 ? LS("hora") : LS("horas")}`;
-        return `${h} ${h === 1 ? LS("hora") : LS("horas")} ${LS("y")} ${m} ${LS("min")}`;
+        const txtHora = h === 1 ? LS("actividadFisica.hora") : LS("actividadFisica.horas");
+        if (!m) return `${h} ${txtHora}`;
+        return `${h} ${txtHora} ${LS("actividadFisica.y")} ${m} ${LS("actividadFisica.min")}`;
     }
 
     function aplicarDiasServidor(diasServidor) {
@@ -102,7 +102,11 @@
         if (!contador || !meta || !ring || !btn || !tiempo) return;
 
         contador.textContent = `${sesiones}/${metaSesiones}`;
-        meta.textContent = `${metaSesiones} ${metaSesiones === 1 ? LS("sesion") : LS("sesiones")} (${LS("Meta total:")} ${formatMin(metaMinutosTotal)})`;
+        
+        const txtSesiones = metaSesiones === 1 ? LS("actividadFisica.unaSesion") : LS("actividadFisica.variasSesiones").replace("{total}", metaSesiones);
+        const txtMetaTotal = LS("actividadFisica.metaTotalLabel");
+        meta.textContent = `${txtSesiones} (${txtMetaTotal} ${formatMin(metaMinutosTotal)})`;
+        
         tiempo.textContent = `${formatMin(minutos)} / ${formatMin(metaMinutosTotal)}`;
 
         const porcentaje = metaSesiones ? Math.min(100, (sesiones / metaSesiones) * 100) : 0;
@@ -115,28 +119,29 @@
 
         if (!activoHoy) {
             btn.classList.add("btn-dia-inactivo");
-            btn.innerHTML = `<span><i class="fa-solid fa-calendar-xmark me-2"></i>${LS("Día no activo")}</span>`;
+            btn.innerHTML = `<span><i class="fa-solid fa-calendar-xmark me-2"></i>${LS("actividadFisica.diaNoActivo")}</span>`;
         } else if (completada) {
             btn.classList.remove("btn-dia-inactivo");
-            btn.innerHTML = `<span>${LS("metaCompletada")}</span>`;
+            btn.innerHTML = `<span>${LS("saludMental.metaCompletada")}</span>`;
         } else {
             btn.classList.remove("btn-dia-inactivo");
-            btn.innerHTML = `<span>+ ${LS("registrarSesion")}</span>`;
+            btn.innerHTML = `<span>+ ${LS("actividadFisica.registrarSesion")}</span>`;
         }
 
         const label = $("label-tipo-meta");
         if (label) {
+            const unidadTexto = dias.length === 1 ? LS("dia") : LS("dias");
             label.textContent = tipoMeta === "diaria" 
-                ? LS("metaDiaria") 
+                ? LS("actividadFisica.diaria") 
                 : tipoMeta === "personalizado" 
-                    ? LS("metaDeDias").replace("{n}", dias.length).replace("{unidad}", dias.length === 1 ? LS("dia") : LS("dias")) 
-                    : LS("metaSemanal");
+                    ? LS("actividadFisica.metaDeDias").replace("{n}", dias.length).replace("{unidad}", unidadTexto) 
+                    : LS("actividadFisica.semanal");
         }
     }
 
     $("btn-add-sesion-fisica")?.addEventListener("click", () => {
         if (!esDiaActivoHoy()) {
-            alert(LS("Hoy no es un día programado para realizar este hábito."));
+            alert(LS("actividadFisica.noProgramado"));
             return;
         }
         modalSesion?.show();
@@ -145,13 +150,13 @@
     $("btn-guardar-sesion")?.addEventListener("click", async () => {
         if (cargando || !id) return;
         if (!esDiaActivoHoy()) {
-            alert(LS("Hoy no es un día programado para realizar este hábito."));
+            alert(LS("actividadFisica.noProgramado"));
             return;
         }
 
         const duracion = Number($("input-duracion-minutos")?.value);
         if (!Number.isInteger(duracion) || duracion < 1 || duracion > 360) {
-            alert(LS("tiempoSesionValido"));
+            alert(LS("actividadFisica.tiempoSesionValido"));
             return;
         }
 
@@ -250,9 +255,9 @@
                         .map(b => Number(b.dataset.dia));
         }
 
-        if (!Number.isInteger(n) || n < 1 || n > 50) return alert(LS("numeroSesionesValido"));
-        if (!Number.isInteger(m) || m < 10 || m > 10000) return alert(LS("duracionSesionValida"));
-        if (tipoMeta === "personalizado" && dias.length === 0) return alert(LS("seleccionarDiaSemana"));
+        if (!Number.isInteger(n) || n < 1 || n > 50) return alert(LS("actividadFisica.numeroSesionesValido"));
+        if (!Number.isInteger(m) || m < 10 || m > 10000) return alert(LS("actividadFisica.duracionSesionValida"));
+        if (tipoMeta === "personalizado" && dias.length === 0) return alert(LS("actividadFisica.seleccionarDiaSemana"));
 
         const dias1a7 = dias.map(x => x + 1);
 

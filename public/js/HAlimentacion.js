@@ -28,11 +28,11 @@
     }
 
     const nombres = {
-        desayuno: "desayuno",
-        merienda_m: "meriendaManana",
-        almuerzo: "almuerzo",
-        merienda_t: "meriendaTarde",
-        cena: "cena"
+        desayuno: "alimentacion.desayuno",
+        merienda_m: "alimentacion.meriendaManana",
+        almuerzo: "alimentacion.almuerzo",
+        merienda_t: "alimentacion.meriendaTarde",
+        cena: "alimentacion.cena"
     };
 
     const lista = $("lista-comidas");
@@ -42,7 +42,6 @@
     const ring = $("ring-comidas");
     const modal = $("modalEditarMeta");
 
-    
     if (typeof HabitoUniversal !== "undefined") {
         HabitoUniversal.init({
             idHabito: id,
@@ -86,7 +85,14 @@
         const hechas = Math.min(completadas, total);
 
         contador.textContent = `${hechas}/${total}`;
-        meta.textContent = `${total} ${LS("tiemposAlDia")}`;
+        
+        const plantillaMeta = LS("alimentacion.tiemposAlDia");
+        if (plantillaMeta && plantillaMeta !== "alimentacion.tiemposAlDia") {
+            meta.textContent = plantillaMeta.replace("{total}", total);
+        } else {
+            meta.textContent = `${total} ${LS("comidas al día")}`;
+        }
+
         const porcentaje = total ? Math.min(100, (hechas / total) * 100) : 0;
         ring.style.background = `conic-gradient(var(--ls-emerald) ${porcentaje}%, rgba(44,212,120,.15) ${porcentaje}%)`;
 
@@ -103,7 +109,11 @@
 
         const completa = total > 0 && hechas >= total;
         btnAdd.disabled = completa || guardando;
-        btnAdd.innerHTML = `<span>${completa ? LS("comidasCompletadas") : LS("sumarComida")}</span>`;
+        
+        const textoCompletado = LS("alimentacion.comidasCompletadas");
+        const textoSumar = LS("alimentacion.sumarComida");
+        
+        btnAdd.innerHTML = `<span>${completa ? (textoCompletado !== "alimentacion.comidasCompletadas" ? textoCompletado : LS("¡Comidas completadas!")) : (textoSumar !== "alimentacion.sumarComida" ? textoSumar : LS("+1 Comida"))}</span>`;
     }
 
     async function toggleComida(comida, hecho) {
@@ -112,7 +122,7 @@
         render();
         try {
             if (hecho) {
-                const r = await fetch(`${API}eliminar_registro.php`, {
+                const r = await fetch(`${API}eliminar-registro.php`, {
                     method: "POST",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
@@ -148,8 +158,7 @@
 
         const d = await r.json();
         if (!d.exito) throw new Error(d.mensaje || LS("No se pudo registrar la comida."));
-        
-        // Validación segura del valor retornado para evitar errores undefined
+
         if (d.registro && (d.registro.progreso_hoy !== undefined || d.registro.registros_hoy !== undefined)) {
             completadas = Number(d.registro.progreso_hoy ?? d.registro.registros_hoy);
         } else {
@@ -215,11 +224,11 @@
         ];
 
         const comidas = activas();
-        if (!comidas.length) return alert(LS("especificaHoras"));
-        if (comidas.some(c => !c.inicio || !c.fin)) return alert(LS("especificaHoras"));
+        if (!comidas.length) return alert(LS("alimentacion.especificaHoras"));
+        if (comidas.some(c => !c.inicio || !c.fin)) return alert(LS("alimentacion.especificaHoras"));
 
         try {
-            const r = await fetch(`${API}actualizar_habito.php`, {
+            const r = await fetch(`${API}actualizar-habito.php`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

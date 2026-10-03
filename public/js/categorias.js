@@ -199,7 +199,7 @@
             info.className = "categoria-info";
 
             const titulo = document.createElement("h2");
-            titulo.textContent = habito.nombre_habito || "Hábito Personalizado";
+            titulo.textContent = habito.nombre_habito || LS("categoriaPersonalizada");
 
             const descripcion = document.createElement("p");
             descripcion.textContent = habito.descripcion || habito.nombre_habito || "";
@@ -246,7 +246,7 @@
             registro.textContent = LS("categorias.registro");
 
             const datos = document.createElement("span");
-            datos.textContent = `${progresoVal}/${objetivo} ${habito.unidad || 'registros'}`;
+            datos.textContent = `${progresoVal}/${objetivo} ${LS(habito.unidad || 'registros')}`;
 
             resumen.append(registro, datos);
 
@@ -292,7 +292,7 @@
                 const btnCrear = document.createElement("a");
                 btnCrear.href = "Personalizados.html";
                 btnCrear.className = "btn-crear-habito";
-                btnCrear.textContent = "+ Crear hábito";
+                btnCrear.textContent = LS("categorias.crearHabito");
 
                 contenedorBtn.appendChild(btnCrear);
                 lista.appendChild(contenedorBtn);
@@ -306,7 +306,6 @@
                 lista.innerHTML = "";
                 mostrarMensaje("");
 
-                // Ruta relativa directa saliendo de /public/ hacia /auth/
                 const respuesta = await fetch("../auth/categorias.php", {
                     method: "GET",
                     credentials: "include",
@@ -315,7 +314,7 @@
                 });
 
                 if (!respuesta.ok) {
-                    throw new Error(`Error ${respuesta.status}: No se encontró el recurso`);
+                    throw new Error(LS("categorias.errorRecurso").replace("{status}", respuesta.status));
                 }
 
                 const datos = await respuesta.json();

@@ -13,8 +13,6 @@
     let capacidadVaso = Number(localStorage.getItem("lifesync_hidratacion_capacidad")) || 250;
     let cargando = false;
 
-    const btnOptions = $("btn-options-hidratacion");
-    const kebabMenu = $("kebab-menu-hidratacion");
     const ring = $("ring-hidratacion");
     const contador = $("contador-vasos");
     const meta = $("meta-vasos");
@@ -24,16 +22,6 @@
     const inputCapacidad = $("input-capacidad");
     const preview = $("preview-meta-total");
 
-    btnOptions?.addEventListener("click", e => {
-        e.stopPropagation();
-        kebabMenu?.classList.toggle("show");
-    });
-
-    document.addEventListener("click", e => {
-        if (kebabMenu && !kebabMenu.contains(e.target)) kebabMenu.classList.remove("show");
-    });
-
-    // Navegación de regreso limpia usando document.referrer
     $("btn-regresar")?.addEventListener("click", e => {
         e.preventDefault();
         if (document.referrer && document.referrer.includes(window.location.host)) {
@@ -59,14 +47,30 @@
         if (!preview) return;
         const vasos = Number(inputVasos?.value) || 0;
         const capacidad = Number(inputCapacidad?.value) || 0;
-        preview.textContent = `${((vasos * capacidad) / 1000).toFixed(1)} ${LS("Litros / día")}`;
+        const litros = ((vasos * capacidad) / 1000).toFixed(1);
+
+        const plantilla = typeof window.traducirLifeSync === "function"
+            ? window.traducirLifeSync("hidratacion.litrosDia", "{litros} Litros / día")
+            : "{litros} Litros / día";
+
+        preview.textContent = plantilla.replace("{litros}", litros);
     }
 
     function render() {
         if (!contador || !meta || !ring || !btnAdd || !contenedor) return;
         contador.textContent = `${vasosTomados}/${vasosTotales}`;
+        
         const litros = ((vasosTotales * capacidadVaso) / 1000).toFixed(1);
-        meta.textContent = `${vasosTotales} ${LS("vasos al día")} (${litros}L - ${capacidadVaso}ml/${LS("vaso")})`;
+        const plantillaMeta = LS("hidratacion.metaFormato");
+        
+        if (plantillaMeta && plantillaMeta !== "hidratacion.metaFormato") {
+            meta.textContent = plantillaMeta
+                .replace("{vasos}", vasosTotales)
+                .replace("{litros}", litros)
+                .replace("{ml}", capacidadVaso);
+        } else {
+            meta.textContent = `${vasosTotales} ${LS("vasos al día")} (${litros}L - ${capacidadVaso}ml/${LS("vaso")})`;
+        }
 
         const porcentaje = vasosTotales ? Math.min(100, vasosTomados / vasosTotales * 100) : 0;
         ring.style.background = `conic-gradient(var(--ls-cyan) ${porcentaje}%, rgba(6,182,212,.15) ${porcentaje}%)`;
@@ -138,7 +142,7 @@
             localStorage.setItem("lifesync_hidratacion_capacidad", String(capacidadVaso));
             render();
             bootstrap.Modal.getInstance($("modalEditarHidratacion"))?.hide();
-            kebabMenu?.classList.remove("show");
+            $("kebab-menu-hidratacion")?.classList.remove("show");
         } catch (e) {
             alert(e.message);
         }
@@ -146,7 +150,7 @@
 
     $("btn-editar-meta")?.addEventListener("click", e => {
         e.preventDefault();
-        kebabMenu?.classList.remove("show");
+        $("kebab-menu-hidratacion")?.classList.remove("show");
         render();
     });
     inputVasos?.addEventListener("input", actualizarPreview);
@@ -159,8 +163,8 @@
 })();
 
 HabitoUniversal.init({
-    btnOptionsId: "btn-options-actividad-fisica",
-    menuId: "kebab-menu-actividad-fisica",
+    btnOptionsId: "btn-options-hidratacion",
+    menuId: "kebab-menu-hidratacion",
     btnDeshabilitarId: "btn-deshabilitar-habito",
     urlRedireccion: "inicio.html"
 });
