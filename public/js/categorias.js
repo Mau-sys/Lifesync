@@ -147,7 +147,7 @@
 
             const datos = document.createElement("span");
             if (activo) {
-                datos.textContent = `${categoria.completados_hoy}/${categoria.total_habitos} ${LS("habitosCompletados")}`;
+                datos.textContent = `${categoria.completados_hoy}/${categoria.total_habitos} ${LS("completados")}`;
             } else {
                 datos.textContent = LS("noTienesHabitosPendientes");
             }
@@ -246,7 +246,8 @@
             registro.textContent = LS("categorias.registro");
 
             const datos = document.createElement("span");
-            datos.textContent = `${progresoVal}/${objetivo} ${LS(habito.unidad || 'registros')}`;
+            const textoUnidad = habito.unidad ? LS(habito.unidad) : LS("completar");
+            datos.textContent = `${progresoVal}/${objetivo} ${textoUnidad}`;
 
             resumen.append(registro, datos);
 

@@ -101,32 +101,35 @@
 
     <div class="modal fade" id="modalEditarHabito" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-secondary">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title fw-bold" data-i18n="personalizado.modalEditarTitulo">Editar Hábito</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content config-modal-bg text-white border-0 rounded-4">
+                <div class="modal-header border-bottom border-secondary border-opacity-25">
+                    <h5 class="modal-title font-sora fw-bold">
+                        <i class="fa-solid fa-gear text-orange me-2"></i>
+                        <span data-i18n="personalizado.modalEditarTitulo">Editar Hábito</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar" data-i18n-aria-label="comun.cerrar"></button>
                 </div>
 
                 <form id="formEditarHabito">
-                    <div class="modal-body">
+                    <div class="modal-body py-4">
                         <div class="mb-3">
-                            <label for="editNombre" class="form-label text-subtle" data-i18n="personalizado.lblNombre">Nombre del Hábito</label>
-                            <input type="text" class="form-control bg-dark text-white border-secondary" id="editNombre" required>
+                            <label for="editNombre" class="form-label text-subtle fw-semibold" data-i18n="personalizado.lblNombre">Nombre del Hábito</label>
+                            <input type="text" class="form-control config-input text-white" id="editNombre" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="editDescripcion" class="form-label text-subtle" data-i18n="personalizado.lblDescripcion">Objetivo / Descripción</label>
-                            <textarea class="form-control bg-dark text-white border-secondary" id="editDescripcion" rows="2" required></textarea>
+                            <label for="editDescripcion" class="form-label text-subtle fw-semibold" data-i18n="personalizado.lblDescripcion">Objetivo / Descripción</label>
+                            <textarea class="form-control config-input text-white" id="editDescripcion" rows="2" required></textarea>
                         </div>
 
                         <div class="mb-3">
-                            <label for="editObjetivo" class="form-label text-subtle" data-i18n="personalizado.lblObjetivo">Meta diaria (registros/veces)</label>
-                            <input type="number" class="form-control bg-dark text-white border-secondary" id="editObjetivo" min="1" required>
+                            <label for="editObjetivo" class="form-label text-subtle fw-semibold" data-i18n="personalizado.lblObjetivo">Meta diaria (registros/veces)</label>
+                            <input type="number" class="form-control config-input text-white" id="editObjetivo" min="1" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="editFrecuencia" class="form-label text-subtle" data-i18n="personalizado.frecuencia">Frecuencia</label>
-                            <select class="form-select bg-dark text-white border-secondary" id="editFrecuencia" required>
+                            <label for="editFrecuencia" class="form-label text-subtle fw-semibold" data-i18n="personalizado.frecuencia">Frecuencia</label>
+                            <select class="form-select config-input text-white" id="editFrecuencia" required>
                                 <option value="diaria" data-i18n="frecuencia.diario">Diario</option>
                                 <option value="semanal" data-i18n="frecuencia.semanal">Semanal</option>
                                 <option value="mensual" data-i18n="frecuencia.mensual">Mensual</option>
@@ -135,35 +138,39 @@
                         </div>
 
                         <div class="mb-3 d-none" id="contenedorDiasSemana">
-                            <label class="form-label text-subtle d-block" data-i18n="personalizado.lblSeleccionaDias">Selecciona los días habilitados:</label>
+                            <label class="form-label text-subtle fw-semibold d-block" data-i18n="personalizado.lblSeleccionaDias">Selecciona los días habilitados:</label>
                             <div class="btn-group w-100 d-flex gap-1" role="group" aria-label="Días de la semana">
                                 <input type="checkbox" class="btn-check" id="day-1" name="diasSemana" value="1" autocomplete="off">
-                                <label class="btn btn-outline-warning btn-sm flex-fill" for="day-1" data-i18n="dias.lunesCorto">L</label>
+                                <label class="btn btn-outline-warning btn-sm flex-fill rounded-3" for="day-1" data-i18n="dias.lunesCorto">L</label>
 
                                 <input type="checkbox" class="btn-check" id="day-2" name="diasSemana" value="2" autocomplete="off">
-                                <label class="btn btn-outline-warning btn-sm flex-fill" for="day-2" data-i18n="dias.martesCorto">M</label>
+                                <label class="btn btn-outline-warning btn-sm flex-fill rounded-3" for="day-2" data-i18n="dias.martesCorto">M</label>
 
                                 <input type="checkbox" class="btn-check" id="day-3" name="diasSemana" value="3" autocomplete="off">
-                                <label class="btn btn-outline-warning btn-sm flex-fill" for="day-3" data-i18n="dias.miercolesCorto">X</label>
+                                <label class="btn btn-outline-warning btn-sm flex-fill rounded-3" for="day-3" data-i18n="dias.miercolesCorto">X</label>
 
                                 <input type="checkbox" class="btn-check" id="day-4" name="diasSemana" value="4" autocomplete="off">
-                                <label class="btn btn-outline-warning btn-sm flex-fill" for="day-4" data-i18n="dias.juevesCorto">J</label>
+                                <label class="btn btn-outline-warning btn-sm flex-fill rounded-3" for="day-4" data-i18n="dias.juevesCorto">J</label>
 
                                 <input type="checkbox" class="btn-check" id="day-5" name="diasSemana" value="5" autocomplete="off">
-                                <label class="btn btn-outline-warning btn-sm flex-fill" for="day-5" data-i18n="dias.viernesCorto">V</label>
+                                <label class="btn btn-outline-warning btn-sm flex-fill rounded-3" for="day-5" data-i18n="dias.viernesCorto">V</label>
 
                                 <input type="checkbox" class="btn-check" id="day-6" name="diasSemana" value="6" autocomplete="off">
-                                <label class="btn btn-outline-warning btn-sm flex-fill" for="day-6" data-i18n="dias.sabadoCorto">S</label>
+                                <label class="btn btn-outline-warning btn-sm flex-fill rounded-3" for="day-6" data-i18n="dias.sabadoCorto">S</label>
 
                                 <input type="checkbox" class="btn-check" id="day-7" name="diasSemana" value="7" autocomplete="off">
-                                <label class="btn btn-outline-warning btn-sm flex-fill" for="day-7" data-i18n="dias.domingoCorto">D</label>
+                                <label class="btn btn-outline-warning btn-sm flex-fill rounded-3" for="day-7" data-i18n="dias.domingoCorto">D</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal-footer border-secondary">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="comun.cancelar">Cancelar</button>
-                        <button type="submit" class="btn btn-action-orange rounded-pill px-4" data-i18n="comun.guardarCambios">Guardar Cambios</button>
+                    <div class="modal-footer border-top border-secondary border-opacity-25 d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-light rounded-pill px-3" data-bs-dismiss="modal">
+                            <span data-i18n="comun.cancelar">Cancelar</span>
+                        </button>
+                        <button type="submit" class="btn btn-action-orange rounded-pill px-4">
+                            <span data-i18n="comun.guardarCambios">Guardar cambios</span>
+                        </button>
                     </div>
                 </form>
             </div>

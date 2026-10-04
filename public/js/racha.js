@@ -4,8 +4,6 @@
     const API = window.location.pathname.includes("/public/") ? "../auth/" : "auth/";
 
     function iniciarRachas() {
-        console.log("=== Inicializando racha.js ===");
-
         const rachaActual = document.getElementById("rachaActual");
         const mejorRacha = document.getElementById("mejorRacha");
         const habitosCompletados = document.getElementById("habitosCompletados");
@@ -29,7 +27,7 @@
             const textosBase = {
                 dia: "día",
                 dias: "días",
-                constancia: "constancia",
+                constancia: "de constancia",
                 errorCargarRachas: "No se pudieron cargar las rachas.",
                 sinDatosCategorias: "No hay categorías con datos todavía.",
                 sinHistorialRachas: "Todavía no hay historial de rachas.",
@@ -58,6 +56,26 @@
             return `${numero} ` + (numero === 1 ? texto("dia") : texto("dias"));
         }
 
+        function traducirNombreCategoria(nombreOriginal) {
+            if (!nombreOriginal) return texto("rachas.categoriaDefault");
+
+            const mapaClaves = {
+                "Hidratación": "categorias.hidratacion",
+                "Alimentación": "categorias.alimentacion",
+                "Salud Mental": "categorias.saludMental",
+                "Actividad Física": "categorias.actividadFisica",
+                "Académico": "categorias.registroAcademico",
+                "Hábito Personalizado": "categorias.habitoPersonalizado"
+            };
+
+            const clave = mapaClaves[nombreOriginal];
+            if (clave && typeof window.traducirLifeSync === "function") {
+                return window.traducirLifeSync(clave, nombreOriginal);
+            }
+
+            return nombreOriginal;
+        }
+
         const iconosCategorias = {
             "Hidratación": "img/Hidrat.png",
             "Alimentación": "img/Alimen.png",
@@ -69,7 +87,6 @@
 
         async function cargarRachas() {
             try {
-                // Se utiliza la constante API para evitar errores 404
                 const respuesta = await fetch(`${API}racha.php`, {
                     method: "GET",
                     credentials: "same-origin",
@@ -97,7 +114,7 @@
 
                     throw new Error(
                         datos.codigo === "SESION_INVALIDA"
-                            ? texto("sesionNoValida")
+                            ? texto("rachas.sesionNoValida")
                             : texto("errorCargarRachas")
                     );
                 }
@@ -174,7 +191,7 @@
 
             if (!Array.isArray(categorias) || categorias.length === 0) {
                 const mensaje = document.createElement("p");
-                mensaje.textContent = texto("sinDatosCategorias");
+                mensaje.textContent = texto("rachas.sinDatosCategorias");
                 listaCategorias.appendChild(mensaje);
                 return;
             }
@@ -183,9 +200,11 @@
                 const tarjeta = document.createElement("div");
                 tarjeta.className = "categoria-racha";
 
+                const nombreTraducido = traducirNombreCategoria(categoria.nombre_categoria);
+
                 const imagen = document.createElement("img");
                 imagen.src = iconosCategorias[categoria.nombre_categoria] || "img/H-Perzona.png";
-                imagen.alt = categoria.nombre_categoria || "Categoría";
+                imagen.alt = nombreTraducido;
                 imagen.onerror = () => {
                     imagen.onerror = null;
                     imagen.src = "img/H-Perzona.png";
@@ -195,7 +214,7 @@
                 informacion.className = "info-categoria";
 
                 const titulo = document.createElement("h3");
-                titulo.textContent = categoria.nombre_categoria || "Categoría";
+                titulo.textContent = nombreTraducido;
 
                 const barra = document.createElement("div");
                 barra.className = "barra";
@@ -208,7 +227,7 @@
 
                 const porcentajeTexto = document.createElement("p");
                 porcentajeTexto.className = "porcentaje";
-                porcentajeTexto.textContent = `${Math.round(porcentaje)}% ${texto("constancia")}`;
+                porcentajeTexto.textContent = `${Math.round(porcentaje)}% ${texto("rachas.constancia")}`;
 
                 informacion.appendChild(titulo);
                 informacion.appendChild(barra);

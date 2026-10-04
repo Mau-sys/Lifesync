@@ -1,5 +1,9 @@
-function LS(clave) {
-    return typeof window !== "undefined" && typeof window.traducirLifeSync === "function" ? window.traducirLifeSync(clave) : clave;
+function LS(clave, predeterminado = "") {
+    if (typeof window !== "undefined" && typeof window.traducirLifeSync === "function") {
+        const res = window.traducirLifeSync(clave, predeterminado);
+        if (res && res !== clave) return res;
+    }
+    return predeterminado || clave;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -53,11 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 let habitoAEliminar = null;
 
-function traducir(clave) {
-    if (typeof window.traducirLifeSync === "function") {
-        return window.traducirLifeSync(clave);
-    }
-    return clave;
+function traducir(clave, predeterminado = "") {
+    return LS(clave, predeterminado);
 }
 
 function cerrarModalNuevo() {
@@ -89,7 +90,7 @@ async function cargarHabitos() {
         const datos = await respuesta.json();
 
         if (!respuesta.ok || !datos.exito) {
-            console.error(datos.mensaje || LS("noSePudoCargarHabitos"));
+            console.error(datos.mensaje || traducir("noSePudieronCargarHabitos", "No se pudieron cargar tus hábitos."));
             contenedor.innerHTML = "";
             return;
         }
@@ -110,17 +111,18 @@ async function cargarHabitos() {
 }
 
 function crearTarjetaHabito(habito, contenedor) {
-    // Usar id_habito_usuario directamente
     const idHU = habito.id_habito_usuario || habito.id_habito;
 
     const tarjeta = document.createElement("article");
     tarjeta.className = "tarjeta-habito";
 
+    const textoEliminar = traducir("personalizados.eliminarHabito", "Eliminar hábito");
+
     const botonEliminar = document.createElement("button");
     botonEliminar.type = "button";
     botonEliminar.className = "btn-eliminar";
-    botonEliminar.setAttribute("aria-label", traducir("eliminarHabito"));
-    botonEliminar.title = traducir("eliminarHabito");
+    botonEliminar.setAttribute("aria-label", textoEliminar);
+    botonEliminar.title = textoEliminar;
     botonEliminar.textContent = "🗑";
 
     botonEliminar.addEventListener("click", (evento) => {
@@ -138,12 +140,12 @@ function crearTarjetaHabito(habito, contenedor) {
 
     const imagen = document.createElement("img");
     imagen.src = habito.icono || habito.imagen_url || "img/H-Perzona.png";
-    imagen.alt = traducir("habitoPersonalizado");
+    imagen.alt = traducir("categorias.habitoPersonalizado", "Hábito Personalizado");
 
     const datos = document.createElement("div");
 
     const titulo = document.createElement("h3");
-    titulo.textContent = habito.nombre_habito || habito.nombre || LS("HabitoPersonalizado");
+    titulo.textContent = habito.nombre_habito || habito.nombre || traducir("categorias.habitoPersonalizado", "Hábito Personalizado");
 
     const descripcion = document.createElement("p");
     descripcion.textContent = obtenerTextoHabito(habito);
@@ -170,26 +172,26 @@ function crearTarjetaHabito(habito, contenedor) {
 function obtenerTextoHabito(habito) {
     const frecuencia = traducirFrecuencia(habito.frecuencia);
     const porcentaje = calcularProgreso(habito);
+    const textoCompletado = traducir("personalizados.completado", "completado");
 
-    return `${frecuencia} • ${porcentaje}% ${traducir("completado")}`;
+    return `${frecuencia} • ${porcentaje}% ${textoCompletado}`;
 }
 
 function traducirFrecuencia(frecuencia) {
     switch (frecuencia) {
         case "diaria":
-            return traducir("frecuenciaDiario");
+            return traducir("personalizados.frecuenciaDiaria", "Diaria");
         case "semanal":
-            return traducir("frecuenciaSemanal");
+            return traducir("personalizados.frecuenciaSemanal", "Semanal");
         case "mensual":
-            return traducir("frecuenciaMensual");
+            return traducir("personalizados.frecuenciaMensual", "Mensual");
         default:
-            return frecuencia || traducir("frecuenciaDiario");
+            return frecuencia || traducir("personalizados.frecuenciaDiaria", "Diaria");
     }
 }
 
 function calcularProgreso(habito) {
     const objetivo = Number(habito.objetivo);
-    // Evaluamos directamente progreso_hoy o progreso (evitando búsquedas de racha/consecutivos)
     const progreso = Number(habito.progreso_hoy ?? habito.progreso ?? habito.progreso_acumulado ?? 0);
 
     if (!objetivo || objetivo <= 0) {
@@ -210,7 +212,7 @@ async function crearHabito(evento) {
     const fechaFin = document.getElementById("fechaFin")?.value || "";
 
     if (!nombreHabito || !objetivoTexto || !frecuencia || !fechaInicio) {
-        alert(traducir("completo"));
+        alert(traducir("personalizados.completaCampos", "Por favor completa todos los campos obligatorios."));
         return;
     }
 
@@ -233,7 +235,7 @@ async function crearHabito(evento) {
         const datos = await respuesta.json();
 
         if (!respuesta.ok || !datos.exito) {
-            alert(datos.mensaje || traducir("noSePudoCrearHabito"));
+            alert(datos.mensaje || traducir("personalizados.noSePudoCrear", "No se pudo crear el hábito."));
             return;
         }
 
@@ -242,7 +244,7 @@ async function crearHabito(evento) {
 
     } catch (error) {
         console.error("Error al crear el hábito:", error);
-        alert(traducir("errorCrearHabito"));
+        alert(traducir("personalizados.errorCrear", "Error al crear el hábito personalizado."));
     }
 }
 
@@ -275,7 +277,7 @@ async function eliminarHabito() {
         const datos = await respuesta.json();
 
         if (!respuesta.ok || !datos.exito) {
-            alert(datos.mensaje || traducir("noSePudoEliminarHabito"));
+            alert(datos.mensaje || traducir("personalizados.noSePudoEliminar", "No se pudo eliminar el hábito."));
             return;
         }
 
@@ -289,6 +291,6 @@ async function eliminarHabito() {
 
     } catch (error) {
         console.error("Error al eliminar el hábito:", error);
-        alert(traducir("errorEliminarHabito"));
+        alert(traducir("personalizados.errorEliminar", "Error al eliminar el hábito personalizado."));
     }
 }

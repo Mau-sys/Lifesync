@@ -49,12 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const datos = await respuesta.json();
 
             if (!respuesta.ok || !datos.exito) {
-                throw new Error(datos.mensaje || "Error al cargar las estadísticas.");
+                throw new Error(datos.mensaje || traducir("estadisticas.errorCargar", "Error al cargar las estadísticas."));
             }
 
             renderizarResumen(datos.resumen);
 
-            // Si es vista anual, agrupamos los datos en intervalos (Trimestres)
             const datosProcesados = esPeriodoAnual(periodo) 
                 ? agruparEnIntervalosAnuales(datos.grafica) 
                 : datos.grafica;
@@ -65,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             console.error("Error en estadísticas:", error);
-            mostrarMensaje(error.message || "No se pudieron obtener las estadísticas de la base de datos.");
+            mostrarMensaje(error.message || traducir("estadisticas.errorConexionDB", "No se pudieron obtener las estadísticas de la base de datos."));
         }
     }
 
@@ -73,7 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return periodo === "anio" || periodo === "ano" || periodo === "year" || periodo === "anual";
     }
 
-    // Función para agrupar los 12 meses o días del año en 4 Trimestres (Intervalos)
     function agruparEnIntervalosAnuales(puntos) {
         if (!Array.isArray(puntos) || puntos.length === 0) return [];
 
@@ -140,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         graficaGeneral.innerHTML = "";
 
         if (!Array.isArray(puntosGrafica) || puntosGrafica.length === 0) {
-            graficaGeneral.innerHTML = `<p class="sin-datos">${traducir("sinDatos", "No hay datos registrados para este período.")}</p>`;
+            graficaGeneral.innerHTML = `<p class="sin-datos">${traducir("estadisticas.sinDatos", "No hay datos registrados para este período.")}</p>`;
             return;
         }
 
@@ -166,6 +164,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const dLina = coordenadas.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`).join(" ");
         const dArea = `${dLina} L ${coordenadas[coordenadas.length - 1].x} ${altoSvg - margen.bottom} L ${coordenadas[0].x} ${altoSvg - margen.bottom} Z`;
 
+        const txtPromedio = traducir("estadisticas.promedio", "promedio");
+        const txtHabitos = traducir("estadisticas.habitos", "hábitos");
+
         let svgHtml = `
             <div class="contenedor-grafica-svg">
                 <svg viewBox="0 0 ${anchoSvg} ${altoSvg}" preserveAspectRatio="none" class="svg-grafica">
@@ -176,25 +177,21 @@ document.addEventListener("DOMContentLoaded", () => {
                         </linearGradient>
                     </defs>
 
-                    <!-- Guías de fondo -->
                     <line x1="${margen.left}" y1="${margen.top}" x2="${anchoSvg - margen.right}" y2="${margen.top}" class="linea-guia"/>
                     <line x1="${margen.left}" y1="${margen.top + altoEfectivo/2}" x2="${anchoSvg - margen.right}" y2="${margen.top + altoEfectivo/2}" class="linea-guia"/>
                     <line x1="${margen.left}" y1="${altoSvg - margen.bottom}" x2="${anchoSvg - margen.right}" y2="${altoSvg - margen.bottom}" class="linea-guia"/>
 
-                    <!-- Área rellena -->
                     <path d="${dArea}" fill="url(#gradienteArea)" />
 
-                    <!-- Línea de la gráfica -->
                     <path d="${dLina}" fill="none" stroke="var(--color-morado)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
 
-                    <!-- Puntos e información flotante -->
                     ${coordenadas.map(pt => {
                         const etq = formatearEtiqueta(pt.item.fecha, periodo, pt.item.esIntervalo);
                         return `
                             <g class="punto-grupo">
                                 <circle cx="${pt.x}" cy="${pt.y}" r="6" class="punto-grafica" />
                                 <circle cx="${pt.x}" cy="${pt.y}" r="16" class="punto-hover-target">
-                                    <title>${etq}:${Math.round(pt.pct)}% promedio (${pt.item.completados}/${pt.item.esperados} hábitos)</title>
+                                    <title>${etq}:${Math.round(pt.pct)}% ${txtPromedio} (${pt.item.completados}/${pt.item.esperados}${txtHabitos})</title>
                                 </circle>
                                 <text x="${pt.x}" y="${pt.y - 12}" class="texto-valor-svg">${Math.round(pt.pct)}%</text>
                                 <text x="${pt.x}" y="${altoSvg - 12}" class="texto-etiqueta-svg">${etq}</text>
@@ -213,9 +210,11 @@ document.addEventListener("DOMContentLoaded", () => {
         listaCategorias.innerHTML = "";
 
         if (!Array.isArray(categorias) || categorias.length === 0) {
-            listaCategorias.innerHTML = `<p class="sin-datos">${traducir("sinCategorias", "No hay categorías registradas.")}</p>`;
+            listaCategorias.innerHTML = `<p class="sin-datos">${traducir("estadisticas.sinCategorias", "No hay categorías registradas.")}</p>`;
             return;
         }
+
+        const plantillaCompletados = traducir("estadisticas.completadosHoy", "{completados} de {total} hábitos completados hoy");
 
         categorias.forEach(cat => {
             const config = CONFIG_CATEGORIAS[cat.nombre_categoria] || CONFIG_CATEGORIAS["Hábito Personalizado"];
@@ -226,14 +225,20 @@ document.addEventListener("DOMContentLoaded", () => {
             const completados = Number(cat.completados_hoy) || 0;
             const total = Number(cat.total_habitos) || 0;
 
+            const textoCompletados = plantillaCompletados
+                .replace("{completados}", completados)
+                .replace("{total}", total);
+
+            const nombreCategoriaTraducido = traducir(`categorias.${cat.nombre_categoria}`, cat.nombre_categoria);
+
             articulo.innerHTML = `
                 <div class="categoria-cabecera">
                     <div class="icono-contenedor">
                         <img src="${config.icono}" alt="${cat.nombre_categoria}">
                     </div>
                     <div class="estadistica-info">
-                        <h3>${cat.nombre_categoria}</h3>
-                        <p>${completados} de ${total} hábitos completados hoy</p>
+                        <h3>${nombreCategoriaTraducido}</h3>
+                        <p>${textoCompletados}</p>
                     </div>
                 </div>
                 <div class="estadistica-progreso">
@@ -253,9 +258,11 @@ document.addEventListener("DOMContentLoaded", () => {
         listaHabitos.innerHTML = "";
 
         if (!Array.isArray(habitos) || habitos.length === 0) {
-            listaHabitos.innerHTML = `<p class="sin-datos">${traducir("sinHabitosPersonalizados", "No hay hábitos personalizados activos.")}</p>`;
+            listaHabitos.innerHTML = `<p class="sin-datos">${traducir("estadisticas.sinHabitosPersonalizados", "No hay hábitos personalizados activos.")}</p>`;
             return;
         }
+
+        const fallbackDetalle = traducir("personalizado.titulo", "Hábito personalizado");
 
         habitos.forEach(habito => {
             const config = CONFIG_CATEGORIAS["Hábito Personalizado"];
@@ -271,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     <div class="estadistica-info">
                         <h3>${habito.nombre}</h3>
-                        <p>${habito.detalle || "Hábito personalizado"}</p>
+                        <p>${habito.detalle || fallbackDetalle}</p>
                     </div>
                 </div>
                 <div class="estadistica-progreso">

@@ -59,26 +59,26 @@
     }
 
     function formatearTextoFrecuencia() {
-        if (!habitoActual) return LS("Diario");
+        if (!habitoActual) return LS("frecuencia.diario");
         const frecuencia = (habitoActual.frecuencia || "").toLowerCase();
         const diasActivos = Array.isArray(habitoActual.dias_activos) ? habitoActual.dias_activos : [];
 
         if (frecuencia === "dias específicos" || frecuencia === "personalizada" || frecuencia === "dias especificos") {
             const nombresDias = [
-                LS("Lunes"), LS("Martes"), LS("Miércoles"), 
-                LS("Jueves"), LS("Viernes"), LS("Sábado"), LS("Domingo")
+                LS("comun.lunes"), LS("comun.martes"), LS("comun.miercoles"), 
+                LS("comun.jueves"), LS("comun.viernes"), LS("comun.sabado"), LS("comun.domingo")
             ];
             const diasTexto = diasActivos.map(d => nombresDias[d - 1]).filter(Boolean).join(", ");
-            return `${LS("Personalizado")} (${diasTexto || LS("Sin días")})`;
+            return `${LS("frecuencia.personalizada")} (${diasTexto || LS("sinInformacion")})`;
         }
 
         const mapa = { 
-            diaria: LS("Diario"), 
-            diario: LS("Diario"), 
-            semanal: LS("Semanal"), 
-            mensual: LS("Mensual") 
+            diaria: LS("frecuencia.diario"), 
+            diario: LS("frecuencia.diario"), 
+            semanal: LS("frecuencia.semanal"), 
+            mensual: LS("frecuencia.mensual") 
         };
-        return mapa[frecuencia] || habitoActual.frecuencia || LS("Diario");
+        return mapa[frecuencia] || habitoActual.frecuencia || LS("frecuencia.diario");
     }
 
     async function cargarHabito() {
@@ -94,20 +94,20 @@
         const r = await fetch(url, { credentials: "include", cache: "no-store" });
         
         if (!r.ok) {
-            throw new Error(`${LS("Error en el servidor")} (${r.status})`);
+            throw new Error(`${LS("errorConexion")} (${r.status})`);
         }
 
         const d = await r.json();
 
         if (!d.exito) {
-            throw new Error(d.mensaje || LS("No se pudieron cargar los datos del hábito."));
+            throw new Error(d.mensaje || LS("errorCargarDatos"));
         }
 
         habitoActual = d.habito;
         idHabitoUsuario = Number(habitoActual.id_habito_usuario);
         habitoActual.dias_activos = Array.isArray(d.habito.dias_activos) ? d.habito.dias_activos.map(Number) : [];
 
-        if (tituloHabito) tituloHabito.textContent = habitoActual.nombre_habito || LS("Hábito Personalizado");
+        if (tituloHabito) tituloHabito.textContent = habitoActual.nombre_habito || LS("personalizado.titulo");
         if (descripcion) descripcion.textContent = habitoActual.descripcion || habitoActual.nombre_habito;
     }
 
@@ -125,12 +125,12 @@
 
         if (!habilitadoHoy) {
             btnAdd.disabled = true;
-            btnAdd.innerHTML = `<span>${LS("Día no programado")}</span>`;
+            btnAdd.innerHTML = `<span>${LS("actividadFisica.noProgramado")}</span>`;
             if (msgBloqueado) msgBloqueado.classList.remove("d-none");
         } else {
             if (msgBloqueado) msgBloqueado.classList.add("d-none");
             btnAdd.disabled = progreso >= objetivo || guardando;
-            btnAdd.innerHTML = `<span>${progreso >= objetivo ? LS("Meta Completada") : LS("+1 registro")}</span>`;
+            btnAdd.innerHTML = `<span>${progreso >= objetivo ? LS("metaAlcanzada") : LS("personalizado.agregarRegistro")}</span>`;
         }
 
         if (frecuenciaTexto) frecuenciaTexto.textContent = formatearTextoFrecuencia();
@@ -157,7 +157,7 @@
             if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
 
             const d = await r.json();
-            if (!d.exito) throw new Error(d.mensaje || LS("No se pudo registrar."));
+            if (!d.exito) throw new Error(d.mensaje || LS("registroAcademico.noSePudoRegistrar"));
 
             await cargarHabito();
         } catch (e) {
@@ -193,9 +193,12 @@
 
         const diasActivos = Array.isArray(habitoActual.dias_activos) ? habitoActual.dias_activos : [];
         document.querySelectorAll('input[name="diasSemana"]').forEach(cb => {
-            const isChecked = diasActivos.includes(Number(cb.value));
-            cb.checked = isChecked;
+            cb.checked = diasActivos.includes(Number(cb.value));
         });
+
+        if (typeof window.LifeSyncIdioma?.aplicar === "function") {
+            window.LifeSyncIdioma.aplicar();
+        }
 
         modalEditar?.show();
     });
@@ -223,7 +226,7 @@
             });
 
             if (diasSeleccionados.length === 0) {
-                alert(LS("Por favor selecciona al menos un día de la semana."));
+                alert(LS("actividadFisica.seleccionarDiaSemana"));
                 return;
             }
         }
@@ -246,7 +249,7 @@
             if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
 
             const data = await res.json();
-            if (!data.exito) throw new Error(data.mensaje || LS("Error al actualizar."));
+            if (!data.exito) throw new Error(data.mensaje || LS("configuracion.errorGuardar"));
 
             modalEditar?.hide();
             await cargarHabito();
@@ -258,7 +261,7 @@
 
     $("btn-eliminar-habito")?.addEventListener("click", async e => {
         e.preventDefault();
-        if (!idHabitoUsuario || !confirm(LS("¿Quieres eliminar este hábito?"))) return;
+        if (!idHabitoUsuario || !confirm(LS("eliminarHabitoConfirmacion"))) return;
 
         try {
             const r = await fetch(`${API}eliminar-personalizado.php`, {
@@ -271,7 +274,7 @@
             if (!r.ok) throw new Error(`HTTP Error: ${r.status}`);
 
             const d = await r.json();
-            if (!d.exito) throw new Error(d.mensaje || LS("No se pudo eliminar el hábito."));
+            if (!d.exito) throw new Error(d.mensaje || LS("errorCargarDatos"));
 
             location.href = "Personalizados.html";
         } catch (e) {
