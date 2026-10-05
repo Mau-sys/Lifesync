@@ -25,12 +25,6 @@
         LifeSync | Rachas
 
     </title>
-
-
-    <!-- =====================================================
-         ESTILOS
-    ====================================================== -->
-
     <link
         rel="stylesheet"
         href="css/variables.css">
@@ -54,12 +48,6 @@
 
 
     <main class="contenedor-racha">
-
-
-        <!-- =================================================
-             ENCABEZADO
-        ================================================== -->
-
         <header class="encabezado">
 
 
@@ -91,13 +79,6 @@
 
 
         </header>
-
-
-
-        <!-- =================================================
-             CONSTELACIÓN DEL MES
-        ================================================== -->
-
         <section class="constelacion">
 
 
@@ -117,21 +98,6 @@
                 hábitos durante este mes.
 
             </p>
-
-
-
-            <!--
-
-                IMPORTANTE:
-
-                Las estrellas ya NO están escritas
-                manualmente.
-
-                racha.js las generará utilizando
-                los datos de MySQL.
-
-            -->
-
             <div
                 id="constelacionUsuario"
                 class="constelacion-grid">
@@ -158,13 +124,6 @@
 
 
         </section>
-
-
-
-        <!-- =================================================
-             RACHA ACTUAL
-        ================================================== -->
-
         <section class="racha-actual">
 
 
@@ -200,13 +159,6 @@
 
 
         </section>
-
-
-
-        <!-- =================================================
-             RESUMEN
-        ================================================== -->
-
         <section class="resumen">
 
 
@@ -232,10 +184,6 @@
 
             </article>
 
-
-
-            <!-- HÁBITOS COMPLETADOS -->
-
             <article class="tarjeta-resumen">
 
 
@@ -255,10 +203,6 @@
 
 
             </article>
-
-
-
-            <!-- DÍAS REGISTRADOS -->
 
             <article class="tarjeta-resumen">
 
@@ -283,12 +227,6 @@
 
         </section>
 
-
-
-        <!-- =================================================
-             CONSTANCIA POR CATEGORÍA
-        ================================================== -->
-
         <section class="categorias">
 
 
@@ -299,18 +237,6 @@
 
             </h2>
 
-
-
-            <!--
-
-                NO ponemos Hidratación ni 55%
-                manualmente.
-
-                racha.js creará las categorías
-                según los datos reales.
-
-            -->
-
             <div
                 id="listaCategorias">
 
@@ -318,12 +244,6 @@
 
 
         </section>
-
-
-
-        <!-- =================================================
-             HISTORIAL DE RACHAS
-        ================================================== -->
 
         <section class="historial">
 
@@ -348,22 +268,12 @@
 
 
     </main>
-
-
-
-    <!-- =====================================================
-         MODAL DE CONSTELACIONES
-    ====================================================== -->
-
     <div
         id="modalConstelaciones"
         class="modal-constelaciones">
 
 
         <div class="contenido-modal">
-
-
-            <!-- ENCABEZADO DEL MODAL -->
 
             <div class="encabezado-modal">
 
@@ -390,10 +300,6 @@
 
             </div>
 
-
-
-            <!-- DESCRIPCIÓN -->
-
             <p
                 data-i18n="rachas.historialDescripcion">
 
@@ -402,16 +308,6 @@
                 los meses anteriores.
 
             </p>
-
-
-
-            <!--
-
-                Las constelaciones de los meses
-                anteriores serán creadas por
-                racha.js.
-
-            -->
 
             <div
                 id="historialConstelaciones">
@@ -424,12 +320,6 @@
 
     </div>
 
-
-
-    <!-- =====================================================
-         JAVASCRIPT GLOBAL
-    ====================================================== -->
-
     <script
         src="js/idioma-global.js">
     </script>
@@ -438,12 +328,6 @@
     <script
         src="js/tema-global.js">
     </script>
-
-
-
-    <!-- =====================================================
-         JAVASCRIPT DE RACHAS
-    ====================================================== -->
 
     <script
         src="js/racha.js">

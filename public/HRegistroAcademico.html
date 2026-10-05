@@ -38,6 +38,8 @@
         rel="stylesheet"
         href="css/RegistroAcademico.css">
 
+        <link rel="stylesheet" href="css/variables.css"><link>
+
 </head>
 
 <body class="bg-lifesync p-0 m-0">
@@ -162,8 +164,6 @@
             </div>
 
             <div class="text-center">
-
-                <!-- ETIQUETA DINÁMICA SEGÚN FRECUENCIA -->
                 <span
                     class="text-subtle d-block fw-semibold text-uppercase tracking-wider label-fluido"
                     id="label-meta-frecuencia"
@@ -180,8 +180,6 @@
                     3 registros académicos
 
                 </span>
-
-                <!-- TOTAL DE HORAS CALCULADAS ENTRE TODAS LAS SESIONES -->
                 <small class="text-subtle fw-medium d-block mt-1" id="meta-horas-totales">
 
                     Total: 2h 15m de estudio
@@ -276,8 +274,6 @@
                 <div class="modal-body py-4">
 
                     <form id="form-config-academico">
-
-                        <!-- 1. FRECUENCIA -->
                         <div class="mb-3">
 
                             <label
@@ -301,8 +297,6 @@
                             </select>
 
                         </div>
-
-                        <!-- DÍAS ACTIVOS (PERSONALIZADO) -->
                         <div class="mb-3 d-none" id="contenedor-dias-semana">
 
                             <label class="form-label text-subtle fw-semibold" data-i18n="comun.seleccionarDias">
@@ -322,8 +316,6 @@
                             </div>
 
                         </div>
-
-                        <!-- 2. CANTIDAD DE SESIONES -->
                         <div class="mb-3">
 
                             <label
@@ -345,8 +337,6 @@
                                 required>
 
                         </div>
-
-                        <!-- 3. MINUTOS POR SESIÓN (LÍMITE MÁXIMO DE 180 MIN) -->
                         <div class="mb-3">
 
                             <label

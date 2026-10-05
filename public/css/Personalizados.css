@@ -7,10 +7,6 @@
     padding: 40px 0 70px;
 
 }
-
-
-/* ENCABEZADO */
-
 .encabezado {
 
     margin-bottom: 36px;
@@ -47,8 +43,6 @@
 }
 
 
-/* LISTA DE HÁBITOS */
-
 .lista-habitos {
 
     display: flex;
@@ -58,9 +52,6 @@
     gap: 22px;
 
 }
-
-
-/* TARJETA DEL HÁBITO */
 
 .tarjeta-habito {
 
@@ -207,9 +198,6 @@
 
 }
 
-
-/* HÁBITO DE EJEMPLO */
-
 .habito-ejemplo {
 
     border-style: dashed;
@@ -227,9 +215,6 @@
     color: var(--color-texto-secundario);
 
 }
-
-
-/* BOTÓN ELIMINAR */
 
 .btn-eliminar {
 
@@ -279,9 +264,6 @@
     transform: scale(1.08);
 
 }
-
-
-/* MODALES */
 
 .modal {
 
@@ -363,9 +345,6 @@
 
 }
 
-
-/* BOTÓN CERRAR MODAL */
-
 .btn-cerrar {
 
     width: 42px;
@@ -396,9 +375,6 @@
     transform: rotate(90deg);
 
 }
-
-
-/* FORMULARIO DEL MODAL */
 
 .habit-form {
 
@@ -441,9 +417,6 @@ input[type="date"] {
     cursor: pointer;
 
 }
-
-
-/* BOTONES DEL MODAL */
 
 .acciones-modal {
 
@@ -504,9 +477,6 @@ input[type="date"] {
 
 }
 
-
-/* SCROLL DEL MODAL */
-
 .modal-contenido::-webkit-scrollbar {
 
     width: 8px;
@@ -526,9 +496,6 @@ input[type="date"] {
     background-color: var(--color-morado);
 
 }
-
-
-/* MODAL DE ELIMINACIÓN */
 
 .modal-pequeno {
 
@@ -595,9 +562,6 @@ input[type="date"] {
 
 }
 
-
-/* ANIMACIONES */
-
 @keyframes aparecerModal {
 
     from {
@@ -637,9 +601,6 @@ input[type="date"] {
     }
 
 }
-
-
-/* TABLET */
 
 @media (max-width: 900px) {
 
@@ -773,9 +734,6 @@ input[type="date"] {
     }
 
 }
-
-
-/* MODO CLARO */
 
 [data-theme="light"] .circulo-progreso {
 

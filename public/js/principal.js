@@ -5,11 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-
-// ==========================================
-// CARGAR PERFIL
-// ==========================================
-
 async function cargarPerfil() {
 
     const nombreUsuario =
@@ -57,11 +52,6 @@ async function cargarPerfil() {
 
     }
 }
-
-
-// ==========================================
-// CARGAR HÁBITOS ACTIVOS
-// ==========================================
 
 async function cargarHabitosActivos() {
 
@@ -123,11 +113,6 @@ async function cargarHabitosActivos() {
     }
 }
 
-
-// ==========================================
-// DIBUJAR HÁBITOS
-// ==========================================
-
 function renderizarHabitos(habitos) {
 
     const listaHabitos =
@@ -163,7 +148,6 @@ function renderizarHabitos(habitos) {
 
         item.classList.add("item-habito");
 
-        // Guardamos la ruta para cuando agregues las páginas
         item.dataset.url = "";
 
         item.innerHTML = `
@@ -176,7 +160,6 @@ function renderizarHabitos(habitos) {
             </p>
         `;
 
-        // Hacer la tarjeta clickeable
         item.addEventListener("click", () => {
 
             const url = item.dataset.url;
@@ -197,11 +180,6 @@ function renderizarHabitos(habitos) {
     });
 
 }
-
-
-// ==========================================
-// SEGURIDAD
-// ==========================================
 
 function escapeHTML(texto) {
 

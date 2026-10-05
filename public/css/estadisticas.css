@@ -162,7 +162,6 @@
     text-anchor: middle;
 }
 
-/* Categorías y Hábitos */
 #listaCategorias,
 #listaHabitos {
     display: grid;

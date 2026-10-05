@@ -126,7 +126,6 @@ html, body {
     padding: clamp(0.7rem, 1.8vh, 1.5rem) clamp(1rem, 2vw, 2rem);
 }
 
-/* Botón Acción Principal */
 .btn-action-amber {
     background-color: var(--ls-amber);
     color: #000219;
@@ -148,7 +147,6 @@ html, body {
     transform: scale(0.98);
 }
 
-/* Estado deshabilitado / Día no activo */
 .btn-action-amber.btn-dia-inactivo,
 .btn-action-amber:disabled {
     opacity: 0.55 !important;
@@ -160,7 +158,6 @@ html, body {
     transform: none !important;
 }
 
-/* Menú Kebab */
 .kebab-dropdown-menu {
     display: none;
     position: absolute;
@@ -207,7 +204,6 @@ html, body {
     background-color: rgba(255, 85, 85, 0.15);
 }
 
-/* Modales */
 .modal-custom-card {
     background-color: #070a21;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -250,7 +246,6 @@ html, body {
     font-size: 0.9rem;
 }
 
-/* Días de la semana (Pills) */
 .dias-pill-container {
     display: flex;
     justify-content: space-between;
@@ -288,7 +283,6 @@ html, body {
     box-shadow: 0 0 14px var(--ls-amber-glow);
 }
 
-/* Botones secundario / footer modales */
 .btn-pill-danger {
     background: transparent;
     border: 1px solid #ff3b30;

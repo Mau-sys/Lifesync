@@ -317,10 +317,6 @@
     border-color: var(--color-personalizada);
 }
 
-/* =================================================
-   SECCIÓN DE HÁBITOS PERSONALIZADOS / DIVISOR
-================================================== */
-
 .divisor-seccion {
     grid-column: 1 / -1;
     border: none;

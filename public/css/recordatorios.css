@@ -51,9 +51,6 @@
 
 }
 
-
-/* Lista de recordatorios */
-
 .lista-recordatorios {
 
     display: flex;
@@ -64,8 +61,6 @@
 
 }
 
-
-/* Tarjetas creadas por JavaScript */
 
 .tarjeta-recordatorio {
 
@@ -253,9 +248,6 @@
 
 }
 
-
-/* Mensaje cuando no existen recordatorios */
-
 .sin-recordatorios {
 
     padding: 40px 24px;
@@ -285,9 +277,6 @@
     color: var(--color-texto-secundario);
 
 }
-
-
-/* Modal */
 
 .modal {
 
@@ -411,9 +400,6 @@
     transform: rotate(90deg);
 }
 
-
-/* Formulario dentro del modal */
-
 #recordatorioForm {
 
     display: flex;
@@ -502,9 +488,6 @@
 
 }
 
-
-/* Estado de carga */
-
 .cargando-recordatorios {
 
     padding: 30px 20px;
@@ -514,9 +497,6 @@
     color: var(--color-texto-secundario);
 
 }
-
-
-/* Mensaje de error */
 
 .error-recordatorios {
 
@@ -533,10 +513,6 @@
     text-align: center;
 
 }
-
-
-/* Animación */
-
 @keyframes aparecerRecordatorio {
 
     from {
