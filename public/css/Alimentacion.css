@@ -7,6 +7,43 @@
     --ls-emerald-soft: rgba(44, 212, 120, 0.12);
     --ls-emerald-glow: rgba(44, 212, 120, 0.35);
     --ls-text-muted: #94a3b8;
+
+    --ls-text-main: #ffffff;
+    --ls-modal-bg: #0d1130;
+    --ls-input-bg: #161b40;
+    --ls-input-border: rgba(255, 255, 255, 0.15);
+}
+
+[data-tema="claro"] {
+    --ls-bg-dark: #f8fafc !important;
+    --ls-card-bg: #ffffff !important;
+    --ls-text-muted: #475569 !important;
+    --ls-text-main: #0f172a !important;
+    --ls-modal-bg: #ffffff !important;
+    --ls-input-bg: #f1f5f9 !important;
+    --ls-input-border: rgba(15, 23, 42, 0.15) !important;
+    --ls-emerald-soft: rgba(44, 212, 120, 0.18) !important;
+}
+
+[data-tema="claro"] .text-white,
+[data-tema="claro"] .text-light,
+[data-tema="claro"] body,
+[data-tema="claro"] p,
+[data-tema="claro"] span,
+[data-tema="claro"] h1,
+[data-tema="claro"] h2,
+[data-tema="claro"] h3,
+[data-tema="claro"] h4,
+[data-tema="claro"] h5,
+[data-tema="claro"] h6,
+[data-tema="claro"] div:not(.btn-action-emerald) {
+    color: var(--ls-text-main) !important;
+}
+
+[data-tema="claro"] .text-subtle,
+[data-tema="claro"] .label-fluido,
+[data-tema="claro"] .text-muted {
+    color: var(--ls-text-muted) !important;
 }
 
 .font-sora {
@@ -22,7 +59,8 @@ html, body {
     overflow-x: hidden;
     background-color: var(--ls-bg-dark) !important;
     font-family: 'Poppins', sans-serif;
-    color: #ffffff;
+    color: var(--ls-text-main);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .tracking-wider {
@@ -30,7 +68,7 @@ html, body {
 }
 
 .text-subtle {
-    color: var(--ls-text-muted);
+    color: var(--ls-text-muted) !important;
 }
 
 .text-emerald {
@@ -63,11 +101,29 @@ html, body {
     font-size: clamp(1.5rem, 3.5vw, 3rem);
 }
 
-.texto-titulo-fluido { font-size: clamp(1.2rem, 2.5vw, 2.2rem); }
-.label-fluido { font-size: clamp(0.7rem, 1.2vw, 1.05rem); }
-.meta-texto-fluido { font-size: clamp(0.95rem, 1.8vw, 1.5rem); }
-.subtexto-fluido { font-size: clamp(0.75rem, 1.3vw, 1.1rem); }
-.boton-fluido { font-size: clamp(1rem, 1.8vw, 1.4rem); }
+.texto-titulo-fluido { 
+    font-size: clamp(1.2rem, 2.5vw, 2.2rem); 
+    color: var(--ls-text-main); 
+}
+
+.label-fluido { 
+    font-size: clamp(0.7rem, 1.2vw, 1.05rem); 
+    color: var(--ls-text-muted);
+}
+
+.meta-texto-fluido { 
+    font-size: clamp(0.95rem, 1.8vw, 1.5rem); 
+    color: var(--ls-text-main);
+}
+
+.subtexto-fluido { 
+    font-size: clamp(0.75rem, 1.3vw, 1.1rem); 
+    color: var(--ls-text-main);
+}
+
+.boton-fluido { 
+    font-size: clamp(1rem, 1.8vw, 1.4rem); 
+}
 
 .progress-ring {
     width: clamp(140px, 28vw, 260px);
@@ -103,6 +159,7 @@ html, body {
 
 .contador-fluido {
     font-size: clamp(2rem, 4.5vw, 3.8rem);
+    color: var(--ls-text-main);
 }
 
 .btn-options {
@@ -112,6 +169,7 @@ html, body {
     background: transparent;
     transition: color 0.2s ease;
 }
+
 .btn-options:hover {
     color: var(--ls-emerald);
 }
@@ -123,23 +181,30 @@ html, body {
 
 .comida-card {
     transition: all 0.2s ease;
+    color: var(--ls-text-main);
 }
+
 .comida-card:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-tema="oscuro"] .comida-card:hover {
     background-color: rgba(255, 255, 255, 0.04);
 }
 
 .comida-completada {
-    background-color: rgba(44, 212, 120, 0.08);
+    background-color: rgba(44, 212, 120, 0.15);
 }
 
 .hora-rango-texto {
     font-size: 0.68rem;
     margin-top: 2px;
+    color: var(--ls-text-muted);
 }
 
 .btn-action-emerald {
     background-color: var(--ls-emerald);
-    color: #000219;
+    color: #000219 !important;
     border: none;
     padding-top: clamp(0.7rem, 1.8vh, 1.2rem);
     padding-bottom: clamp(0.7rem, 1.8vh, 1.2rem);
@@ -150,7 +215,7 @@ html, body {
 
 .btn-action-emerald:hover {
     background-color: #3debb5; 
-    color: #000219;
+    color: #000219 !important;
     box-shadow: 0 6px 25px rgba(44, 212, 120, 0.5);
 }
 
@@ -158,10 +223,12 @@ html, body {
     transform: scale(0.98);
 }
 
-.btn-action-emerald.disabled {
+.btn-action-emerald.disabled,
+.btn-action-emerald:disabled {
     background-color: #1a3a2a !important;
     color: #5d8a70 !important;
     box-shadow: none !important;
+    opacity: 0.7;
 }
 
 .kebab-dropdown-menu {
@@ -171,11 +238,11 @@ html, body {
     right: 0;
     margin-top: 0.5rem;
     min-width: 210px;
-    background-color: #1e1e2d;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--ls-card-bg);
+    border: 1px solid var(--ls-input-border);
     border-radius: 12px;
     padding: 0.5rem 0;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     z-index: 1050;
 }
 
@@ -187,23 +254,27 @@ html, body {
     display: flex;
     align-items: center;
     padding: 0.6rem 1rem;
-    color: #ffffff;
+    color: var(--ls-text-main);
     text-decoration: none;
     font-size: 0.875rem;
     transition: background-color 0.2s ease;
 }
 
 .kebab-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--ls-text-main);
+}
+
+[data-tema="oscuro"] .kebab-item:hover {
     background-color: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
 }
 
 .dropdown-divider {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--ls-input-border);
 }
 
 .kebab-item.danger {
-    color: #ff5555;
+    color: #ff5555 !important;
 }
 
 .kebab-item.danger:hover {
@@ -211,31 +282,32 @@ html, body {
 }
 
 .bg-dark-card {
-    background-color: #0d1130;
+    background-color: var(--ls-modal-bg);
     border-radius: 12px;
+    color: var(--ls-text-main);
 }
 
 .border-bottom-subtle {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-bottom: 1px solid var(--ls-input-border) !important;
 }
 
 .border-top-subtle {
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid var(--ls-input-border) !important;
 }
 
 .input-dark {
-    background-color: #161b40;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #ffffff;
+    background-color: var(--ls-input-bg);
+    border: 1px solid var(--ls-input-border);
+    color: var(--ls-text-main);
     border-radius: 6px;
     padding: 0.25rem 0.4rem;
     font-size: 0.8rem;
 }
 
 .input-dark:focus {
-    background-color: #1a204d;
+    background-color: var(--ls-input-bg);
     border-color: var(--ls-emerald);
-    color: #ffffff;
+    color: var(--ls-text-main);
     box-shadow: 0 0 6px var(--ls-emerald-glow);
 }
 

@@ -67,6 +67,18 @@
             const habitos = Array.isArray(categoria.habitos) ? categoria.habitos : [];
             const activo = habitos.length > 0;
 
+            let registrosHoyTotal = 0;
+            let objetivoTotal = 0;
+
+            habitos.forEach(hab => {
+                registrosHoyTotal += parseFloat(hab.progreso_hoy || hab.progreso) || 0;
+                objetivoTotal += parseFloat(hab.objetivo) || 1;
+            });
+
+            const porcentajeCalculado = objetivoTotal > 0
+                ? Math.min(100, Math.round((registrosHoyTotal / objetivoTotal) * 100))
+                : Math.min(100, Math.round(Number(categoria.progreso) || 0));
+
             const articulo = document.createElement("article");
             articulo.className = "categoria";
 
@@ -74,7 +86,7 @@
                 articulo.classList.add("desactivada");
             }
 
-            if (categoria.progreso >= 100) {
+            if (porcentajeCalculado >= 100) {
                 articulo.classList.add("completada");
             }
 
@@ -122,7 +134,7 @@
 
             const porcentaje = document.createElement("span");
             porcentaje.className = "porcentaje";
-            porcentaje.textContent = `${Math.round(Number(categoria.progreso) || 0)}%`;
+            porcentaje.textContent = `${porcentajeCalculado}%`;
 
             progresoInfo.append(textoProgreso, porcentaje);
 
@@ -131,7 +143,7 @@
 
             const barra = document.createElement("div");
             barra.className = `barra ${claseColor(nombre)}`;
-            barra.style.width = `${Math.min(100, Math.max(0, Number(categoria.progreso) || 0))}%`;
+            barra.style.width = `${porcentajeCalculado}%`;
 
             barraProgreso.appendChild(barra);
             progreso.append(progresoInfo, barraProgreso);
@@ -147,7 +159,9 @@
 
             const datos = document.createElement("span");
             if (activo) {
-                datos.textContent = `${categoria.completados_hoy}/${categoria.total_habitos} ${LS("completados")}`;
+                const totalRegistros = Math.round(registrosHoyTotal);
+                const textoRegistro = totalRegistros === 1 ? LS("registro") : LS("registros");
+                datos.textContent = `${totalRegistros} ${textoRegistro}`;
             } else {
                 datos.textContent = LS("noTienesHabitosPendientes");
             }
@@ -173,8 +187,8 @@
 
         function crearTarjetaPersonalizada(habito) {
             const idHU = habito.id_habito_usuario;
-            const objetivo = Number(habito.objetivo) || 1;
-            const progresoVal = Number(habito.progreso_hoy) || Number(habito.progreso) || 0;
+            const objetivo = parseFloat(habito.objetivo) || 1;
+            const progresoVal = parseFloat(habito.progreso_hoy) || parseFloat(habito.progreso) || 0;
             const porcentajeCalculado = objetivo > 0 ? Math.min(100, Math.round((progresoVal / objetivo) * 100)) : 0;
             const completado = porcentajeCalculado >= 100;
 
@@ -246,8 +260,9 @@
             registro.textContent = LS("categorias.registro");
 
             const datos = document.createElement("span");
-            const textoUnidad = habito.unidad ? LS(habito.unidad) : LS("completar");
-            datos.textContent = `${progresoVal}/${objetivo} ${textoUnidad}`;
+            const totalRegistros = Math.round(progresoVal);
+            const textoRegistro = totalRegistros === 1 ? LS("registro") : LS("registros");
+            datos.textContent = `${totalRegistros} ${textoRegistro}`;
 
             resumen.append(registro, datos);
 

@@ -292,5 +292,6 @@
     });
 
     window.addEventListener("lifesyncIdiomaCambiado", render);
+    window.addEventListener("lifesyncTemaCambiado", render);
     cargar().then(render).catch(e => alert(e.message));
 })();

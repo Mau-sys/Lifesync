@@ -102,7 +102,7 @@
             const card = document.createElement("div");
             card.className = `text-center comida-card p-2 rounded-3 ${hecho ? "comida-completada" : ""}`;
             card.style.cssText = "cursor:pointer;min-width:75px";
-            card.innerHTML = `<i class="fa-solid ${comida.icono} ${hecho ? "text-emerald" : "text-subtle"} fs-4 mb-1"></i><span class="d-block ${hecho ? "text-white" : "text-subtle"} fw-medium subtexto-fluido">${LS(nombres[comida.id])}</span><span class="d-block text-subtle small hora-rango-texto">${hora(comida.inicio)} - ${hora(comida.fin)}</span>`;
+            card.innerHTML = `<i class="fa-solid ${comida.icono} ${hecho ? "text-emerald" : "text-subtle"} fs-4 mb-1"></i><span class="d-block ${hecho ? "text-main" : "text-subtle"} fw-medium subtexto-fluido">${LS(nombres[comida.id])}</span><span class="d-block text-subtle small hora-rango-texto">${hora(comida.inicio)} - ${hora(comida.fin)}</span>`;
             card.addEventListener("click", () => toggleComida(comida, hecho));
             lista.appendChild(card);
         });
@@ -252,5 +252,6 @@
     });
 
     window.addEventListener("lifesyncIdiomaCambiado", render);
+    window.addEventListener("lifesyncTemaCambiado", render);
     cargar().then(render).catch(e => alert(e.message));
 })();

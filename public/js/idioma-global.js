@@ -15,7 +15,7 @@
         "actividadFisica.actividad": "Actividad",
         "actividadFisica.caminar": "🚶‍♂️ Caminar",
         "actividadFisica.ciclismo": "🚴‍♂️ Ciclismo",
-        "actividadFisica.correr": "🏃‍♂️️ Correr",
+        "actividadFisica.correr": "🏃‍♂️ Correr",
         "actividadFisica.diaria": "Diaria",
         "actividadFisica.diasActivos": "Selecciona los días activos",
         "actividadFisica.duracion": "Duración (1 - 360 min)",
@@ -183,7 +183,7 @@
         "configuracion.seleccionarIdioma": "Selecciona el idioma",
         "configuracion.sesionesActivas": "Sesiones activas",
         "configuracion.sincronizacionAutomatica": "Sincronización automática",
-        "configuracion.sincronizacionTitulo": "☁️ Sincronización",
+        "configuracion.sincronizacionTitulo": "☁️️ Sincronización",
         "configuracion.sincronizada": "● Sincronizada",
         "configuracion.sonidos": "Sonidos de la aplicación",
         "configuracion.titulo": "Configuración",
@@ -474,8 +474,8 @@
         "restablecer.tituloPagina": "LifeSync | Restablecer contraseña",
         "registrando": "Registrando...",
         "registrarse": "Registrarse",
-        "registro": "registro",
-        "registros": "registros",
+        "registro": "registro hoy",
+        "registros": "registros hoy",
         "registro.apple": "Registrarse con Apple",
         "registro.boton": "Registrarse",
         "registro.confirmarPassword": "Confirmar contraseña",
@@ -578,13 +578,13 @@
 
     const EN = {
         "Completa todos los campos.": "Complete all fields.",
-        "El correo o la contraseña son incorrectos.": "The email or password are incorrect.",
+        "El correo o la contraseña son incorrectos.": "The email or password is incorrect.",
         "El inicio de sesión con Apple estará disponible próximamente.": "Apple sign-in will be available soon.",
         "El inicio de sesión con Google estará disponible próximamente.": "Google sign-in will be available soon.",
         "El servidor devolvió una respuesta no válida.": "The server returned an invalid response.",
         "Error al cargar estadísticas:": "Error loading statistics:",
         "Ingresa un correo electrónico válido.": "Enter a valid email address.",
-        "No se pudo cargar el perfil.": "Could not load the profile.",
+        "No se pudo cargar el perfil.": "Could not load profile.",
         "No se pudo cerrar la sesión. Inténtalo nuevamente.": "Could not sign out. Please try again.",
         "No se pudo conectar con el servidor. Inténtalo nuevamente.": "Could not connect to the server. Please try again.",
         "actividadFisica.actividad": "Activity",
@@ -904,7 +904,7 @@
         "noHayDatosSuficientes": "Not enough data to display the chart.",
         "noSePudieronCargarEstadisticas": "Could not load statistics.",
         "noSePudieronGuardarPreferencias": "Could not save preferences.",
-        "noSePudoCargarPerfil": "Could not load the profile.",
+        "noSePudoCargarPerfil": "Could not load profile.",
         "noSePudoCerrarSesion": "Could not sign out.",
         "noTienesHabitosPendientes": "You have no habits pending for today.",
         "pausa": "break",
@@ -1048,8 +1048,8 @@
         "restablecer.tituloPagina": "LifeSync | Reset password",
         "registrando": "Signing up...",
         "registrarse": "Sign up",
-        "registro": "entry",
-        "registros": "entries",
+        "registro": "tracker today",
+        "registros": "trackers today",
         "registro.apple": "Sign up with Apple",
         "registro.boton": "Sign up",
         "registro.confirmarPassword": "Confirm password",
@@ -1124,13 +1124,13 @@
         "noSePudieronCargarHabitos": "Could not load your habits.",
         "configuracion.sincronizacionDesactivada": "Automatic synchronization is disabled.",
         "configuracion.noSincronizada": "● Not synchronized",
-        "configuracion.errorCargar": "Could not load the settings.",
-        "configuracion.errorGuardar": "Could not save the changes.",
+        "configuracion.errorCargar": "Could not load settings.",
+        "configuracion.errorGuardar": "Could not save changes.",
         "configuracion.guardadaCorrectamente": "Settings saved successfully.",
-        "configuracion.errorCambiarContrasena": "Could not change the password.",
+        "configuracion.errorCambiarContrasena": "Could not change password.",
         "configuracion.contrasenaActualizada": "Password updated successfully.",
         "configuracion.cargandoSesiones": "Loading sessions...",
-        "configuracion.errorSesiones": "Could not load the sessions.",
+        "configuracion.errorSesiones": "Could not load sessions.",
         "configuracion.sinSesiones": "No active sessions registered.",
         "configuracion.dispositivoDesconocido": "Unknown device",
         "configuracion.inicioSesion": "Started",
@@ -1172,7 +1172,7 @@
                 }
             }
         } catch (error) {
-            console.warn("No se pudo leer el idioma de la configuración.");
+            console.warn("Could not read language configuration.");
         }
 
         for (const key of STORAGE_KEYS.slice(1)) {

@@ -1,10 +1,23 @@
 :root {
-    --ls-bg-dark: #000219;
+    --ls-bg: #000219;
     --ls-card-bg: #080b26;
+    --ls-surface-light: #12163e;
+    --ls-text-main: #ffffff;
+    --ls-text-muted: #94a3b8;
+    --ls-border: rgba(168, 85, 247, 0.2);
+    
     --ls-purple: #a855f7;
     --ls-purple-soft: rgba(168, 85, 247, 0.15);
     --ls-purple-glow: rgba(168, 85, 247, 0.35);
-    --ls-text-muted: #94a3b8;
+}
+
+[data-tema="claro"], .tema-claro {
+    --ls-bg: #ffffff;
+    --ls-card-bg: #f7f8fc;
+    --ls-surface-light: #e2e8f0;
+    --ls-text-main: #111111;
+    --ls-text-muted: #475569;
+    --ls-border: #cbd5e1;
 }
 
 .font-sora {
@@ -18,9 +31,9 @@ html, body {
     height: 100% !important;
     min-height: 100vh;
     overflow-x: hidden;
-    background-color: var(--ls-bg-dark) !important;
+    background-color: var(--ls-bg) !important;
     font-family: 'Poppins', sans-serif;
-    color: #ffffff;
+    color: var(--ls-text-main) !important;
 }
 
 .tracking-wider {
@@ -28,7 +41,7 @@ html, body {
 }
 
 .text-subtle {
-    color: var(--ls-text-muted);
+    color: var(--ls-text-muted) !important;
 }
 
 .text-purple {
@@ -36,7 +49,7 @@ html, body {
 }
 
 .card-full-screen {
-    background-color: var(--ls-bg-dark);
+    background-color: var(--ls-bg);
     width: 100vw;
     height: 100vh;
     min-height: 100vh;
@@ -63,11 +76,29 @@ html, body {
     font-size: clamp(1.5rem, 3.5vw, 3rem);
 }
 
-.texto-titulo-fluido { font-size: clamp(1.2rem, 2.5vw, 2.2rem); }
-.label-fluido { font-size: clamp(0.7rem, 1.2vw, 1.05rem); }
-.meta-texto-fluido { font-size: clamp(0.95rem, 1.8vw, 1.5rem); }
-.subtexto-fluido { font-size: clamp(0.75rem, 1.3vw, 1.1rem); }
-.boton-fluido { font-size: clamp(1rem, 1.8vw, 1.4rem); }
+.texto-titulo-fluido {
+    font-size: clamp(1.2rem, 2.5vw, 2.2rem);
+    color: var(--ls-text-main) !important;
+}
+
+.label-fluido {
+    font-size: clamp(0.7rem, 1.2vw, 1.05rem);
+    color: var(--ls-text-muted) !important;
+}
+
+.meta-texto-fluido {
+    font-size: clamp(0.95rem, 1.8vw, 1.5rem);
+    color: var(--ls-text-main) !important;
+}
+
+.subtexto-fluido {
+    font-size: clamp(0.75rem, 1.3vw, 1.1rem);
+    color: var(--ls-text-main) !important;
+}
+
+.boton-fluido {
+    font-size: clamp(1rem, 1.8vw, 1.4rem);
+}
 
 .progress-ring {
     width: clamp(140px, 28vw, 260px);
@@ -79,7 +110,7 @@ html, body {
     align-items: center;
     justify-content: center;
     position: relative;
-    background: conic-gradient(var(--ls-purple) 50%, rgba(168, 85, 247, 0.15) 50%);
+    background: conic-gradient(var(--ls-purple) 50%, var(--ls-purple-soft) 50%);
     box-shadow: 0 0 30px var(--ls-purple-glow);
 }
 
@@ -90,7 +121,7 @@ html, body {
     left: clamp(8px, 1.5vw, 16px);
     right: clamp(8px, 1.5vw, 16px);
     bottom: clamp(8px, 1.5vw, 16px);
-    background-color: var(--ls-bg-dark);
+    background-color: var(--ls-bg);
     border-radius: 50%;
 }
 
@@ -102,6 +133,7 @@ html, body {
 
 .contador-fluido {
     font-size: clamp(2rem, 4.5vw, 3.8rem);
+    color: var(--ls-text-main) !important;
 }
 
 .btn-options {
@@ -118,12 +150,12 @@ html, body {
 
 .pausas-container {
     background-color: var(--ls-card-bg);
-    border: 1px solid rgba(168, 85, 247, 0.2);
+    border: 1px solid var(--ls-border);
 }
 
 .btn-action-purple {
     background-color: var(--ls-purple);
-    color: #ffffff;
+    color: #ffffff !important;
     border: none;
     padding-top: clamp(0.7rem, 1.8vh, 1.2rem);
     padding-bottom: clamp(0.7rem, 1.8vh, 1.2rem);
@@ -135,7 +167,7 @@ html, body {
 
 .btn-action-purple:hover {
     background-color: #c084fc;
-    color: #ffffff;
+    color: #ffffff !important;
     box-shadow: 0 6px 25px rgba(168, 85, 247, 0.5);
 }
 
@@ -150,11 +182,11 @@ html, body {
     right: 0;
     margin-top: 0.5rem;
     min-width: 170px;
-    background-color: #1e1e2d;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--ls-card-bg);
+    border: 1px solid var(--ls-border);
     border-radius: 12px;
     padding: 0.5rem 0;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     z-index: 1050;
 }
 
@@ -167,7 +199,7 @@ html, body {
     align-items: center;
     width: 100%;
     padding: 0.6rem 1rem;
-    color: #ffffff;
+    color: var(--ls-text-main) !important;
     text-decoration: none;
     font-size: 0.875rem;
     transition: background-color 0.2s ease;
@@ -181,16 +213,16 @@ html, body {
 }
 
 .kebab-item:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
+    background-color: var(--ls-surface-light);
+    color: var(--ls-text-main) !important;
 }
 
 .dropdown-divider {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--ls-border);
 }
 
 .kebab-item.danger {
-    color: #ff5555;
+    color: #ff5555 !important;
 }
 
 .kebab-item.danger:hover {
@@ -198,20 +230,33 @@ html, body {
 }
 
 .config-modal-bg {
-    background-color: #080b26;
-    border: 1px solid rgba(168, 85, 247, 0.3) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    background-color: var(--ls-card-bg) !important;
+    border: 1px solid var(--ls-border) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    color: var(--ls-text-main) !important;
+}
+
+.config-modal-bg .modal-title,
+.config-modal-bg .form-label,
+.config-modal-bg h5,
+.config-modal-bg label {
+    color: var(--ls-text-main) !important;
 }
 
 .config-input {
-    background-color: #12163e !important;
-    border: 1px solid rgba(168, 85, 247, 0.25) !important;
+    background-color: var(--ls-surface-light) !important;
+    border: 1px solid var(--ls-border) !important;
+    color: var(--ls-text-main) !important;
+}
+
+.config-input option {
+    background-color: var(--ls-card-bg);
+    color: var(--ls-text-main);
 }
 
 .config-input:focus {
     border-color: var(--ls-purple) !important;
     box-shadow: 0 0 12px var(--ls-purple-glow) !important;
-    color: #ffffff !important;
 }
 
 .modal-backdrop.show {
@@ -219,9 +264,9 @@ html, body {
 }
 
 .btn-dia {
-    background-color: #12163e;
-    border: 1px solid rgba(168, 85, 247, 0.25);
-    color: var(--ls-text-muted);
+    background-color: var(--ls-surface-light);
+    border: 1px solid var(--ls-border);
+    color: var(--ls-text-muted) !important;
     font-size: 0.85rem;
     font-weight: 600;
     padding: 0.4rem 0;
@@ -231,12 +276,33 @@ html, body {
 
 .btn-dia:hover {
     border-color: var(--ls-purple);
-    color: #ffffff;
+    color: var(--ls-text-main) !important;
 }
 
 .btn-dia.active {
     background-color: var(--ls-purple);
     border-color: var(--ls-purple);
-    color: #ffffff;
+    color: #ffffff !important;
     box-shadow: 0 0 10px var(--ls-purple-glow);
+}
+
+[data-tema="claro"] .text-white,
+[data-tema="claro"] h1,
+[data-tema="claro"] h2,
+[data-tema="claro"] h3,
+[data-tema="claro"] h4,
+[data-tema="claro"] h5,
+[data-tema="claro"] h6,
+[data-tema="claro"] span,
+[data-tema="claro"] p,
+[data-tema="claro"] label {
+    color: var(--ls-text-main);
+}
+
+[data-tema="claro"] .text-subtle {
+    color: var(--ls-text-muted) !important;
+}
+
+[data-tema="claro"] .border-secondary {
+    border-color: var(--ls-border) !important;
 }

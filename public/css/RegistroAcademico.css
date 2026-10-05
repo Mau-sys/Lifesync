@@ -1,10 +1,23 @@
 :root {
     --ls-bg-dark: #000219;
     --ls-card-bg: #080b26;
+    --ls-surface-light: #12163e;
+    --ls-text-main: #ffffff;
+    --ls-text-muted: #94a3b8;
+    --ls-border: rgba(236, 72, 153, 0.25);
+
     --ls-pink: #ec4899;
     --ls-pink-soft: rgba(236, 72, 153, 0.15);
     --ls-pink-glow: rgba(236, 72, 153, 0.35);
-    --ls-text-muted: #94a3b8;
+}
+
+[data-tema="claro"], .tema-claro {
+    --ls-bg-dark: #ffffff;
+    --ls-card-bg: #f7f8fc;
+    --ls-surface-light: #e2e8f0;
+    --ls-text-main: #111111;
+    --ls-text-muted: #475569;
+    --ls-border: #cbd5e1;
 }
 
 .font-sora {
@@ -20,7 +33,7 @@ html, body {
     overflow-x: hidden;
     background-color: var(--ls-bg-dark) !important;
     font-family: 'Poppins', sans-serif;
-    color: #ffffff;
+    color: var(--ls-text-main) !important;
 }
 
 .tracking-wider {
@@ -28,7 +41,7 @@ html, body {
 }
 
 .text-subtle {
-    color: var(--ls-text-muted);
+    color: var(--ls-text-muted) !important;
 }
 
 .text-pink {
@@ -61,10 +74,22 @@ html, body {
     font-size: clamp(1.5rem, 3.5vw, 3rem);
 }
 
-.texto-titulo-fluido { font-size: clamp(1.2rem, 2.5vw, 2.2rem); }
-.label-fluido { font-size: clamp(0.7rem, 1.2vw, 1.05rem); }
-.meta-texto-fluido { font-size: clamp(0.95rem, 1.8vw, 1.5rem); }
-.subtexto-fluido { font-size: clamp(0.75rem, 1.3vw, 1.1rem); }
+.texto-titulo-fluido { 
+    font-size: clamp(1.2rem, 2.5vw, 2.2rem); 
+    color: var(--ls-text-main) !important;
+}
+.label-fluido { 
+    font-size: clamp(0.7rem, 1.2vw, 1.05rem); 
+    color: var(--ls-text-muted) !important;
+}
+.meta-texto-fluido { 
+    font-size: clamp(0.95rem, 1.8vw, 1.5rem); 
+    color: var(--ls-text-main) !important;
+}
+.subtexto-fluido { 
+    font-size: clamp(0.75rem, 1.3vw, 1.1rem); 
+    color: var(--ls-text-main) !important;
+}
 .boton-fluido { font-size: clamp(1rem, 1.8vw, 1.4rem); }
 
 .progress-ring {
@@ -101,6 +126,7 @@ html, body {
 
 .contador-fluido {
     font-size: clamp(2rem, 4.5vw, 3.8rem);
+    color: var(--ls-text-main) !important;
 }
 
 .btn-options {
@@ -117,12 +143,12 @@ html, body {
 
 .tiempo-box {
     background-color: var(--ls-card-bg);
-    border: 1px solid rgba(236, 72, 153, 0.25);
+    border: 1px solid var(--ls-border);
 }
 
 .btn-action-pink {
     background-color: var(--ls-pink);
-    color: #ffffff;
+    color: #ffffff !important;
     border: none;
     padding-top: clamp(0.7rem, 1.8vh, 1.2rem);
     padding-bottom: clamp(0.7rem, 1.8vh, 1.2rem);
@@ -133,7 +159,7 @@ html, body {
 
 .btn-action-pink:hover:not(:disabled) {
     background-color: #f472b6;
-    color: #ffffff;
+    color: #ffffff !important;
     box-shadow: 0 6px 25px rgba(236, 72, 153, 0.5);
 }
 
@@ -144,8 +170,8 @@ html, body {
 .btn-action-pink.btn-dia-inactivo,
 .btn-action-pink:disabled {
     opacity: 0.55 !important;
-    background-color: #1e2548 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background-color: var(--ls-surface-light) !important;
+    border: 1px solid var(--ls-border) !important;
     color: var(--ls-text-muted) !important;
     cursor: not-allowed !important;
     box-shadow: none !important;
@@ -159,11 +185,11 @@ html, body {
     right: 0;
     margin-top: 0.5rem;
     min-width: 170px;
-    background-color: #1e1e2d;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--ls-card-bg);
+    border: 1px solid var(--ls-border);
     border-radius: 12px;
     padding: 0.5rem 0;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     z-index: 1050;
 }
 
@@ -176,7 +202,7 @@ html, body {
     align-items: center;
     width: 100%;
     padding: 0.6rem 1rem;
-    color: #ffffff;
+    color: var(--ls-text-main) !important;
     text-decoration: none;
     font-size: 0.875rem;
     transition: background-color 0.2s ease;
@@ -190,16 +216,16 @@ html, body {
 }
 
 .kebab-item:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
+    background-color: var(--ls-surface-light);
+    color: var(--ls-text-main) !important;
 }
 
 .dropdown-divider {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--ls-border);
 }
 
 .kebab-item.danger {
-    color: #ff5555;
+    color: #ff5555 !important;
 }
 
 .kebab-item.danger:hover {
@@ -207,23 +233,31 @@ html, body {
 }
 
 .modal-lifesync {
-    background-color: #0d0f2d;
-    border: 1px solid rgba(236, 72, 153, 0.3);
+    background-color: var(--ls-card-bg) !important;
+    border: 1px solid var(--ls-border) !important;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    color: var(--ls-text-main) !important;
+}
+
+.modal-lifesync .modal-title,
+.modal-lifesync .form-label,
+.modal-lifesync h5,
+.modal-lifesync label {
+    color: var(--ls-text-main) !important;
 }
 
 .custom-input {
-    background-color: #07091e;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: var(--ls-surface-light) !important;
+    border: 1px solid var(--ls-border) !important;
     border-radius: 10px;
-    color: #ffffff;
+    color: var(--ls-text-main) !important;
     padding: 0.75rem 1rem;
 }
 
 select.custom-input option {
-    background-color: #07091e;
-    color: #ffffff;
+    background-color: var(--ls-card-bg);
+    color: var(--ls-text-main);
 }
 
 .custom-input.input-group-left {
@@ -232,15 +266,15 @@ select.custom-input option {
 }
 
 .custom-input:focus {
-    background-color: #07091e;
-    border-color: var(--ls-pink);
-    color: #ffffff;
-    box-shadow: 0 0 10px var(--ls-pink-soft);
+    background-color: var(--ls-surface-light) !important;
+    border-color: var(--ls-pink) !important;
+    color: var(--ls-text-main) !important;
+    box-shadow: 0 0 10px var(--ls-pink-soft) !important;
 }
 
 .custom-input-suffix {
-    background-color: #0e1238;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: var(--ls-surface-light);
+    border: 1px solid var(--ls-border);
     border-left: none;
     color: var(--ls-text-muted);
     border-top-right-radius: 10px;
@@ -283,25 +317,25 @@ select.custom-input option {
 
 .btn-outline-danger-custom:hover {
     background-color: rgba(239, 68, 68, 0.15);
-    color: #f87171;
+    color: #dc2626;
 }
 
 .btn-secondary-custom {
     background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #ffffff;
+    border: 1px solid var(--ls-border);
+    color: var(--ls-text-main);
     transition: all 0.2s ease;
 }
 
 .btn-secondary-custom:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
+    background-color: var(--ls-surface-light);
+    color: var(--ls-text-main);
 }
 
 .btn-dia-semana {
-    background-color: #07091e;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: var(--ls-text-muted);
+    background-color: var(--ls-surface-light);
+    border: 1px solid var(--ls-border);
+    color: var(--ls-text-muted) !important;
     border-radius: 8px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -310,12 +344,33 @@ select.custom-input option {
 
 .btn-dia-semana:hover {
     border-color: var(--ls-pink);
-    color: #ffffff;
+    color: var(--ls-text-main) !important;
 }
 
 .btn-dia-semana.active {
     background-color: var(--ls-pink);
     border-color: var(--ls-pink);
-    color: #ffffff;
+    color: #ffffff !important;
     box-shadow: 0 0 10px var(--ls-pink-soft);
+}
+
+[data-tema="claro"] .text-white,
+[data-tema="claro"] h1,
+[data-tema="claro"] h2,
+[data-tema="claro"] h3,
+[data-tema="claro"] h4,
+[data-tema="claro"] h5,
+[data-tema="claro"] h6,
+[data-tema="claro"] span,
+[data-tema="claro"] p,
+[data-tema="claro"] label {
+    color: var(--ls-text-main);
+}
+
+[data-tema="claro"] .text-subtle {
+    color: var(--ls-text-muted) !important;
+}
+
+[data-tema="claro"] .sesion-numero {
+    color: var(--ls-text-main) !important;
 }

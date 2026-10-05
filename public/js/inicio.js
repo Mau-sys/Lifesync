@@ -36,8 +36,8 @@
         const listaNotificaciones = document.getElementById("listaNotificaciones");
         const contadorNotificaciones = document.getElementById("contadorNotificaciones");
         const nombreUsuario = document.getElementById("nombreUsuario");
-        const fechaActual = document.getElementById("fechaActual");
         const fotoPerfil = document.getElementById("fotoPerfil");
+        const fechaActual = document.getElementById("fechaActual");
         const contenedorCategorias = document.getElementById("contenedorCategorias");
 
         function abrirNotificaciones() {
@@ -112,7 +112,7 @@
                 actualizarProgreso(resultado.progreso);
                 actualizarCategorias(resultado.habitos_hoy);
             } catch (error) {
-                console.error("Error al cargar Inicio:", error);
+                console.error("Error loading Home:", error);
                 mostrarErrorInicio(error.message);
             }
         }
@@ -121,26 +121,32 @@
             if (!usuario) return;
 
             if (nombreUsuario) {
-                nombreUsuario.textContent = usuario.nombre || LS("usuario");
+                nombreUsuario.textContent = usuario.nombre || usuario.nombre_usuario || LS("usuario");
             }
 
             if (fotoPerfil) {
-                let rutaFoto = usuario.foto || "img/Perfil.png";
-
-                if (!/^https?:\/\//i.test(rutaFoto) && !rutaFoto.startsWith("/")) {
-                    if (window.location.pathname.includes("/public/") && !rutaFoto.startsWith("../")) {
-                        rutaFoto = "../" + rutaFoto;
-                    }
-                }
-
-                fotoPerfil.src = rutaFoto;
+                const fotoApi = usuario.foto_perfil || usuario.foto;
+                const tieneFoto = fotoApi && String(fotoApi).trim() !== "" && !fotoApi.includes("Perfil.png");
 
                 fotoPerfil.onerror = function () {
                     this.onerror = null;
-                    this.src = window.location.pathname.includes("/public/") 
-                        ? "../img/Perfil.png" 
-                        : "img/Perfil.png";
+                    this.src = "img/Perfil.png";
                 };
+
+                if (tieneFoto) {
+                    let rutaLimpia = String(fotoApi).trim();
+
+                    if (!/^https?:\/\//i.test(rutaLimpia) && !rutaLimpia.startsWith("/")) {
+                        if (window.location.pathname.includes("/public/") && !rutaLimpia.startsWith("../")) {
+                            rutaLimpia = "../" + rutaLimpia;
+                        }
+                    }
+
+                    const conector = rutaLimpia.includes("?") ? "&" : "?";
+                    fotoPerfil.src = `${rutaLimpia}${conector}v=${new Date().getTime()}`;
+                } else {
+                    fotoPerfil.src = "img/Perfil.png";
+                }
             }
         }
 
@@ -312,7 +318,7 @@
 
                 actualizarContador(0);
             } catch (error) {
-                console.error("Error al marcar notificaciones:", error);
+                console.error("Error marking notifications as read:", error);
             }
         }
 
@@ -357,7 +363,7 @@
             }
 
             if (elemento.id === "diasRacha") {
-                const textoDia = valor === 1 ? LS("dia") || "día" : LS("dias") || "días";
+                const textoDia = valor === 1 ? LS("dia") || "day" : LS("dias") || "days";
                 elemento.textContent = `${valor} ${textoDia}`;
             } else {
                 elemento.textContent = !isNaN(valor) ? valor : 0;
@@ -408,21 +414,18 @@
                 if (!grupos[nombre]) {
                     grupos[nombre] = {
                         nombre,
-                        total: 0,
-                        completados: 0,
-                        pendientes: 0,
+                        registrosHoyTotal: 0,
+                        objetivoTotal: 0,
                         ids: []
                     };
                 }
 
-                grupos[nombre].total++;
-                grupos[nombre].ids.push(Number(habito.id_habito_usuario));
+                const progreso = parseFloat(habito.progreso) || 0;
+                const objetivo = parseFloat(habito.objetivo) || 1;
 
-                if (habito.completado) {
-                    grupos[nombre].completados++;
-                } else {
-                    grupos[nombre].pendientes++;
-                }
+                grupos[nombre].registrosHoyTotal += progreso;
+                grupos[nombre].objetivoTotal += objetivo;
+                grupos[nombre].ids.push(Number(habito.id_habito_usuario));
             });
 
             Object.values(grupos).forEach(grupo => {
@@ -444,16 +447,21 @@
 
                 const detalle = document.createElement("p");
                 detalle.className = "detalle-categoria";
-                detalle.textContent = `${grupo.completados}/${grupo.total} ${LS("habitosCompletados")}`;
+
+                const totalRegistros = Math.round(grupo.registrosHoyTotal);
+                const textoRegistro = totalRegistros === 1 ? LS("registro") || "tracker today" : LS("registros") || "trackers today";
+                detalle.textContent = `${totalRegistros} ${textoRegistro}`;
 
                 texto.append(titulo, detalle);
                 info.append(imagen, texto);
 
                 const circulo = document.createElement("div");
                 circulo.className = "circulo";
-                const porcentaje = grupo.total > 0
-                    ? Math.round((grupo.completados / grupo.total) * 100)
+
+                const porcentaje = grupo.objetivoTotal > 0
+                    ? Math.min(100, Math.round((grupo.registrosHoyTotal / grupo.objetivoTotal) * 100))
                     : 0;
+
                 circulo.textContent = `${porcentaje}%`;
 
                 articulo.append(info, circulo);

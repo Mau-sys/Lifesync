@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (ringElement) {
             const porcentaje = pausasTotales > 0 ? Math.min((pausasCompletadas / pausasTotales) * 100, 100) : 0;
-            ringElement.style.background = `conic-gradient(var(--ls-purple) ${porcentaje}%, rgba(168, 85, 247, 0.15) ${porcentaje}%)`;
+            ringElement.style.background = `conic-gradient(var(--ls-purple) ${porcentaje}%, var(--ls-purple-soft) ${porcentaje}%)`;
         }
 
         if (btnAddPausa) {
@@ -322,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
             item.innerHTML = `
                 <div class="d-flex align-items-center">
                     <i class="fa-solid fa-circle-check text-purple me-2"></i>
-                    <span class="text-white fw-medium subtexto-fluido">Pausa #${numPausa}</span>
+                    <span class="fw-medium subtexto-fluido">Pausa #${numPausa}</span>
                 </div>
                 <span class="text-subtle small">${horaTexto}</span>
             `;
