@@ -36,7 +36,6 @@ try {
         $fechaInicio = $hoy->modify('first day of January this year');
     }
 
-    // 1. Obtener hábitos activos del usuario
     $consultaHabitos = $db->prepare(
         "SELECT hu.id_habito_usuario, h.id_categoria, h.nombre_habito, h.es_base,
                 c.nombre AS nombre_categoria, hu.objetivo, hu.frecuencia, hu.fecha_inicio, hu.fecha_fin
@@ -48,7 +47,6 @@ try {
     $consultaHabitos->execute([':id_usuario' => $idUsuario]);
     $habitos = $consultaHabitos->fetchAll(PDO::FETCH_ASSOC);
 
-    // 2. Registros reales de la BD dentro del rango seleccionado
     $consultaRegistros = $db->prepare(
         "SELECT r.id_habito_usuario, DATE(r.fecha_registro) AS fecha, SUM(r.valor_registrado) AS total_dia
          FROM registros_habitos r
@@ -64,20 +62,17 @@ try {
     ]);
     $registrosBD = $consultaRegistros->fetchAll(PDO::FETCH_ASSOC);
 
-    // Mapear registros por [id_habito_usuario][fecha]
     $matrizRegistros = [];
     foreach ($registrosBD as $reg) {
         $matrizRegistros[(int)$reg['id_habito_usuario']][$reg['fecha']] = (float)$reg['total_dia'];
     }
 
-    // 3. Días específicos para hábitos con frecuencia personalizada
     $diasPersonalizados = [];
     $consultaDias = $db->query("SELECT id_habito_usuario, dia_semana FROM habito_dias");
     foreach ($consultaDias->fetchAll(PDO::FETCH_ASSOC) as $dia) {
         $diasPersonalizados[(int)$dia['id_habito_usuario']][] = (int)$dia['dia_semana'];
     }
 
-    // 4. Calcular datos de la gráfica día por día
     $grafica = [];
     $cursor = $fechaInicio;
     $totalCompletadosPeriodo = 0;
@@ -91,12 +86,10 @@ try {
         foreach ($habitos as $habito) {
             $idHU = (int)$habito['id_habito_usuario'];
 
-            // Comprobar rango de fechas activas
             if ($habito['fecha_inicio'] > $fechaStr || ($habito['fecha_fin'] !== null && $habito['fecha_fin'] < $fechaStr)) {
                 continue;
             }
 
-            // Comprobar si correspondía realizar el hábito en este día
             $corresponde = $habito['frecuencia'] === 'diaria';
             if ($habito['frecuencia'] === 'dias específicos' || $habito['frecuencia'] === 'personalizada') {
                 $corresponde = in_array($numDiaSemana, $diasPersonalizados[$idHU] ?? [], true);
@@ -124,7 +117,6 @@ try {
         $cursor = $cursor->modify('+1 day');
     }
 
-    // 5. Racha general desde BD
     $consultaRacha = $db->prepare(
         "SELECT COALESCE(racha_general_actual, 0) 
          FROM rachas_usuario 
@@ -133,11 +125,9 @@ try {
     $consultaRacha->execute([':id_usuario' => $idUsuario]);
     $diasRacha = (int) $consultaRacha->fetchColumn();
 
-    // 6. Progreso Promedio General
     $sumaPorcentajes = array_sum(array_column($grafica, 'porcentaje'));
     $progresoGeneral = count($grafica) > 0 ? round($sumaPorcentajes / count($grafica), 2) : 0;
 
-    // 7. Estadísticas por Categorías
     $consultaCategorias = $db->query("SELECT id_categoria, nombre FROM categorias ORDER BY id_categoria");
     $categoriasBD = $consultaCategorias->fetchAll(PDO::FETCH_ASSOC);
 
@@ -165,7 +155,6 @@ try {
         ];
     }
 
-    // 8. Hábitos Personalizados
     $habitosPersonalizados = [];
     foreach ($habitos as $h) {
         if (!(bool)$h['es_base']) {

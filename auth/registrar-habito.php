@@ -25,7 +25,6 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
-    // 1. Obtener la información del hábito
     $stmtHabito = $db->prepare("
         SELECT hu.*, h.nombre_habito 
         FROM habitos_usuario hu
@@ -43,13 +42,10 @@ try {
         throw new Exception('El hábito no existe o no está activo.');
     }
 
-    // ----------------------------------------------------------------------
-    // VALIDACIÓN: Verificar si hoy es un día permitido para registrar
-    // ----------------------------------------------------------------------
     $frecuencia = mb_strtolower(trim($habito['frecuencia']), 'UTF-8');
 
     if ($frecuencia === 'dias específicos' || $frecuencia === 'personalizada' || $frecuencia === 'personalizado') {
-        // En PHP: date('N') devuelve 1 para Lunes y 7 para Domingo
+   
         $diaHoy = (int) date('N');
 
         $stmtDia = $db->prepare("
@@ -75,7 +71,6 @@ try {
 
     $db->beginTransaction();
 
-    // 2. Insertar el registro individual
     $stmtInsert = $db->prepare("
         INSERT INTO registros_habitos (id_habito_usuario, fecha_registro, valor_registrado, observaciones)
         VALUES (:id, NOW(), :valor, :obs)
@@ -86,7 +81,6 @@ try {
         ':obs'   => $observaciones !== '' ? $observaciones : null
     ]);
 
-    // 3. Recalcular el progreso del día de hoy
     $stmtSum = $db->prepare("
         SELECT COALESCE(SUM(valor_registrado), 0) AS suma_hoy, COUNT(*) AS registros_hoy 
         FROM registros_habitos 

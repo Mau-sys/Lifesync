@@ -34,7 +34,6 @@ try {
         $accion = $_GET["accion"] ?? "";
 
         if ($accion === "listar") {
-            // CORREGIDO: Se agregó "AS nombre_categoria" para que coincida con la extracción posterior
             $consulta = $db->prepare(
                 "SELECT
                     r.id_recordatorio,
@@ -147,8 +146,6 @@ try {
                 ]);
                 exit;
             }
-
-            // CORREGIDO: Se ajustaron los marcadores en VALUES a :fecha_recordatorio
             $consulta = $db->prepare(
                 "INSERT INTO recordatorios (
                     id_usuario,
@@ -190,7 +187,6 @@ try {
         }
 
         if ($accion === "eliminar") {
-            // Se acepta tanto 'id' como 'id_recordatorio' por compatibilidad
             $idRecordatorio = (int) ($datos["id"] ?? $datos["id_recordatorio"] ?? 0);
 
             if ($idRecordatorio <= 0) {

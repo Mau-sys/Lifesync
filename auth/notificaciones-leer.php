@@ -33,11 +33,9 @@ try {
     $database = new Database();
     $db = $database->getConnection();
     
-    // Obtener posible JSON enviado
     $input = file_get_contents("php://input");
     $datos = json_decode($input, true);
     
-    // Convertir el ID a entero (si es un id de recordatorio como "rec_1", (int) dará 0)
     $idNotificacion = isset($datos["id_notificacion"]) ? (int) $datos["id_notificacion"] : 0;
 
     if ($idNotificacion > 0) {
@@ -52,7 +50,7 @@ try {
             ":id_usuario" => $usuarioId
         ]);
     } else {
-        // Si no se especifica ID o es un marcado general
+     
         $consulta = $db->prepare(
             "UPDATE notificaciones
              SET leida = 1

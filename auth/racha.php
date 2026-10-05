@@ -28,7 +28,6 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
-    // 1. Obtener todos los hábitos activos del usuario
     $consulta = $db->prepare(
         "SELECT
             hu.id_habito_usuario,
@@ -64,7 +63,6 @@ try {
         ]);
     }
 
-    // Precargar días de hábitos personalizados
     $diasMap = [];
     $stmtDiasHabito = $db->prepare("SELECT dia_semana FROM habito_dias WHERE id_habito_usuario = :id_habito_usuario");
     foreach ($habitos as $habito) {
@@ -77,7 +75,6 @@ try {
     $hoy = new DateTimeImmutable('today');
     $fechaHoy = $hoy->format('Y-m-d');
 
-    // Función auxiliar para saber si un hábito se completó en una fecha dada
     $calcularProgresoHabito = function (int $idHU, string $unidadHabito, float $objetivo, string $fechaTexto) use ($db): bool {
         $stmtSum = $db->prepare("
             SELECT 
@@ -100,9 +97,6 @@ try {
         return $objetivo > 0 && $progreso >= $objetivo;
     };
 
-    // =========================================================================
-    // A. ACTUALIZAR RACHAS POR HÁBITO INDIVIDUAL (rachas_habito)
-    // =========================================================================
     $stmtRachaHabitoSelect = $db->prepare("SELECT racha_actual, mejor_racha, total_completados, ultima_fecha FROM rachas_habito WHERE id_habito_usuario = :id");
     $stmtRachaHabitoInsert = $db->prepare("
         INSERT INTO rachas_habito (id_habito_usuario, racha_actual, mejor_racha, total_completados, ultima_fecha)
@@ -117,13 +111,11 @@ try {
     foreach ($habitos as $habito) {
         $idHU = (int) $habito['id_habito_usuario'];
         
-        // Calcular historial del hábito para obtener racha y total
         $rachaHabito = 0;
         $mejorRachaHabito = 0;
         $totalCompletadosHabito = 0;
         $ultimaFechaCompletado = null;
 
-        // Evaluar hasta 365 días atrás
         $rachaContando = true;
         for ($offset = 0; $offset < 365; $offset++) {
             $fechaEval = $hoy->modify("-$offset days");
@@ -150,7 +142,6 @@ try {
                         $rachaHabito++;
                     }
                 } else {
-                    // Si el día de hoy no ha terminado/completado, no rompe la racha actual aún si ayer cumplió
                     if ($offset === 0) {
                         continue;
                     }
@@ -158,13 +149,10 @@ try {
                 }
             }
         }
-
-        // Obtener mejor racha histórica del hábito
         $stmtRachaHabitoSelect->execute([':id' => $idHU]);
         $rachaGuardada = $stmtRachaHabitoSelect->fetch(PDO::FETCH_ASSOC);
         $mejorRachaHabito = max($rachaHabito, (int)($rachaGuardada['mejor_racha'] ?? 0));
 
-        // Guardar/Actualizar en la base de datos
         $stmtRachaHabitoInsert->execute([
             ':id' => $idHU,
             ':racha_actual' => $rachaHabito,
@@ -173,10 +161,6 @@ try {
             ':ultima_fecha' => $ultimaFechaCompletado
         ]);
     }
-
-    // =========================================================================
-    // B. EVALUAR Y GUARDAR DÍAS DE CONSTELACIÓN (100% de hábitos completados)
-    // =========================================================================
     $fechasCompletas = [];
     $stmtConstelacionInsert = $db->prepare("
         INSERT IGNORE INTO constelacion_dias (id_usuario, fecha) VALUES (:id_usuario, :fecha)
@@ -212,18 +196,12 @@ try {
 
         if ($esperados > 0 && $completados === $esperados) {
             $fechasCompletas[] = $fechaTexto;
-            // Guardar el día completado al 100% en la tabla constelacion_dias
             $stmtConstelacionInsert->execute([
                 ':id_usuario' => $idUsuario,
                 ':fecha' => $fechaTexto
             ]);
         }
     }
-
-    // =========================================================================
-    // C. ACTUALIZAR RACHA GENERAL DEL USUARIO (rachas_usuario)
-    // =========================================================================
-    // La racha general cuenta días consecutivos completando AL MENOS 1 hábito al día
     $diasConAlMenosUnHabito = [];
     $stmtDiasConActividad = $db->prepare("
         SELECT DISTINCT DATE(r.fecha_registro) as fecha_actividad
@@ -244,7 +222,6 @@ try {
         $offsetGeneral++;
     }
 
-    // Obtener mejor racha general histórica
     $stmtRachaUsuarioSelect = $db->prepare("SELECT mejor_racha_general FROM rachas_usuario WHERE id_usuario = :id_usuario");
     $stmtRachaUsuarioSelect->execute([':id_usuario' => $idUsuario]);
     $rachaUsuarioGuardada = $stmtRachaUsuarioSelect->fetch(PDO::FETCH_ASSOC);
@@ -267,16 +244,10 @@ try {
         ':ultima_fecha' => $ultimaFechaActividad
     ]);
 
-    // =========================================================================
-    // D. DATOS COMPLEMENTARIOS Y RESPUESTA JSON A FRONTIEND
-    // =========================================================================
-    
-    // Constelación actual (estrellas del mes)
     $constelacionActual = array_values(array_filter($fechasCompletas, function ($f) use ($hoy) {
         return str_starts_with($f, $hoy->format('Y-m'));
     }));
 
-    // Categorías del día
     $categoriasMap = [];
     $diaSemanaHoy = (int) $hoy->format('N');
 
@@ -310,7 +281,6 @@ try {
         ];
     }
 
-    // Hábitos completados hoy
     $habitosCompletadosHoy = 0;
     foreach ($habitos as $habito) {
         if ($calcularProgresoHabito((int)$habito['id_habito_usuario'], (string)$habito['unidad'], (float)$habito['objetivo'], $fechaHoy)) {
@@ -318,10 +288,8 @@ try {
         }
     }
 
-    // Días con registros en total
     $diasRegistrados = count($diasConAlMenosUnHabito);
 
-    // Historial de los últimos 12 meses
     $historial = [];
     for ($i = 0; $i < 12; $i++) {
         $mesEval = $hoy->modify("-$i months");
@@ -342,11 +310,9 @@ try {
             'dias_con_registro' => (int) $stmtHist->fetchColumn()
         ];
     }
-
-    // Devolver JSON usando los nuevos campos guardados
     responderRacha(true, 'Rachas sincronizadas y guardadas correctamente.', [
-        'racha_actual' => $rachaGeneralActual,       // Racha General (al menos 1 hábito/día)
-        'mejor_racha' => $mejorRachaGeneral,        // Récord General
+        'racha_actual' => $rachaGeneralActual,       
+        'mejor_racha' => $mejorRachaGeneral,        
         'habitos_completados' => $habitosCompletadosHoy,
         'dias_registrados' => $diasRegistrados,
         'constelacion_actual' => $constelacionActual,

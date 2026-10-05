@@ -30,8 +30,6 @@ try {
         throw new Exception('Hábito no encontrado.');
     }
 
-    // Normalización de la frecuencia para que coincida con el ENUM de MySQL:
-    // 'diaria', 'semanal', 'dias específicos', 'mensual'
     if (isset($entrada['frecuencia'])) {
         $frec = mb_strtolower(trim((string) $entrada['frecuencia']), 'UTF-8');
         if ($frec === 'diario' || $frec === 'diaria') {
@@ -65,7 +63,6 @@ try {
         }
     }
 
-    // Aceptar 'dias_activos' o 'dias' desde el JS
     $diasEntrada = null;
     if (array_key_exists('dias_activos', $entrada)) {
         $diasEntrada = $entrada['dias_activos'];
@@ -86,7 +83,6 @@ try {
         $stmt->execute($params);
     }
 
-    // Actualización de la tabla auxiliar de días (habito_dias)
     if ($diasEntrada !== null) {
         $db->prepare("DELETE FROM habito_dias WHERE id_habito_usuario = :id")->execute([':id' => $id]);
         

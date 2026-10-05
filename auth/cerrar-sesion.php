@@ -31,7 +31,6 @@ if (ini_get('session.use_cookies')) {
 }
 session_destroy();
 
-// Limpiar cookies de preferencias en caso de guardarse en PHP
 setcookie('lifesync_tema', '', time() - 3600, '/');
 setcookie('lifesync_idioma', '', time() - 3600, '/');
 

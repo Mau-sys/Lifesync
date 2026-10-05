@@ -50,7 +50,6 @@ try {
 
     $habito = null;
 
-    // Búsqueda por ID directo
     if ($idHabitoUsuario > 0) {
         $stmt = $db->prepare($selectFields . " WHERE hu.id_usuario = :usuario AND hu.id_habito_usuario = :id_hu LIMIT 1");
         $stmt->execute([':usuario' => $usuarioId, ':id_hu' => $idHabitoUsuario]);
@@ -101,7 +100,6 @@ try {
     $stmtDias->execute([':id' => $idHU]);
     $diasActivos = array_map('intval', $stmtDias->fetchAll(PDO::FETCH_COLUMN));
 
-    // AHORA CONSULTA LA NUEVA TABLA: rachas_habito
     $stmtRacha = $db->prepare("SELECT racha_actual, mejor_racha, total_completados, ultima_fecha FROM rachas_habito WHERE id_habito_usuario = :id LIMIT 1");
     $stmtRacha->execute([':id' => $idHU]);
     $racha = $stmtRacha->fetch(PDO::FETCH_ASSOC) ?: [

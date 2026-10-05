@@ -21,7 +21,6 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
-    // 1. Elimina ÚNICAMENTE los registros de HOY para el hábito correspondiente al usuario
     $stmt = $db->prepare("
         DELETE rh 
         FROM registros_habitos rh
@@ -36,7 +35,6 @@ try {
         ':usuario' => (int) $_SESSION['usuario_id']
     ]);
 
-    // 2. Limpia las estadísticas del día de hoy
     $stmtStats = $db->prepare("
         DELETE FROM estadisticas_habitos 
         WHERE id_habito_usuario = :id 

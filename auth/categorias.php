@@ -23,9 +23,6 @@ try {
     );
     $categorias = $consultaCategorias->fetchAll(PDO::FETCH_ASSOC);
 
-    // 2. Obtener hábitos activos del usuario
-    // Se elimina la restricción estricta de fecha_inicio <= CURDATE() para garantizar
-    // que los hábitos recién creados aparezcan de inmediato.
     $consultaHabitos = $db->prepare(
         'SELECT
             hu.id_habito_usuario,

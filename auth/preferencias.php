@@ -20,7 +20,6 @@ try {
 
     $metodo = $_SERVER['REQUEST_METHOD'];
 
-    // --- PETICIÓN GET: Cargar las categorías/hábitos activos del usuario ---
     if ($metodo === 'GET') {
         $stmt = $db->prepare(
             "SELECT h.id_categoria 
@@ -38,12 +37,10 @@ try {
         exit;
     }
 
-    // --- PETICIÓN POST: Sincronización general O Deshabilitación individual ---
     if ($metodo === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
         $accion = $input['accion'] ?? 'sincronizar';
 
-        // ACCIÓN A: Deshabilitar un hábito específico
         if ($accion === 'deshabilitar') {
             $idHabitoUsuario = isset($input['id_habito_usuario']) ? (int)$input['id_habito_usuario'] : 0;
 
@@ -80,17 +77,14 @@ try {
             exit;
         }
 
-        // ACCIÓN B: Guardar / Sincronizar selección masiva de categorías
         $categoriasSeleccionadas = $input['categorias'] ?? [];
 
         $db->beginTransaction();
 
-        // 1. Desactivar todos los hábitos actuales del usuario
         $stmtDesactivar = $db->prepare("UPDATE habitos_usuario SET activo = FALSE WHERE id_usuario = :id_usuario");
         $stmtDesactivar->execute([":id_usuario" => $usuarioId]);
 
         if (!empty($categoriasSeleccionadas)) {
-            // Obtener los id_habito base asociados a esas categorías
             $placeholders = implode(',', array_fill(0, count($categoriasSeleccionadas), '?'));
             
             $stmtHabitosBase = $db->prepare("SELECT id_habito, id_categoria FROM habitos WHERE id_categoria IN ($placeholders) AND es_base = TRUE");
@@ -100,17 +94,14 @@ try {
             foreach ($habitosBase as $habito) {
                 $idHabito = $habito['id_habito'];
 
-                // Verificar si ya existe la relación para este usuario
                 $stmtCheck = $db->prepare("SELECT id_habito_usuario FROM habitos_usuario WHERE id_usuario = ? AND id_habito = ?");
                 $stmtCheck->execute([$usuarioId, $idHabito]);
                 $idHabitoUsuario = $stmtCheck->fetchColumn();
 
                 if ($idHabitoUsuario) {
-                    // Si ya existe, lo reactivamos
                     $stmtUpdate = $db->prepare("UPDATE habitos_usuario SET activo = TRUE WHERE id_habito_usuario = ?");
                     $stmtUpdate->execute([$idHabitoUsuario]);
                 } else {
-                    // Si no existe, lo insertamos
                     $stmtInsert = $db->prepare("INSERT INTO habitos_usuario (id_usuario, id_habito, activo, objetivo, frecuencia) VALUES (?, ?, TRUE, 1, 'diaria')");
                     $stmtInsert->execute([$usuarioId, $idHabito]);
                 }

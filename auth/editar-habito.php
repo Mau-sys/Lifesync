@@ -23,7 +23,6 @@ $nombre = trim((string) ($datos["nombre_habito"] ?? $datos["nombre"] ?? ""));
 $descripcion = trim((string) ($datos["descripcion"] ?? $datos["objetivo_texto"] ?? ""));
 $objetivo = (float) ($datos["objetivo"] ?? 1);
 
-// Normalizar Frecuencia
 $frecuenciaRaw = strtolower(trim((string) ($datos["frecuencia"] ?? "diaria")));
 if ($frecuenciaRaw === "diario" || $frecuenciaRaw === "diaria") {
     $frecuenciaBD = "diaria";
@@ -35,7 +34,6 @@ if ($frecuenciaRaw === "diario" || $frecuenciaRaw === "diaria") {
     $frecuenciaBD = "dias específicos";
 }
 
-// Aceptar variantes de arreglo de días
 $diasEntrada = $datos["dias_activos"] ?? $datos["dias_semana"] ?? $datos["dias"] ?? null;
 
 try {
@@ -43,7 +41,6 @@ try {
     $db = $database->getConnection();
     $db->beginTransaction();
 
-    // Validar propiedad del hábito
     $stmtVer = $db->prepare("SELECT hu.id_habito FROM habitos_usuario hu WHERE hu.id_habito_usuario = :id_hu AND hu.id_usuario = :usuario LIMIT 1");
     $stmtVer->execute([":id_hu" => $idHabitoUsuario, ":usuario" => $usuarioId]);
     $idHabito = $stmtVer->fetchColumn();
@@ -58,11 +55,9 @@ try {
         $stmtH->execute([":nombre" => $nombre, ":descr" => $descripcion, ":id_h" => $idHabito]);
     }
 
-    // 2. Actualizar habitos_usuario
     $stmtHU = $db->prepare("UPDATE habitos_usuario SET objetivo = :objetivo, frecuencia = :frecuencia WHERE id_habito_usuario = :id_hu");
     $stmtHU->execute([":objetivo" => $objetivo, ":frecuencia" => $frecuenciaBD, ":id_hu" => $idHabitoUsuario]);
 
-    // 3. Actualizar habito_dias
     if ($diasEntrada !== null) {
         $db->prepare("DELETE FROM habito_dias WHERE id_habito_usuario = :id_hu")->execute([":id_hu" => $idHabitoUsuario]);
 

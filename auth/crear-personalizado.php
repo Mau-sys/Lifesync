@@ -22,7 +22,6 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
-    // Validar existencia del usuario
     $stmtVerificarUser = $db->prepare("SELECT id_usuario FROM usuario WHERE id_usuario = :id LIMIT 1");
     $stmtVerificarUser->execute([':id' => $usuarioId]);
     
@@ -36,14 +35,12 @@ try {
         exit;
     }
 
-    // Leer payload JSON o FormData POST
     $inputRaw = file_get_contents('php://input');
     $data = json_decode($inputRaw, true);
     if (!is_array($data)) {
         $data = $_POST;
     }
 
-    // Normalización de campos
     $nombre = trim((string)($data['nombre_habito'] ?? $data['nombre'] ?? ''));
     $descripcion = trim((string)($data['descripcion'] ?? 'Hábito personalizado'));
     $idCategoria = isset($data['id_categoria']) ? (int)$data['id_categoria'] : 0;
@@ -51,7 +48,6 @@ try {
     $objetivo = !empty($data['objetivo']) ? (float)$data['objetivo'] : 1.00;
     $unidad = trim((string)($data['unidad'] ?? 'completar'));
     
-    // Normalización de duración para evitar CHECK CONSTRAINT
     $duracionVal = isset($data['duracion_minutos']) ? (int)$data['duracion_minutos'] : 0;
     $duracionMinutos = ($duracionVal > 0) ? $duracionVal : null;
 
@@ -66,7 +62,6 @@ try {
 
     $db->beginTransaction();
 
-    // 1. Categoria válida
     if ($idCategoria <= 0) {
         $stmtCat = $db->prepare("SELECT id_categoria FROM categorias WHERE nombre LIKE '%personalizado%' OR nombre LIKE '%otro%' LIMIT 1");
         $stmtCat->execute();
@@ -78,7 +73,6 @@ try {
         }
     }
 
-    // 2. Insertar en habitos
     $stmtHabito = $db->prepare("
         INSERT INTO habitos (id_categoria, nombre_habito, descripcion, es_base, color, imagen_url) 
         VALUES (:id_cat, :nombre, :desc, 0, '#81C784', 'img/H-Perzona.png')
@@ -91,7 +85,6 @@ try {
 
     $idHabito = (int) $db->lastInsertId();
 
-    // 3. Insertar en habitos_usuario
     $stmtUsuario = $db->prepare("
         INSERT INTO habitos_usuario (
             id_usuario, id_habito, activo, objetivo, unidad, frecuencia, duracion_minutos, fecha_inicio, fecha_fin
